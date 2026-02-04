@@ -1,0 +1,52 @@
+# Source files (only ship dist/)
+src/
+
+# Test files
+*.test.ts
+*.test.js
+*.test.d.ts
+*.test.js.map
+*.test.d.ts.map
+
+# Test utilities
+__test-utils__/
+__fixtures__/
+__mocks__/
+
+# Development files
+*.log
+.env*
+.env.example
+coverage/
+.nyc_output/
+.sisyphus/
+
+# Build artifacts
+tsconfig.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation (keep README.md and LICENSE)
+# Note: README.md and LICENSE are in package.json "files" array
+
+# Misc
+node_modules/
+.npm/
+*.tgz
