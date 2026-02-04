@@ -29,7 +29,7 @@ This project is a TypeScript rewrite of [mcp-proxmox-server](https://github.com/
 - No permission checks → two-tier permission model (basic / elevated)
 
 **Developer Experience**:
-- `npx proxmox-mcp` just works
+- `npx @bldg-7/proxmox-mcp` just works
 - All 55 tool descriptions exposed via MCP `ListTools`
 - Rate limiter middleware included
 - Pino structured logging instead of `console.log`
@@ -48,11 +48,11 @@ This project is a TypeScript rewrite of [mcp-proxmox-server](https://github.com/
 ## Installation
 
 ```bash
-npm install proxmox-mcp
+npm install @bldg-7/proxmox-mcp
 # or
-pnpm add proxmox-mcp
+pnpm add @bldg-7/proxmox-mcp
 # or
-yarn add proxmox-mcp
+yarn add @bldg-7/proxmox-mcp
 ```
 
 ## Configuration
@@ -101,7 +101,7 @@ export PROXMOX_TOKEN_VALUE=abc123-def456-ghi789
 export PROXMOX_SSL_MODE=verify
 export PROXMOX_ALLOW_ELEVATED=true
 
-proxmox-mcp
+npx @bldg-7/proxmox-mcp
 ```
 
 ### Using with Claude Desktop
@@ -112,7 +112,8 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
 {
   "mcpServers": {
     "proxmox": {
-      "command": "proxmox-mcp",
+      "command": "npx",
+      "args": ["-y", "@bldg-7/proxmox-mcp"],
       "env": {
         "PROXMOX_HOST": "pve.example.com",
         "PROXMOX_USER": "root@pam",
@@ -988,7 +989,7 @@ All tools return structured responses following the MCP protocol:
 ### Building from Source
 
 ```bash
-git clone https://github.com/yourusername/proxmox-mcp.git
+git clone https://github.com/Bldg-7/proxmox-mcp.git
 cd proxmox-mcp
 pnpm install
 pnpm build

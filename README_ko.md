@@ -29,7 +29,7 @@ Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 55개 도구
 - 권한 체크 없음 → 2단계 권한 모델 (기본 / 관리자)
 
 **개발자 경험**:
-- `npx proxmox-mcp`로 바로 실행
+- `npx @bldg-7/proxmox-mcp`로 바로 실행
 - MCP `ListTools`를 통해 55개 도구 설명 자동 노출
 - Rate Limiter 미들웨어 내장
 - `console.log` 대신 Pino 구조화 로깅
@@ -48,11 +48,11 @@ Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 55개 도구
 ## 설치
 
 ```bash
-npm install proxmox-mcp
+npm install @bldg-7/proxmox-mcp
 # 또는
-pnpm add proxmox-mcp
+pnpm add @bldg-7/proxmox-mcp
 # 또는
-npx proxmox-mcp
+npx @bldg-7/proxmox-mcp
 ```
 
 ## 설정
@@ -110,7 +110,7 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
   "mcpServers": {
     "proxmox": {
       "command": "npx",
-      "args": ["-y", "proxmox-mcp"],
+      "args": ["-y", "@bldg-7/proxmox-mcp"],
       "env": {
         "PROXMOX_HOST": "pve.example.com",
         "PROXMOX_USER": "root@pam",
@@ -528,7 +528,7 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 ## 개발
 
 ```bash
-git clone https://github.com/yourusername/proxmox-mcp.git
+git clone https://github.com/Bldg-7/proxmox-mcp.git
 cd proxmox-mcp
 pnpm install
 pnpm build

@@ -1,5 +1,5 @@
 {
-  "name": "proxmox-mcp",
+  "name": "@bldg-7/proxmox-mcp",
   "version": "0.1.0",
   "description": "Proxmox MCP Server - TypeScript rewrite",
   "type": "module",
