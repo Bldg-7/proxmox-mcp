@@ -9,7 +9,12 @@ import {
   removeMountpointLxc,
   moveDiskVM,
   moveDiskLxc,
+  getNodeZfs,
+  getDiskSmart,
+  getNodeLvm,
+  getNodeDisks,
 } from './disk.js';
+import { sampleZfsData, noZfsPools, sampleLvmData, noLvmConfigured, sampleDiskList, emptyDiskList } from '../__fixtures__/disks.js';
 
 describe('addDiskVM', () => {
   it('requires elevated permissions', async () => {
@@ -632,6 +637,196 @@ describe('moveDiskLxc', () => {
       storage: 'local-lvm-2',
     });
 
-    expect(result.content[0].text).toContain('**Valid volumes**: rootfs, mp0, mp1, mp2, etc.');
+     expect(result.content[0].text).toContain('**Valid volumes**: rootfs, mp0, mp1, mp2, etc.');
+   });
+});
+
+describe('getDiskSmart', () => {
+  it('returns SMART data successfully', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig({ allowElevated: false });
+    const { sampleSmartData } = await import('../__fixtures__/disks.js');
+    client.request.mockResolvedValue(sampleSmartData);
+
+    const result = await getDiskSmart(client, config, {
+      node: 'pve1',
+      disk: '/dev/sda',
+    });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('💾');
+    expect(result.content[0].text).toContain('SMART Data');
+    expect(result.content[0].text).toContain('PASSED');
+    expect(result.content[0].text).toContain('Reallocated_Sector_Ct');
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/disks/smart?disk=%2Fdev%2Fsda');
+  });
+
+  it('returns health only when health_only=true', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig({ allowElevated: false });
+    const { sampleSmartData } = await import('../__fixtures__/disks.js');
+    client.request.mockResolvedValue(sampleSmartData);
+
+    const result = await getDiskSmart(client, config, {
+      node: 'pve1',
+      disk: '/dev/sda',
+      health_only: true,
+    });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('PASSED');
+    expect(result.content[0].text).not.toContain('Reallocated_Sector_Ct');
+  });
+
+  it('validates node name', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig({ allowElevated: false });
+
+    const result = await getDiskSmart(client, config, {
+      node: 'invalid@node',
+      disk: '/dev/sda',
+    });
+
+    expect(result.isError).toBe(true);
+  });
+
+  it('validates disk parameter is provided', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig({ allowElevated: false });
+
+    const result = await getDiskSmart(client, config, {
+      node: 'pve1',
+      disk: '',
+    });
+
+    expect(result.isError).toBe(true);
+  });
+});
+
+describe('getNodeLvm', () => {
+  it('returns LVM data successfully', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+    client.request.mockResolvedValue(sampleLvmData);
+
+    const result = await getNodeLvm(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('LVM');
+    expect(result.content[0].text).toContain('pve');
+    expect(result.content[0].text).toContain('data');
+  });
+
+  it('validates node name', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+
+    const result = await getNodeLvm(client, config, { node: '' });
+
+    expect(result.isError).toBe(true);
+  });
+
+  it('handles no LVM configured', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+    client.request.mockResolvedValue(noLvmConfigured);
+
+    const result = await getNodeLvm(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('No LVM');
+  });
+});
+
+describe('getNodeDisks', () => {
+  it('returns disk list successfully', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+    client.request.mockResolvedValue(sampleDiskList);
+
+    const result = await getNodeDisks(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('💿');
+    expect(result.content[0].text).toContain('pve1');
+    expect(result.content[0].text).toContain('Found 4 disk(s)');
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/disks/list');
+  });
+
+  it('passes optional parameters to API', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+    client.request.mockResolvedValue(sampleDiskList);
+
+    await getNodeDisks(client, config, {
+      node: 'pve1',
+      include_partitions: true,
+      skip_smart: true,
+      type: 'unused',
+    });
+
+    expect(client.request).toHaveBeenCalledWith(
+      '/nodes/pve1/disks/list',
+      'GET',
+      { 'include-partitions': true, skipsmart: true, type: 'unused' }
+    );
+  });
+
+  it('validates node name', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+
+    const result = await getNodeDisks(client, config, { node: 'invalid@node!' });
+
+    expect(result.isError).toBe(true);
+  });
+
+  it('handles empty disk list', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+    client.request.mockResolvedValue(emptyDiskList);
+
+    const result = await getNodeDisks(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('No disks found');
+  });
+});
+
+describe('getNodeZfs', () => {
+  it('returns ZFS pools successfully', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+    client.request.mockResolvedValue(sampleZfsData);
+
+    const result = await getNodeZfs(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('💾');
+    expect(result.content[0].text).toContain('ZFS Pools');
+    expect(result.content[0].text).toContain('pve1');
+    expect(result.content[0].text).toContain('rpool');
+    expect(result.content[0].text).toContain('tank');
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/disks/zfs');
+  });
+
+  it('validates node name', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+
+    const result = await getNodeZfs(client, config, { node: 'invalid@node!' });
+
+    expect(result.isError).toBe(true);
+  });
+
+  it('handles no ZFS pools', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+    client.request.mockResolvedValue(noZfsPools);
+
+    const result = await getNodeZfs(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('No ZFS pools found');
   });
 });

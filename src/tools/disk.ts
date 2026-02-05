@@ -4,6 +4,7 @@ import type { ToolResponse } from '../types/index.js';
 import {
   formatToolResponse,
   formatErrorResponse,
+  formatBytes,
 } from '../formatters/index.js';
 import { requireElevated } from '../middleware/index.js';
 import { validateNodeName, validateVMID, validateStorageName } from '../validators/index.js';
@@ -16,6 +17,10 @@ import {
   removeMountpointLxcSchema,
   moveDiskVmSchema,
   moveDiskLxcSchema,
+  getNodeLvmSchema,
+  getNodeDisksSchema,
+  getDiskSmartSchema,
+  getNodeZfsSchema,
 } from '../schemas/disk.js';
 import type {
   AddDiskVmInput,
@@ -26,6 +31,10 @@ import type {
   RemoveMountpointLxcInput,
   MoveDiskVmInput,
   MoveDiskLxcInput,
+  GetNodeLvmInput,
+  GetNodeDisksInput,
+  GetDiskSmartInput,
+  GetNodeZfsInput,
 } from '../schemas/disk.js';
 
 /**
@@ -359,5 +368,232 @@ export async function moveDiskLxc(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Move LXC Disk');
+  }
+}
+
+/**
+ * Get SMART data for a disk
+ * Does not require elevated permissions
+ */
+export async function getDiskSmart(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetDiskSmartInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getDiskSmartSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    let endpoint = `/nodes/${safeNode}/disks/smart?disk=${encodeURIComponent(validated.disk)}`;
+    if (validated.health_only) {
+      endpoint += '&health_only=1';
+    }
+
+    const result = await client.request(endpoint);
+
+    // If health_only is true, return only health status
+    if (validated.health_only) {
+      const health = (result as { health?: string }).health || 'UNKNOWN';
+      let output = `💾 **Disk Health Status**\n\n`;
+      output += `• **Disk**: ${validated.disk}\n`;
+      output += `• **Health**: ${health}\n`;
+      return formatToolResponse(output);
+    }
+
+    // Return full SMART data with attributes
+    const smartData = result as {
+      health?: string;
+      type?: string;
+      attributes?: Array<{
+        id: number;
+        name: string;
+        value: number;
+        worst: number;
+        threshold: number;
+        raw: string;
+      }>;
+    };
+
+    let output = `💾 **SMART Data**\n\n`;
+    output += `• **Disk**: ${validated.disk}\n`;
+    output += `• **Health**: ${smartData.health || 'UNKNOWN'}\n`;
+    output += `• **Type**: ${smartData.type || 'UNKNOWN'}\n\n`;
+
+    if (smartData.attributes && smartData.attributes.length > 0) {
+      output += `**SMART Attributes**:\n\n`;
+      output += `| ID | Name | Value | Worst | Threshold | Raw |\n`;
+      output += `|----|------|-------|-------|-----------|-----|\n`;
+      for (const attr of smartData.attributes) {
+        output += `| ${attr.id} | ${attr.name} | ${attr.value} | ${attr.worst} | ${attr.threshold} | ${attr.raw} |\n`;
+      }
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Disk SMART');
+  }
+}
+
+/**
+ * Get LVM information for a node
+ * Does not require elevated permissions
+ */
+export async function getNodeLvm(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeLvmInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeLvmSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const result = await client.request(`/nodes/${safeNode}/disks/lvm`);
+
+    const lvmData = result as {
+      leaf: boolean;
+      children?: Array<{
+        leaf: boolean;
+        name: string;
+        size: number;
+        free: number;
+        children?: Array<{
+          leaf: boolean;
+          name: string;
+          size: number;
+          free: number;
+        }>;
+      }>;
+    };
+
+    // Handle no LVM configured
+    if (!lvmData.children || lvmData.children.length === 0) {
+      let output = `📦 **LVM Configuration**\n\n`;
+      output += `• **Node**: ${safeNode}\n`;
+      output += `• **Status**: No LVM volume groups configured\n`;
+      return formatToolResponse(output);
+    }
+
+    // Format LVM tree structure
+    let output = `📦 **LVM Volume Groups**\n\n`;
+    output += `• **Node**: ${safeNode}\n\n`;
+
+    for (const vg of lvmData.children) {
+      output += `**Volume Group: ${vg.name}**\n`;
+      output += `  • Size: ${(vg.size / (1024 ** 3)).toFixed(2)} GB\n`;
+      output += `  • Free: ${(vg.free / (1024 ** 3)).toFixed(2)} GB\n`;
+      output += `  • Used: ${(((vg.size - vg.free) / vg.size) * 100).toFixed(1)}%\n`;
+
+      if (vg.children && vg.children.length > 0) {
+        output += `  • Physical Volumes:\n`;
+        for (const pv of vg.children) {
+          output += `    - ${pv.name}\n`;
+          output += `      Size: ${(pv.size / (1024 ** 3)).toFixed(2)} GB\n`;
+        }
+      }
+      output += `\n`;
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node LVM');
+  }
+}
+
+/**
+ * Get ZFS pools on a node
+ * Read-only operation (no elevated permissions required)
+ */
+export async function getNodeZfs(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeZfsInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeZfsSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const pools = await client.request(`/nodes/${safeNode}/disks/zfs`);
+
+    if (!Array.isArray(pools) || pools.length === 0) {
+      return formatToolResponse(`💾 **ZFS Pools - ${safeNode}**\n\nNo ZFS pools found.`);
+    }
+
+    let output = `💾 **ZFS Pools - ${safeNode}**\n\n`;
+    output += `Found ${pools.length} pool(s):\n\n`;
+
+    for (const pool of pools) {
+      output += `---\n`;
+      output += `• **Name**: ${pool.name}\n`;
+      output += `• **Size**: ${formatBytes(pool.size)}\n`;
+      output += `• **Allocated**: ${formatBytes(pool.alloc)}\n`;
+      output += `• **Free**: ${formatBytes(pool.free)}\n`;
+      output += `• **Fragmentation**: ${pool.frag}%\n`;
+      output += `• **Dedup Ratio**: ${pool.dedup.toFixed(2)}x\n`;
+      output += `• **Health**: ${pool.health}\n`;
+      output += `\n`;
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node ZFS');
+  }
+}
+
+/**
+ * Get list of physical disks on a node
+ * Read-only operation (no elevated permissions required)
+ */
+export async function getNodeDisks(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeDisksInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeDisksSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const params: Record<string, unknown> = {};
+    if (validated.include_partitions !== undefined) {
+      params['include-partitions'] = validated.include_partitions;
+    }
+    if (validated.skip_smart !== undefined) {
+      params.skipsmart = validated.skip_smart;
+    }
+    if (validated.type !== undefined) {
+      params.type = validated.type;
+    }
+
+    let disks;
+    if (Object.keys(params).length > 0) {
+      disks = await client.request(
+        `/nodes/${safeNode}/disks/list`,
+        'GET',
+        params
+      );
+    } else {
+      disks = await client.request(`/nodes/${safeNode}/disks/list`);
+    }
+
+    if (!Array.isArray(disks) || disks.length === 0) {
+      return formatToolResponse(`💿 **Node Disks - ${safeNode}**\n\nNo disks found.`);
+    }
+
+    let output = `💿 **Node Disks - ${safeNode}**\n\n`;
+    output += `Found ${disks.length} disk(s):\n\n`;
+
+    for (const disk of disks) {
+      output += `---\n`;
+      output += `• **Device**: ${disk.devpath}\n`;
+      output += `• **Size**: ${formatBytes(disk.size)}\n`;
+      if (disk.model) output += `• **Model**: ${disk.vendor || ''} ${disk.model}\n`;
+      if (disk.serial) output += `• **Serial**: ${disk.serial}\n`;
+      output += `• **Used**: ${disk.used || 'unused'}\n`;
+      if (disk.health) output += `• **Health**: ${disk.health}\n`;
+      output += `\n`;
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Disks');
   }
 }
