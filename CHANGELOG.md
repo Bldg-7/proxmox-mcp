@@ -1,5 +1,11 @@
 # @bldg-7/proxmox-mcp
 
+## 0.1.2
+
+### Patch Changes
+
+- e056ec9: chore: upgrade Node.js requirement to v24 for npm provenance support
+
 ## 0.1.1
 
 ### Patch Changes
