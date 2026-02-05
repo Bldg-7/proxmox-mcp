@@ -1,7 +1,21 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createMockProxmoxClient, createTestConfig } from '../__test-utils__/index.js';
 import { sampleNodes } from '../__fixtures__/nodes.js';
-import { getNodes, getNodeStatus, getNodeNetwork, getNodeDns, getNetworkIface } from './node.js';
+import {
+  getNodes,
+  getNodeStatus,
+  getNodeNetwork,
+  getNodeDns,
+  getNetworkIface,
+  getNodeServices,
+  controlNodeService,
+  getNodeSyslog,
+  getNodeJournal,
+  getNodeTasks,
+  getNodeTask,
+  getNodeAplinfo,
+  getNodeNetstat,
+} from './node.js';
 
 describe('getNodes', () => {
   let client: ReturnType<typeof createMockProxmoxClient>;
@@ -466,5 +480,264 @@ describe('getNetworkIface', () => {
     await getNetworkIface(client, config, { node: 'pve1', iface: 'vmbr0' });
 
     expect(client.request).toHaveBeenCalledWith('/nodes/pve1/network/vmbr0');
+  });
+});
+
+describe('getNodeServices', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted list of services', async () => {
+    const config = createTestConfig();
+    const { sampleNodeServices } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleNodeServices);
+
+    const result = await getNodeServices(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Node Services');
+    expect(result.content[0].text).toContain('pveproxy');
+    expect(result.content[0].text).toContain('sshd');
+  });
+
+  it('handles empty service list', async () => {
+    const config = createTestConfig();
+    client.request.mockResolvedValue([]);
+
+    const result = await getNodeServices(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('No services found');
+  });
+});
+
+describe('controlNodeService', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('requires elevated permissions', async () => {
+    const config = createTestConfig({ allowElevated: false });
+
+    const result = await controlNodeService(client, config, {
+      node: 'pve1',
+      service: 'pveproxy',
+      command: 'restart',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Permission Denied');
+  });
+
+  it('issues service control command', async () => {
+    const config = createTestConfig({ allowElevated: true });
+    client.request.mockResolvedValue('UPID:pve1:0002E0B4:0000001D:64A539CB:service:root@pam:');
+
+    const result = await controlNodeService(client, config, {
+      node: 'pve1',
+      service: 'pveproxy',
+      command: 'restart',
+    });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Service Command Issued');
+    expect(result.content[0].text).toContain('restart');
+    expect(client.request).toHaveBeenCalledWith(
+      '/nodes/pve1/services/pveproxy',
+      'POST',
+      { command: 'restart' }
+    );
+  });
+});
+
+describe('getNodeSyslog', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted syslog entries', async () => {
+    const config = createTestConfig();
+    const { sampleSyslogEntries } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleSyslogEntries);
+
+    const result = await getNodeSyslog(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('System Log');
+    expect(result.content[0].text).toContain('kernel');
+  });
+
+  it('calls correct API endpoint', async () => {
+    const config = createTestConfig();
+    const { sampleSyslogEntries } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleSyslogEntries);
+
+    await getNodeSyslog(client, config, { node: 'pve1' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/syslog');
+  });
+});
+
+describe('getNodeJournal', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted journal entries', async () => {
+    const config = createTestConfig();
+    const { sampleJournalEntries } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleJournalEntries);
+
+    const result = await getNodeJournal(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Systemd Journal');
+    expect(result.content[0].text).toContain('PVE API Proxy');
+  });
+
+  it('calls correct API endpoint', async () => {
+    const config = createTestConfig();
+    const { sampleJournalEntries } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleJournalEntries);
+
+    await getNodeJournal(client, config, { node: 'pve1' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/journal');
+  });
+});
+
+describe('getNodeTasks', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted node tasks', async () => {
+    const config = createTestConfig();
+    const { sampleNodeTasks } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleNodeTasks);
+
+    const result = await getNodeTasks(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Node Tasks');
+    expect(result.content[0].text).toContain('qmstart');
+    expect(result.content[0].text).toContain('UPID');
+  });
+
+  it('calls correct API endpoint', async () => {
+    const config = createTestConfig();
+    const { sampleNodeTasks } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleNodeTasks);
+
+    await getNodeTasks(client, config, { node: 'pve1' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/tasks');
+  });
+});
+
+describe('getNodeTask', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted task details', async () => {
+    const config = createTestConfig();
+    const { sampleNodeTasks } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleNodeTasks[0]);
+
+    const result = await getNodeTask(client, config, {
+      node: 'pve1',
+      upid: sampleNodeTasks[0].upid,
+    });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Task Details');
+    expect(result.content[0].text).toContain('UPID');
+    expect(result.content[0].text).toContain('qmstart');
+  });
+
+  it('calls correct API endpoint', async () => {
+    const config = createTestConfig();
+    const { sampleNodeTasks } = await import('../__fixtures__/node-management.js');
+    const upid = sampleNodeTasks[0].upid;
+    client.request.mockResolvedValue(sampleNodeTasks[0]);
+
+    await getNodeTask(client, config, { node: 'pve1', upid });
+
+    expect(client.request).toHaveBeenCalledWith(`/nodes/pve1/tasks/${upid}`);
+  });
+});
+
+describe('getNodeAplinfo', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted appliance templates', async () => {
+    const config = createTestConfig();
+    const { sampleApplianceTemplates } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleApplianceTemplates);
+
+    const result = await getNodeAplinfo(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Appliance Templates');
+    expect(result.content[0].text).toContain('debian-12-standard');
+  });
+
+  it('calls correct API endpoint', async () => {
+    const config = createTestConfig();
+    const { sampleApplianceTemplates } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleApplianceTemplates);
+
+    await getNodeAplinfo(client, config, { node: 'pve1' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/aplinfo');
+  });
+});
+
+describe('getNodeNetstat', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted netstat entries', async () => {
+    const config = createTestConfig();
+    const { sampleNetstatEntries } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleNetstatEntries);
+
+    const result = await getNodeNetstat(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Network Connections');
+    expect(result.content[0].text).toContain('tcp');
+    expect(result.content[0].text).toContain('sshd');
+  });
+
+  it('calls correct API endpoint', async () => {
+    const config = createTestConfig();
+    const { sampleNetstatEntries } = await import('../__fixtures__/node-management.js');
+    client.request.mockResolvedValue(sampleNetstatEntries);
+
+    await getNodeNetstat(client, config, { node: 'pve1' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/netstat');
   });
 });

@@ -1,27 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { ProxmoxApiClient } from '../client/proxmox.js';
-import type { Config } from '../config/index.js';
+import { describe, it, expect } from 'vitest';
+import { createMockProxmoxClient, createTestConfig } from '../__test-utils__/index.js';
 import { listTemplates, createLxc, createVM } from './vm-create.js';
-
-function createMockProxmoxClient(): ProxmoxApiClient {
-  return {
-    request: vi.fn(),
-  } as unknown as ProxmoxApiClient;
-}
-
-function createTestConfig(overrides?: Partial<Config>): Config {
-  return {
-    allowElevated: true,
-    ...overrides,
-  } as Config;
-}
 
 describe('VM Creation Tools', () => {
   describe('listTemplates', () => {
     it('lists available templates', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue([
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue([
         {
           volid: 'local:vztmpl/debian-12-standard_12.2-1_amd64.tar.gz',
           size: 314572800,
@@ -45,8 +31,8 @@ describe('VM Creation Tools', () => {
 
     it('handles empty template list', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue([]);
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue([]);
 
       const result = await listTemplates(client, config, {
         node: 'pve1',
@@ -60,7 +46,7 @@ describe('VM Creation Tools', () => {
 
     it('validates node name', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
+      const config = createTestConfig({ allowElevated: true });
 
       const result = await listTemplates(client, config, {
         node: 'invalid@node',
@@ -73,7 +59,7 @@ describe('VM Creation Tools', () => {
 
     it('validates storage name', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
+      const config = createTestConfig({ allowElevated: true });
 
       const result = await listTemplates(client, config, {
         node: 'pve1',
@@ -102,8 +88,8 @@ describe('VM Creation Tools', () => {
 
     it('generates password if not provided', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await createLxc(client, config, {
         node: 'pve1',
@@ -119,8 +105,8 @@ describe('VM Creation Tools', () => {
 
     it('uses provided password', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await createLxc(client, config, {
         node: 'pve1',
@@ -136,8 +122,8 @@ describe('VM Creation Tools', () => {
 
     it('creates container with custom hostname', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await createLxc(client, config, {
         node: 'pve1',
@@ -157,7 +143,7 @@ describe('VM Creation Tools', () => {
 
     it('validates VM ID', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
+      const config = createTestConfig({ allowElevated: true });
 
       const result = await createLxc(client, config, {
         node: 'pve1',
@@ -186,8 +172,8 @@ describe('VM Creation Tools', () => {
 
     it('creates VM with minimal config', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await createVM(client, config, {
         node: 'pve1',
@@ -203,8 +189,8 @@ describe('VM Creation Tools', () => {
 
     it('creates VM with custom config', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await createVM(client, config, {
         node: 'pve1',
@@ -230,8 +216,8 @@ describe('VM Creation Tools', () => {
 
     it('handles disk size with various formats', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await createVM(client, config, {
         node: 'pve1',
@@ -245,7 +231,7 @@ describe('VM Creation Tools', () => {
 
     it('validates VM ID', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
+      const config = createTestConfig({ allowElevated: true });
 
       const result = await createVM(client, config, {
         node: 'pve1',

@@ -44,3 +44,62 @@ export const getNetworkIfaceSchema = z.object({
 });
 
 export type GetNetworkIfaceInput = z.infer<typeof getNetworkIfaceSchema>;
+
+// proxmox_get_node_services - List services on a node
+export const getNodeServicesSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetNodeServicesInput = z.infer<typeof getNodeServicesSchema>;
+
+// proxmox_control_node_service - Start/stop/restart a service on a node
+export const controlNodeServiceSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+  service: z.string().min(1).describe('Service name (e.g., pveproxy, ssh, pvedaemon)'),
+  command: z.enum(['start', 'stop', 'restart']).describe('Service command'),
+});
+
+export type ControlNodeServiceInput = z.infer<typeof controlNodeServiceSchema>;
+
+// proxmox_get_node_syslog - Read syslog for a node
+export const getNodeSyslogSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetNodeSyslogInput = z.infer<typeof getNodeSyslogSchema>;
+
+// proxmox_get_node_journal - Read systemd journal for a node
+export const getNodeJournalSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetNodeJournalInput = z.infer<typeof getNodeJournalSchema>;
+
+// proxmox_get_node_tasks - List node tasks
+export const getNodeTasksSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetNodeTasksInput = z.infer<typeof getNodeTasksSchema>;
+
+// proxmox_get_node_task - Get status/log for a specific task
+export const getNodeTaskSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+  upid: z.string().min(1).describe('Task UPID'),
+});
+
+export type GetNodeTaskInput = z.infer<typeof getNodeTaskSchema>;
+
+// proxmox_get_node_aplinfo - List available appliance templates
+export const getNodeAplinfoSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetNodeAplinfoInput = z.infer<typeof getNodeAplinfoSchema>;
+
+// proxmox_get_node_netstat - Network statistics for a node
+export const getNodeNetstatSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetNodeNetstatInput = z.infer<typeof getNodeNetstatSchema>;

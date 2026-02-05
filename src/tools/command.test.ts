@@ -1,20 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { ProxmoxApiClient } from '../client/proxmox.js';
-import type { Config } from '../config/index.js';
+import { describe, it, expect } from 'vitest';
+import { createMockProxmoxClient, createTestConfig } from '../__test-utils__/index.js';
 import { executeVMCommand } from './command.js';
-
-function createMockProxmoxClient(): ProxmoxApiClient {
-  return {
-    request: vi.fn(),
-  } as unknown as ProxmoxApiClient;
-}
-
-function createTestConfig(overrides?: Partial<Config>): Config {
-  return {
-    allowElevated: true,
-    ...overrides,
-  } as Config;
-}
 
 describe('Command Tools', () => {
   describe('executeVMCommand', () => {
@@ -34,8 +20,8 @@ describe('Command Tools', () => {
 
     it('executes command and returns PID', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue({ pid: 12345 });
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue({ pid: 12345 });
 
       const result = await executeVMCommand(client, config, {
         node: 'pve1',
@@ -52,8 +38,8 @@ describe('Command Tools', () => {
 
     it('executes command on LXC container', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue({ pid: 54321 });
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue({ pid: 54321 });
 
       const result = await executeVMCommand(client, config, {
         node: 'pve1',
@@ -71,7 +57,7 @@ describe('Command Tools', () => {
 
     it('validates command for dangerous characters', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
+      const config = createTestConfig({ allowElevated: true });
 
       const result = await executeVMCommand(client, config, {
         node: 'pve1',
@@ -85,7 +71,7 @@ describe('Command Tools', () => {
 
     it('rejects command with pipe character', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
+      const config = createTestConfig({ allowElevated: true });
 
       const result = await executeVMCommand(client, config, {
         node: 'pve1',
@@ -99,7 +85,7 @@ describe('Command Tools', () => {
 
     it('rejects command with backticks', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
+      const config = createTestConfig({ allowElevated: true });
 
       const result = await executeVMCommand(client, config, {
         node: 'pve1',
@@ -113,7 +99,7 @@ describe('Command Tools', () => {
 
     it('validates node name', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
+      const config = createTestConfig({ allowElevated: true });
 
       const result = await executeVMCommand(client, config, {
         node: 'invalid@node',
@@ -127,7 +113,7 @@ describe('Command Tools', () => {
 
     it('validates VM ID', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
+      const config = createTestConfig({ allowElevated: true });
 
       const result = await executeVMCommand(client, config, {
         node: 'pve1',

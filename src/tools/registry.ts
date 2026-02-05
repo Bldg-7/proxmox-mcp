@@ -10,6 +10,14 @@ import {
   getNodeNetwork,
   getNodeDns,
   getNetworkIface,
+  getNodeServices,
+  controlNodeService,
+  getNodeSyslog,
+  getNodeJournal,
+  getNodeTasks,
+  getNodeTask,
+  getNodeAplinfo,
+  getNodeNetstat,
   getClusterStatus,
   getNextVMID,
   getVMs,
@@ -78,6 +86,14 @@ import {
   getNodeNetworkSchema,
   getNodeDnsSchema,
   getNetworkIfaceSchema,
+  getNodeServicesSchema,
+  controlNodeServiceSchema,
+  getNodeSyslogSchema,
+  getNodeJournalSchema,
+  getNodeTasksSchema,
+  getNodeTaskSchema,
+  getNodeAplinfoSchema,
+  getNodeNetstatSchema,
   getClusterStatusSchema,
   getNextVmidSchema,
 } from '../schemas/node.js';
@@ -173,6 +189,19 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_get_cluster_status: { handler: getClusterStatus, schema: getClusterStatusSchema },
   proxmox_get_next_vmid: { handler: getNextVMID, schema: getNextVmidSchema },
 
+  // Node Management
+  proxmox_get_node_services: { handler: getNodeServices, schema: getNodeServicesSchema },
+  proxmox_control_node_service: {
+    handler: controlNodeService,
+    schema: controlNodeServiceSchema,
+  },
+  proxmox_get_node_syslog: { handler: getNodeSyslog, schema: getNodeSyslogSchema },
+  proxmox_get_node_journal: { handler: getNodeJournal, schema: getNodeJournalSchema },
+  proxmox_get_node_tasks: { handler: getNodeTasks, schema: getNodeTasksSchema },
+  proxmox_get_node_task: { handler: getNodeTask, schema: getNodeTaskSchema },
+  proxmox_get_node_aplinfo: { handler: getNodeAplinfo, schema: getNodeAplinfoSchema },
+  proxmox_get_node_netstat: { handler: getNodeNetstat, schema: getNodeNetstatSchema },
+
   // VM Query
   proxmox_get_vms: { handler: getVMs, schema: getVmsSchema },
   proxmox_get_vm_status: { handler: getVMStatus, schema: getVmStatusSchema },
@@ -254,10 +283,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 64 tools are registered
+// Validate all 72 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 64) {
+if (registeredCount !== 72) {
   throw new Error(
-    `Tool registry incomplete: expected 64 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 72 tools, got ${registeredCount}`
   );
 }

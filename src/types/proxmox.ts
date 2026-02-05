@@ -94,6 +94,53 @@ export interface ProxmoxTask {
   endtime?: number;
 }
 
+export interface ProxmoxService {
+  name?: string;
+  service?: string;
+  state?: string;
+  status?: string;
+  enabled?: number;
+  desc?: string;
+}
+
+export interface ProxmoxSyslogEntry {
+  n?: number;
+  t?: string;
+  msg?: string;
+  time?: number;
+  pri?: string;
+}
+
+export interface ProxmoxJournalEntry {
+  n?: number;
+  t?: string;
+  msg?: string;
+  time?: number;
+  pri?: string;
+}
+
+export interface ProxmoxApplianceTemplate {
+  template?: string;
+  package?: string;
+  version?: string;
+  type?: string;
+  os?: string;
+  description?: string;
+}
+
+export interface ProxmoxNetstatEntry {
+  proto?: string;
+  local_address?: string;
+  remote_address?: string;
+  local?: string;
+  remote?: string;
+  state?: string;
+  recvq?: number;
+  sendq?: number;
+  pid?: number;
+  program?: string;
+}
+
 export interface ProxmoxNetwork {
   iface: string;
   type: string;

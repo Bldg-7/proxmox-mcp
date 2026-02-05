@@ -23,6 +23,17 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_get_cluster_status: 'Get overall cluster status including nodes and resource usage',
   proxmox_get_next_vmid: 'Get the next available VM/Container ID number',
 
+  // Node Management
+  proxmox_get_node_services: 'List system services on a Proxmox node',
+  proxmox_control_node_service:
+    'Start/stop/restart a system service on a Proxmox node (requires elevated permissions)',
+  proxmox_get_node_syslog: 'Read syslog entries from a Proxmox node',
+  proxmox_get_node_journal: 'Read systemd journal entries from a Proxmox node',
+  proxmox_get_node_tasks: 'List recent tasks for a Proxmox node',
+  proxmox_get_node_task: 'Get status details for a specific Proxmox node task',
+  proxmox_get_node_aplinfo: 'List available appliance templates on a Proxmox node',
+  proxmox_get_node_netstat: 'Get network connection statistics for a Proxmox node',
+
   // VM Query
   proxmox_get_vms: 'List all virtual machines across the cluster with their status',
   proxmox_get_vm_status: 'Get detailed status information for a specific VM',
@@ -119,7 +130,8 @@ export function createServer(client: ProxmoxApiClient, config: Config): Server {
     const jsonSchema = toJsonSchemaCompat(entry.schema) as Record<string, unknown>;
 
     // $schema meta-property is not part of the MCP tool inputSchema spec
-    const { $schema: _$schema, ...inputSchema } = jsonSchema;
+    const { $schema, ...inputSchema } = jsonSchema;
+    void $schema;
 
     return {
       name,

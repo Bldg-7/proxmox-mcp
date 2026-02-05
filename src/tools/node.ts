@@ -1,7 +1,15 @@
 import type { ProxmoxApiClient } from '../client/proxmox.js';
 import type { Config } from '../config/index.js';
 import type { ToolResponse } from '../types/index.js';
-import type { ProxmoxNode } from '../types/proxmox.js';
+import type {
+  ProxmoxNode,
+  ProxmoxService,
+  ProxmoxSyslogEntry,
+  ProxmoxJournalEntry,
+  ProxmoxTask,
+  ProxmoxApplianceTemplate,
+  ProxmoxNetstatEntry,
+} from '../types/proxmox.js';
 import {
   formatToolResponse,
   formatErrorResponse,
@@ -11,13 +19,26 @@ import {
   formatCpuPercent,
 } from '../formatters/index.js';
 import { requireElevated } from '../middleware/index.js';
-import { validateNodeName, validateInterfaceName } from '../validators/index.js';
+import {
+  validateNodeName,
+  validateInterfaceName,
+  validateServiceName,
+  validateUpid,
+} from '../validators/index.js';
 import {
   getNodesSchema,
   getNodeStatusSchema,
   getNodeNetworkSchema,
   getNodeDnsSchema,
   getNetworkIfaceSchema,
+  getNodeServicesSchema,
+  controlNodeServiceSchema,
+  getNodeSyslogSchema,
+  getNodeJournalSchema,
+  getNodeTasksSchema,
+  getNodeTaskSchema,
+  getNodeAplinfoSchema,
+  getNodeNetstatSchema,
 } from '../schemas/node.js';
 import type {
   GetNodesInput,
@@ -25,6 +46,14 @@ import type {
   GetNodeNetworkInput,
   GetNodeDnsInput,
   GetNetworkIfaceInput,
+  GetNodeServicesInput,
+  ControlNodeServiceInput,
+  GetNodeSyslogInput,
+  GetNodeJournalInput,
+  GetNodeTasksInput,
+  GetNodeTaskInput,
+  GetNodeAplinfoInput,
+  GetNodeNetstatInput,
 } from '../schemas/node.js';
 import type { ProxmoxNetwork, ProxmoxDNS } from '../types/proxmox.js';
 
@@ -229,5 +258,314 @@ export async function getNetworkIface(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Get Network Interface');
+  }
+}
+
+/**
+ * List services on a specific node.
+ * No elevated permissions required.
+ */
+export async function getNodeServices(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeServicesInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeServicesSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const services = (await client.request(
+      `/nodes/${safeNode}/services`
+    )) as ProxmoxService[];
+
+    if (services.length === 0) {
+      return formatToolResponse('No services found.');
+    }
+
+    let output = '🛠️  **Node Services**\n\n';
+    for (const service of services) {
+      const name = service.name || service.service || 'unknown';
+      const state = service.state || service.status || 'unknown';
+      const description = service.desc || 'N/A';
+      const enabled =
+        service.enabled === undefined
+          ? 'N/A'
+          : service.enabled === 1
+            ? 'Yes'
+            : 'No';
+
+      output += `• **${name}** (${state})\n`;
+      if (description !== 'N/A') {
+        output += `   • Description: ${description}\n`;
+      }
+      if (enabled !== 'N/A') {
+        output += `   • Enabled: ${enabled}\n`;
+      }
+      output += '\n';
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Services');
+  }
+}
+
+/**
+ * Start/stop/restart a service on a specific node.
+ * Requires elevated permissions.
+ */
+export async function controlNodeService(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ControlNodeServiceInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'control node service');
+
+    const validated = controlNodeServiceSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeService = validateServiceName(validated.service);
+
+    const result = await client.request(
+      `/nodes/${safeNode}/services/${safeService}`,
+      'POST',
+      { command: validated.command }
+    );
+
+    const output =
+      `🛠️  **Service Command Issued**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **Service**: ${safeService}\n` +
+      `• **Command**: ${validated.command}\n` +
+      `• **Task ID**: ${result || 'N/A'}\n`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    const err = error as Error;
+    if (err.message.includes('Permission denied')) {
+      return formatPermissionDenied('control node service');
+    }
+    return formatErrorResponse(err, 'Control Node Service');
+  }
+}
+
+/**
+ * Read syslog for a specific node.
+ * No elevated permissions required.
+ */
+export async function getNodeSyslog(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeSyslogInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeSyslogSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const entries = (await client.request(
+      `/nodes/${safeNode}/syslog`
+    )) as ProxmoxSyslogEntry[];
+
+    if (entries.length === 0) {
+      return formatToolResponse('No syslog entries found.');
+    }
+
+    let output = '📜 **System Log (Syslog)**\n\n';
+    entries.forEach((entry, index) => {
+      const line = entry.n ?? index + 1;
+      const message = entry.t || entry.msg || 'N/A';
+      const time = entry.time ? ` (${entry.time})` : '';
+      output += `• [${line}]${time} ${message}\n`;
+    });
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Syslog');
+  }
+}
+
+/**
+ * Read systemd journal for a specific node.
+ * No elevated permissions required.
+ */
+export async function getNodeJournal(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeJournalInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeJournalSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const entries = (await client.request(
+      `/nodes/${safeNode}/journal`
+    )) as ProxmoxJournalEntry[];
+
+    if (entries.length === 0) {
+      return formatToolResponse('No journal entries found.');
+    }
+
+    let output = '📚 **Systemd Journal**\n\n';
+    entries.forEach((entry, index) => {
+      const line = entry.n ?? index + 1;
+      const message = entry.t || entry.msg || 'N/A';
+      const time = entry.time ? ` (${entry.time})` : '';
+      output += `• [${line}]${time} ${message}\n`;
+    });
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Journal');
+  }
+}
+
+/**
+ * List tasks for a specific node.
+ * No elevated permissions required.
+ */
+export async function getNodeTasks(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeTasksInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeTasksSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const tasks = (await client.request(
+      `/nodes/${safeNode}/tasks`
+    )) as ProxmoxTask[];
+
+    if (tasks.length === 0) {
+      return formatToolResponse('No tasks found.');
+    }
+
+    let output = '📋 **Node Tasks**\n\n';
+    for (const task of tasks) {
+      const status = task.status || 'unknown';
+      const type = task.type || 'task';
+      output += `• **${type}** (${status})\n`;
+      if (task.id) output += `   • ID: ${task.id}\n`;
+      if (task.user) output += `   • User: ${task.user}\n`;
+      if (task.starttime !== undefined) output += `   • Start: ${task.starttime}\n`;
+      if (task.upid) output += `   • UPID: ${task.upid}\n`;
+      if (task.exitstatus) output += `   • Exit: ${task.exitstatus}\n`;
+      output += '\n';
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Tasks');
+  }
+}
+
+/**
+ * Get details for a specific node task.
+ * No elevated permissions required.
+ */
+export async function getNodeTask(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeTaskInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeTaskSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeUpid = validateUpid(validated.upid);
+
+    const task = (await client.request(
+      `/nodes/${safeNode}/tasks/${safeUpid}`
+    )) as ProxmoxTask;
+
+    let output = `📌 **Task Details**\n\n`;
+    output += `• **UPID**: ${task.upid || safeUpid}\n`;
+    output += `• **Type**: ${task.type || 'N/A'}\n`;
+    output += `• **Status**: ${task.status || 'N/A'}\n`;
+    if (task.exitstatus) output += `• **Exit Status**: ${task.exitstatus}\n`;
+    if (task.user) output += `• **User**: ${task.user}\n`;
+    if (task.starttime !== undefined) output += `• **Start Time**: ${task.starttime}\n`;
+    if (task.endtime !== undefined) output += `• **End Time**: ${task.endtime}\n`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Task');
+  }
+}
+
+/**
+ * List available appliance templates on a node.
+ * No elevated permissions required.
+ */
+export async function getNodeAplinfo(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeAplinfoInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeAplinfoSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const templates = (await client.request(
+      `/nodes/${safeNode}/aplinfo`
+    )) as ProxmoxApplianceTemplate[];
+
+    if (templates.length === 0) {
+      return formatToolResponse('No appliance templates found.');
+    }
+
+    let output = '📦 **Appliance Templates**\n\n';
+    for (const template of templates) {
+      const name = template.template || template.package || 'unknown';
+      const version = template.version || 'N/A';
+      const type = template.type || template.os || 'N/A';
+      output += `• **${name}**\n`;
+      if (type !== 'N/A') output += `   • Type: ${type}\n`;
+      if (version !== 'N/A') output += `   • Version: ${version}\n`;
+      if (template.description) output += `   • Description: ${template.description}\n`;
+      output += '\n';
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Appliance Templates');
+  }
+}
+
+/**
+ * Get network statistics for a node.
+ * No elevated permissions required.
+ */
+export async function getNodeNetstat(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeNetstatInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeNetstatSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const entries = (await client.request(
+      `/nodes/${safeNode}/netstat`
+    )) as ProxmoxNetstatEntry[];
+
+    if (entries.length === 0) {
+      return formatToolResponse('No network statistics found.');
+    }
+
+    let output = '📡 **Network Connections**\n\n';
+    for (const entry of entries) {
+      const proto = entry.proto || 'N/A';
+      const local = entry.local_address || entry.local || 'N/A';
+      const remote = entry.remote_address || entry.remote || 'N/A';
+      const state = entry.state || 'N/A';
+      output += `• **${proto}** ${local} → ${remote} (${state})\n`;
+      if (entry.pid !== undefined) output += `   • PID: ${entry.pid}\n`;
+      if (entry.program) output += `   • Program: ${entry.program}\n`;
+      output += '\n';
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Netstat');
   }
 }

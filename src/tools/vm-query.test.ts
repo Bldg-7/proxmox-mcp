@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import type { ProxmoxApiClient } from '../client/proxmox.js';
 import { createTestConfig } from '../__test-utils__/index.js';
-import { sampleQemuVMs, sampleLxcContainers, sampleAllVMs } from '../__fixtures__/vms.js';
+import { sampleQemuVMs, sampleLxcContainers } from '../__fixtures__/vms.js';
 import { sampleNodes } from '../__fixtures__/nodes.js';
 import { sampleStorage } from '../__fixtures__/storage.js';
 import { getVMs, getVMStatus, getStorage } from './vm-query.js';

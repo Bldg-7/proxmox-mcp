@@ -27,6 +27,56 @@ export function validateNodeName(node: unknown): string {
 }
 
 /**
+ * Validates a system service name.
+ * Allows alphanumeric characters, hyphens, underscores, dots, and @.
+ * Maximum length: 128 characters.
+ *
+ * @throws {Error} If service name is invalid
+ */
+export function validateServiceName(service: unknown): string {
+  if (!service || typeof service !== 'string') {
+    throw new Error('Service name is required and must be a string');
+  }
+
+  if (!/^[a-zA-Z0-9@._-]+$/.test(service)) {
+    throw new Error(
+      'Invalid service name format. Only alphanumeric, hyphens, underscores, dots, and @ allowed'
+    );
+  }
+
+  if (service.length > 128) {
+    throw new Error('Service name too long (max 128 characters)');
+  }
+
+  return service;
+}
+
+/**
+ * Validates a Proxmox task UPID.
+ * Allows alphanumeric characters, colons, hyphens, underscores, dots, and @.
+ * Maximum length: 512 characters.
+ *
+ * @throws {Error} If UPID is invalid
+ */
+export function validateUpid(upid: unknown): string {
+  if (!upid || typeof upid !== 'string') {
+    throw new Error('Task UPID is required and must be a string');
+  }
+
+  if (!/^[a-zA-Z0-9:._@-]+$/.test(upid)) {
+    throw new Error(
+      'Invalid task UPID format. Only alphanumeric, colons, hyphens, underscores, dots, and @ allowed'
+    );
+  }
+
+  if (upid.length > 512) {
+    throw new Error('Task UPID too long (max 512 characters)');
+  }
+
+  return upid;
+}
+
+/**
  * Validates a Proxmox VM ID.
  * Must be a number between 100 and 999999999.
  *

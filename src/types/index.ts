@@ -16,6 +16,11 @@ export type {
   ProxmoxFirewallRule,
   ProxmoxCertificate,
   ProxmoxDNS,
+  ProxmoxService,
+  ProxmoxSyslogEntry,
+  ProxmoxJournalEntry,
+  ProxmoxApplianceTemplate,
+  ProxmoxNetstatEntry,
   VMType,
   PermissionLevel,
 } from './proxmox.js';

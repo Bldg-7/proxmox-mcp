@@ -3,7 +3,7 @@
 > Complete reference for all available tools and planned Proxmox API integrations
 
 **Current Version**: 0.1.5  
-**Total Tools**: 64  
+**Total Tools**: 72  
 **Last Updated**: 2026-02-05
 
 ---
@@ -14,6 +14,7 @@
 - [Permission Model](#permission-model)
 - [Implemented Tools](#implemented-tools)
   - [Node & Cluster (7 tools)](#node--cluster-7-tools)
+  - [Node Management (8 tools)](#node-management-8-tools)
   - [VM Query (5 tools)](#vm-query-5-tools)
   - [VM Lifecycle (12 tools)](#vm-lifecycle-12-tools)
   - [VM Modify (4 tools)](#vm-modify-4-tools)
@@ -40,6 +41,7 @@ This document provides a complete reference for all tools available in the Proxm
 | Category | Count | Permission |
 |----------|-------|------------|
 | Node & Cluster | 7 | Mixed |
+| Node Management | 8 | Mixed |
 | VM Query | 5 | Basic |
 | VM Lifecycle | 12 | Elevated |
 | VM Modify | 4 | Elevated |
@@ -50,7 +52,7 @@ This document provides a complete reference for all tools available in the Proxm
 | Command Execution | 1 | Elevated |
 | VM Creation | 3 | Mixed |
 | Node Disk Query | 4 | Basic |
-| **Total** | **64** | |
+| **Total** | **72** | |
 
 ---
 
@@ -212,6 +214,192 @@ Get the next available VM/Container ID number.
 ```
 
 **Returns**: Next available VMID as integer.
+
+---
+
+### Node Management (8 tools)
+
+#### `proxmox_get_node_services`
+List system services on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/services` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+**Example**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+**Returns**: Service list including `name`, `state`, `enabled`, and description fields.
+
+---
+
+#### `proxmox_control_node_service` 🔒
+Start, stop, or restart a service on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/services/{service}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `service` | string | Yes | Service name (e.g., `pveproxy`, `ssh`, `pvedaemon`) |
+| `command` | string | Yes | `start`, `stop`, or `restart` |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "service": "pveproxy",
+  "command": "restart"
+}
+```
+
+---
+
+#### `proxmox_get_node_syslog`
+Read syslog entries on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/syslog` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+**Example**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+---
+
+#### `proxmox_get_node_journal`
+Read systemd journal entries on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/journal` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+**Example**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+---
+
+#### `proxmox_get_node_tasks`
+List recent tasks for a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/tasks` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+**Example**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+---
+
+#### `proxmox_get_node_task`
+Get status details for a specific node task.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/tasks/{upid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `upid` | string | Yes | Task UPID |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "upid": "UPID:pve1:0002E0B4:0000001D:64A539CB:qmstart:100:root@pam:"
+}
+```
+
+---
+
+#### `proxmox_get_node_aplinfo`
+List available appliance templates on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/aplinfo` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+**Example**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+---
+
+#### `proxmox_get_node_netstat`
+Get network connection statistics for a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/netstat` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+**Example**:
+```json
+{
+  "node": "pve1"
+}
+```
 
 ---
 
@@ -1139,19 +1327,6 @@ APIs that would significantly enhance functionality:
 | `/cluster/backup` | GET/POST/PUT/DELETE | Scheduled backup jobs |
 | `/cluster/replication` | GET/POST/PUT/DELETE | Storage replication jobs |
 | `/cluster/options` | GET/PUT | Cluster-wide options |
-
-#### Node Management
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/nodes/{node}/services` | GET | List node services |
-| `/nodes/{node}/services/{service}` | POST | Start/stop/restart services |
-| `/nodes/{node}/syslog` | GET | Read system log |
-| `/nodes/{node}/journal` | GET | Read systemd journal |
-| `/nodes/{node}/tasks` | GET | List node tasks |
-| `/nodes/{node}/tasks/{upid}` | GET | Get task status/log |
-| `/nodes/{node}/aplinfo` | GET | List available appliance templates |
-| `/nodes/{node}/netstat` | GET | Network statistics |
 
 #### VM/LXC Advanced
 

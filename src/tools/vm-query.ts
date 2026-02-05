@@ -32,7 +32,7 @@ export async function getVMs(
     const nodeFilter = validated.node;
     const typeFilter = validated.type || 'all';
 
-    let vms: VMWithType[] = [];
+    const vms: VMWithType[] = [];
 
     if (nodeFilter) {
       // Single node logic
@@ -298,7 +298,7 @@ export async function getStorage(
     const validated = getStorageSchema.parse(input);
     const nodeFilter = validated.node;
 
-    let storages: StorageWithNode[] = [];
+    const storages: StorageWithNode[] = [];
 
     if (nodeFilter) {
       // Single node logic

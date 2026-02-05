@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   validateNodeName,
+  validateServiceName,
+  validateUpid,
   validateVMID,
   validateCommand,
   validateStorageName,
@@ -38,6 +40,58 @@ describe('validateNodeName', () => {
   it('accepts max length name', () => {
     const maxName = 'a'.repeat(64);
     expect(validateNodeName(maxName)).toBe(maxName);
+  });
+});
+
+describe('validateServiceName', () => {
+  it('accepts valid service names', () => {
+    expect(validateServiceName('pveproxy')).toBe('pveproxy');
+    expect(validateServiceName('ssh')).toBe('ssh');
+    expect(validateServiceName('pve-ha-lrm')).toBe('pve-ha-lrm');
+    expect(validateServiceName('pvedaemon.service')).toBe('pvedaemon.service');
+    expect(validateServiceName('serial-getty@ttyS0')).toBe('serial-getty@ttyS0');
+  });
+
+  it('rejects non-string input', () => {
+    expect(() => validateServiceName(null)).toThrow('Service name is required');
+    expect(() => validateServiceName(undefined)).toThrow('Service name is required');
+    expect(() => validateServiceName(123)).toThrow('Service name is required');
+  });
+
+  it('rejects invalid characters', () => {
+    expect(() => validateServiceName('pve/proxy')).toThrow('Invalid service name format');
+    expect(() => validateServiceName('pve proxy')).toThrow('Invalid service name format');
+    expect(() => validateServiceName('pve;proxy')).toThrow('Invalid service name format');
+  });
+
+  it('rejects too long names', () => {
+    expect(() => validateServiceName('a'.repeat(129))).toThrow('too long');
+  });
+});
+
+describe('validateUpid', () => {
+  it('accepts valid UPIDs', () => {
+    expect(validateUpid('UPID:pve1:0002E0B4:0000001D:64A539CB:qmstart:100:root@pam:')).toBe(
+      'UPID:pve1:0002E0B4:0000001D:64A539CB:qmstart:100:root@pam:'
+    );
+    expect(validateUpid('UPID:pve-node_1:ABC123:00000001:5F09D2AB:vzdump:101:backup@pve:')).toBe(
+      'UPID:pve-node_1:ABC123:00000001:5F09D2AB:vzdump:101:backup@pve:'
+    );
+  });
+
+  it('rejects non-string input', () => {
+    expect(() => validateUpid(null)).toThrow('Task UPID is required');
+    expect(() => validateUpid(undefined)).toThrow('Task UPID is required');
+    expect(() => validateUpid(123)).toThrow('Task UPID is required');
+  });
+
+  it('rejects invalid characters', () => {
+    expect(() => validateUpid('UPID/pve1/123')).toThrow('Invalid task UPID format');
+    expect(() => validateUpid('UPID:pve1:123?bad')).toThrow('Invalid task UPID format');
+  });
+
+  it('rejects too long UPIDs', () => {
+    expect(() => validateUpid('a'.repeat(513))).toThrow('too long');
   });
 });
 

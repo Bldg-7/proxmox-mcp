@@ -1,6 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { ProxmoxApiClient } from '../client/proxmox.js';
-import type { Config } from '../config/index.js';
+import { describe, it, expect } from 'vitest';
+import { createMockProxmoxClient, createTestConfig } from '../__test-utils__/index.js';
 import {
   addNetworkVm,
   addNetworkLxc,
@@ -9,19 +8,6 @@ import {
   removeNetworkVm,
   removeNetworkLxc,
 } from './network.js';
-
-function createMockProxmoxClient(): ProxmoxApiClient {
-  return {
-    request: vi.fn(),
-  } as unknown as ProxmoxApiClient;
-}
-
-function createTestConfig(overrides?: Partial<Config>): Config {
-  return {
-    allowElevated: true,
-    ...overrides,
-  } as Config;
-}
 
 describe('Network Tools', () => {
   describe('addNetworkVm', () => {
@@ -42,8 +28,8 @@ describe('Network Tools', () => {
 
     it('adds network with minimal config', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await addNetworkVm(client, config, {
         node: 'pve1',
@@ -61,8 +47,8 @@ describe('Network Tools', () => {
 
     it('adds network with full config', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await addNetworkVm(client, config, {
         node: 'pve1',
@@ -84,7 +70,7 @@ describe('Network Tools', () => {
 
     it('validates network interface name', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
+      const config = createTestConfig({ allowElevated: true });
 
       const result = await addNetworkVm(client, config, {
         node: 'pve1',
@@ -99,7 +85,7 @@ describe('Network Tools', () => {
 
     it('validates bridge name', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
+      const config = createTestConfig({ allowElevated: true });
 
       const result = await addNetworkVm(client, config, {
         node: 'pve1',
@@ -131,8 +117,8 @@ describe('Network Tools', () => {
 
     it('adds network with minimal config', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await addNetworkLxc(client, config, {
         node: 'pve1',
@@ -150,8 +136,8 @@ describe('Network Tools', () => {
 
     it('adds network with IP and gateway', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await addNetworkLxc(client, config, {
         node: 'pve1',
@@ -188,8 +174,8 @@ describe('Network Tools', () => {
 
     it('updates network bridge', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any)
+      const config = createTestConfig({ allowElevated: true });
+      client.request
         .mockResolvedValueOnce({
           net0: 'model=virtio,bridge=vmbr0',
         })
@@ -209,8 +195,8 @@ describe('Network Tools', () => {
 
     it('returns error if network does not exist', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValueOnce({});
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValueOnce({});
 
       const result = await updateNetworkVm(client, config, {
         node: 'pve1',
@@ -242,8 +228,8 @@ describe('Network Tools', () => {
 
     it('updates network IP address', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any)
+      const config = createTestConfig({ allowElevated: true });
+      client.request
         .mockResolvedValueOnce({
           net0: 'name=eth0,bridge=vmbr0,ip=dhcp',
         })
@@ -279,8 +265,8 @@ describe('Network Tools', () => {
 
     it('removes network interface', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await removeNetworkVm(client, config, {
         node: 'pve1',
@@ -311,8 +297,8 @@ describe('Network Tools', () => {
 
     it('removes network interface', async () => {
       const client = createMockProxmoxClient();
-      const config = createTestConfig();
-      (client.request as any).mockResolvedValue('UPID:pve1:00001234');
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('UPID:pve1:00001234');
 
       const result = await removeNetworkLxc(client, config, {
         node: 'pve1',

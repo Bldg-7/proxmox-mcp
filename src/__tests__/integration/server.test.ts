@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { createServer } from '../../server.js';
 import { createMockProxmoxClient, createTestConfig } from '../../__test-utils__/index.js';
 import { TOOL_NAMES } from '../../types/tools.js';
@@ -30,7 +30,7 @@ describe('MCP Server Integration', () => {
   });
 
   describe('ListTools Handler', () => {
-    it('returns all 55 tools', async () => {
+    it('returns all 72 tools', async () => {
       const server = createServer(client, config);
 
       const handler = server._requestHandlers.get('tools/list');
@@ -40,7 +40,7 @@ describe('MCP Server Integration', () => {
       expect(response).toBeDefined();
       expect(response.tools).toBeDefined();
       expect(Array.isArray(response.tools)).toBe(true);
-      expect(response.tools).toHaveLength(64);
+      expect(response.tools).toHaveLength(72);
     });
 
     it('includes correct tool properties', async () => {
@@ -411,7 +411,7 @@ describe('MCP Server Integration', () => {
 
       const listHandler = server._requestHandlers.get('tools/list');
       const listResponse = await listHandler!({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
-      expect(listResponse.tools).toHaveLength(64);
+    expect(listResponse.tools).toHaveLength(72);
 
       const getNodesToolDef = listResponse.tools.find(
         (t: { name: string }) => t.name === 'proxmox_get_nodes'

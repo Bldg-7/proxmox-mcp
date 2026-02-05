@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { createMockProxmoxClient, createTestConfig } from '../__test-utils__/index.js';
 import {
   createBackupLxc,
