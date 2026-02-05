@@ -81,3 +81,36 @@ export const moveDiskLxcSchema = z.object({
 });
 
 export type MoveDiskLxcInput = z.infer<typeof moveDiskLxcSchema>;
+
+// proxmox_get_node_disks - Get list of disks on a node
+export const getNodeDisksSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+  include_partitions: z.boolean().optional().describe('Include partitions in listing'),
+  skip_smart: z.boolean().optional().describe('Skip SMART health checks (faster)'),
+  type: z.enum(['unused', 'journal_disks']).optional().describe('Filter by disk type'),
+});
+
+export type GetNodeDisksInput = z.infer<typeof getNodeDisksSchema>;
+
+// proxmox_get_disk_smart - Get SMART health information for a disk
+export const getDiskSmartSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+  disk: z.string().min(1).describe('Block device path (e.g., /dev/sda)'),
+  health_only: z.boolean().optional().describe('Only return health status'),
+});
+
+export type GetDiskSmartInput = z.infer<typeof getDiskSmartSchema>;
+
+// proxmox_get_node_lvm - Get LVM information for a node
+export const getNodeLvmSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetNodeLvmInput = z.infer<typeof getNodeLvmSchema>;
+
+// proxmox_get_node_zfs - Get ZFS information for a node
+export const getNodeZfsSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetNodeZfsInput = z.infer<typeof getNodeZfsSchema>;
