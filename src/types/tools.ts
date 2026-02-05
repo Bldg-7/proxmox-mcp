@@ -56,10 +56,13 @@ export const TOOL_NAMES = [
   'proxmox_update_network_lxc',
    'proxmox_remove_network_vm',
    'proxmox_remove_network_lxc',
-   'proxmox_get_node_disks',
-   'proxmox_get_disk_smart',
-   'proxmox_get_node_lvm',
-   'proxmox_get_node_zfs',
+    'proxmox_get_node_disks',
+    'proxmox_get_disk_smart',
+    'proxmox_get_node_lvm',
+    'proxmox_get_node_zfs',
+    'proxmox_get_node_network',
+    'proxmox_get_node_dns',
+    'proxmox_get_network_iface',
 ] as const;
 
 export type ToolName = (typeof TOOL_NAMES)[number];

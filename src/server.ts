@@ -17,6 +17,9 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   // Node & Cluster
   proxmox_get_nodes: 'List all Proxmox cluster nodes with their status and resources',
   proxmox_get_node_status: 'Get detailed status information for a specific Proxmox node',
+  proxmox_get_node_network: 'Get network interfaces for a specific Proxmox node',
+  proxmox_get_node_dns: 'Get DNS configuration for a specific Proxmox node',
+  proxmox_get_network_iface: 'Get details for a specific network interface on a Proxmox node',
   proxmox_get_cluster_status: 'Get overall cluster status including nodes and resource usage',
   proxmox_get_next_vmid: 'Get the next available VM/Container ID number',
 

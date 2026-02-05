@@ -7,6 +7,9 @@ import type { z } from 'zod';
 import {
   getNodes,
   getNodeStatus,
+  getNodeNetwork,
+  getNodeDns,
+  getNetworkIface,
   getClusterStatus,
   getNextVMID,
   getVMs,
@@ -72,6 +75,9 @@ import {
 import {
   getNodesSchema,
   getNodeStatusSchema,
+  getNodeNetworkSchema,
+  getNodeDnsSchema,
+  getNetworkIfaceSchema,
   getClusterStatusSchema,
   getNextVmidSchema,
 } from '../schemas/node.js';
@@ -161,6 +167,9 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   // Node & Cluster
   proxmox_get_nodes: { handler: getNodes, schema: getNodesSchema },
   proxmox_get_node_status: { handler: getNodeStatus, schema: getNodeStatusSchema },
+  proxmox_get_node_network: { handler: getNodeNetwork, schema: getNodeNetworkSchema },
+  proxmox_get_node_dns: { handler: getNodeDns, schema: getNodeDnsSchema },
+  proxmox_get_network_iface: { handler: getNetworkIface, schema: getNetworkIfaceSchema },
   proxmox_get_cluster_status: { handler: getClusterStatus, schema: getClusterStatusSchema },
   proxmox_get_next_vmid: { handler: getNextVMID, schema: getNextVmidSchema },
 
@@ -245,10 +254,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 61 tools are registered
+// Validate all 64 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 61) {
+if (registeredCount !== 64) {
   throw new Error(
-    `Tool registry incomplete: expected 61 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 64 tools, got ${registeredCount}`
   );
 }

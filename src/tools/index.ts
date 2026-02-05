@@ -1,5 +1,5 @@
 // Node & Cluster tools
-export { getNodes, getNodeStatus } from './node.js';
+export { getNodes, getNodeStatus, getNodeNetwork, getNodeDns, getNetworkIface } from './node.js';
 export { getClusterStatus, getNextVMID } from './cluster.js';
 
 // VM Query & Lifecycle tools
