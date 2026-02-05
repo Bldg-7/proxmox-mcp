@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-A comprehensive MCP server providing 55 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
+A comprehensive MCP server providing 64 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
 
 ## Credits & Background
 
@@ -23,20 +23,20 @@ This project is a TypeScript rewrite of [mcp-proxmox-server](https://github.com/
 - Giant switch statement (55 cases) → tool registry with handler/schema pairs
 
 **Quality**:
-- 0 tests → 373 tests (351 unit + 22 integration)
+- 0 tests → 405 tests (351 unit + 22 integration)
 - No input validation → Zod runtime validation on every tool call
 - Implicit error handling → structured MCP error responses with context
 - No permission checks → two-tier permission model (basic / elevated)
 
 **Developer Experience**:
 - `npx @bldg-7/proxmox-mcp` just works
-- All 55 tool descriptions exposed via MCP `ListTools`
+- All 64 tool descriptions exposed via MCP `ListTools`
 - Rate limiter middleware included
 - Pino structured logging instead of `console.log`
 
 ## Features
 
-- **55 comprehensive tools** for Proxmox management
+- **64 comprehensive tools** for Proxmox management
 - **Full TypeScript implementation** with strict type safety
 - **Support for both QEMU VMs and LXC containers**
 - **Secure authentication** (API token)
@@ -218,6 +218,44 @@ List all storage pools and their usage across the cluster.
   "node": "pve1"
 }
 ```
+
+---
+
+### VM/LXC Configuration Query (2 tools)
+
+#### `proxmox_get_vm_config`
+Get hardware configuration for a QEMU virtual machine.
+
+**Parameters**:
+- `node` (string): Node name where VM is located
+- `vmid` (number): VM ID number
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "vmid": 101
+}
+```
+
+**Returns**: CPU, memory, disks, network interfaces, boot order, and other VM settings.
+
+#### `proxmox_get_lxc_config`
+Get hardware configuration for an LXC container.
+
+**Parameters**:
+- `node` (string): Node name where container is located
+- `vmid` (number): Container ID number
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "vmid": 100
+}
+```
+
+**Returns**: CPU, memory, mount points, network interfaces, and other container settings.
 
 ---
 
@@ -893,6 +931,126 @@ Create a new QEMU virtual machine.
   "bridge": "vmbr0"
 }
 ```
+
+---
+
+### Node Disk Query (4 tools)
+
+#### `proxmox_get_node_disks`
+List physical disks on a Proxmox node.
+
+**Parameters**:
+- `node` (string): Node name
+- `type` (string, optional): Filter by disk type (`unused`, `journal_disks`)
+
+**Example**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+**Returns**: List of physical disks with device path, size, model, serial, and usage status.
+
+#### `proxmox_get_node_disk_smart`
+Get SMART health data for a specific disk.
+
+**Parameters**:
+- `node` (string): Node name
+- `disk` (string): Disk device path (e.g., `/dev/sda`)
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "disk": "/dev/sda"
+}
+```
+
+**Returns**: SMART health status, attributes, and disk diagnostics.
+
+#### `proxmox_get_node_lvm`
+List LVM volume groups and logical volumes on a node.
+
+**Parameters**:
+- `node` (string): Node name
+
+**Example**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+**Returns**: Volume groups with their logical volumes, sizes, and free space.
+
+#### `proxmox_get_node_zfs`
+List ZFS pools on a Proxmox node.
+
+**Parameters**:
+- `node` (string): Node name
+
+**Example**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+**Returns**: ZFS pools with health status, size, allocated/free space, and fragmentation.
+
+---
+
+### Node Network Query (3 tools)
+
+#### `proxmox_get_node_network`
+List network interfaces on a Proxmox node.
+
+**Parameters**:
+- `node` (string): Node name
+- `type` (string, optional): Filter by interface type (`bridge`, `bond`, `eth`, `alias`, `vlan`, `OVSBridge`, `OVSBond`, `OVSPort`, `OVSIntPort`, `any_bridge`, `any_local_bridge`)
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "type": "bridge"
+}
+```
+
+**Returns**: List of network interfaces with IP addresses, status, and configuration.
+
+#### `proxmox_get_node_dns`
+Get DNS configuration for a Proxmox node.
+
+**Parameters**:
+- `node` (string): Node name
+
+**Example**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+**Returns**: DNS servers (dns1, dns2, dns3) and search domain.
+
+#### `proxmox_get_network_iface`
+Get detailed configuration for a specific network interface.
+
+**Parameters**:
+- `node` (string): Node name
+- `iface` (string): Interface name (e.g., `vmbr0`, `eth0`)
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "iface": "vmbr0"
+}
+```
+
+**Returns**: Interface details including type, IP address, netmask, gateway, bridge ports, and active status.
 
 ---
 

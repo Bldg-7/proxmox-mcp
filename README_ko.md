@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 55개 도구를 제공하는 MCP 서버입니다.
+Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 64개 도구를 제공하는 MCP 서버입니다.
 
 ## 참고 프로젝트 & 개선사항
 
@@ -23,20 +23,20 @@ Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 55개 도구
 - 55개 case의 거대한 switch문 → handler/schema 쌍의 도구 레지스트리
 
 **품질**:
-- 테스트 0건 → 373건 (단위 351 + 통합 22)
+- 테스트 0건 → 405건 (단위 351 + 통합 22)
 - 입력 검증 없음 → 모든 도구 호출에 Zod 런타임 검증
 - 암묵적 에러 처리 → 컨텍스트를 포함한 구조화된 MCP 에러 응답
 - 권한 체크 없음 → 2단계 권한 모델 (기본 / 관리자)
 
 **개발자 경험**:
 - `npx @bldg-7/proxmox-mcp`로 바로 실행
-- MCP `ListTools`를 통해 55개 도구 설명 자동 노출
+- MCP `ListTools`를 통해 64개 도구 설명 자동 노출
 - Rate Limiter 미들웨어 내장
 - `console.log` 대신 Pino 구조화 로깅
 
 ## 주요 기능
 
-- **55개 관리 도구** - Proxmox 전 영역 커버
+- **64개 관리 도구** - Proxmox 전 영역 커버
 - **완전한 TypeScript 구현** - 엄격한 타입 안전성
 - **QEMU VM + LXC 컨테이너** 동시 지원
 - **보안 인증** - API 토큰
@@ -155,6 +155,44 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 ```json
 { "node": "pve1", "vmid": 100, "type": "qemu" }
 ```
+
+---
+
+### VM/LXC 구성 조회 (2개)
+
+#### `proxmox_get_vm_config`
+QEMU 가상머신의 하드웨어 구성을 조회합니다.
+
+**매개변수**:
+- `node` (string): 노드 이름
+- `vmid` (number): VM ID
+
+**예시**:
+```json
+{
+  "node": "pve1",
+  "vmid": 101
+}
+```
+
+**반환값**: CPU, 메모리, 디스크, 네트워크 인터페이스, 부팅 순서 및 기타 VM 설정.
+
+#### `proxmox_get_lxc_config`
+LXC 컨테이너의 하드웨어 구성을 조회합니다.
+
+**매개변수**:
+- `node` (string): 노드 이름
+- `vmid` (number): 컨테이너 ID
+
+**예시**:
+```json
+{
+  "node": "pve1",
+  "vmid": 100
+}
+```
+
+**반환값**: CPU, 메모리, 마운트 포인트, 네트워크 인터페이스 및 기타 컨테이너 설정.
 
 ---
 
@@ -459,6 +497,126 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
   "bridge": "vmbr0"
 }
 ```
+
+---
+
+### 노드 디스크 조회 (4개)
+
+#### `proxmox_get_node_disks`
+Proxmox 노드의 물리 디스크 목록을 조회합니다.
+
+**매개변수**:
+- `node` (string): 노드 이름
+- `type` (string, optional): 디스크 타입으로 필터링 (`unused`, `journal_disks`)
+
+**예시**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+**반환값**: 디바이스 경로, 크기, 모델, 시리얼 번호 및 사용 상태를 포함한 물리 디스크 목록.
+
+#### `proxmox_get_node_disk_smart`
+특정 디스크의 SMART 상태 데이터를 조회합니다.
+
+**매개변수**:
+- `node` (string): 노드 이름
+- `disk` (string): 디스크 디바이스 경로 (예: `/dev/sda`)
+
+**예시**:
+```json
+{
+  "node": "pve1",
+  "disk": "/dev/sda"
+}
+```
+
+**반환값**: SMART 상태, 속성 및 디스크 진단 정보.
+
+#### `proxmox_get_node_lvm`
+노드의 LVM 볼륨 그룹 및 논리 볼륨을 조회합니다.
+
+**매개변수**:
+- `node` (string): 노드 이름
+
+**예시**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+**반환값**: 논리 볼륨, 크기 및 여유 공간을 포함한 볼륨 그룹.
+
+#### `proxmox_get_node_zfs`
+Proxmox 노드의 ZFS 풀을 조회합니다.
+
+**매개변수**:
+- `node` (string): 노드 이름
+
+**예시**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+**반환값**: 상태, 크기, 할당/여유 공간 및 단편화를 포함한 ZFS 풀.
+
+---
+
+### 노드 네트워크 조회 (3개)
+
+#### `proxmox_get_node_network`
+Proxmox 노드의 네트워크 인터페이스 목록을 조회합니다.
+
+**매개변수**:
+- `node` (string): 노드 이름
+- `type` (string, optional): 인터페이스 타입으로 필터링 (`bridge`, `bond`, `eth`, `alias`, `vlan`, `OVSBridge`, `OVSBond`, `OVSPort`, `OVSIntPort`, `any_bridge`, `any_local_bridge`)
+
+**예시**:
+```json
+{
+  "node": "pve1",
+  "type": "bridge"
+}
+```
+
+**반환값**: IP 주소, 상태 및 설정을 포함한 네트워크 인터페이스 목록.
+
+#### `proxmox_get_node_dns`
+Proxmox 노드의 DNS 설정을 조회합니다.
+
+**매개변수**:
+- `node` (string): 노드 이름
+
+**예시**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+**반환값**: DNS 서버 (dns1, dns2, dns3) 및 검색 도메인.
+
+#### `proxmox_get_network_iface`
+특정 네트워크 인터페이스의 상세 설정을 조회합니다.
+
+**매개변수**:
+- `node` (string): 노드 이름
+- `iface` (string): 인터페이스 이름 (예: `vmbr0`, `eth0`)
+
+**예시**:
+```json
+{
+  "node": "pve1",
+  "iface": "vmbr0"
+}
+```
+
+**반환값**: 타입, IP 주소, 넷마스크, 게이트웨이, 브릿지 포트 및 활성 상태를 포함한 인터페이스 상세 정보.
 
 ---
 
