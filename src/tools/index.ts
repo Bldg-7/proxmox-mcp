@@ -3,7 +3,7 @@ export { getNodes, getNodeStatus } from './node.js';
 export { getClusterStatus, getNextVMID } from './cluster.js';
 
 // VM Query & Lifecycle tools
-export { getVMs, getVMStatus, getStorage } from './vm-query.js';
+export { getVMs, getVMStatus, getVMConfig, getLxcConfig, getStorage } from './vm-query.js';
 export {
   startLxc,
   startVM,

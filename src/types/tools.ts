@@ -3,6 +3,8 @@ export const TOOL_NAMES = [
   'proxmox_get_node_status',
   'proxmox_get_vms',
   'proxmox_get_vm_status',
+  'proxmox_get_vm_config',
+  'proxmox_get_lxc_config',
   'proxmox_execute_vm_command',
   'proxmox_get_storage',
   'proxmox_get_cluster_status',

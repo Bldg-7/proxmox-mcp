@@ -10,8 +10,8 @@ import {
   formatCpuPercent,
 } from '../formatters/index.js';
 import { validateNodeName, validateVMID } from '../validators/index.js';
-import { getVmsSchema, getVmStatusSchema, getStorageSchema } from '../schemas/vm.js';
-import type { GetVmsInput, GetVmStatusInput, GetStorageInput } from '../schemas/vm.js';
+import { getVmsSchema, getVmStatusSchema, getStorageSchema, getVmConfigSchema, getLxcConfigSchema } from '../schemas/vm.js';
+import type { GetVmsInput, GetVmStatusInput, GetStorageInput, GetVmConfigInput, GetLxcConfigInput } from '../schemas/vm.js';
 
 interface VMWithType extends ProxmoxVM {
   type: VMType;
@@ -155,6 +155,129 @@ export async function getVMStatus(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Get VM Status');
+  }
+}
+
+/**
+ * Get hardware configuration for a QEMU VM.
+ * Returns disks, network interfaces, CPU, memory settings.
+ * No elevated permissions required.
+ */
+export async function getVMConfig(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetVmConfigInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getVmConfigSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVMID = validateVMID(validated.vmid);
+
+    const vmConfig = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVMID}/config`
+    ) as Record<string, unknown>;
+
+    let output = `🖥️ **QEMU VM Configuration** (ID: ${safeVMID})\n\n`;
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Name**: ${vmConfig.name || 'N/A'}\n`;
+    output += `• **Memory**: ${vmConfig.memory || 'N/A'} MB\n`;
+    output += `• **CPU Cores**: ${vmConfig.cores || 1}\n`;
+    output += `• **CPU Sockets**: ${vmConfig.sockets || 1}\n`;
+    output += `• **OS Type**: ${vmConfig.ostype || 'N/A'}\n\n`;
+
+    // Disks
+    output += `**💿 Disks**:\n`;
+    const diskKeys = Object.keys(vmConfig).filter(k => 
+      /^(scsi|virtio|ide|sata)\d+$/.test(k)
+    ).sort();
+    if (diskKeys.length === 0) {
+      output += `  (none)\n`;
+    } else {
+      for (const key of diskKeys) {
+        output += `  • ${key}: ${vmConfig[key]}\n`;
+      }
+    }
+
+    // Network interfaces
+    output += `\n**🌐 Network Interfaces**:\n`;
+    const netKeys = Object.keys(vmConfig).filter(k => /^net\d+$/.test(k)).sort();
+    if (netKeys.length === 0) {
+      output += `  (none)\n`;
+    } else {
+      for (const key of netKeys) {
+        output += `  • ${key}: ${vmConfig[key]}\n`;
+      }
+    }
+
+    // Boot order
+    if (vmConfig.boot) {
+      output += `\n**🔄 Boot Order**: ${vmConfig.boot}\n`;
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get VM Config');
+  }
+}
+
+/**
+ * Get hardware configuration for an LXC container.
+ * Returns mount points, network interfaces, CPU, memory settings.
+ * No elevated permissions required.
+ */
+export async function getLxcConfig(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetLxcConfigInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getLxcConfigSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVMID = validateVMID(validated.vmid);
+
+    const lxcConfig = await client.request(
+      `/nodes/${safeNode}/lxc/${safeVMID}/config`
+    ) as Record<string, unknown>;
+
+    let output = `📦 **LXC Container Configuration** (ID: ${safeVMID})\n\n`;
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Hostname**: ${lxcConfig.hostname || 'N/A'}\n`;
+    output += `• **Memory**: ${lxcConfig.memory || 'N/A'} MB\n`;
+    output += `• **Swap**: ${lxcConfig.swap || 0} MB\n`;
+    output += `• **CPU Cores**: ${lxcConfig.cores || 'unlimited'}\n`;
+    output += `• **OS Type**: ${lxcConfig.ostype || 'N/A'}\n\n`;
+
+    // Root filesystem
+    if (lxcConfig.rootfs) {
+      output += `**💿 Root Filesystem**:\n`;
+      output += `  • rootfs: ${lxcConfig.rootfs}\n\n`;
+    }
+
+    // Mount points
+    output += `**📁 Mount Points**:\n`;
+    const mpKeys = Object.keys(lxcConfig).filter(k => /^mp\d+$/.test(k)).sort();
+    if (mpKeys.length === 0) {
+      output += `  (none)\n`;
+    } else {
+      for (const key of mpKeys) {
+        output += `  • ${key}: ${lxcConfig[key]}\n`;
+      }
+    }
+
+    // Network interfaces
+    output += `\n**🌐 Network Interfaces**:\n`;
+    const netKeys = Object.keys(lxcConfig).filter(k => /^net\d+$/.test(k)).sort();
+    if (netKeys.length === 0) {
+      output += `  (none)\n`;
+    } else {
+      for (const key of netKeys) {
+        output += `  • ${key}: ${lxcConfig[key]}\n`;
+      }
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get LXC Config');
   }
 }
 

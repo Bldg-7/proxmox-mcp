@@ -11,6 +11,8 @@ import {
   getNextVMID,
   getVMs,
   getVMStatus,
+  getVMConfig,
+  getLxcConfig,
   getStorage,
   startLxc,
   startVM,
@@ -72,6 +74,8 @@ import {
 import {
   getVmsSchema,
   getVmStatusSchema,
+  getVmConfigSchema,
+  getLxcConfigSchema,
   getStorageSchema,
   startLxcSchema,
   startVmSchema,
@@ -155,6 +159,8 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   // VM Query
   proxmox_get_vms: { handler: getVMs, schema: getVmsSchema },
   proxmox_get_vm_status: { handler: getVMStatus, schema: getVmStatusSchema },
+  proxmox_get_vm_config: { handler: getVMConfig, schema: getVmConfigSchema },
+  proxmox_get_lxc_config: { handler: getLxcConfig, schema: getLxcConfigSchema },
   proxmox_get_storage: { handler: getStorage, schema: getStorageSchema },
 
   // VM Lifecycle
@@ -227,10 +233,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 55 tools are registered
+// Validate all 57 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 55) {
+if (registeredCount !== 57) {
   throw new Error(
-    `Tool registry incomplete: expected 55 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 57 tools, got ${registeredCount}`
   );
 }

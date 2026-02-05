@@ -23,6 +23,22 @@ export const getVmStatusSchema = z.object({
 
 export type GetVmStatusInput = z.infer<typeof getVmStatusSchema>;
 
+// proxmox_get_vm_config - Get hardware configuration for a QEMU VM
+export const getVmConfigSchema = z.object({
+  node: z.string().min(1).describe('Node name where VM is located'),
+  vmid: z.coerce.number().describe('VM ID number'),
+});
+
+export type GetVmConfigInput = z.infer<typeof getVmConfigSchema>;
+
+// proxmox_get_lxc_config - Get hardware configuration for an LXC container
+export const getLxcConfigSchema = z.object({
+  node: z.string().min(1).describe('Node name where container is located'),
+  vmid: z.coerce.number().describe('Container ID number'),
+});
+
+export type GetLxcConfigInput = z.infer<typeof getLxcConfigSchema>;
+
 // proxmox_get_storage - List all storage pools
 export const getStorageSchema = z.object({
   node: z.string().optional().describe('Optional: filter by specific node'),
