@@ -3,7 +3,7 @@
 > 사용 가능한 모든 도구 및 계획된 Proxmox API 통합에 대한 완전한 레퍼런스
 
 **현재 버전**: 0.1.5  
-**총 도구 수**: 105  
+**총 도구 수**: 131  
 **최종 업데이트**: 2026-02-05
 
 ---
@@ -17,9 +17,10 @@
   - [노드 관리 (8개)](#노드-관리-8개)
   - [클러스터 관리 (33개)](#클러스터-관리-33개)
   - [VM 조회 (5개)](#vm-조회-5개)
-  - [VM 라이프사이클 (12개)](#vm-라이프사이클-12개)
-  - [VM 수정 (4개)](#vm-수정-4개)
-  - [스냅샷 (8개)](#스냅샷-8개)
+- [VM 라이프사이클 (12개)](#vm-라이프사이클-12개)
+- [VM 수정 (4개)](#vm-수정-4개)
+- [VM/LXC 고급 (26개)](#vmlxc-고급-26개)
+- [스냅샷 (8개)](#스냅샷-8개)
   - [백업 (6개)](#백업-6개)
   - [디스크 (8개)](#디스크-8개)
   - [VM/LXC 네트워크 (6개)](#vmlxc-네트워크-6개)
@@ -47,6 +48,7 @@
 | VM 조회 | 5 | 기본 |
 | VM 라이프사이클 | 12 | 관리자 |
 | VM 수정 | 4 | 관리자 |
+| VM/LXC 고급 | 26 | 혼합 |
 | 스냅샷 | 8 | 혼합 |
 | 백업 | 6 | 관리자 |
 | 디스크 | 8 | 관리자 |
@@ -54,7 +56,7 @@
 | 명령어 실행 | 1 | 관리자 |
 | VM 생성 | 3 | 혼합 |
 | 노드 디스크 조회 | 4 | 기본 |
-| **합계** | **105** | |
+| **합계** | **131** | |
 
 ---
 
@@ -1509,6 +1511,389 @@ QEMU VM의 CPU/메모리를 조정합니다.
 
 ---
 
+### VM/LXC 고급 (26개)
+
+마이그레이션, 템플릿 전환, 게스트 에이전트 명령, 방화벽 규칙, 성능 메트릭을 포함한 고급 VM/LXC 작업입니다.
+
+#### `proxmox_migrate_vm` 🔒
+QEMU VM을 다른 노드로 마이그레이션합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 관리자 |
+| API 엔드포인트 | `POST /api2/json/nodes/{node}/qemu/{vmid}/migrate` |
+
+**매개변수**:
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `node` | string | 예 | 소스 노드 이름 |
+| `vmid` | number | 예 | VM ID |
+| `target` | string | 예 | 대상 노드 이름 |
+| `online` | boolean | 아니오 | 라이브 마이그레이션 |
+| `force` | boolean | 아니오 | 강제 마이그레이션 |
+| `bwlimit` | number | 아니오 | 대역폭 제한 (MB/s) |
+| `with-local-disks` | boolean | 아니오 | 로컬 디스크 포함 |
+| `with-local-storage` | boolean | 아니오 | 로컬 스토리지 포함 |
+
+---
+
+#### `proxmox_migrate_lxc` 🔒
+LXC 컨테이너를 다른 노드로 마이그레이션합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 관리자 |
+| API 엔드포인트 | `POST /api2/json/nodes/{node}/lxc/{vmid}/migrate` |
+
+**매개변수**: `proxmox_migrate_vm`과 동일.
+
+---
+
+#### `proxmox_create_template_vm` 🔒
+QEMU VM을 템플릿으로 전환합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 관리자 |
+| API 엔드포인트 | `POST /api2/json/nodes/{node}/qemu/{vmid}/template` |
+
+**매개변수**:
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `node` | string | 예 | 노드 이름 |
+| `vmid` | number | 예 | VM ID |
+
+---
+
+#### `proxmox_create_template_lxc` 🔒
+LXC 컨테이너를 템플릿으로 전환합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 관리자 |
+| API 엔드포인트 | `POST /api2/json/nodes/{node}/lxc/{vmid}/template` |
+
+**매개변수**: `proxmox_create_template_vm`과 동일.
+
+---
+
+#### `proxmox_get_vm_rrddata`
+QEMU VM 성능 메트릭(RRD)을 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/qemu/{vmid}/rrddata` |
+
+**매개변수**:
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `node` | string | 예 | 노드 이름 |
+| `vmid` | number | 예 | VM ID |
+| `timeframe` | string | 아니오 | 기간 (hour/day/week/month/year) |
+| `cf` | string | 아니오 | 집계 함수 (AVERAGE, MAX) |
+
+---
+
+#### `proxmox_get_lxc_rrddata`
+LXC 컨테이너 성능 메트릭(RRD)을 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/lxc/{vmid}/rrddata` |
+
+**매개변수**: `proxmox_get_vm_rrddata`와 동일.
+
+---
+
+#### `proxmox_agent_ping`
+QEMU 게스트 에이전트를 핑합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/ping` |
+
+**매개변수**: `proxmox_create_template_vm`과 동일.
+
+---
+
+#### `proxmox_agent_get_osinfo`
+QEMU 게스트 에이전트를 통해 OS 정보를 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-osinfo` |
+
+**매개변수**: `proxmox_create_template_vm`과 동일.
+
+---
+
+#### `proxmox_agent_get_fsinfo`
+QEMU 게스트 에이전트를 통해 파일시스템 정보를 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-fsinfo` |
+
+**매개변수**: `proxmox_create_template_vm`과 동일.
+
+---
+
+#### `proxmox_agent_get_memory_blocks`
+QEMU 게스트 에이전트를 통해 메모리 블록 정보를 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-memory-blocks` |
+
+**매개변수**: `proxmox_create_template_vm`과 동일.
+
+---
+
+#### `proxmox_agent_get_network_interfaces`
+QEMU 게스트 에이전트를 통해 네트워크 인터페이스를 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/network-get-interfaces` |
+
+**매개변수**: `proxmox_create_template_vm`과 동일.
+
+---
+
+#### `proxmox_agent_get_time`
+QEMU 게스트 에이전트를 통해 시간을 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-time` |
+
+**매개변수**: `proxmox_create_template_vm`과 동일.
+
+---
+
+#### `proxmox_agent_get_timezone`
+QEMU 게스트 에이전트를 통해 시간대를 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-timezone` |
+
+**매개변수**: `proxmox_create_template_vm`과 동일.
+
+---
+
+#### `proxmox_agent_get_vcpus`
+QEMU 게스트 에이전트를 통해 vCPU 정보를 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-vcpus` |
+
+**매개변수**: `proxmox_create_template_vm`과 동일.
+
+---
+
+#### `proxmox_agent_exec` 🔒
+QEMU 게스트 에이전트를 통해 명령을 실행합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 관리자 |
+| API 엔드포인트 | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/exec` |
+
+**매개변수**:
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `node` | string | 예 | 노드 이름 |
+| `vmid` | number | 예 | VM ID |
+| `command` | string | 예 | 실행할 명령 |
+| `args` | string[] | 아니오 | 명령 인자 |
+| `input-data` | string | 아니오 | stdin 입력 |
+| `capture-output` | boolean | 아니오 | stdout/stderr 캡처 |
+| `timeout` | number | 아니오 | 제한 시간(초) |
+
+---
+
+#### `proxmox_agent_exec_status`
+QEMU 게스트 에이전트 명령 상태를 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/exec-status` |
+
+**매개변수**:
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `node` | string | 예 | 노드 이름 |
+| `vmid` | number | 예 | VM ID |
+| `pid` | number | 예 | exec에서 받은 PID |
+
+---
+
+#### `proxmox_list_vm_firewall_rules`
+VM별 방화벽 규칙을 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/qemu/{vmid}/firewall/rules` |
+
+**매개변수**: `proxmox_create_template_vm`과 동일.
+
+---
+
+#### `proxmox_get_vm_firewall_rule`
+VM 방화벽 규칙을 위치로 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}` |
+
+**매개변수**:
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `node` | string | 예 | 노드 이름 |
+| `vmid` | number | 예 | VM ID |
+| `pos` | number | 예 | 규칙 위치 |
+
+---
+
+#### `proxmox_create_vm_firewall_rule` 🔒
+VM 방화벽 규칙을 생성합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 관리자 |
+| API 엔드포인트 | `POST /api2/json/nodes/{node}/qemu/{vmid}/firewall/rules` |
+
+**매개변수**:
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `node` | string | 예 | 노드 이름 |
+| `vmid` | number | 예 | VM ID |
+| `action` | string | 예 | `ACCEPT`, `REJECT`, `DROP` |
+| `type` | string | 예 | `in`, `out`, `group` |
+| `proto` | string | 아니오 | 프로토콜 |
+| `dport` | string | 아니오 | 목적지 포트 |
+| `source` | string | 아니오 | 소스 CIDR |
+| `dest` | string | 아니오 | 목적지 CIDR |
+
+---
+
+#### `proxmox_update_vm_firewall_rule` 🔒
+VM 방화벽 규칙을 수정합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 관리자 |
+| API 엔드포인트 | `PUT /api2/json/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}` |
+
+**매개변수**:
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `node` | string | 예 | 노드 이름 |
+| `vmid` | number | 예 | VM ID |
+| `pos` | number | 예 | 규칙 위치 |
+| `comment` | string | 아니오 | 설명 |
+| `delete` | string | 아니오 | 삭제할 설정 목록 |
+
+---
+
+#### `proxmox_delete_vm_firewall_rule` 🔒
+VM 방화벽 규칙을 삭제합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 관리자 |
+| API 엔드포인트 | `DELETE /api2/json/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}` |
+
+**매개변수**:
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `node` | string | 예 | 노드 이름 |
+| `vmid` | number | 예 | VM ID |
+| `pos` | number | 예 | 규칙 위치 |
+| `digest` | string | 아니오 | 구성 해시 |
+
+---
+
+#### `proxmox_list_lxc_firewall_rules`
+LXC별 방화벽 규칙을 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/lxc/{vmid}/firewall/rules` |
+
+**매개변수**: `proxmox_create_template_vm`과 동일.
+
+---
+
+#### `proxmox_get_lxc_firewall_rule`
+LXC 방화벽 규칙을 위치로 조회합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 기본 |
+| API 엔드포인트 | `GET /api2/json/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}` |
+
+**매개변수**:
+| 이름 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `node` | string | 예 | 노드 이름 |
+| `vmid` | number | 예 | 컨테이너 ID |
+| `pos` | number | 예 | 규칙 위치 |
+
+---
+
+#### `proxmox_create_lxc_firewall_rule` 🔒
+LXC 방화벽 규칙을 생성합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 관리자 |
+| API 엔드포인트 | `POST /api2/json/nodes/{node}/lxc/{vmid}/firewall/rules` |
+
+**매개변수**: `proxmox_create_vm_firewall_rule`과 동일(컨테이너 ID 사용).
+
+---
+
+#### `proxmox_update_lxc_firewall_rule` 🔒
+LXC 방화벽 규칙을 수정합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 관리자 |
+| API 엔드포인트 | `PUT /api2/json/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}` |
+
+**매개변수**: `proxmox_update_vm_firewall_rule`과 동일(컨테이너 ID 사용).
+
+---
+
+#### `proxmox_delete_lxc_firewall_rule` 🔒
+LXC 방화벽 규칙을 삭제합니다.
+
+| 속성 | 값 |
+|------|-----|
+| 권한 | 관리자 |
+| API 엔드포인트 | `DELETE /api2/json/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}` |
+
+**매개변수**: `proxmox_delete_vm_firewall_rule`과 동일(컨테이너 ID 사용).
+
+---
+
 ### 스냅샷 (8개)
 
 #### `proxmox_create_snapshot_lxc` 🔒
@@ -2078,22 +2463,6 @@ Proxmox 노드의 ZFS 풀을 조회합니다.
 ### 높은 우선순위
 
 기능을 크게 향상시킬 API:
-
-#### VM/LXC 고급
-
-| 엔드포인트 | 메서드 | 설명 |
-|-----------|--------|------|
-| `/nodes/{node}/qemu/{vmid}/migrate` | POST | VM을 다른 노드로 마이그레이션 |
-| `/nodes/{node}/lxc/{vmid}/migrate` | POST | 컨테이너를 다른 노드로 마이그레이션 |
-| `/nodes/{node}/qemu/{vmid}/template` | POST | VM을 템플릿으로 변환 |
-| `/nodes/{node}/lxc/{vmid}/template` | POST | 컨테이너를 템플릿으로 변환 |
-| `/nodes/{node}/qemu/{vmid}/agent/*` | 다양 | QEMU Guest Agent 명령 |
-| `/nodes/{node}/qemu/{vmid}/firewall/*` | 다양 | VM별 방화벽 규칙 |
-| `/nodes/{node}/lxc/{vmid}/firewall/*` | 다양 | 컨테이너별 방화벽 규칙 |
-| `/nodes/{node}/qemu/{vmid}/rrddata` | GET | VM 성능 메트릭 (RRD) |
-| `/nodes/{node}/lxc/{vmid}/rrddata` | GET | 컨테이너 성능 메트릭 |
-
----
 
 ### 중간 우선순위
 

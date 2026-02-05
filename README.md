@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-A comprehensive MCP server providing 105 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
+A comprehensive MCP server providing 131 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
 
 ## Credits & Background
 
@@ -30,13 +30,13 @@ This project is a TypeScript rewrite of [mcp-proxmox-server](https://github.com/
 
 **Developer Experience**:
 - `npx @bldg-7/proxmox-mcp` just works
-- All 105 tool descriptions exposed via MCP `ListTools`
+- All 131 tool descriptions exposed via MCP `ListTools`
 - Rate limiter middleware included
 - Pino structured logging instead of `console.log`
 
 ## Features
 
-- **105 comprehensive tools** for Proxmox management
+- **131 comprehensive tools** for Proxmox management
 - **Full TypeScript implementation** with strict type safety
 - **Support for both QEMU VMs and LXC containers**
 - **Secure authentication** (API token)
@@ -125,7 +125,7 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
 
 ## Available Tools
 
-This server provides **105 comprehensive tools** for Proxmox management:
+This server provides **131 comprehensive tools** for Proxmox management:
 
 | Category | Tools | Permission |
 |----------|-------|------------|
@@ -135,6 +135,7 @@ This server provides **105 comprehensive tools** for Proxmox management:
 | VM Query | 5 | Basic |
 | VM Lifecycle | 12 | Elevated 🔒 |
 | VM Modify | 4 | Elevated 🔒 |
+| VM/LXC Advanced | 26 | Mixed |
 | Snapshots | 8 | Mixed |
 | Backups | 6 | Elevated 🔒 |
 | Disks | 8 | Elevated 🔒 |
@@ -142,7 +143,7 @@ This server provides **105 comprehensive tools** for Proxmox management:
 | Command Execution | 1 | Elevated 🔒 |
 | VM Creation | 3 | Mixed |
 | Node Disk Query | 4 | Basic |
-| **Total** | **105** | |
+| **Total** | **131** | |
 
 📖 **[Full Tools Reference →](docs/TOOLS.md)**
 

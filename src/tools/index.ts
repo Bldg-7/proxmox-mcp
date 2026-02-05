@@ -71,6 +71,36 @@ export {
 } from './vm-lifecycle.js';
 export { cloneLxc, cloneVM, resizeLxc, resizeVM } from './vm-modify.js';
 
+// VM/LXC Advanced tools
+export {
+  migrateVm,
+  migrateLxc,
+  createTemplateVm,
+  createTemplateLxc,
+  getVmRrddata,
+  getLxcRrddata,
+  agentPing,
+  agentGetOsinfo,
+  agentGetFsinfo,
+  agentGetMemoryBlocks,
+  agentGetNetworkInterfaces,
+  agentGetTime,
+  agentGetTimezone,
+  agentGetVcpus,
+  agentExec,
+  agentExecStatus,
+  listVmFirewallRules,
+  getVmFirewallRule,
+  createVmFirewallRule,
+  updateVmFirewallRule,
+  deleteVmFirewallRule,
+  listLxcFirewallRules,
+  getLxcFirewallRule,
+  createLxcFirewallRule,
+  updateLxcFirewallRule,
+  deleteLxcFirewallRule,
+} from './vm-advanced.js';
+
 // Snapshot tools
 export {
   createSnapshotLxc,

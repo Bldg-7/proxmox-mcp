@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 105개 도구를 제공하는 MCP 서버입니다.
+Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 131개 도구를 제공하는 MCP 서버입니다.
 
 ## 참고 프로젝트 & 개선사항
 
@@ -30,13 +30,13 @@ Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 105개 도�
 
 **개발자 경험**:
 - `npx @bldg-7/proxmox-mcp`로 바로 실행
-- MCP `ListTools`를 통해 105개 도구 설명 자동 노출
+- MCP `ListTools`를 통해 131개 도구 설명 자동 노출
 - Rate Limiter 미들웨어 내장
 - `console.log` 대신 Pino 구조화 로깅
 
 ## 주요 기능
 
-- **105개 관리 도구** - Proxmox 전 영역 커버
+- **131개 관리 도구** - Proxmox 전 영역 커버
 - **완전한 TypeScript 구현** - 엄격한 타입 안전성
 - **QEMU VM + LXC 컨테이너** 동시 지원
 - **보안 인증** - API 토큰
@@ -122,7 +122,7 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 ## 도구 목록
 
-이 서버는 Proxmox 관리를 위한 **105개의 종합 도구**를 제공합니다:
+이 서버는 Proxmox 관리를 위한 **131개의 종합 도구**를 제공합니다:
 
 | 카테고리 | 도구 수 | 권한 |
 |----------|---------|------|
@@ -132,6 +132,7 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 | VM 조회 | 5 | 기본 |
 | VM 라이프사이클 | 12 | 🔒 관리자 |
 | VM 수정 | 4 | 🔒 관리자 |
+| VM/LXC 고급 | 26 | 혼합 |
 | 스냅샷 | 8 | 혼합 |
 | 백업 | 6 | 🔒 관리자 |
 | 디스크 | 8 | 🔒 관리자 |
@@ -139,7 +140,7 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 | 명령어 실행 | 1 | 🔒 관리자 |
 | VM 생성 | 3 | 혼합 |
 | 노드 디스크 조회 | 4 | 기본 |
-| **합계** | **105** | |
+| **합계** | **131** | |
 
 📖 **[전체 도구 레퍼런스 →](docs/TOOLS_ko.md)**
 

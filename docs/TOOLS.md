@@ -3,7 +3,7 @@
 > Complete reference for all available tools and planned Proxmox API integrations
 
 **Current Version**: 0.1.5  
-**Total Tools**: 105  
+**Total Tools**: 131  
 **Last Updated**: 2026-02-05
 
 ---
@@ -17,9 +17,10 @@
   - [Node Management (8 tools)](#node-management-8-tools)
   - [Cluster Management (33 tools)](#cluster-management-33-tools)
   - [VM Query (5 tools)](#vm-query-5-tools)
-  - [VM Lifecycle (12 tools)](#vm-lifecycle-12-tools)
-  - [VM Modify (4 tools)](#vm-modify-4-tools)
-  - [Snapshots (8 tools)](#snapshots-8-tools)
+- [VM Lifecycle (12 tools)](#vm-lifecycle-12-tools)
+- [VM Modify (4 tools)](#vm-modify-4-tools)
+- [VM/LXC Advanced (26 tools)](#vmlxc-advanced-26-tools)
+- [Snapshots (8 tools)](#snapshots-8-tools)
   - [Backups (6 tools)](#backups-6-tools)
   - [Disks (8 tools)](#disks-8-tools)
   - [VM/LXC Network (6 tools)](#vmlxc-network-6-tools)
@@ -47,6 +48,7 @@ This document provides a complete reference for all tools available in the Proxm
 | VM Query | 5 | Basic |
 | VM Lifecycle | 12 | Elevated |
 | VM Modify | 4 | Elevated |
+| VM/LXC Advanced | 26 | Mixed |
 | Snapshots | 8 | Mixed |
 | Backups | 6 | Elevated |
 | Disks | 8 | Elevated |
@@ -54,7 +56,7 @@ This document provides a complete reference for all tools available in the Proxm
 | Command Execution | 1 | Elevated |
 | VM Creation | 3 | Mixed |
 | Node Disk Query | 4 | Basic |
-| **Total** | **105** | |
+| **Total** | **131** | |
 
 ---
 
@@ -1509,6 +1511,389 @@ Resize a QEMU VM CPU/memory.
 
 ---
 
+### VM/LXC Advanced (26 tools)
+
+Advanced VM/LXC operations including migrations, templates, guest agent commands, firewall rules, and performance metrics.
+
+#### `proxmox_migrate_vm` 🔒
+Migrate a QEMU VM to another node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/migrate` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Source node name |
+| `vmid` | number | Yes | VM ID |
+| `target` | string | Yes | Target node name |
+| `online` | boolean | No | Live migration |
+| `force` | boolean | No | Force migration |
+| `bwlimit` | number | No | Bandwidth limit (MB/s) |
+| `with-local-disks` | boolean | No | Migrate local disks |
+| `with-local-storage` | boolean | No | Migrate local storage |
+
+---
+
+#### `proxmox_migrate_lxc` 🔒
+Migrate an LXC container to another node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/lxc/{vmid}/migrate` |
+
+**Parameters**: Same as `proxmox_migrate_vm`.
+
+---
+
+#### `proxmox_create_template_vm` 🔒
+Convert a QEMU VM to a template.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/template` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+
+---
+
+#### `proxmox_create_template_lxc` 🔒
+Convert an LXC container to a template.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/lxc/{vmid}/template` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_get_vm_rrddata`
+Get performance metrics (RRD data) for a QEMU VM.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/rrddata` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `timeframe` | string | No | Timeframe (hour/day/week/month/year) |
+| `cf` | string | No | Consolidation function (AVERAGE, MAX) |
+
+---
+
+#### `proxmox_get_lxc_rrddata`
+Get performance metrics (RRD data) for an LXC container.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/lxc/{vmid}/rrddata` |
+
+**Parameters**: Same as `proxmox_get_vm_rrddata`.
+
+---
+
+#### `proxmox_agent_ping`
+Ping the QEMU guest agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/ping` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_get_osinfo`
+Get guest OS information via QEMU guest agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-osinfo` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_get_fsinfo`
+Get guest filesystem information via QEMU guest agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-fsinfo` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_get_memory_blocks`
+Get guest memory block info via QEMU guest agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-memory-blocks` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_get_network_interfaces`
+Get guest network interfaces via QEMU guest agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/network-get-interfaces` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_get_time`
+Get guest time via QEMU guest agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-time` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_get_timezone`
+Get guest timezone via QEMU guest agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-timezone` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_get_vcpus`
+Get guest vCPU info via QEMU guest agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-vcpus` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_exec` 🔒
+Execute a command via QEMU guest agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/exec` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `command` | string | Yes | Command to execute |
+| `args` | string[] | No | Command arguments |
+| `input-data` | string | No | stdin content |
+| `capture-output` | boolean | No | Capture stdout/stderr |
+| `timeout` | number | No | Timeout in seconds |
+
+---
+
+#### `proxmox_agent_exec_status`
+Get command status via QEMU guest agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/exec-status` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `pid` | number | Yes | PID from exec |
+
+---
+
+#### `proxmox_list_vm_firewall_rules`
+List per-VM firewall rules.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/firewall/rules` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_get_vm_firewall_rule`
+Get a VM firewall rule by position.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `pos` | number | Yes | Rule position |
+
+---
+
+#### `proxmox_create_vm_firewall_rule` 🔒
+Create a VM firewall rule.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/firewall/rules` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `action` | string | Yes | `ACCEPT`, `REJECT`, `DROP` |
+| `type` | string | Yes | `in`, `out`, `group` |
+| `proto` | string | No | Protocol |
+| `dport` | string | No | Destination port |
+| `source` | string | No | Source CIDR |
+| `dest` | string | No | Destination CIDR |
+
+---
+
+#### `proxmox_update_vm_firewall_rule` 🔒
+Update a VM firewall rule.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `pos` | number | Yes | Rule position |
+| `comment` | string | No | Description |
+| `delete` | string | No | List of settings to delete |
+
+---
+
+#### `proxmox_delete_vm_firewall_rule` 🔒
+Delete a VM firewall rule.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/qemu/{vmid}/firewall/rules/{pos}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `pos` | number | Yes | Rule position |
+| `digest` | string | No | Config digest |
+
+---
+
+#### `proxmox_list_lxc_firewall_rules`
+List per-LXC firewall rules.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/lxc/{vmid}/firewall/rules` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_get_lxc_firewall_rule`
+Get an LXC firewall rule by position.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | Container ID |
+| `pos` | number | Yes | Rule position |
+
+---
+
+#### `proxmox_create_lxc_firewall_rule` 🔒
+Create an LXC firewall rule.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/lxc/{vmid}/firewall/rules` |
+
+**Parameters**: Same as `proxmox_create_vm_firewall_rule` (with container ID).
+
+---
+
+#### `proxmox_update_lxc_firewall_rule` 🔒
+Update an LXC firewall rule.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}` |
+
+**Parameters**: Same as `proxmox_update_vm_firewall_rule` (with container ID).
+
+---
+
+#### `proxmox_delete_lxc_firewall_rule` 🔒
+Delete an LXC firewall rule.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/lxc/{vmid}/firewall/rules/{pos}` |
+
+**Parameters**: Same as `proxmox_delete_vm_firewall_rule` (with container ID).
+
+---
+
 ### Snapshots (8 tools)
 
 #### `proxmox_create_snapshot_lxc` 🔒
@@ -2078,22 +2463,6 @@ This section lists Proxmox VE API endpoints that are not yet implemented in this
 ### High Priority
 
 APIs that would significantly enhance functionality:
-
-#### VM/LXC Advanced
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/nodes/{node}/qemu/{vmid}/migrate` | POST | Migrate VM to another node |
-| `/nodes/{node}/lxc/{vmid}/migrate` | POST | Migrate container to another node |
-| `/nodes/{node}/qemu/{vmid}/template` | POST | Convert VM to template |
-| `/nodes/{node}/lxc/{vmid}/template` | POST | Convert container to template |
-| `/nodes/{node}/qemu/{vmid}/agent/*` | Various | QEMU Guest Agent commands |
-| `/nodes/{node}/qemu/{vmid}/firewall/*` | Various | Per-VM firewall rules |
-| `/nodes/{node}/lxc/{vmid}/firewall/*` | Various | Per-container firewall rules |
-| `/nodes/{node}/qemu/{vmid}/rrddata` | GET | VM performance metrics (RRD) |
-| `/nodes/{node}/lxc/{vmid}/rrddata` | GET | Container performance metrics |
-
----
 
 ### Medium Priority
 

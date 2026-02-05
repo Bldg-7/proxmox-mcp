@@ -74,6 +74,32 @@ import {
   cloneVM,
   resizeLxc,
   resizeVM,
+  migrateVm,
+  migrateLxc,
+  createTemplateVm,
+  createTemplateLxc,
+  getVmRrddata,
+  getLxcRrddata,
+  agentPing,
+  agentGetOsinfo,
+  agentGetFsinfo,
+  agentGetMemoryBlocks,
+  agentGetNetworkInterfaces,
+  agentGetTime,
+  agentGetTimezone,
+  agentGetVcpus,
+  agentExec,
+  agentExecStatus,
+  listVmFirewallRules,
+  getVmFirewallRule,
+  createVmFirewallRule,
+  updateVmFirewallRule,
+  deleteVmFirewallRule,
+  listLxcFirewallRules,
+  getLxcFirewallRule,
+  createLxcFirewallRule,
+  updateLxcFirewallRule,
+  deleteLxcFirewallRule,
   createSnapshotLxc,
   createSnapshotVM,
   listSnapshotsLxc,
@@ -192,6 +218,34 @@ import {
   createLxcSchema,
   createVmSchema,
 } from '../schemas/vm.js';
+import {
+  migrateVmSchema,
+  migrateLxcSchema,
+  createTemplateVmSchema,
+  createTemplateLxcSchema,
+  getVmRrddataSchema,
+  getLxcRrddataSchema,
+  agentPingSchema,
+  agentGetOsinfoSchema,
+  agentGetFsinfoSchema,
+  agentGetMemoryBlocksSchema,
+  agentGetNetworkInterfacesSchema,
+  agentGetTimeSchema,
+  agentGetTimezoneSchema,
+  agentGetVcpusSchema,
+  agentExecSchema,
+  agentExecStatusSchema,
+  listVmFirewallRulesSchema,
+  getVmFirewallRuleSchema,
+  createVmFirewallRuleSchema,
+  updateVmFirewallRuleSchema,
+  deleteVmFirewallRuleSchema,
+  listLxcFirewallRulesSchema,
+  getLxcFirewallRuleSchema,
+  createLxcFirewallRuleSchema,
+  updateLxcFirewallRuleSchema,
+  deleteLxcFirewallRuleSchema,
+} from '../schemas/vm-advanced.js';
 import {
   createSnapshotLxcSchema,
   createSnapshotVmSchema,
@@ -395,6 +449,67 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_resize_lxc: { handler: resizeLxc, schema: resizeLxcSchema },
   proxmox_resize_vm: { handler: resizeVM, schema: resizeVmSchema },
 
+  // VM/LXC Advanced
+  proxmox_migrate_vm: { handler: migrateVm, schema: migrateVmSchema },
+  proxmox_migrate_lxc: { handler: migrateLxc, schema: migrateLxcSchema },
+  proxmox_create_template_vm: { handler: createTemplateVm, schema: createTemplateVmSchema },
+  proxmox_create_template_lxc: { handler: createTemplateLxc, schema: createTemplateLxcSchema },
+  proxmox_get_vm_rrddata: { handler: getVmRrddata, schema: getVmRrddataSchema },
+  proxmox_get_lxc_rrddata: { handler: getLxcRrddata, schema: getLxcRrddataSchema },
+  proxmox_agent_ping: { handler: agentPing, schema: agentPingSchema },
+  proxmox_agent_get_osinfo: { handler: agentGetOsinfo, schema: agentGetOsinfoSchema },
+  proxmox_agent_get_fsinfo: { handler: agentGetFsinfo, schema: agentGetFsinfoSchema },
+  proxmox_agent_get_memory_blocks: {
+    handler: agentGetMemoryBlocks,
+    schema: agentGetMemoryBlocksSchema,
+  },
+  proxmox_agent_get_network_interfaces: {
+    handler: agentGetNetworkInterfaces,
+    schema: agentGetNetworkInterfacesSchema,
+  },
+  proxmox_agent_get_time: { handler: agentGetTime, schema: agentGetTimeSchema },
+  proxmox_agent_get_timezone: { handler: agentGetTimezone, schema: agentGetTimezoneSchema },
+  proxmox_agent_get_vcpus: { handler: agentGetVcpus, schema: agentGetVcpusSchema },
+  proxmox_agent_exec: { handler: agentExec, schema: agentExecSchema },
+  proxmox_agent_exec_status: { handler: agentExecStatus, schema: agentExecStatusSchema },
+  proxmox_list_vm_firewall_rules: {
+    handler: listVmFirewallRules,
+    schema: listVmFirewallRulesSchema,
+  },
+  proxmox_get_vm_firewall_rule: { handler: getVmFirewallRule, schema: getVmFirewallRuleSchema },
+  proxmox_create_vm_firewall_rule: {
+    handler: createVmFirewallRule,
+    schema: createVmFirewallRuleSchema,
+  },
+  proxmox_update_vm_firewall_rule: {
+    handler: updateVmFirewallRule,
+    schema: updateVmFirewallRuleSchema,
+  },
+  proxmox_delete_vm_firewall_rule: {
+    handler: deleteVmFirewallRule,
+    schema: deleteVmFirewallRuleSchema,
+  },
+  proxmox_list_lxc_firewall_rules: {
+    handler: listLxcFirewallRules,
+    schema: listLxcFirewallRulesSchema,
+  },
+  proxmox_get_lxc_firewall_rule: {
+    handler: getLxcFirewallRule,
+    schema: getLxcFirewallRuleSchema,
+  },
+  proxmox_create_lxc_firewall_rule: {
+    handler: createLxcFirewallRule,
+    schema: createLxcFirewallRuleSchema,
+  },
+  proxmox_update_lxc_firewall_rule: {
+    handler: updateLxcFirewallRule,
+    schema: updateLxcFirewallRuleSchema,
+  },
+  proxmox_delete_lxc_firewall_rule: {
+    handler: deleteLxcFirewallRule,
+    schema: deleteLxcFirewallRuleSchema,
+  },
+
   // Snapshots
   proxmox_create_snapshot_lxc: { handler: createSnapshotLxc, schema: createSnapshotLxcSchema },
   proxmox_create_snapshot_vm: { handler: createSnapshotVM, schema: createSnapshotVmSchema },
@@ -449,10 +564,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 105 tools are registered
+// Validate all 131 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 105) {
+if (registeredCount !== 131) {
   throw new Error(
-    `Tool registry incomplete: expected 105 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 131 tools, got ${registeredCount}`
   );
 }

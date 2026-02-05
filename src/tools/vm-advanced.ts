@@ -1,0 +1,1013 @@
+import type { ProxmoxApiClient } from '../client/proxmox.js';
+import type { Config } from '../config/index.js';
+import type { ToolResponse } from '../types/index.js';
+import type { ProxmoxFirewallRule } from '../types/proxmox.js';
+import { formatToolResponse, formatErrorResponse } from '../formatters/index.js';
+import { requireElevated } from '../middleware/index.js';
+import { validateNodeName, validateVMID, validateFirewallRulePos } from '../validators/index.js';
+import {
+  migrateVmSchema,
+  migrateLxcSchema,
+  createTemplateVmSchema,
+  createTemplateLxcSchema,
+  getVmRrddataSchema,
+  getLxcRrddataSchema,
+  agentPingSchema,
+  agentGetOsinfoSchema,
+  agentGetFsinfoSchema,
+  agentGetMemoryBlocksSchema,
+  agentGetNetworkInterfacesSchema,
+  agentGetTimeSchema,
+  agentGetTimezoneSchema,
+  agentGetVcpusSchema,
+  agentExecSchema,
+  agentExecStatusSchema,
+  listVmFirewallRulesSchema,
+  getVmFirewallRuleSchema,
+  createVmFirewallRuleSchema,
+  updateVmFirewallRuleSchema,
+  deleteVmFirewallRuleSchema,
+  listLxcFirewallRulesSchema,
+  getLxcFirewallRuleSchema,
+  createLxcFirewallRuleSchema,
+  updateLxcFirewallRuleSchema,
+  deleteLxcFirewallRuleSchema,
+} from '../schemas/vm-advanced.js';
+import type {
+  MigrateVmInput,
+  MigrateLxcInput,
+  CreateTemplateVmInput,
+  CreateTemplateLxcInput,
+  GetVmRrddataInput,
+  GetLxcRrddataInput,
+  AgentPingInput,
+  AgentGetOsinfoInput,
+  AgentGetFsinfoInput,
+  AgentGetMemoryBlocksInput,
+  AgentGetNetworkInterfacesInput,
+  AgentGetTimeInput,
+  AgentGetTimezoneInput,
+  AgentGetVcpusInput,
+  AgentExecInput,
+  AgentExecStatusInput,
+  ListVmFirewallRulesInput,
+  GetVmFirewallRuleInput,
+  CreateVmFirewallRuleInput,
+  UpdateVmFirewallRuleInput,
+  DeleteVmFirewallRuleInput,
+  ListLxcFirewallRulesInput,
+  GetLxcFirewallRuleInput,
+  CreateLxcFirewallRuleInput,
+  UpdateLxcFirewallRuleInput,
+  DeleteLxcFirewallRuleInput,
+} from '../schemas/vm-advanced.js';
+
+interface ProxmoxRrdDataPoint {
+  [key: string]: number | string | null | undefined;
+  time?: number;
+}
+
+function formatJsonBlock(data: unknown): string {
+  return `\n\n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``;
+}
+
+/**
+ * Migrate a QEMU VM to another node.
+ */
+export async function migrateVm(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: MigrateVmInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'migrate VM');
+
+    const validated = migrateVmSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safeTarget = validateNodeName(validated.target);
+    const payload: Record<string, unknown> = { target: safeTarget };
+
+    if (validated.online !== undefined) payload.online = validated.online;
+    if (validated.force !== undefined) payload.force = validated.force;
+    if (validated.bwlimit !== undefined) payload.bwlimit = validated.bwlimit;
+    if (validated['with-local-disks'] !== undefined) {
+      payload['with-local-disks'] = validated['with-local-disks'];
+    }
+    if (validated['with-local-storage'] !== undefined) {
+      payload['with-local-storage'] = validated['with-local-storage'];
+    }
+
+    const result = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/migrate`,
+      'POST',
+      payload
+    );
+
+    const output =
+      `🚚 **VM Migration Initiated**\n\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **Source Node**: ${safeNode}\n` +
+      `• **Target Node**: ${safeTarget}\n` +
+      `• **Task ID**: ${result || 'N/A'}\n\n` +
+      `Migration runs asynchronously.`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Migrate VM');
+  }
+}
+
+/**
+ * Migrate an LXC container to another node.
+ */
+export async function migrateLxc(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: MigrateLxcInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'migrate LXC container');
+
+    const validated = migrateLxcSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safeTarget = validateNodeName(validated.target);
+    const payload: Record<string, unknown> = { target: safeTarget };
+
+    if (validated.online !== undefined) payload.online = validated.online;
+    if (validated.force !== undefined) payload.force = validated.force;
+    if (validated.bwlimit !== undefined) payload.bwlimit = validated.bwlimit;
+    if (validated['with-local-disks'] !== undefined) {
+      payload['with-local-disks'] = validated['with-local-disks'];
+    }
+    if (validated['with-local-storage'] !== undefined) {
+      payload['with-local-storage'] = validated['with-local-storage'];
+    }
+
+    const result = await client.request(
+      `/nodes/${safeNode}/lxc/${safeVmid}/migrate`,
+      'POST',
+      payload
+    );
+
+    const output =
+      `🚚 **LXC Migration Initiated**\n\n` +
+      `• **Container ID**: ${safeVmid}\n` +
+      `• **Source Node**: ${safeNode}\n` +
+      `• **Target Node**: ${safeTarget}\n` +
+      `• **Task ID**: ${result || 'N/A'}\n\n` +
+      `Migration runs asynchronously.`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Migrate LXC');
+  }
+}
+
+/**
+ * Convert a QEMU VM to a template.
+ */
+export async function createTemplateVm(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CreateTemplateVmInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'convert VM to template');
+
+    const validated = createTemplateVmSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const result = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/template`,
+      'POST'
+    );
+
+    const output =
+      `✅ **VM Converted to Template**\n\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **Result**: ${result || 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Create VM Template');
+  }
+}
+
+/**
+ * Convert an LXC container to a template.
+ */
+export async function createTemplateLxc(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CreateTemplateLxcInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'convert LXC container to template');
+
+    const validated = createTemplateLxcSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const result = await client.request(
+      `/nodes/${safeNode}/lxc/${safeVmid}/template`,
+      'POST'
+    );
+
+    const output =
+      `✅ **LXC Converted to Template**\n\n` +
+      `• **Container ID**: ${safeVmid}\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **Result**: ${result || 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Create LXC Template');
+  }
+}
+
+/**
+ * Get VM performance metrics (RRD data).
+ */
+export async function getVmRrddata(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetVmRrddataInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getVmRrddataSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const params = new URLSearchParams();
+    if (validated.timeframe) params.set('timeframe', validated.timeframe);
+    if (validated.cf) params.set('cf', validated.cf);
+
+    const query = params.toString();
+    const path = `/nodes/${safeNode}/qemu/${safeVmid}/rrddata${query ? `?${query}` : ''}`;
+    const data = (await client.request(path)) as ProxmoxRrdDataPoint[];
+
+    let output = '📈 **VM Performance Metrics**\n\n';
+    output += `• **VM ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}\n`;
+
+    if (!data || data.length === 0) {
+      output += '\nNo performance metrics available.';
+      return formatToolResponse(output);
+    }
+
+    output += `• **Points**: ${data.length}`;
+    output += formatJsonBlock(data.slice(0, 5));
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get VM RRD Data');
+  }
+}
+
+/**
+ * Get LXC performance metrics (RRD data).
+ */
+export async function getLxcRrddata(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetLxcRrddataInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getLxcRrddataSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const params = new URLSearchParams();
+    if (validated.timeframe) params.set('timeframe', validated.timeframe);
+    if (validated.cf) params.set('cf', validated.cf);
+
+    const query = params.toString();
+    const path = `/nodes/${safeNode}/lxc/${safeVmid}/rrddata${query ? `?${query}` : ''}`;
+    const data = (await client.request(path)) as ProxmoxRrdDataPoint[];
+
+    let output = '📈 **LXC Performance Metrics**\n\n';
+    output += `• **Container ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}\n`;
+
+    if (!data || data.length === 0) {
+      output += '\nNo performance metrics available.';
+      return formatToolResponse(output);
+    }
+
+    output += `• **Points**: ${data.length}`;
+    output += formatJsonBlock(data.slice(0, 5));
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get LXC RRD Data');
+  }
+}
+
+/**
+ * Ping the QEMU guest agent.
+ */
+export async function agentPing(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentPingInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentPingSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const result = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/ping`,
+      'POST'
+    );
+
+    const output =
+      `✅ **QEMU Guest Agent Ping**\n\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **Result**: ${result ?? 'pong'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Ping');
+  }
+}
+
+/**
+ * Get OS info via QEMU guest agent.
+ */
+export async function agentGetOsinfo(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentGetOsinfoInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentGetOsinfoSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const osinfo = await client.request(`/nodes/${safeNode}/qemu/${safeVmid}/agent/get-osinfo`);
+
+    let output = '🧠 **Guest OS Information**\n\n';
+    output += `• **VM ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}`;
+    output += formatJsonBlock(osinfo);
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Get OS Info');
+  }
+}
+
+/**
+ * Get filesystem info via QEMU guest agent.
+ */
+export async function agentGetFsinfo(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentGetFsinfoInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentGetFsinfoSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const fsinfo = await client.request(`/nodes/${safeNode}/qemu/${safeVmid}/agent/get-fsinfo`);
+
+    let output = '📁 **Guest Filesystem Information**\n\n';
+    output += `• **VM ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}`;
+    output += formatJsonBlock(fsinfo);
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Get FS Info');
+  }
+}
+
+/**
+ * Get memory block info via QEMU guest agent.
+ */
+export async function agentGetMemoryBlocks(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentGetMemoryBlocksInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentGetMemoryBlocksSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const blocks = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/get-memory-blocks`
+    );
+
+    let output = '🧠 **Guest Memory Blocks**\n\n';
+    output += `• **VM ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}`;
+    output += formatJsonBlock(blocks);
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Get Memory Blocks');
+  }
+}
+
+/**
+ * Get network interfaces via QEMU guest agent.
+ */
+export async function agentGetNetworkInterfaces(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentGetNetworkInterfacesInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentGetNetworkInterfacesSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const interfaces = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/network-get-interfaces`
+    );
+
+    let output = '🌐 **Guest Network Interfaces**\n\n';
+    output += `• **VM ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}`;
+    output += formatJsonBlock(interfaces);
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Get Network Interfaces');
+  }
+}
+
+/**
+ * Get guest time via QEMU guest agent.
+ */
+export async function agentGetTime(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentGetTimeInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentGetTimeSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const timeInfo = await client.request(`/nodes/${safeNode}/qemu/${safeVmid}/agent/get-time`);
+
+    let output = '⏱️  **Guest Time**\n\n';
+    output += `• **VM ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}`;
+    output += formatJsonBlock(timeInfo);
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Get Time');
+  }
+}
+
+/**
+ * Get guest timezone via QEMU guest agent.
+ */
+export async function agentGetTimezone(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentGetTimezoneInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentGetTimezoneSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const timezone = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/get-timezone`
+    );
+
+    let output = '🕒 **Guest Timezone**\n\n';
+    output += `• **VM ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}`;
+    output += formatJsonBlock(timezone);
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Get Timezone');
+  }
+}
+
+/**
+ * Get guest vCPU info via QEMU guest agent.
+ */
+export async function agentGetVcpus(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentGetVcpusInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentGetVcpusSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const vcpus = await client.request(`/nodes/${safeNode}/qemu/${safeVmid}/agent/get-vcpus`);
+
+    let output = '🧩 **Guest vCPU Info**\n\n';
+    output += `• **VM ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}`;
+    output += formatJsonBlock(vcpus);
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Get vCPUs');
+  }
+}
+
+/**
+ * Execute a command via QEMU guest agent.
+ */
+export async function agentExec(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentExecInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'execute guest agent command');
+
+    const validated = agentExecSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const payload: Record<string, unknown> = {
+      command: validated.command,
+    };
+    if (validated.args) payload.args = validated.args;
+    if (validated['input-data']) payload['input-data'] = validated['input-data'];
+    if (validated['capture-output'] !== undefined) {
+      payload['capture-output'] = validated['capture-output'];
+    }
+    if (validated.timeout !== undefined) payload.timeout = validated.timeout;
+
+    const result = (await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/exec`,
+      'POST',
+      payload
+    )) as { pid?: number };
+
+    let output = '⚡ **Guest Agent Command Started**\n\n';
+    output += `• **VM ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Command**: \`${validated.command}\`\n`;
+    if (validated.args) output += `• **Args**: ${validated.args.join(' ')}\n`;
+    if (result?.pid !== undefined) output += `• **PID**: ${result.pid}\n`;
+    output += '\nUse `proxmox_agent_exec_status` to check status.';
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Exec');
+  }
+}
+
+/**
+ * Get guest agent execution status.
+ */
+export async function agentExecStatus(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentExecStatusInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentExecStatusSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safePid = validated.pid;
+
+    const status = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/exec-status?pid=${safePid}`
+    );
+
+    let output = '📋 **Guest Agent Exec Status**\n\n';
+    output += `• **VM ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **PID**: ${safePid}`;
+    output += formatJsonBlock(status);
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Exec Status');
+  }
+}
+
+/**
+ * List VM firewall rules.
+ */
+export async function listVmFirewallRules(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: ListVmFirewallRulesInput
+): Promise<ToolResponse> {
+  try {
+    const validated = listVmFirewallRulesSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const rules = (await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/firewall/rules`
+    )) as ProxmoxFirewallRule[];
+
+    let output = '🛡️  **VM Firewall Rules**\n\n';
+
+    if (!rules || rules.length === 0) {
+      output += 'No firewall rules found.';
+      return formatToolResponse(output);
+    }
+
+    for (const rule of rules) {
+      output += `• **${rule.pos}** ${rule.type} ${rule.action}`;
+      if (rule.proto) output += ` ${rule.proto}`;
+      if (rule.source) output += ` src=${rule.source}`;
+      if (rule.dest) output += ` dst=${rule.dest}`;
+      if (rule.dport) output += ` dport=${rule.dport}`;
+      if (rule.comment) output += `\n  ${rule.comment}`;
+      output += '\n';
+    }
+
+    output += `\n**Total**: ${rules.length} rule(s)`;
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'List VM Firewall Rules');
+  }
+}
+
+/**
+ * Get VM firewall rule by position.
+ */
+export async function getVmFirewallRule(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetVmFirewallRuleInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getVmFirewallRuleSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safePos = validateFirewallRulePos(validated.pos);
+
+    const rule = (await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/firewall/rules/${safePos}`
+    )) as ProxmoxFirewallRule;
+
+    let output = '🛡️  **VM Firewall Rule**\n\n';
+    output += `• **Position**: ${safePos}\n`;
+    if (rule.type) output += `• **Type**: ${rule.type}\n`;
+    if (rule.action) output += `• **Action**: ${rule.action}\n`;
+    if (rule.proto) output += `• **Protocol**: ${rule.proto}\n`;
+    if (rule.source) output += `• **Source**: ${rule.source}\n`;
+    if (rule.dest) output += `• **Destination**: ${rule.dest}\n`;
+    if (rule.dport) output += `• **Dest Port**: ${rule.dport}\n`;
+    if (rule.comment) output += `• **Comment**: ${rule.comment}\n`;
+
+    return formatToolResponse(output.trimEnd());
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get VM Firewall Rule');
+  }
+}
+
+/**
+ * Create VM firewall rule.
+ */
+export async function createVmFirewallRule(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CreateVmFirewallRuleInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'create VM firewall rule');
+
+    const validated = createVmFirewallRuleSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const payload: Record<string, unknown> = {
+      action: validated.action,
+      type: validated.type,
+    };
+
+    if (validated.comment) payload.comment = validated.comment;
+    if (validated.dest) payload.dest = validated.dest;
+    if (validated.dport) payload.dport = validated.dport;
+    if (validated.enable !== undefined) payload.enable = validated.enable;
+    if (validated.iface) payload.iface = validated.iface;
+    if (validated.log) payload.log = validated.log;
+    if (validated.macro) payload.macro = validated.macro;
+    if (validated.pos !== undefined) payload.pos = validateFirewallRulePos(validated.pos);
+    if (validated.proto) payload.proto = validated.proto;
+    if (validated.source) payload.source = validated.source;
+    if (validated.sport) payload.sport = validated.sport;
+
+    const result = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/firewall/rules`,
+      'POST',
+      payload
+    );
+
+    let output = '✅ **VM Firewall Rule Created**\n\n';
+    output += `• **Action**: ${validated.action}\n`;
+    output += `• **Type**: ${validated.type}\n`;
+    if (payload.pos !== undefined) output += `• **Position**: ${payload.pos}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Create VM Firewall Rule');
+  }
+}
+
+/**
+ * Update VM firewall rule.
+ */
+export async function updateVmFirewallRule(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: UpdateVmFirewallRuleInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'update VM firewall rule');
+
+    const validated = updateVmFirewallRuleSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safePos = validateFirewallRulePos(validated.pos);
+    const payload: Record<string, unknown> = {};
+
+    if (validated.action) payload.action = validated.action;
+    if (validated.comment) payload.comment = validated.comment;
+    if (validated.delete) payload.delete = validated.delete;
+    if (validated.dest) payload.dest = validated.dest;
+    if (validated.digest) payload.digest = validated.digest;
+    if (validated.dport) payload.dport = validated.dport;
+    if (validated.enable !== undefined) payload.enable = validated.enable;
+    if (validated.iface) payload.iface = validated.iface;
+    if (validated.log) payload.log = validated.log;
+    if (validated.macro) payload.macro = validated.macro;
+    if (validated.moveto !== undefined) payload.moveto = validated.moveto;
+    if (validated.proto) payload.proto = validated.proto;
+    if (validated.source) payload.source = validated.source;
+    if (validated.sport) payload.sport = validated.sport;
+    if (validated.type) payload.type = validated.type;
+
+    const result = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/firewall/rules/${safePos}`,
+      'PUT',
+      payload
+    );
+
+    let output = '✅ **VM Firewall Rule Updated**\n\n';
+    output += `• **Position**: ${safePos}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Update VM Firewall Rule');
+  }
+}
+
+/**
+ * Delete VM firewall rule.
+ */
+export async function deleteVmFirewallRule(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: DeleteVmFirewallRuleInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'delete VM firewall rule');
+
+    const validated = deleteVmFirewallRuleSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safePos = validateFirewallRulePos(validated.pos);
+    const payload = validated.digest ? { digest: validated.digest } : undefined;
+
+    const result = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/firewall/rules/${safePos}`,
+      'DELETE',
+      payload
+    );
+
+    let output = '🗑️  **VM Firewall Rule Deleted**\n\n';
+    output += `• **Position**: ${safePos}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Delete VM Firewall Rule');
+  }
+}
+
+/**
+ * List LXC firewall rules.
+ */
+export async function listLxcFirewallRules(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: ListLxcFirewallRulesInput
+): Promise<ToolResponse> {
+  try {
+    const validated = listLxcFirewallRulesSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const rules = (await client.request(
+      `/nodes/${safeNode}/lxc/${safeVmid}/firewall/rules`
+    )) as ProxmoxFirewallRule[];
+
+    let output = '🛡️  **LXC Firewall Rules**\n\n';
+
+    if (!rules || rules.length === 0) {
+      output += 'No firewall rules found.';
+      return formatToolResponse(output);
+    }
+
+    for (const rule of rules) {
+      output += `• **${rule.pos}** ${rule.type} ${rule.action}`;
+      if (rule.proto) output += ` ${rule.proto}`;
+      if (rule.source) output += ` src=${rule.source}`;
+      if (rule.dest) output += ` dst=${rule.dest}`;
+      if (rule.dport) output += ` dport=${rule.dport}`;
+      if (rule.comment) output += `\n  ${rule.comment}`;
+      output += '\n';
+    }
+
+    output += `\n**Total**: ${rules.length} rule(s)`;
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'List LXC Firewall Rules');
+  }
+}
+
+/**
+ * Get LXC firewall rule by position.
+ */
+export async function getLxcFirewallRule(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetLxcFirewallRuleInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getLxcFirewallRuleSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safePos = validateFirewallRulePos(validated.pos);
+
+    const rule = (await client.request(
+      `/nodes/${safeNode}/lxc/${safeVmid}/firewall/rules/${safePos}`
+    )) as ProxmoxFirewallRule;
+
+    let output = '🛡️  **LXC Firewall Rule**\n\n';
+    output += `• **Position**: ${safePos}\n`;
+    if (rule.type) output += `• **Type**: ${rule.type}\n`;
+    if (rule.action) output += `• **Action**: ${rule.action}\n`;
+    if (rule.proto) output += `• **Protocol**: ${rule.proto}\n`;
+    if (rule.source) output += `• **Source**: ${rule.source}\n`;
+    if (rule.dest) output += `• **Destination**: ${rule.dest}\n`;
+    if (rule.dport) output += `• **Dest Port**: ${rule.dport}\n`;
+    if (rule.comment) output += `• **Comment**: ${rule.comment}\n`;
+
+    return formatToolResponse(output.trimEnd());
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get LXC Firewall Rule');
+  }
+}
+
+/**
+ * Create LXC firewall rule.
+ */
+export async function createLxcFirewallRule(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CreateLxcFirewallRuleInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'create LXC firewall rule');
+
+    const validated = createLxcFirewallRuleSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const payload: Record<string, unknown> = {
+      action: validated.action,
+      type: validated.type,
+    };
+
+    if (validated.comment) payload.comment = validated.comment;
+    if (validated.dest) payload.dest = validated.dest;
+    if (validated.dport) payload.dport = validated.dport;
+    if (validated.enable !== undefined) payload.enable = validated.enable;
+    if (validated.iface) payload.iface = validated.iface;
+    if (validated.log) payload.log = validated.log;
+    if (validated.macro) payload.macro = validated.macro;
+    if (validated.pos !== undefined) payload.pos = validateFirewallRulePos(validated.pos);
+    if (validated.proto) payload.proto = validated.proto;
+    if (validated.source) payload.source = validated.source;
+    if (validated.sport) payload.sport = validated.sport;
+
+    const result = await client.request(
+      `/nodes/${safeNode}/lxc/${safeVmid}/firewall/rules`,
+      'POST',
+      payload
+    );
+
+    let output = '✅ **LXC Firewall Rule Created**\n\n';
+    output += `• **Action**: ${validated.action}\n`;
+    output += `• **Type**: ${validated.type}\n`;
+    if (payload.pos !== undefined) output += `• **Position**: ${payload.pos}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Create LXC Firewall Rule');
+  }
+}
+
+/**
+ * Update LXC firewall rule.
+ */
+export async function updateLxcFirewallRule(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: UpdateLxcFirewallRuleInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'update LXC firewall rule');
+
+    const validated = updateLxcFirewallRuleSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safePos = validateFirewallRulePos(validated.pos);
+    const payload: Record<string, unknown> = {};
+
+    if (validated.action) payload.action = validated.action;
+    if (validated.comment) payload.comment = validated.comment;
+    if (validated.delete) payload.delete = validated.delete;
+    if (validated.dest) payload.dest = validated.dest;
+    if (validated.digest) payload.digest = validated.digest;
+    if (validated.dport) payload.dport = validated.dport;
+    if (validated.enable !== undefined) payload.enable = validated.enable;
+    if (validated.iface) payload.iface = validated.iface;
+    if (validated.log) payload.log = validated.log;
+    if (validated.macro) payload.macro = validated.macro;
+    if (validated.moveto !== undefined) payload.moveto = validated.moveto;
+    if (validated.proto) payload.proto = validated.proto;
+    if (validated.source) payload.source = validated.source;
+    if (validated.sport) payload.sport = validated.sport;
+    if (validated.type) payload.type = validated.type;
+
+    const result = await client.request(
+      `/nodes/${safeNode}/lxc/${safeVmid}/firewall/rules/${safePos}`,
+      'PUT',
+      payload
+    );
+
+    let output = '✅ **LXC Firewall Rule Updated**\n\n';
+    output += `• **Position**: ${safePos}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Update LXC Firewall Rule');
+  }
+}
+
+/**
+ * Delete LXC firewall rule.
+ */
+export async function deleteLxcFirewallRule(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: DeleteLxcFirewallRuleInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'delete LXC firewall rule');
+
+    const validated = deleteLxcFirewallRuleSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safePos = validateFirewallRulePos(validated.pos);
+    const payload = validated.digest ? { digest: validated.digest } : undefined;
+
+    const result = await client.request(
+      `/nodes/${safeNode}/lxc/${safeVmid}/firewall/rules/${safePos}`,
+      'DELETE',
+      payload
+    );
+
+    let output = '🗑️  **LXC Firewall Rule Deleted**\n\n';
+    output += `• **Position**: ${safePos}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Delete LXC Firewall Rule');
+  }
+}
