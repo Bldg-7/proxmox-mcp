@@ -1,5 +1,13 @@
 # @bldg-7/proxmox-mcp
 
+## 0.1.3
+
+### Patch Changes
+
+- 97c47c3: fix: only use pino-pretty in development mode
+
+  Changed condition from `NODE_ENV !== 'production'` to `NODE_ENV === 'development'` to prevent pino-pretty from being used when NODE_ENV is undefined.
+
 ## 0.1.2
 
 ### Patch Changes
