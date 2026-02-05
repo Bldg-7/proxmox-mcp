@@ -1,5 +1,11 @@
 # @bldg-7/proxmox-mcp
 
+## 0.1.4
+
+### Patch Changes
+
+- Fix pino logger writing to stdout instead of stderr, which broke MCP JSON-RPC communication
+
 ## 0.1.3
 
 ### Patch Changes
