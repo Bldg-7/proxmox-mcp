@@ -3,7 +3,7 @@
 > Complete reference for all available tools and planned Proxmox API integrations
 
 **Current Version**: 0.1.5  
-**Total Tools**: 72  
+**Total Tools**: 105  
 **Last Updated**: 2026-02-05
 
 ---
@@ -15,6 +15,7 @@
 - [Implemented Tools](#implemented-tools)
   - [Node & Cluster (7 tools)](#node--cluster-7-tools)
   - [Node Management (8 tools)](#node-management-8-tools)
+  - [Cluster Management (33 tools)](#cluster-management-33-tools)
   - [VM Query (5 tools)](#vm-query-5-tools)
   - [VM Lifecycle (12 tools)](#vm-lifecycle-12-tools)
   - [VM Modify (4 tools)](#vm-modify-4-tools)
@@ -42,6 +43,7 @@ This document provides a complete reference for all tools available in the Proxm
 |----------|-------|------------|
 | Node & Cluster | 7 | Mixed |
 | Node Management | 8 | Mixed |
+| Cluster Management | 33 | Mixed |
 | VM Query | 5 | Basic |
 | VM Lifecycle | 12 | Elevated |
 | VM Modify | 4 | Elevated |
@@ -52,7 +54,7 @@ This document provides a complete reference for all tools available in the Proxm
 | Command Execution | 1 | Elevated |
 | VM Creation | 3 | Mixed |
 | Node Disk Query | 4 | Basic |
-| **Total** | **72** | |
+| **Total** | **105** | |
 
 ---
 
@@ -398,6 +400,768 @@ Get network connection statistics for a Proxmox node.
 ```json
 {
   "node": "pve1"
+}
+```
+
+---
+
+### Cluster Management (33 tools)
+
+#### `proxmox_get_ha_resources`
+List High Availability resources in the cluster.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/ha/resources` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | string | No | Filter: `vm`, `ct` |
+
+**Example**:
+```json
+{
+  "type": "vm"
+}
+```
+
+---
+
+#### `proxmox_get_ha_resource`
+Get a specific HA resource by ID.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/ha/resources/{sid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `sid` | string | Yes | HA resource ID (e.g., `vm:100`) |
+
+**Example**:
+```json
+{
+  "sid": "vm:100"
+}
+```
+
+---
+
+#### `proxmox_create_ha_resource` 🔒
+Create a new HA resource.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/ha/resources` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `sid` | string | Yes | HA resource ID (e.g., `vm:100`) |
+| `type` | string | No | Resource type (`vm`, `ct`) |
+| `group` | string | No | HA group identifier |
+| `state` | string | No | `started`, `stopped`, `enabled`, `disabled`, `ignored` |
+| `comment` | string | No | Description |
+
+**Example**:
+```json
+{
+  "sid": "vm:100",
+  "type": "vm",
+  "group": "prod",
+  "state": "started"
+}
+```
+
+---
+
+#### `proxmox_update_ha_resource` 🔒
+Update an HA resource.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/ha/resources/{sid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `sid` | string | Yes | HA resource ID |
+| `state` | string | No | `started`, `stopped`, `enabled`, `disabled`, `ignored` |
+| `group` | string | No | HA group identifier |
+| `comment` | string | No | Description |
+| `delete` | string | No | List of settings to delete |
+
+**Example**:
+```json
+{
+  "sid": "vm:100",
+  "state": "enabled"
+}
+```
+
+---
+
+#### `proxmox_delete_ha_resource` 🔒
+Delete an HA resource.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/ha/resources/{sid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `sid` | string | Yes | HA resource ID |
+
+**Example**:
+```json
+{
+  "sid": "vm:100"
+}
+```
+
+---
+
+#### `proxmox_get_ha_groups`
+List HA groups.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/ha/groups` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_ha_group`
+Get HA group details.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/ha/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | HA group identifier |
+
+**Example**:
+```json
+{
+  "group": "prod"
+}
+```
+
+---
+
+#### `proxmox_create_ha_group` 🔒
+Create a new HA group.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/ha/groups` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | HA group identifier |
+| `nodes` | string | Yes | Node list with priorities (e.g., `pve1:1,pve2:2`) |
+| `comment` | string | No | Description |
+| `restricted` | boolean | No | Restrict to listed nodes |
+| `nofailback` | boolean | No | Prevent failback |
+
+**Example**:
+```json
+{
+  "group": "prod",
+  "nodes": "pve1:1,pve2:2",
+  "restricted": true
+}
+```
+
+---
+
+#### `proxmox_update_ha_group` 🔒
+Update an HA group.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/ha/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | HA group identifier |
+| `nodes` | string | No | Node list with priorities |
+| `comment` | string | No | Description |
+| `restricted` | boolean | No | Restrict to listed nodes |
+| `nofailback` | boolean | No | Prevent failback |
+| `delete` | string | No | List of settings to delete |
+
+**Example**:
+```json
+{
+  "group": "prod",
+  "nodes": "pve1:1,pve3:2"
+}
+```
+
+---
+
+#### `proxmox_delete_ha_group` 🔒
+Delete an HA group.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/ha/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | HA group identifier |
+
+**Example**:
+```json
+{
+  "group": "prod"
+}
+```
+
+---
+
+#### `proxmox_get_ha_status`
+Get HA manager status.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/ha/status` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_list_cluster_firewall_rules`
+List cluster-wide firewall rules.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/rules` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_cluster_firewall_rule`
+Get a cluster firewall rule by position.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/rules/{pos}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `pos` | number | Yes | Rule position |
+
+**Example**:
+```json
+{
+  "pos": 0
+}
+```
+
+---
+
+#### `proxmox_create_cluster_firewall_rule` 🔒
+Create a cluster firewall rule.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/firewall/rules` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `action` | string | Yes | `ACCEPT`, `REJECT`, `DROP` |
+| `type` | string | Yes | `in`, `out`, `group` |
+| `proto` | string | No | Protocol (e.g., `tcp`) |
+| `dport` | string | No | Destination port(s) |
+| `source` | string | No | Source CIDR |
+| `dest` | string | No | Destination CIDR |
+
+**Example**:
+```json
+{
+  "action": "ACCEPT",
+  "type": "in",
+  "proto": "tcp",
+  "dport": "22"
+}
+```
+
+---
+
+#### `proxmox_update_cluster_firewall_rule` 🔒
+Update a cluster firewall rule.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/firewall/rules/{pos}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `pos` | number | Yes | Rule position |
+| `action` | string | No | Rule action |
+| `type` | string | No | `in`, `out`, `group` |
+| `comment` | string | No | Description |
+| `delete` | string | No | List of settings to delete |
+
+**Example**:
+```json
+{
+  "pos": 0,
+  "comment": "Allow SSH"
+}
+```
+
+---
+
+#### `proxmox_delete_cluster_firewall_rule` 🔒
+Delete a cluster firewall rule.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/firewall/rules/{pos}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `pos` | number | Yes | Rule position |
+| `digest` | string | No | Config digest |
+
+**Example**:
+```json
+{
+  "pos": 0
+}
+```
+
+---
+
+#### `proxmox_list_cluster_firewall_groups`
+List cluster firewall groups.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/groups` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_cluster_firewall_group`
+Get a cluster firewall group by name.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | Firewall group name |
+
+**Example**:
+```json
+{
+  "group": "web-servers"
+}
+```
+
+---
+
+#### `proxmox_create_cluster_firewall_group` 🔒
+Create a cluster firewall group.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/firewall/groups` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | Firewall group name |
+| `comment` | string | No | Description |
+| `rename` | string | No | Rename group to new name |
+
+**Example**:
+```json
+{
+  "group": "web-servers",
+  "comment": "Web tier rules"
+}
+```
+
+---
+
+#### `proxmox_update_cluster_firewall_group` 🔒
+Update a cluster firewall group.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/firewall/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | Firewall group name |
+| `comment` | string | No | Description |
+| `rename` | string | No | Rename group to new name |
+| `delete` | string | No | List of settings to delete |
+| `digest` | string | No | Config digest |
+
+**Example**:
+```json
+{
+  "group": "web-servers",
+  "comment": "Updated description"
+}
+```
+
+---
+
+#### `proxmox_delete_cluster_firewall_group` 🔒
+Delete a cluster firewall group.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/firewall/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | Firewall group name |
+
+**Example**:
+```json
+{
+  "group": "web-servers"
+}
+```
+
+---
+
+#### `proxmox_list_cluster_backup_jobs`
+List cluster backup jobs.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/backup` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_cluster_backup_job`
+Get a cluster backup job by ID.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/backup/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | Backup job ID |
+
+**Example**:
+```json
+{
+  "id": "daily-backup"
+}
+```
+
+---
+
+#### `proxmox_create_cluster_backup_job` 🔒
+Create a cluster backup job.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/backup` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `starttime` | string | Yes | Start time (`HH:MM`) |
+| `dow` | string | Yes | Days of week (e.g., `mon,tue`) |
+| `storage` | string | Yes | Storage identifier |
+| `all` | boolean | No | Backup all VMs |
+| `compress` | string | No | `gzip`, `lzo`, `zstd` |
+| `mode` | string | No | `snapshot`, `suspend`, `stop` |
+
+**Example**:
+```json
+{
+  "starttime": "02:00",
+  "dow": "mon,tue,wed,thu,fri",
+  "storage": "backup-nfs",
+  "mode": "snapshot"
+}
+```
+
+---
+
+#### `proxmox_update_cluster_backup_job` 🔒
+Update a cluster backup job.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/backup/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | Backup job ID |
+| `starttime` | string | No | Start time (`HH:MM`) |
+| `dow` | string | No | Days of week |
+| `storage` | string | No | Storage identifier |
+| `enabled` | boolean | No | Enable/disable job |
+| `delete` | string | No | List of settings to delete |
+
+**Example**:
+```json
+{
+  "id": "daily-backup",
+  "enabled": false
+}
+```
+
+---
+
+#### `proxmox_delete_cluster_backup_job` 🔒
+Delete a cluster backup job.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/backup/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | Backup job ID |
+
+**Example**:
+```json
+{
+  "id": "daily-backup"
+}
+```
+
+---
+
+#### `proxmox_list_cluster_replication_jobs`
+List cluster replication jobs.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/replication` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_cluster_replication_job`
+Get a cluster replication job by ID.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/replication/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | Replication job ID (`<guest>-<jobnum>`) |
+
+**Example**:
+```json
+{
+  "id": "101-0"
+}
+```
+
+---
+
+#### `proxmox_create_cluster_replication_job` 🔒
+Create a cluster replication job.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/replication` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | Replication job ID (`<guest>-<jobnum>`) |
+| `target` | string | Yes | Target node name |
+| `type` | string | Yes | Replication type (`local`) |
+| `schedule` | string | No | Replication schedule |
+
+**Example**:
+```json
+{
+  "id": "101-0",
+  "target": "pve2",
+  "type": "local",
+  "schedule": "*/15"
+}
+```
+
+---
+
+#### `proxmox_update_cluster_replication_job` 🔒
+Update a cluster replication job.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/replication/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | Replication job ID |
+| `disable` | boolean | No | Disable replication |
+| `schedule` | string | No | Replication schedule |
+| `delete` | string | No | List of settings to delete |
+
+**Example**:
+```json
+{
+  "id": "101-0",
+  "disable": true
+}
+```
+
+---
+
+#### `proxmox_delete_cluster_replication_job` 🔒
+Delete a cluster replication job.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/replication/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | Replication job ID |
+| `force` | boolean | No | Force deletion |
+| `keep` | boolean | No | Keep replicated data |
+
+**Example**:
+```json
+{
+  "id": "101-0",
+  "keep": true
+}
+```
+
+---
+
+#### `proxmox_get_cluster_options`
+Get cluster-wide options.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/options` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_update_cluster_options` 🔒
+Update cluster-wide options.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/options` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `console` | string | No | Console type (e.g., `xtermjs`) |
+| `language` | string | No | UI language |
+| `keyboard` | string | No | Keyboard layout |
+
+**Example**:
+```json
+{
+  "console": "xtermjs",
+  "language": "en"
 }
 ```
 
@@ -1314,19 +2078,6 @@ This section lists Proxmox VE API endpoints that are not yet implemented in this
 ### High Priority
 
 APIs that would significantly enhance functionality:
-
-#### Cluster Management
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/cluster/ha/resources` | GET/POST/PUT/DELETE | High Availability resource management |
-| `/cluster/ha/groups` | GET/POST/PUT/DELETE | HA group management |
-| `/cluster/ha/status` | GET | HA status overview |
-| `/cluster/firewall/rules` | GET/POST/PUT/DELETE | Cluster-wide firewall rules |
-| `/cluster/firewall/groups` | GET/POST/PUT/DELETE | Firewall security groups |
-| `/cluster/backup` | GET/POST/PUT/DELETE | Scheduled backup jobs |
-| `/cluster/replication` | GET/POST/PUT/DELETE | Storage replication jobs |
-| `/cluster/options` | GET/PUT | Cluster-wide options |
 
 #### VM/LXC Advanced
 

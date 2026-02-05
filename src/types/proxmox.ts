@@ -187,6 +187,47 @@ export interface ProxmoxClusterStatus {
   nodes?: number;
 }
 
+export interface ProxmoxHaResource {
+  sid?: string;
+  type?: string;
+  state?: string;
+  group?: string;
+  comment?: string;
+}
+
+export interface ProxmoxHaGroup {
+  group?: string;
+  nodes?: string;
+  comment?: string;
+  restricted?: number;
+  nofailback?: number;
+}
+
+export interface ProxmoxFirewallGroup {
+  group?: string;
+  comment?: string;
+  digest?: string;
+}
+
+export interface ProxmoxBackupJob {
+  id?: string;
+  storage?: string;
+  starttime?: string;
+  dow?: string;
+  enabled?: number;
+  comment?: string;
+}
+
+export interface ProxmoxReplicationJob {
+  id?: string;
+  guest?: number;
+  target?: string;
+  type?: string;
+  schedule?: string;
+  disable?: number;
+  comment?: string;
+}
+
 export interface ProxmoxFirewallRule {
   pos: number;
   type: string;

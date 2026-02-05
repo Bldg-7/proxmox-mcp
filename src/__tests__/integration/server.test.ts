@@ -4,6 +4,15 @@ import { createMockProxmoxClient, createTestConfig } from '../../__test-utils__/
 import { TOOL_NAMES } from '../../types/tools.js';
 import type { Config } from '../../config/index.js';
 
+type RequestHandler = (request: any) => Promise<any>;
+
+type ServerWithHandlers = {
+  _requestHandlers: Map<string, RequestHandler>;
+};
+
+const getRequestHandlers = (server: unknown): ServerWithHandlers['_requestHandlers'] =>
+  (server as ServerWithHandlers)._requestHandlers;
+
 describe('MCP Server Integration', () => {
   let client: ReturnType<typeof createMockProxmoxClient>;
   let config: Config;
@@ -22,30 +31,30 @@ describe('MCP Server Integration', () => {
 
     it('server has request handlers registered', () => {
       const server = createServer(client, config);
-      const listHandler = server._requestHandlers.get('tools/list');
-      const callHandler = server._requestHandlers.get('tools/call');
+      const listHandler = getRequestHandlers(server).get('tools/list');
+      const callHandler = getRequestHandlers(server).get('tools/call');
       expect(listHandler).toBeDefined();
       expect(callHandler).toBeDefined();
     });
   });
 
   describe('ListTools Handler', () => {
-    it('returns all 72 tools', async () => {
+    it('returns all 105 tools', async () => {
       const server = createServer(client, config);
 
-      const handler = server._requestHandlers.get('tools/list');
+      const handler = getRequestHandlers(server).get('tools/list');
       expect(handler).toBeDefined();
 
       const response = await handler!({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
       expect(response).toBeDefined();
       expect(response.tools).toBeDefined();
       expect(Array.isArray(response.tools)).toBe(true);
-      expect(response.tools).toHaveLength(72);
+      expect(response.tools).toHaveLength(105);
     });
 
     it('includes correct tool properties', async () => {
       const server = createServer(client, config);
-      const handler = server._requestHandlers.get('tools/list');
+      const handler = getRequestHandlers(server).get('tools/list');
       const response = await handler!({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
       const tools = response.tools;
 
@@ -60,7 +69,7 @@ describe('MCP Server Integration', () => {
 
     it('includes all expected tool names', async () => {
       const server = createServer(client, config);
-      const handler = server._requestHandlers.get('tools/list');
+      const handler = getRequestHandlers(server).get('tools/list');
       const response = await handler!({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
       const tools = response.tools;
       const toolNames = tools.map((t: { name: string }) => t.name);
@@ -72,7 +81,7 @@ describe('MCP Server Integration', () => {
 
     it('includes inputSchema for each tool', async () => {
       const server = createServer(client, config);
-      const handler = server._requestHandlers.get('tools/list');
+      const handler = getRequestHandlers(server).get('tools/list');
       const response = await handler!({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
       const tools = response.tools;
 
@@ -85,7 +94,7 @@ describe('MCP Server Integration', () => {
 
     it('includes descriptions for all tools', async () => {
       const server = createServer(client, config);
-      const handler = server._requestHandlers.get('tools/list');
+      const handler = getRequestHandlers(server).get('tools/list');
       const response = await handler!({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
       const tools = response.tools;
 
@@ -103,7 +112,7 @@ describe('MCP Server Integration', () => {
         { node: 'pve1', status: 'online', uptime: 86400 },
       ]);
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -129,7 +138,7 @@ describe('MCP Server Integration', () => {
         loadavg: [0.5, 0.6, 0.7],
       });
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -151,7 +160,7 @@ describe('MCP Server Integration', () => {
       const server = createServer(client, config);
       client.request.mockResolvedValueOnce([]);
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -177,7 +186,7 @@ describe('MCP Server Integration', () => {
     it('returns error for unknown tool', async () => {
       const server = createServer(client, config);
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -196,7 +205,7 @@ describe('MCP Server Integration', () => {
     it('returns error for invalid input (validation failure)', async () => {
       const server = createServer(client, config);
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -215,7 +224,7 @@ describe('MCP Server Integration', () => {
     it('returns error for invalid parameter type', async () => {
       const server = createServer(client, config);
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -239,7 +248,7 @@ describe('MCP Server Integration', () => {
       const server = createServer(client, config);
       client.request.mockRejectedValueOnce(new Error('API connection failed'));
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -259,7 +268,7 @@ describe('MCP Server Integration', () => {
       const restrictedConfig = createTestConfig({ allowElevated: false });
       const server = createServer(client, restrictedConfig);
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -286,7 +295,7 @@ describe('MCP Server Integration', () => {
 
       client.request.mockResolvedValueOnce({ upid: 'UPID:pve1:00001234' });
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -308,7 +317,7 @@ describe('MCP Server Integration', () => {
       const restrictedConfig = createTestConfig({ allowElevated: false });
       const server = createServer(client, restrictedConfig);
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -335,7 +344,7 @@ describe('MCP Server Integration', () => {
         { node: 'pve1', status: 'online', uptime: 86400 },
       ]);
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -356,7 +365,7 @@ describe('MCP Server Integration', () => {
       const server = createServer(client, config);
       client.request.mockResolvedValueOnce([]);
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
 
       const response1 = await handler!({
         jsonrpc: '2.0',
@@ -389,7 +398,7 @@ describe('MCP Server Integration', () => {
       const server = createServer(client, config);
       client.request.mockResolvedValueOnce([]);
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
       const response = await handler!({
         jsonrpc: '2.0',
         id: 1,
@@ -409,9 +418,9 @@ describe('MCP Server Integration', () => {
     it('executes complete flow: list tools -> call tool -> get result', async () => {
       const server = createServer(client, config);
 
-      const listHandler = server._requestHandlers.get('tools/list');
+      const listHandler = getRequestHandlers(server).get('tools/list');
       const listResponse = await listHandler!({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
-    expect(listResponse.tools).toHaveLength(72);
+      expect(listResponse.tools).toHaveLength(105);
 
       const getNodesToolDef = listResponse.tools.find(
         (t: { name: string }) => t.name === 'proxmox_get_nodes'
@@ -423,7 +432,7 @@ describe('MCP Server Integration', () => {
         { node: 'pve2', status: 'online', uptime: 172800 },
       ]);
 
-      const callHandler = server._requestHandlers.get('tools/call');
+      const callHandler = getRequestHandlers(server).get('tools/call');
       const callResponse = await callHandler!({
         jsonrpc: '2.0',
         id: 2,
@@ -446,7 +455,7 @@ describe('MCP Server Integration', () => {
         { node: 'pve1', status: 'online', uptime: 86400 },
       ]);
 
-      const handler = server._requestHandlers.get('tools/call');
+      const handler = getRequestHandlers(server).get('tools/call');
 
       const response1 = await handler!({
         jsonrpc: '2.0',

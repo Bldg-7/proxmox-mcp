@@ -3,7 +3,7 @@
 > 사용 가능한 모든 도구 및 계획된 Proxmox API 통합에 대한 완전한 레퍼런스
 
 **현재 버전**: 0.1.5  
-**총 도구 수**: 72  
+**총 도구 수**: 105  
 **최종 업데이트**: 2026-02-05
 
 ---
@@ -15,6 +15,7 @@
 - [구현된 도구](#구현된-도구)
   - [노드 & 클러스터 (7개)](#노드--클러스터-7개)
   - [노드 관리 (8개)](#노드-관리-8개)
+  - [클러스터 관리 (33개)](#클러스터-관리-33개)
   - [VM 조회 (5개)](#vm-조회-5개)
   - [VM 라이프사이클 (12개)](#vm-라이프사이클-12개)
   - [VM 수정 (4개)](#vm-수정-4개)
@@ -42,6 +43,7 @@
 |----------|------|------|
 | 노드 & 클러스터 | 7 | 혼합 |
 | 노드 관리 | 8 | 혼합 |
+| 클러스터 관리 | 33 | 혼합 |
 | VM 조회 | 5 | 기본 |
 | VM 라이프사이클 | 12 | 관리자 |
 | VM 수정 | 4 | 관리자 |
@@ -52,7 +54,7 @@
 | 명령어 실행 | 1 | 관리자 |
 | VM 생성 | 3 | 혼합 |
 | 노드 디스크 조회 | 4 | 기본 |
-| **합계** | **72** | |
+| **합계** | **105** | |
 
 ---
 
@@ -398,6 +400,768 @@ Proxmox 노드의 시스템 서비스를 조회합니다.
 ```json
 {
   "node": "pve1"
+}
+```
+
+---
+
+### 클러스터 관리 (33개)
+
+#### `proxmox_get_ha_resources`
+클러스터의 고가용성(HA) 리소스를 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/ha/resources` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | string | No | 필터: `vm`, `ct` |
+
+**Example**:
+```json
+{
+  "type": "vm"
+}
+```
+
+---
+
+#### `proxmox_get_ha_resource`
+ID로 HA 리소스 상세 정보를 가져옵니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/ha/resources/{sid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `sid` | string | Yes | HA 리소스 ID (예: `vm:100`) |
+
+**Example**:
+```json
+{
+  "sid": "vm:100"
+}
+```
+
+---
+
+#### `proxmox_create_ha_resource` 🔒
+HA 리소스를 생성합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/ha/resources` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `sid` | string | Yes | HA 리소스 ID (예: `vm:100`) |
+| `type` | string | No | 리소스 타입 (`vm`, `ct`) |
+| `group` | string | No | HA 그룹 ID |
+| `state` | string | No | `started`, `stopped`, `enabled`, `disabled`, `ignored` |
+| `comment` | string | No | 설명 |
+
+**Example**:
+```json
+{
+  "sid": "vm:100",
+  "type": "vm",
+  "group": "prod",
+  "state": "started"
+}
+```
+
+---
+
+#### `proxmox_update_ha_resource` 🔒
+HA 리소스를 수정합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/ha/resources/{sid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `sid` | string | Yes | HA 리소스 ID |
+| `state` | string | No | `started`, `stopped`, `enabled`, `disabled`, `ignored` |
+| `group` | string | No | HA 그룹 ID |
+| `comment` | string | No | 설명 |
+| `delete` | string | No | 삭제할 설정 목록 |
+
+**Example**:
+```json
+{
+  "sid": "vm:100",
+  "state": "enabled"
+}
+```
+
+---
+
+#### `proxmox_delete_ha_resource` 🔒
+HA 리소스를 삭제합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/ha/resources/{sid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `sid` | string | Yes | HA 리소스 ID |
+
+**Example**:
+```json
+{
+  "sid": "vm:100"
+}
+```
+
+---
+
+#### `proxmox_get_ha_groups`
+HA 그룹 목록을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/ha/groups` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_ha_group`
+HA 그룹 상세 정보를 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/ha/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | HA 그룹 ID |
+
+**Example**:
+```json
+{
+  "group": "prod"
+}
+```
+
+---
+
+#### `proxmox_create_ha_group` 🔒
+HA 그룹을 생성합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/ha/groups` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | HA 그룹 ID |
+| `nodes` | string | Yes | 노드 목록(우선순위 포함, 예: `pve1:1,pve2:2`) |
+| `comment` | string | No | 설명 |
+| `restricted` | boolean | No | 목록 노드로 제한 |
+| `nofailback` | boolean | No | 페일백 방지 |
+
+**Example**:
+```json
+{
+  "group": "prod",
+  "nodes": "pve1:1,pve2:2",
+  "restricted": true
+}
+```
+
+---
+
+#### `proxmox_update_ha_group` 🔒
+HA 그룹을 수정합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/ha/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | HA 그룹 ID |
+| `nodes` | string | No | 노드 목록 |
+| `comment` | string | No | 설명 |
+| `restricted` | boolean | No | 목록 노드로 제한 |
+| `nofailback` | boolean | No | 페일백 방지 |
+| `delete` | string | No | 삭제할 설정 목록 |
+
+**Example**:
+```json
+{
+  "group": "prod",
+  "nodes": "pve1:1,pve3:2"
+}
+```
+
+---
+
+#### `proxmox_delete_ha_group` 🔒
+HA 그룹을 삭제합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/ha/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | HA 그룹 ID |
+
+**Example**:
+```json
+{
+  "group": "prod"
+}
+```
+
+---
+
+#### `proxmox_get_ha_status`
+HA 매니저 상태를 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/ha/status` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_list_cluster_firewall_rules`
+클러스터 방화벽 규칙을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/rules` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_cluster_firewall_rule`
+위치로 클러스터 방화벽 규칙을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/rules/{pos}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `pos` | number | Yes | 규칙 위치 |
+
+**Example**:
+```json
+{
+  "pos": 0
+}
+```
+
+---
+
+#### `proxmox_create_cluster_firewall_rule` 🔒
+클러스터 방화벽 규칙을 생성합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/firewall/rules` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `action` | string | Yes | `ACCEPT`, `REJECT`, `DROP` |
+| `type` | string | Yes | `in`, `out`, `group` |
+| `proto` | string | No | 프로토콜 (예: `tcp`) |
+| `dport` | string | No | 목적지 포트 |
+| `source` | string | No | 소스 CIDR |
+| `dest` | string | No | 목적지 CIDR |
+
+**Example**:
+```json
+{
+  "action": "ACCEPT",
+  "type": "in",
+  "proto": "tcp",
+  "dport": "22"
+}
+```
+
+---
+
+#### `proxmox_update_cluster_firewall_rule` 🔒
+클러스터 방화벽 규칙을 수정합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/firewall/rules/{pos}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `pos` | number | Yes | 규칙 위치 |
+| `action` | string | No | 규칙 액션 |
+| `type` | string | No | `in`, `out`, `group` |
+| `comment` | string | No | 설명 |
+| `delete` | string | No | 삭제할 설정 목록 |
+
+**Example**:
+```json
+{
+  "pos": 0,
+  "comment": "Allow SSH"
+}
+```
+
+---
+
+#### `proxmox_delete_cluster_firewall_rule` 🔒
+클러스터 방화벽 규칙을 삭제합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/firewall/rules/{pos}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `pos` | number | Yes | 규칙 위치 |
+| `digest` | string | No | 구성 해시 |
+
+**Example**:
+```json
+{
+  "pos": 0
+}
+```
+
+---
+
+#### `proxmox_list_cluster_firewall_groups`
+클러스터 방화벽 그룹을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/groups` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_cluster_firewall_group`
+이름으로 클러스터 방화벽 그룹을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | 방화벽 그룹 이름 |
+
+**Example**:
+```json
+{
+  "group": "web-servers"
+}
+```
+
+---
+
+#### `proxmox_create_cluster_firewall_group` 🔒
+클러스터 방화벽 그룹을 생성합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/firewall/groups` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | 방화벽 그룹 이름 |
+| `comment` | string | No | 설명 |
+| `rename` | string | No | 새 이름으로 변경 |
+
+**Example**:
+```json
+{
+  "group": "web-servers",
+  "comment": "Web tier rules"
+}
+```
+
+---
+
+#### `proxmox_update_cluster_firewall_group` 🔒
+클러스터 방화벽 그룹을 수정합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/firewall/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | 방화벽 그룹 이름 |
+| `comment` | string | No | 설명 |
+| `rename` | string | No | 새 이름으로 변경 |
+| `delete` | string | No | 삭제할 설정 목록 |
+| `digest` | string | No | 구성 해시 |
+
+**Example**:
+```json
+{
+  "group": "web-servers",
+  "comment": "Updated description"
+}
+```
+
+---
+
+#### `proxmox_delete_cluster_firewall_group` 🔒
+클러스터 방화벽 그룹을 삭제합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/firewall/groups/{group}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `group` | string | Yes | 방화벽 그룹 이름 |
+
+**Example**:
+```json
+{
+  "group": "web-servers"
+}
+```
+
+---
+
+#### `proxmox_list_cluster_backup_jobs`
+클러스터 백업 작업 목록을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/backup` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_cluster_backup_job`
+ID로 클러스터 백업 작업을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/backup/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | 백업 작업 ID |
+
+**Example**:
+```json
+{
+  "id": "daily-backup"
+}
+```
+
+---
+
+#### `proxmox_create_cluster_backup_job` 🔒
+클러스터 백업 작업을 생성합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/backup` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `starttime` | string | Yes | 시작 시간 (`HH:MM`) |
+| `dow` | string | Yes | 요일 (예: `mon,tue`) |
+| `storage` | string | Yes | 스토리지 ID |
+| `all` | boolean | No | 전체 VM 백업 |
+| `compress` | string | No | `gzip`, `lzo`, `zstd` |
+| `mode` | string | No | `snapshot`, `suspend`, `stop` |
+
+**Example**:
+```json
+{
+  "starttime": "02:00",
+  "dow": "mon,tue,wed,thu,fri",
+  "storage": "backup-nfs",
+  "mode": "snapshot"
+}
+```
+
+---
+
+#### `proxmox_update_cluster_backup_job` 🔒
+클러스터 백업 작업을 수정합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/backup/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | 백업 작업 ID |
+| `starttime` | string | No | 시작 시간 (`HH:MM`) |
+| `dow` | string | No | 요일 |
+| `storage` | string | No | 스토리지 ID |
+| `enabled` | boolean | No | 활성/비활성 |
+| `delete` | string | No | 삭제할 설정 목록 |
+
+**Example**:
+```json
+{
+  "id": "daily-backup",
+  "enabled": false
+}
+```
+
+---
+
+#### `proxmox_delete_cluster_backup_job` 🔒
+클러스터 백업 작업을 삭제합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/backup/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | 백업 작업 ID |
+
+**Example**:
+```json
+{
+  "id": "daily-backup"
+}
+```
+
+---
+
+#### `proxmox_list_cluster_replication_jobs`
+클러스터 복제 작업 목록을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/replication` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_cluster_replication_job`
+ID로 클러스터 복제 작업을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/replication/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | 복제 작업 ID (`<guest>-<jobnum>`) |
+
+**Example**:
+```json
+{
+  "id": "101-0"
+}
+```
+
+---
+
+#### `proxmox_create_cluster_replication_job` 🔒
+클러스터 복제 작업을 생성합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/replication` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | 복제 작업 ID (`<guest>-<jobnum>`) |
+| `target` | string | Yes | 대상 노드 이름 |
+| `type` | string | Yes | 복제 타입 (`local`) |
+| `schedule` | string | No | 복제 스케줄 |
+
+**Example**:
+```json
+{
+  "id": "101-0",
+  "target": "pve2",
+  "type": "local",
+  "schedule": "*/15"
+}
+```
+
+---
+
+#### `proxmox_update_cluster_replication_job` 🔒
+클러스터 복제 작업을 수정합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/replication/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | 복제 작업 ID |
+| `disable` | boolean | No | 복제 비활성화 |
+| `schedule` | string | No | 복제 스케줄 |
+| `delete` | string | No | 삭제할 설정 목록 |
+
+**Example**:
+```json
+{
+  "id": "101-0",
+  "disable": true
+}
+```
+
+---
+
+#### `proxmox_delete_cluster_replication_job` 🔒
+클러스터 복제 작업을 삭제합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/replication/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | 복제 작업 ID |
+| `force` | boolean | No | 강제 삭제 |
+| `keep` | boolean | No | 복제 데이터 유지 |
+
+**Example**:
+```json
+{
+  "id": "101-0",
+  "keep": true
+}
+```
+
+---
+
+#### `proxmox_get_cluster_options`
+클러스터 옵션을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/options` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_update_cluster_options` 🔒
+클러스터 옵션을 수정합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/options` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `console` | string | No | 콘솔 타입 (예: `xtermjs`) |
+| `language` | string | No | UI 언어 |
+| `keyboard` | string | No | 키보드 레이아웃 |
+
+**Example**:
+```json
+{
+  "console": "xtermjs",
+  "language": "en"
 }
 ```
 
@@ -1314,19 +2078,6 @@ Proxmox 노드의 ZFS 풀을 조회합니다.
 ### 높은 우선순위
 
 기능을 크게 향상시킬 API:
-
-#### 클러스터 관리
-
-| 엔드포인트 | 메서드 | 설명 |
-|-----------|--------|------|
-| `/cluster/ha/resources` | GET/POST/PUT/DELETE | 고가용성 리소스 관리 |
-| `/cluster/ha/groups` | GET/POST/PUT/DELETE | HA 그룹 관리 |
-| `/cluster/ha/status` | GET | HA 상태 개요 |
-| `/cluster/firewall/rules` | GET/POST/PUT/DELETE | 클러스터 전체 방화벽 규칙 |
-| `/cluster/firewall/groups` | GET/POST/PUT/DELETE | 방화벽 보안 그룹 |
-| `/cluster/backup` | GET/POST/PUT/DELETE | 예약된 백업 작업 |
-| `/cluster/replication` | GET/POST/PUT/DELETE | 스토리지 복제 작업 |
-| `/cluster/options` | GET/PUT | 클러스터 전체 옵션 |
 
 #### VM/LXC 고급
 

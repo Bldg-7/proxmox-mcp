@@ -4,3 +4,4 @@ export * from './snapshot.js';
 export * from './backup.js';
 export * from './disk.js';
 export * from './network.js';
+export * from './cluster-management.js';

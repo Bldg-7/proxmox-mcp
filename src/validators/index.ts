@@ -77,6 +77,125 @@ export function validateUpid(upid: unknown): string {
 }
 
 /**
+ * Validates a HA resource ID (e.g., vm:100 or ct:100).
+ *
+ * @throws {Error} If HA resource ID is invalid
+ */
+export function validateHaResourceId(sid: unknown): string {
+  if (!sid || typeof sid !== 'string') {
+    throw new Error('HA resource ID is required and must be a string');
+  }
+
+  if (!/^[a-zA-Z0-9:_-]+$/.test(sid)) {
+    throw new Error('Invalid HA resource ID format');
+  }
+
+  if (sid.length > 128) {
+    throw new Error('HA resource ID too long (max 128 characters)');
+  }
+
+  return sid;
+}
+
+/**
+ * Validates a HA group identifier.
+ *
+ * @throws {Error} If HA group ID is invalid
+ */
+export function validateHaGroupId(group: unknown): string {
+  if (!group || typeof group !== 'string') {
+    throw new Error('HA group ID is required and must be a string');
+  }
+
+  if (!/^[a-zA-Z0-9_-]+$/.test(group)) {
+    throw new Error('Invalid HA group ID format');
+  }
+
+  if (group.length > 64) {
+    throw new Error('HA group ID too long (max 64 characters)');
+  }
+
+  return group;
+}
+
+/**
+ * Validates a firewall group name.
+ *
+ * @throws {Error} If firewall group name is invalid
+ */
+export function validateFirewallGroupName(group: unknown): string {
+  if (!group || typeof group !== 'string') {
+    throw new Error('Firewall group name is required and must be a string');
+  }
+
+  if (!/^[A-Za-z][A-Za-z0-9_-]+$/.test(group)) {
+    throw new Error('Invalid firewall group name format');
+  }
+
+  if (group.length < 2 || group.length > 64) {
+    throw new Error('Firewall group name length must be between 2 and 64 characters');
+  }
+
+  return group;
+}
+
+/**
+ * Validates a firewall rule position.
+ *
+ * @throws {Error} If rule position is invalid
+ */
+export function validateFirewallRulePos(pos: unknown): number {
+  if (pos === undefined || pos === null) {
+    throw new Error('Firewall rule position is required');
+  }
+
+  const parsed = typeof pos === 'number' ? pos : parseInt(String(pos), 10);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    throw new Error('Invalid firewall rule position');
+  }
+
+  return parsed;
+}
+
+/**
+ * Validates a backup job ID.
+ *
+ * @throws {Error} If backup job ID is invalid
+ */
+export function validateBackupJobId(id: unknown): string {
+  if (!id || typeof id !== 'string') {
+    throw new Error('Backup job ID is required and must be a string');
+  }
+
+  if (!/^[A-Za-z0-9._-]+$/.test(id)) {
+    throw new Error('Invalid backup job ID format');
+  }
+
+  if (id.length > 64) {
+    throw new Error('Backup job ID too long (max 64 characters)');
+  }
+
+  return id;
+}
+
+/**
+ * Validates a replication job ID (<guest>-<jobnum>).
+ *
+ * @throws {Error} If replication job ID is invalid
+ */
+export function validateReplicationJobId(id: unknown): string {
+  if (!id || typeof id !== 'string') {
+    throw new Error('Replication job ID is required and must be a string');
+  }
+
+  if (!/^[1-9][0-9]{2,8}-[0-9]{1,9}$/.test(id)) {
+    throw new Error('Invalid replication job ID format');
+  }
+
+  return id;
+}
+
+/**
  * Validates a Proxmox VM ID.
  * Must be a number between 100 and 999999999.
  *

@@ -16,6 +16,43 @@ export {
 } from './node.js';
 export { getClusterStatus, getNextVMID } from './cluster.js';
 
+// Cluster Management tools
+export {
+  getHaResources,
+  getHaResource,
+  createHaResource,
+  updateHaResource,
+  deleteHaResource,
+  getHaGroups,
+  getHaGroup,
+  createHaGroup,
+  updateHaGroup,
+  deleteHaGroup,
+  getHaStatus,
+  listClusterFirewallRules,
+  getClusterFirewallRule,
+  createClusterFirewallRule,
+  updateClusterFirewallRule,
+  deleteClusterFirewallRule,
+  listClusterFirewallGroups,
+  getClusterFirewallGroup,
+  createClusterFirewallGroup,
+  updateClusterFirewallGroup,
+  deleteClusterFirewallGroup,
+  listClusterBackupJobs,
+  getClusterBackupJob,
+  createClusterBackupJob,
+  updateClusterBackupJob,
+  deleteClusterBackupJob,
+  listClusterReplicationJobs,
+  getClusterReplicationJob,
+  createClusterReplicationJob,
+  updateClusterReplicationJob,
+  deleteClusterReplicationJob,
+  getClusterOptions,
+  updateClusterOptions,
+} from './cluster-management.js';
+
 // VM Query & Lifecycle tools
 export { getVMs, getVMStatus, getVMConfig, getLxcConfig, getStorage } from './vm-query.js';
 export {

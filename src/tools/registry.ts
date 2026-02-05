@@ -20,6 +20,39 @@ import {
   getNodeNetstat,
   getClusterStatus,
   getNextVMID,
+  getHaResources,
+  getHaResource,
+  createHaResource,
+  updateHaResource,
+  deleteHaResource,
+  getHaGroups,
+  getHaGroup,
+  createHaGroup,
+  updateHaGroup,
+  deleteHaGroup,
+  getHaStatus,
+  listClusterFirewallRules,
+  getClusterFirewallRule,
+  createClusterFirewallRule,
+  updateClusterFirewallRule,
+  deleteClusterFirewallRule,
+  listClusterFirewallGroups,
+  getClusterFirewallGroup,
+  createClusterFirewallGroup,
+  updateClusterFirewallGroup,
+  deleteClusterFirewallGroup,
+  listClusterBackupJobs,
+  getClusterBackupJob,
+  createClusterBackupJob,
+  updateClusterBackupJob,
+  deleteClusterBackupJob,
+  listClusterReplicationJobs,
+  getClusterReplicationJob,
+  createClusterReplicationJob,
+  updateClusterReplicationJob,
+  deleteClusterReplicationJob,
+  getClusterOptions,
+  updateClusterOptions,
   getVMs,
   getVMStatus,
   getVMConfig,
@@ -97,6 +130,41 @@ import {
   getClusterStatusSchema,
   getNextVmidSchema,
 } from '../schemas/node.js';
+import {
+  getHaResourcesSchema,
+  getHaResourceSchema,
+  createHaResourceSchema,
+  updateHaResourceSchema,
+  deleteHaResourceSchema,
+  getHaGroupsSchema,
+  getHaGroupSchema,
+  createHaGroupSchema,
+  updateHaGroupSchema,
+  deleteHaGroupSchema,
+  getHaStatusSchema,
+  listClusterFirewallRulesSchema,
+  getClusterFirewallRuleSchema,
+  createClusterFirewallRuleSchema,
+  updateClusterFirewallRuleSchema,
+  deleteClusterFirewallRuleSchema,
+  listClusterFirewallGroupsSchema,
+  getClusterFirewallGroupSchema,
+  createClusterFirewallGroupSchema,
+  updateClusterFirewallGroupSchema,
+  deleteClusterFirewallGroupSchema,
+  listClusterBackupJobsSchema,
+  getClusterBackupJobSchema,
+  createClusterBackupJobSchema,
+  updateClusterBackupJobSchema,
+  deleteClusterBackupJobSchema,
+  listClusterReplicationJobsSchema,
+  getClusterReplicationJobSchema,
+  createClusterReplicationJobSchema,
+  updateClusterReplicationJobSchema,
+  deleteClusterReplicationJobSchema,
+  getClusterOptionsSchema,
+  updateClusterOptionsSchema,
+} from '../schemas/cluster-management.js';
 import {
   getVmsSchema,
   getVmStatusSchema,
@@ -188,6 +256,104 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_get_network_iface: { handler: getNetworkIface, schema: getNetworkIfaceSchema },
   proxmox_get_cluster_status: { handler: getClusterStatus, schema: getClusterStatusSchema },
   proxmox_get_next_vmid: { handler: getNextVMID, schema: getNextVmidSchema },
+
+  // Cluster Management
+  proxmox_get_ha_resources: { handler: getHaResources, schema: getHaResourcesSchema },
+  proxmox_get_ha_resource: { handler: getHaResource, schema: getHaResourceSchema },
+  proxmox_create_ha_resource: { handler: createHaResource, schema: createHaResourceSchema },
+  proxmox_update_ha_resource: { handler: updateHaResource, schema: updateHaResourceSchema },
+  proxmox_delete_ha_resource: { handler: deleteHaResource, schema: deleteHaResourceSchema },
+  proxmox_get_ha_groups: { handler: getHaGroups, schema: getHaGroupsSchema },
+  proxmox_get_ha_group: { handler: getHaGroup, schema: getHaGroupSchema },
+  proxmox_create_ha_group: { handler: createHaGroup, schema: createHaGroupSchema },
+  proxmox_update_ha_group: { handler: updateHaGroup, schema: updateHaGroupSchema },
+  proxmox_delete_ha_group: { handler: deleteHaGroup, schema: deleteHaGroupSchema },
+  proxmox_get_ha_status: { handler: getHaStatus, schema: getHaStatusSchema },
+  proxmox_list_cluster_firewall_rules: {
+    handler: listClusterFirewallRules,
+    schema: listClusterFirewallRulesSchema,
+  },
+  proxmox_get_cluster_firewall_rule: {
+    handler: getClusterFirewallRule,
+    schema: getClusterFirewallRuleSchema,
+  },
+  proxmox_create_cluster_firewall_rule: {
+    handler: createClusterFirewallRule,
+    schema: createClusterFirewallRuleSchema,
+  },
+  proxmox_update_cluster_firewall_rule: {
+    handler: updateClusterFirewallRule,
+    schema: updateClusterFirewallRuleSchema,
+  },
+  proxmox_delete_cluster_firewall_rule: {
+    handler: deleteClusterFirewallRule,
+    schema: deleteClusterFirewallRuleSchema,
+  },
+  proxmox_list_cluster_firewall_groups: {
+    handler: listClusterFirewallGroups,
+    schema: listClusterFirewallGroupsSchema,
+  },
+  proxmox_get_cluster_firewall_group: {
+    handler: getClusterFirewallGroup,
+    schema: getClusterFirewallGroupSchema,
+  },
+  proxmox_create_cluster_firewall_group: {
+    handler: createClusterFirewallGroup,
+    schema: createClusterFirewallGroupSchema,
+  },
+  proxmox_update_cluster_firewall_group: {
+    handler: updateClusterFirewallGroup,
+    schema: updateClusterFirewallGroupSchema,
+  },
+  proxmox_delete_cluster_firewall_group: {
+    handler: deleteClusterFirewallGroup,
+    schema: deleteClusterFirewallGroupSchema,
+  },
+  proxmox_list_cluster_backup_jobs: {
+    handler: listClusterBackupJobs,
+    schema: listClusterBackupJobsSchema,
+  },
+  proxmox_get_cluster_backup_job: {
+    handler: getClusterBackupJob,
+    schema: getClusterBackupJobSchema,
+  },
+  proxmox_create_cluster_backup_job: {
+    handler: createClusterBackupJob,
+    schema: createClusterBackupJobSchema,
+  },
+  proxmox_update_cluster_backup_job: {
+    handler: updateClusterBackupJob,
+    schema: updateClusterBackupJobSchema,
+  },
+  proxmox_delete_cluster_backup_job: {
+    handler: deleteClusterBackupJob,
+    schema: deleteClusterBackupJobSchema,
+  },
+  proxmox_list_cluster_replication_jobs: {
+    handler: listClusterReplicationJobs,
+    schema: listClusterReplicationJobsSchema,
+  },
+  proxmox_get_cluster_replication_job: {
+    handler: getClusterReplicationJob,
+    schema: getClusterReplicationJobSchema,
+  },
+  proxmox_create_cluster_replication_job: {
+    handler: createClusterReplicationJob,
+    schema: createClusterReplicationJobSchema,
+  },
+  proxmox_update_cluster_replication_job: {
+    handler: updateClusterReplicationJob,
+    schema: updateClusterReplicationJobSchema,
+  },
+  proxmox_delete_cluster_replication_job: {
+    handler: deleteClusterReplicationJob,
+    schema: deleteClusterReplicationJobSchema,
+  },
+  proxmox_get_cluster_options: { handler: getClusterOptions, schema: getClusterOptionsSchema },
+  proxmox_update_cluster_options: {
+    handler: updateClusterOptions,
+    schema: updateClusterOptionsSchema,
+  },
 
   // Node Management
   proxmox_get_node_services: { handler: getNodeServices, schema: getNodeServicesSchema },
@@ -283,10 +449,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 72 tools are registered
+// Validate all 105 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 72) {
+if (registeredCount !== 105) {
   throw new Error(
-    `Tool registry incomplete: expected 72 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 105 tools, got ${registeredCount}`
   );
 }

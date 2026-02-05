@@ -23,6 +23,53 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_get_cluster_status: 'Get overall cluster status including nodes and resource usage',
   proxmox_get_next_vmid: 'Get the next available VM/Container ID number',
 
+  // Cluster Management
+  proxmox_get_ha_resources: 'List High Availability resources in the cluster',
+  proxmox_get_ha_resource: 'Get details for a specific HA resource',
+  proxmox_create_ha_resource: 'Create a new HA resource (requires elevated permissions)',
+  proxmox_update_ha_resource: 'Update an HA resource (requires elevated permissions)',
+  proxmox_delete_ha_resource: 'Delete an HA resource (requires elevated permissions)',
+  proxmox_get_ha_groups: 'List High Availability groups in the cluster',
+  proxmox_get_ha_group: 'Get details for a specific HA group',
+  proxmox_create_ha_group: 'Create a new HA group (requires elevated permissions)',
+  proxmox_update_ha_group: 'Update an HA group (requires elevated permissions)',
+  proxmox_delete_ha_group: 'Delete an HA group (requires elevated permissions)',
+  proxmox_get_ha_status: 'Get HA manager status information for the cluster',
+  proxmox_list_cluster_firewall_rules: 'List cluster-wide firewall rules',
+  proxmox_get_cluster_firewall_rule: 'Get a cluster firewall rule by position',
+  proxmox_create_cluster_firewall_rule:
+    'Create a cluster-wide firewall rule (requires elevated permissions)',
+  proxmox_update_cluster_firewall_rule:
+    'Update a cluster firewall rule (requires elevated permissions)',
+  proxmox_delete_cluster_firewall_rule:
+    'Delete a cluster firewall rule (requires elevated permissions)',
+  proxmox_list_cluster_firewall_groups: 'List cluster firewall security groups',
+  proxmox_get_cluster_firewall_group: 'Get a cluster firewall group by name',
+  proxmox_create_cluster_firewall_group:
+    'Create a cluster firewall group (requires elevated permissions)',
+  proxmox_update_cluster_firewall_group:
+    'Update a cluster firewall group (requires elevated permissions)',
+  proxmox_delete_cluster_firewall_group:
+    'Delete a cluster firewall group (requires elevated permissions)',
+  proxmox_list_cluster_backup_jobs: 'List scheduled cluster backup jobs',
+  proxmox_get_cluster_backup_job: 'Get a scheduled cluster backup job',
+  proxmox_create_cluster_backup_job:
+    'Create a scheduled cluster backup job (requires elevated permissions)',
+  proxmox_update_cluster_backup_job:
+    'Update a scheduled cluster backup job (requires elevated permissions)',
+  proxmox_delete_cluster_backup_job:
+    'Delete a scheduled cluster backup job (requires elevated permissions)',
+  proxmox_list_cluster_replication_jobs: 'List cluster replication jobs',
+  proxmox_get_cluster_replication_job: 'Get a cluster replication job by ID',
+  proxmox_create_cluster_replication_job:
+    'Create a cluster replication job (requires elevated permissions)',
+  proxmox_update_cluster_replication_job:
+    'Update a cluster replication job (requires elevated permissions)',
+  proxmox_delete_cluster_replication_job:
+    'Delete a cluster replication job (requires elevated permissions)',
+  proxmox_get_cluster_options: 'Get cluster-wide options',
+  proxmox_update_cluster_options: 'Update cluster-wide options (requires elevated permissions)',
+
   // Node Management
   proxmox_get_node_services: 'List system services on a Proxmox node',
   proxmox_control_node_service:
