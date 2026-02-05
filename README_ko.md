@@ -39,7 +39,7 @@ Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 55개 도구
 - **55개 관리 도구** - Proxmox 전 영역 커버
 - **완전한 TypeScript 구현** - 엄격한 타입 안전성
 - **QEMU VM + LXC 컨테이너** 동시 지원
-- **보안 인증** - 비밀번호 + API 토큰
+- **보안 인증** - API 토큰
 - **유연한 SSL 모드** - strict, verify, insecure
 - **권한 기반 접근 제어** - 읽기 전용 / 관리자 분리
 - **구조화된 오류 처리**
@@ -62,8 +62,7 @@ npx @bldg-7/proxmox-mcp
 | 변수 | 필수 | 설명 | 기본값 |
 |------|------|------|--------|
 | `PROXMOX_HOST` | **예** | Proxmox 서버 호스트명 또는 IP | - |
-| `PROXMOX_USER` | **예** | 사용자명 (예: `root@pam`) | - |
-| `PROXMOX_PASSWORD` | **예** | 비밀번호 | - |
+| `PROXMOX_USER` | 아니오 | 사용자명 (예: `root@pam`) | `root@pam` |
 | `PROXMOX_TOKEN_NAME` | **예** | API 토큰 이름 | - |
 | `PROXMOX_TOKEN_VALUE` | **예** | API 토큰 값 | - |
 | `PROXMOX_SSL_MODE` | 아니오 | SSL 검증 모드 | `strict` |
@@ -91,8 +90,6 @@ npx @bldg-7/proxmox-mcp
 
 ```bash
 export PROXMOX_HOST=pve.example.com
-export PROXMOX_USER=root@pam
-export PROXMOX_PASSWORD=your-password
 export PROXMOX_TOKEN_NAME=mytoken
 export PROXMOX_TOKEN_VALUE=abc123-def456-ghi789
 export PROXMOX_SSL_MODE=verify
@@ -113,8 +110,6 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
       "args": ["-y", "@bldg-7/proxmox-mcp"],
       "env": {
         "PROXMOX_HOST": "pve.example.com",
-        "PROXMOX_USER": "root@pam",
-        "PROXMOX_PASSWORD": "your-password",
         "PROXMOX_TOKEN_NAME": "mytoken",
         "PROXMOX_TOKEN_VALUE": "abc123-def456-ghi789",
         "PROXMOX_SSL_MODE": "verify",
@@ -506,8 +501,7 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 ### 인증 오류
 
 `401 Unauthorized` 시:
-- `PROXMOX_USER`에 realm 포함 여부 확인 (예: `root@pam`, `root`만 사용 불가)
-- `PROXMOX_PASSWORD` 확인
+- `PROXMOX_USER` 설정 시 realm 포함 여부 확인 (예: `root@pam`, `root`만 사용 불가)
 - `PROXMOX_TOKEN_NAME`과 `PROXMOX_TOKEN_VALUE` 유효성 확인
 - Proxmox에서 API 토큰에 충분한 권한 부여 여부 확인
 

@@ -39,7 +39,7 @@ This project is a TypeScript rewrite of [mcp-proxmox-server](https://github.com/
 - **55 comprehensive tools** for Proxmox management
 - **Full TypeScript implementation** with strict type safety
 - **Support for both QEMU VMs and LXC containers**
-- **Secure authentication** (password + API token)
+- **Secure authentication** (API token)
 - **Flexible SSL modes** (strict, verify, insecure)
 - **Permission-based access control** (basic vs elevated operations)
 - **Comprehensive error handling** with structured responses
@@ -64,8 +64,7 @@ Set the following environment variables before starting the server:
 | Variable | Required | Description | Default |
 |----------|----------|-------------|---------|
 | `PROXMOX_HOST` | **Yes** | Proxmox server hostname or IP address | - |
-| `PROXMOX_USER` | **Yes** | Username with realm (e.g., `root@pam`) | - |
-| `PROXMOX_PASSWORD` | **Yes** | User password | - |
+| `PROXMOX_USER` | No | Username with realm (e.g., `root@pam`) | `root@pam` |
 | `PROXMOX_TOKEN_NAME` | **Yes** | API token name | - |
 | `PROXMOX_TOKEN_VALUE` | **Yes** | API token value | - |
 | `PROXMOX_SSL_MODE` | No | SSL verification mode | `strict` |
@@ -94,8 +93,6 @@ This prevents accidental destructive operations and provides an additional safet
 ```bash
 # With environment variables
 export PROXMOX_HOST=pve.example.com
-export PROXMOX_USER=root@pam
-export PROXMOX_PASSWORD=your-password
 export PROXMOX_TOKEN_NAME=mytoken
 export PROXMOX_TOKEN_VALUE=abc123-def456-ghi789
 export PROXMOX_SSL_MODE=verify
@@ -116,8 +113,6 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
       "args": ["-y", "@bldg-7/proxmox-mcp"],
       "env": {
         "PROXMOX_HOST": "pve.example.com",
-        "PROXMOX_USER": "root@pam",
-        "PROXMOX_PASSWORD": "your-password",
         "PROXMOX_TOKEN_NAME": "mytoken",
         "PROXMOX_TOKEN_VALUE": "abc123-def456-ghi789",
         "PROXMOX_SSL_MODE": "verify",
@@ -961,8 +956,7 @@ All tools return structured responses following the MCP protocol:
 **Problem**: `401 Unauthorized` or authentication failed
 
 **Solutions**:
-- Verify `PROXMOX_USER` includes realm (e.g., `root@pam`, not just `root`)
-- Check `PROXMOX_PASSWORD` is correct
+- Verify `PROXMOX_USER` includes realm if set (e.g., `root@pam`, not just `root`)
 - Verify `PROXMOX_TOKEN_NAME` and `PROXMOX_TOKEN_VALUE` are valid
 - Ensure API token has sufficient permissions in Proxmox
 
