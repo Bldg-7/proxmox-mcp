@@ -215,6 +215,28 @@ export function validateBridgeName(bridge: unknown): string {
 }
 
 /**
+ * Validates a Linux network interface name.
+ * Must start with a letter, followed by alphanumeric characters, dots (for VLAN), hyphens, or underscores.
+ * Examples: eth0, vmbr0, bond0, eth0.100 (VLAN), ens18, enp0s3
+ *
+ * @throws {Error} If interface name is invalid
+ */
+export function validateInterfaceName(iface: unknown): string {
+  if (!iface || typeof iface !== 'string') {
+    throw new Error('Interface name is required and must be a string');
+  }
+
+  // Linux interface names: must start with letter, then alphanumeric, dots (VLAN), hyphens, underscores
+  if (!/^[a-zA-Z][a-zA-Z0-9._-]*$/.test(iface)) {
+    throw new Error(
+      'Invalid interface name format. Must start with a letter, followed by alphanumeric characters, dots (VLAN), hyphens, or underscores'
+    );
+  }
+
+  return iface;
+}
+
+/**
  * Generates a secure random password using Node.js crypto.
  * Length: 16 characters.
  * Character set: A-Z, a-z, 0-9, !@#$%^&*

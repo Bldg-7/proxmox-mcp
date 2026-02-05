@@ -9,6 +9,7 @@ import {
   validateDiskId,
   validateNetworkId,
   validateBridgeName,
+  validateInterfaceName,
 } from './index.js';
 
 describe('validateNodeName', () => {
@@ -227,5 +228,79 @@ describe('validateBridgeName', () => {
     expect(() => validateBridgeName('br0')).toThrow('Invalid bridge name format');
     expect(() => validateBridgeName('vmbr')).toThrow('Invalid bridge name format');
     expect(() => validateBridgeName('vmbr0a')).toThrow('Invalid bridge name format');
+  });
+});
+
+describe('validateInterfaceName', () => {
+  it('accepts valid physical interface names', () => {
+    expect(validateInterfaceName('eth0')).toBe('eth0');
+    expect(validateInterfaceName('eth1')).toBe('eth1');
+    expect(validateInterfaceName('ens18')).toBe('ens18');
+    expect(validateInterfaceName('enp0s3')).toBe('enp0s3');
+  });
+
+  it('accepts valid bridge interface names', () => {
+    expect(validateInterfaceName('vmbr0')).toBe('vmbr0');
+    expect(validateInterfaceName('vmbr1')).toBe('vmbr1');
+  });
+
+  it('accepts valid bond interface names', () => {
+    expect(validateInterfaceName('bond0')).toBe('bond0');
+    expect(validateInterfaceName('bond1')).toBe('bond1');
+  });
+
+  it('accepts VLAN interface names with dots', () => {
+    expect(validateInterfaceName('eth0.100')).toBe('eth0.100');
+    expect(validateInterfaceName('eth1.200')).toBe('eth1.200');
+    expect(validateInterfaceName('vmbr0.100')).toBe('vmbr0.100');
+  });
+
+  it('accepts interface names with hyphens and underscores', () => {
+    expect(validateInterfaceName('eth-0')).toBe('eth-0');
+    expect(validateInterfaceName('eth_0')).toBe('eth_0');
+    expect(validateInterfaceName('my-interface')).toBe('my-interface');
+    expect(validateInterfaceName('my_interface')).toBe('my_interface');
+  });
+
+  it('accepts complex interface names', () => {
+    expect(validateInterfaceName('enp0s3.100')).toBe('enp0s3.100');
+    expect(validateInterfaceName('bond0-vlan')).toBe('bond0-vlan');
+    expect(validateInterfaceName('a1b2c3')).toBe('a1b2c3');
+  });
+
+  it('rejects non-string input', () => {
+    expect(() => validateInterfaceName(null)).toThrow('Interface name is required and must be a string');
+    expect(() => validateInterfaceName(undefined)).toThrow('Interface name is required and must be a string');
+    expect(() => validateInterfaceName(123)).toThrow('Interface name is required and must be a string');
+  });
+
+  it('rejects empty string', () => {
+    expect(() => validateInterfaceName('')).toThrow('Interface name is required and must be a string');
+  });
+
+  it('rejects names starting with numbers', () => {
+    expect(() => validateInterfaceName('0eth')).toThrow('Invalid interface name format');
+    expect(() => validateInterfaceName('123start')).toThrow('Invalid interface name format');
+    expect(() => validateInterfaceName('1interface')).toThrow('Invalid interface name format');
+  });
+
+  it('rejects names starting with special characters', () => {
+    expect(() => validateInterfaceName('@invalid')).toThrow('Invalid interface name format');
+    expect(() => validateInterfaceName('-eth0')).toThrow('Invalid interface name format');
+    expect(() => validateInterfaceName('_eth0')).toThrow('Invalid interface name format');
+    expect(() => validateInterfaceName('.eth0')).toThrow('Invalid interface name format');
+  });
+
+  it('rejects names with spaces', () => {
+    expect(() => validateInterfaceName('eth 0')).toThrow('Invalid interface name format');
+    expect(() => validateInterfaceName('eth0 vlan')).toThrow('Invalid interface name format');
+  });
+
+  it('rejects names with invalid special characters', () => {
+    expect(() => validateInterfaceName('eth@0')).toThrow('Invalid interface name format');
+    expect(() => validateInterfaceName('eth#0')).toThrow('Invalid interface name format');
+    expect(() => validateInterfaceName('eth$0')).toThrow('Invalid interface name format');
+    expect(() => validateInterfaceName('eth/0')).toThrow('Invalid interface name format');
+    expect(() => validateInterfaceName('eth:0')).toThrow('Invalid interface name format');
   });
 });
