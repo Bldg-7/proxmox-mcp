@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createMockProxmoxClient, createTestConfig } from '../__test-utils__/index.js';
 import { sampleNodes } from '../__fixtures__/nodes.js';
-import { getNodes, getNodeStatus } from './node.js';
+import { getNodes, getNodeStatus, getNodeNetwork, getNodeDns, getNetworkIface } from './node.js';
 
 describe('getNodes', () => {
   let client: ReturnType<typeof createMockProxmoxClient>;
@@ -241,5 +241,230 @@ describe('getNodeStatus', () => {
     await getNodeStatus(client, config, { node: 'pve1' });
 
     expect(client.request).toHaveBeenCalledWith('/nodes/pve1/status');
+  });
+});
+
+describe('getNodeNetwork', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted list of interfaces', async () => {
+    const config = createTestConfig();
+    const { sampleNetworkInterfaces } = await import('../__fixtures__/network.js');
+    client.request.mockResolvedValue(sampleNetworkInterfaces);
+
+    const result = await getNodeNetwork(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('🌐');
+    expect(result.content[0].text).toContain('Network Interfaces');
+    expect(result.content[0].text).toContain('vmbr0');
+    expect(result.content[0].text).toContain('eth0');
+    expect(result.content[0].text).toContain('bond0');
+    expect(result.content[0].text).toContain('eth0.100');
+  });
+
+  it('handles empty interface list', async () => {
+    const config = createTestConfig();
+    const { emptyNetworkList } = await import('../__fixtures__/network.js');
+    client.request.mockResolvedValue(emptyNetworkList);
+
+    const result = await getNodeNetwork(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('No network interfaces found');
+  });
+
+  it('filters by type when provided', async () => {
+    const config = createTestConfig();
+    const { sampleNetworkInterfaces } = await import('../__fixtures__/network.js');
+    client.request.mockResolvedValue(sampleNetworkInterfaces);
+
+    const result = await getNodeNetwork(client, config, { node: 'pve1', type: 'bridge' });
+
+    expect(result.isError).toBe(false);
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/network?type=bridge');
+  });
+
+  it('validates node name (rejects invalid names)', async () => {
+    const config = createTestConfig();
+
+    const result = await getNodeNetwork(client, config, { node: 'invalid@node' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+  });
+
+  it('handles API errors gracefully', async () => {
+    const config = createTestConfig();
+    client.request.mockRejectedValue(new Error('Network query failed'));
+
+    const result = await getNodeNetwork(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+    expect(result.content[0].text).toContain('Network query failed');
+  });
+
+  it('calls correct API endpoint', async () => {
+    const config = createTestConfig();
+    const { sampleNetworkInterfaces } = await import('../__fixtures__/network.js');
+    client.request.mockResolvedValue(sampleNetworkInterfaces);
+
+    await getNodeNetwork(client, config, { node: 'pve1' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/network');
+  });
+
+  it('calls correct endpoint with type filter', async () => {
+    const config = createTestConfig();
+    const { sampleNetworkInterfaces } = await import('../__fixtures__/network.js');
+    client.request.mockResolvedValue(sampleNetworkInterfaces);
+
+    await getNodeNetwork(client, config, { node: 'pve1', type: 'bridge' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/network?type=bridge');
+  });
+});
+
+describe('getNodeDns', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted DNS configuration', async () => {
+    const config = createTestConfig();
+    const { sampleDnsConfig } = await import('../__fixtures__/network.js');
+    client.request.mockResolvedValue(sampleDnsConfig);
+
+    const result = await getNodeDns(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('🌐');
+    expect(result.content[0].text).toContain('DNS Configuration');
+    expect(result.content[0].text).toContain('8.8.8.8');
+    expect(result.content[0].text).toContain('8.8.4.4');
+    expect(result.content[0].text).toContain('1.1.1.1');
+    expect(result.content[0].text).toContain('example.com');
+  });
+
+  it('handles partial DNS config (missing dns2/dns3)', async () => {
+    const config = createTestConfig();
+    const { partialDnsConfig } = await import('../__fixtures__/network.js');
+    client.request.mockResolvedValue(partialDnsConfig);
+
+    const result = await getNodeDns(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('192.168.1.1');
+    expect(result.content[0].text).toContain('example.com');
+  });
+
+  it('validates node name', async () => {
+    const config = createTestConfig();
+
+    const result = await getNodeDns(client, config, { node: 'invalid;node' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+  });
+
+  it('handles API errors gracefully', async () => {
+    const config = createTestConfig();
+    client.request.mockRejectedValue(new Error('DNS query failed'));
+
+    const result = await getNodeDns(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+    expect(result.content[0].text).toContain('DNS query failed');
+  });
+
+  it('calls correct API endpoint', async () => {
+    const config = createTestConfig();
+    const { sampleDnsConfig } = await import('../__fixtures__/network.js');
+    client.request.mockResolvedValue(sampleDnsConfig);
+
+    await getNodeDns(client, config, { node: 'pve1' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/dns');
+  });
+});
+
+describe('getNetworkIface', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted interface details', async () => {
+    const config = createTestConfig();
+    const { sampleInterfaceDetail } = await import('../__fixtures__/network.js');
+    client.request.mockResolvedValue(sampleInterfaceDetail);
+
+    const result = await getNetworkIface(client, config, { node: 'pve1', iface: 'vmbr0' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('🌐');
+    expect(result.content[0].text).toContain('Network Interface');
+    expect(result.content[0].text).toContain('vmbr0');
+    expect(result.content[0].text).toContain('bridge');
+    expect(result.content[0].text).toContain('192.168.1.100');
+  });
+
+  it('handles interface not found (API error)', async () => {
+    const config = createTestConfig();
+    client.request.mockRejectedValue(new Error('Interface not found'));
+
+    const result = await getNetworkIface(client, config, { node: 'pve1', iface: 'vmbr99' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+    expect(result.content[0].text).toContain('Interface not found');
+  });
+
+  it('validates node name', async () => {
+    const config = createTestConfig();
+
+    const result = await getNetworkIface(client, config, { node: 'invalid@node', iface: 'vmbr0' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+  });
+
+  it('validates interface name (uses validateInterfaceName)', async () => {
+    const config = createTestConfig();
+
+    const result = await getNetworkIface(client, config, { node: 'pve1', iface: '@invalid' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+  });
+
+  it('handles API errors gracefully', async () => {
+    const config = createTestConfig();
+    client.request.mockRejectedValue(new Error('Network error'));
+
+    const result = await getNetworkIface(client, config, { node: 'pve1', iface: 'eth0' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+    expect(result.content[0].text).toContain('Network error');
+  });
+
+  it('calls correct API endpoint', async () => {
+    const config = createTestConfig();
+    const { sampleInterfaceDetail } = await import('../__fixtures__/network.js');
+    client.request.mockResolvedValue(sampleInterfaceDetail);
+
+    await getNetworkIface(client, config, { node: 'pve1', iface: 'vmbr0' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/network/vmbr0');
   });
 });
