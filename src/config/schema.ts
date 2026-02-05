@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+export const sslModeSchema = z.enum(['strict', 'verify', 'insecure']);
+export type SslMode = z.infer<typeof sslModeSchema>;
+
 export const configSchema = z.object({
   host: z
     .string({ required_error: 'PROXMOX_HOST is required' })
@@ -23,9 +26,7 @@ export const configSchema = z.object({
   allowElevated: z
     .boolean()
     .default(false),
-  sslVerify: z
-    .boolean()
-    .default(false),
+  sslMode: sslModeSchema.default('strict'),
   sslCaCert: z
     .string()
     .optional(),

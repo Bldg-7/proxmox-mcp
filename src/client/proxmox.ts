@@ -1,5 +1,5 @@
-import https from 'node:https';
 import fs from 'node:fs';
+import { Agent, type Dispatcher } from 'undici';
 import type { Config } from '../config/schema.js';
 import { logger } from '../utils/index.js';
 
@@ -19,25 +19,30 @@ export class ProxmoxApiError extends Error {
 export class ProxmoxApiClient {
   private readonly baseUrl: string;
   private readonly authHeader: string;
-  private readonly agent: https.Agent;
+  private readonly dispatcher: Dispatcher;
 
   constructor(config: Config) {
     this.baseUrl = `https://${config.host}:${config.port}/api2/json`;
     this.authHeader = `PVEAPIToken=${config.user}!${config.tokenName}=${config.tokenValue}`;
 
-    if (config.sslVerify && config.sslCaCert) {
-      this.agent = new https.Agent({
-        ca: fs.readFileSync(config.sslCaCert),
-      });
-    } else if (config.sslVerify) {
-      this.agent = new https.Agent({
-        rejectUnauthorized: true,
-      });
-    } else {
-      this.agent = new https.Agent({
-        rejectUnauthorized: false,
-      });
+    const connectOptions: { rejectUnauthorized?: boolean; ca?: Buffer } = {};
+
+    switch (config.sslMode) {
+      case 'strict':
+        connectOptions.rejectUnauthorized = true;
+        break;
+      case 'verify':
+        connectOptions.rejectUnauthorized = true;
+        if (config.sslCaCert) {
+          connectOptions.ca = fs.readFileSync(config.sslCaCert);
+        }
+        break;
+      case 'insecure':
+        connectOptions.rejectUnauthorized = false;
+        break;
     }
+
+    this.dispatcher = new Agent({ connect: connectOptions });
   }
 
   async request<T>(endpoint: string, method = 'GET', body?: unknown): Promise<T> {
@@ -48,15 +53,12 @@ export class ProxmoxApiClient {
       'Content-Type': 'application/json',
     };
 
-    const options: RequestInit & { dispatcher?: unknown } = {
+    const options = {
       method,
       headers,
       signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
-    };
-
-    // Pass the HTTPS agent via the Node.js-specific dispatcher
-    // Node's native fetch accepts an agent-like option
-    (options as Record<string, unknown>)['agent'] = this.agent;
+      dispatcher: this.dispatcher,
+    } as unknown as RequestInit;
 
     if (body !== undefined) {
       options.body = JSON.stringify(body);

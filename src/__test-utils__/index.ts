@@ -11,7 +11,7 @@ export function createTestConfig(overrides: Partial<Config> = {}): Config {
     tokenName: 'test-token',
     tokenValue: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
     allowElevated: false,
-    sslVerify: false,
+    sslMode: 'insecure',
     ...overrides,
   };
 }

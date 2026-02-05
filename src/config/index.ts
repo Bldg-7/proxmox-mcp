@@ -1,7 +1,18 @@
 import dotenv from 'dotenv';
-import { configSchema, type Config } from './schema.js';
+import { configSchema, sslModeSchema, type Config, type SslMode } from './schema.js';
 
-export { type Config } from './schema.js';
+export { type Config, type SslMode } from './schema.js';
+
+function parseSslMode(value: string | undefined): SslMode {
+  if (!value) return 'strict';
+  
+  const result = sslModeSchema.safeParse(value.toLowerCase());
+  if (result.success) {
+    return result.data;
+  }
+  
+  return 'strict';
+}
 
 export function loadConfig(): Config {
   dotenv.config();
@@ -13,7 +24,7 @@ export function loadConfig(): Config {
     tokenName: process.env.PROXMOX_TOKEN_NAME,
     tokenValue: process.env.PROXMOX_TOKEN_VALUE,
     allowElevated: process.env.PROXMOX_ALLOW_ELEVATED === 'true',
-    sslVerify: process.env.PROXMOX_SSL_VERIFY === 'true',
+    sslMode: parseSslMode(process.env.PROXMOX_SSL_MODE),
     sslCaCert: process.env.PROXMOX_SSL_CA_CERT || undefined,
   };
 
