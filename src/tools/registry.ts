@@ -52,6 +52,10 @@ import {
   removeMountpointLxc,
   moveDiskVM,
   moveDiskLxc,
+  getNodeDisks,
+  getDiskSmart,
+  getNodeLvm,
+  getNodeZfs,
   addNetworkVm,
   addNetworkLxc,
   updateNetworkVm,
@@ -125,6 +129,10 @@ import {
   removeMountpointLxcSchema,
   moveDiskVmSchema,
   moveDiskLxcSchema,
+  getNodeDisksSchema,
+  getDiskSmartSchema,
+  getNodeLvmSchema,
+  getNodeZfsSchema,
 } from '../schemas/disk.js';
 import {
   addNetworkVmSchema,
@@ -201,15 +209,19 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_restore_backup_vm: { handler: restoreBackupVM, schema: restoreBackupVmSchema },
   proxmox_delete_backup: { handler: deleteBackup, schema: deleteBackupSchema },
 
-  // Disks
-  proxmox_add_disk_vm: { handler: addDiskVM, schema: addDiskVmSchema },
-  proxmox_add_mountpoint_lxc: { handler: addMountpointLxc, schema: addMountpointLxcSchema },
-  proxmox_resize_disk_vm: { handler: resizeDiskVM, schema: resizeDiskVmSchema },
-  proxmox_resize_disk_lxc: { handler: resizeDiskLxc, schema: resizeDiskLxcSchema },
-  proxmox_remove_disk_vm: { handler: removeDiskVM, schema: removeDiskVmSchema },
-  proxmox_remove_mountpoint_lxc: { handler: removeMountpointLxc, schema: removeMountpointLxcSchema },
-  proxmox_move_disk_vm: { handler: moveDiskVM, schema: moveDiskVmSchema },
-  proxmox_move_disk_lxc: { handler: moveDiskLxc, schema: moveDiskLxcSchema },
+   // Disks
+   proxmox_add_disk_vm: { handler: addDiskVM, schema: addDiskVmSchema },
+   proxmox_add_mountpoint_lxc: { handler: addMountpointLxc, schema: addMountpointLxcSchema },
+   proxmox_resize_disk_vm: { handler: resizeDiskVM, schema: resizeDiskVmSchema },
+   proxmox_resize_disk_lxc: { handler: resizeDiskLxc, schema: resizeDiskLxcSchema },
+   proxmox_remove_disk_vm: { handler: removeDiskVM, schema: removeDiskVmSchema },
+   proxmox_remove_mountpoint_lxc: { handler: removeMountpointLxc, schema: removeMountpointLxcSchema },
+   proxmox_move_disk_vm: { handler: moveDiskVM, schema: moveDiskVmSchema },
+   proxmox_move_disk_lxc: { handler: moveDiskLxc, schema: moveDiskLxcSchema },
+   proxmox_get_node_disks: { handler: getNodeDisks, schema: getNodeDisksSchema },
+   proxmox_get_disk_smart: { handler: getDiskSmart, schema: getDiskSmartSchema },
+   proxmox_get_node_lvm: { handler: getNodeLvm, schema: getNodeLvmSchema },
+   proxmox_get_node_zfs: { handler: getNodeZfs, schema: getNodeZfsSchema },
 
   // Network
   proxmox_add_network_vm: { handler: addNetworkVm, schema: addNetworkVmSchema },
@@ -233,10 +245,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 57 tools are registered
+// Validate all 61 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 57) {
+if (registeredCount !== 61) {
   throw new Error(
-    `Tool registry incomplete: expected 57 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 61 tools, got ${registeredCount}`
   );
 }

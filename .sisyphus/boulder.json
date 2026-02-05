@@ -1,10 +1,8 @@
 {
-  "active_plan": "/Users/snark/Documents/dev/proxmox-mcp/.sisyphus/plans/add-config-read-tools.md",
-  "started_at": "2026-02-05T07:55:55.722Z",
-  "completed_at": "2026-02-05T07:59:01.000Z",
+  "active_plan": "/Users/snark/Documents/dev/proxmox-mcp/.sisyphus/plans/add-node-disk-tools.md",
+  "started_at": "2026-02-05T09:05:29.967Z",
   "session_ids": [
     "ses_3d400eb1dffeKd4WDY8OIavIPs"
   ],
-  "plan_name": "add-config-read-tools",
-  "status": "completed"
+  "plan_name": "add-node-disk-tools"
 }

@@ -52,6 +52,10 @@ export {
   removeMountpointLxc,
   moveDiskVM,
   moveDiskLxc,
+  getNodeDisks,
+  getDiskSmart,
+  getNodeLvm,
+  getNodeZfs,
 } from './disk.js';
 
 // Network tools
