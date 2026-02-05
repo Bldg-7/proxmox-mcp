@@ -53,6 +53,18 @@ import {
   deleteClusterReplicationJob,
   getClusterOptions,
   updateClusterOptions,
+  listStorageConfig,
+  getStorageConfig,
+  createStorage,
+  updateStorage,
+  deleteStorage,
+  uploadToStorage,
+  downloadUrlToStorage,
+  listStorageContent,
+  deleteStorageContent,
+  listFileRestore,
+  downloadFileRestore,
+  pruneBackups,
   getVMs,
   getVMStatus,
   getVMConfig,
@@ -191,6 +203,20 @@ import {
   getClusterOptionsSchema,
   updateClusterOptionsSchema,
 } from '../schemas/cluster-management.js';
+import {
+  listStorageConfigSchema,
+  getStorageConfigSchema,
+  createStorageSchema,
+  updateStorageSchema,
+  deleteStorageSchema,
+  uploadToStorageSchema,
+  downloadUrlToStorageSchema,
+  listStorageContentSchema,
+  deleteStorageContentSchema,
+  listFileRestoreSchema,
+  downloadFileRestoreSchema,
+  pruneBackupsSchema,
+} from '../schemas/storage-management.js';
 import {
   getVmsSchema,
   getVmStatusSchema,
@@ -409,6 +435,35 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
     schema: updateClusterOptionsSchema,
   },
 
+  // Storage Management
+  proxmox_list_storage_config: {
+    handler: listStorageConfig,
+    schema: listStorageConfigSchema,
+  },
+  proxmox_get_storage_config: { handler: getStorageConfig, schema: getStorageConfigSchema },
+  proxmox_create_storage: { handler: createStorage, schema: createStorageSchema },
+  proxmox_update_storage: { handler: updateStorage, schema: updateStorageSchema },
+  proxmox_delete_storage: { handler: deleteStorage, schema: deleteStorageSchema },
+  proxmox_upload_to_storage: { handler: uploadToStorage, schema: uploadToStorageSchema },
+  proxmox_download_url_to_storage: {
+    handler: downloadUrlToStorage,
+    schema: downloadUrlToStorageSchema,
+  },
+  proxmox_list_storage_content: {
+    handler: listStorageContent,
+    schema: listStorageContentSchema,
+  },
+  proxmox_delete_storage_content: {
+    handler: deleteStorageContent,
+    schema: deleteStorageContentSchema,
+  },
+  proxmox_list_file_restore: { handler: listFileRestore, schema: listFileRestoreSchema },
+  proxmox_download_file_restore: {
+    handler: downloadFileRestore,
+    schema: downloadFileRestoreSchema,
+  },
+  proxmox_prune_backups: { handler: pruneBackups, schema: pruneBackupsSchema },
+
   // Node Management
   proxmox_get_node_services: { handler: getNodeServices, schema: getNodeServicesSchema },
   proxmox_control_node_service: {
@@ -564,10 +619,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 131 tools are registered
+// Validate all 143 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 131) {
+if (registeredCount !== 143) {
   throw new Error(
-    `Tool registry incomplete: expected 131 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 143 tools, got ${registeredCount}`
   );
 }

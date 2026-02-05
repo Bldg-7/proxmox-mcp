@@ -70,6 +70,21 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_get_cluster_options: 'Get cluster-wide options',
   proxmox_update_cluster_options: 'Update cluster-wide options (requires elevated permissions)',
 
+  // Storage Management
+  proxmox_list_storage_config: 'List storage configurations available in Proxmox',
+  proxmox_get_storage_config: 'Get a storage configuration by name',
+  proxmox_create_storage: 'Create a storage configuration (requires elevated permissions)',
+  proxmox_update_storage: 'Update a storage configuration (requires elevated permissions)',
+  proxmox_delete_storage: 'Delete a storage configuration (requires elevated permissions)',
+  proxmox_upload_to_storage: 'Upload ISO/template to storage (requires elevated permissions)',
+  proxmox_download_url_to_storage:
+    'Download a file from URL to storage (requires elevated permissions)',
+  proxmox_list_storage_content: 'List content stored on a storage',
+  proxmox_delete_storage_content: 'Delete content from storage (requires elevated permissions)',
+  proxmox_list_file_restore: 'List files in a backup for restore',
+  proxmox_download_file_restore: 'Download a file from backup',
+  proxmox_prune_backups: 'Prune old backups from storage (requires elevated permissions)',
+
   // Node Management
   proxmox_get_node_services: 'List system services on a Proxmox node',
   proxmox_control_node_service:

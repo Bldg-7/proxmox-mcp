@@ -3,7 +3,7 @@
 > 사용 가능한 모든 도구 및 계획된 Proxmox API 통합에 대한 완전한 레퍼런스
 
 **현재 버전**: 0.1.5  
-**총 도구 수**: 131  
+**총 도구 수**: 143  
 **최종 업데이트**: 2026-02-05
 
 ---
@@ -16,6 +16,7 @@
   - [노드 & 클러스터 (7개)](#노드--클러스터-7개)
   - [노드 관리 (8개)](#노드-관리-8개)
   - [클러스터 관리 (33개)](#클러스터-관리-33개)
+  - [스토리지 관리 (12개)](#스토리지-관리-12개)
   - [VM 조회 (5개)](#vm-조회-5개)
 - [VM 라이프사이클 (12개)](#vm-라이프사이클-12개)
 - [VM 수정 (4개)](#vm-수정-4개)
@@ -45,6 +46,7 @@
 | 노드 & 클러스터 | 7 | 혼합 |
 | 노드 관리 | 8 | 혼합 |
 | 클러스터 관리 | 33 | 혼합 |
+| 스토리지 관리 | 12 | 혼합 |
 | VM 조회 | 5 | 기본 |
 | VM 라이프사이클 | 12 | 관리자 |
 | VM 수정 | 4 | 관리자 |
@@ -56,7 +58,7 @@
 | 명령어 실행 | 1 | 관리자 |
 | VM 생성 | 3 | 혼합 |
 | 노드 디스크 조회 | 4 | 기본 |
-| **합계** | **131** | |
+| **합계** | **143** | |
 
 ---
 
@@ -1164,6 +1166,323 @@ ID로 클러스터 복제 작업을 조회합니다.
 {
   "console": "xtermjs",
   "language": "en"
+}
+```
+
+---
+
+### 스토리지 관리 (12개)
+
+#### `proxmox_list_storage_config`
+스토리지 구성 목록을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/storage` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_storage_config`
+스토리지 구성을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/storage/{storage}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `storage` | string | Yes | 스토리지 ID |
+
+**Example**:
+```json
+{
+  "storage": "backup-nfs"
+}
+```
+
+---
+
+#### `proxmox_create_storage` 🔒
+스토리지 구성을 생성합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/storage` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `storage` | string | Yes | 스토리지 ID |
+| `type` | string | Yes | 스토리지 타입 (예: `dir`, `nfs`, `lvmthin`) |
+| `content` | string | No | 콘텐츠 유형 (쉼표로 구분) |
+| `path` | string | No | dir 스토리지 경로 |
+| `server` | string | No | 원격 서버 주소 |
+| `export` | string | No | NFS export 경로 |
+
+**Example**:
+```json
+{
+  "storage": "backup-nfs",
+  "type": "nfs",
+  "server": "10.0.0.10",
+  "export": "/exports/backups",
+  "content": "backup"
+}
+```
+
+---
+
+#### `proxmox_update_storage` 🔒
+스토리지 구성을 업데이트합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/storage/{storage}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `storage` | string | Yes | 스토리지 ID |
+| `content` | string | No | 콘텐츠 유형 (쉼표로 구분) |
+| `nodes` | string | No | 적용 노드 제한 |
+| `delete` | string | No | 삭제할 설정 목록 |
+| `digest` | string | No | 설정 digest |
+
+**Example**:
+```json
+{
+  "storage": "backup-nfs",
+  "content": "backup,iso"
+}
+```
+
+---
+
+#### `proxmox_delete_storage` 🔒
+스토리지 구성을 삭제합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/storage/{storage}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `storage` | string | Yes | 스토리지 ID |
+
+**Example**:
+```json
+{
+  "storage": "backup-nfs"
+}
+```
+
+---
+
+#### `proxmox_upload_to_storage` 🔒
+ISO/템플릿 파일을 스토리지에 업로드합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/storage/{storage}/upload` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | 노드 이름 |
+| `storage` | string | Yes | 스토리지 ID |
+| `content` | string | Yes | `iso`, `vztmpl`, `backup` |
+| `filename` | string | Yes | 업로드 파일명 |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "local",
+  "content": "iso",
+  "filename": "ubuntu.iso"
+}
+```
+
+---
+
+#### `proxmox_download_url_to_storage` 🔒
+URL에서 파일을 다운로드하여 스토리지에 저장합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/storage/{storage}/download-url` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | 노드 이름 |
+| `storage` | string | Yes | 스토리지 ID |
+| `url` | string | Yes | 다운로드 URL |
+| `content` | string | Yes | `iso`, `vztmpl`, `backup` |
+| `filename` | string | No | 대상 파일명 |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "local",
+  "url": "https://example.com/ubuntu.iso",
+  "content": "iso",
+  "filename": "ubuntu.iso"
+}
+```
+
+---
+
+#### `proxmox_list_storage_content`
+스토리지 콘텐츠 목록을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/storage/{storage}/content` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | 노드 이름 |
+| `storage` | string | Yes | 스토리지 ID |
+| `content` | string | No | 콘텐츠 유형 필터 |
+| `vmid` | number | No | VMID 필터 |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "local",
+  "content": "iso"
+}
+```
+
+---
+
+#### `proxmox_delete_storage_content` 🔒
+스토리지의 콘텐츠를 삭제합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/storage/{storage}/content/{volume}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | 노드 이름 |
+| `storage` | string | Yes | 스토리지 ID |
+| `volume` | string | Yes | 볼륨 식별자 (volid) |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "local",
+  "volume": "local:iso/ubuntu.iso"
+}
+```
+
+---
+
+#### `proxmox_list_file_restore`
+백업 아카이브 내 파일 목록을 조회합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/storage/{storage}/file-restore/list` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | 노드 이름 |
+| `storage` | string | Yes | 스토리지 ID |
+| `volume` | string | Yes | 백업 볼륨 식별자 |
+| `path` | string | No | 백업 내 경로 |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "backup-nfs",
+  "volume": "backup-nfs:backup/vzdump-qemu-100-2024_01_01-12_00_00.vma.zst"
+}
+```
+
+---
+
+#### `proxmox_download_file_restore`
+백업 아카이브에서 파일을 다운로드합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/storage/{storage}/file-restore/download` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | 노드 이름 |
+| `storage` | string | Yes | 스토리지 ID |
+| `volume` | string | Yes | 백업 볼륨 식별자 |
+| `filepath` | string | Yes | 백업 내 파일 경로 |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "backup-nfs",
+  "volume": "backup-nfs:backup/vzdump-qemu-100-2024_01_01-12_00_00.vma.zst",
+  "filepath": "/etc/hosts"
+}
+```
+
+---
+
+#### `proxmox_prune_backups` 🔒
+스토리지의 오래된 백업을 정리합니다.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/storage/{storage}/prunebackups` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | 노드 이름 |
+| `storage` | string | Yes | 스토리지 ID |
+| `keep-last` | number | No | 최근 N개 유지 |
+| `keep-daily` | number | No | 일간 백업 유지 |
+| `keep-weekly` | number | No | 주간 백업 유지 |
+| `keep-monthly` | number | No | 월간 백업 유지 |
+| `keep-yearly` | number | No | 연간 백업 유지 |
+| `dry-run` | boolean | No | 시뮬레이션만 수행 |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "backup-nfs",
+  "keep-last": 3
 }
 ```
 
@@ -2467,16 +2786,6 @@ Proxmox 노드의 ZFS 풀을 조회합니다.
 ### 중간 우선순위
 
 특수 사용 사례를 위한 API:
-
-#### 스토리지 관리
-
-| 엔드포인트 | 메서드 | 설명 |
-|-----------|--------|------|
-| `/storage` | POST/PUT/DELETE | 스토리지 구성 CRUD |
-| `/nodes/{node}/storage/{storage}/upload` | POST | ISO/템플릿 파일 업로드 |
-| `/nodes/{node}/storage/{storage}/download-url` | POST | URL에서 다운로드 |
-| `/nodes/{node}/storage/{storage}/file-restore` | GET/POST | 파일 수준 백업 복원 |
-| `/nodes/{node}/storage/{storage}/prunebackups` | DELETE | 오래된 백업 정리 |
 
 #### 접근 제어
 

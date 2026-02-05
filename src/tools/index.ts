@@ -53,6 +53,22 @@ export {
   updateClusterOptions,
 } from './cluster-management.js';
 
+// Storage Management tools
+export {
+  listStorageConfig,
+  getStorageConfig,
+  createStorage,
+  updateStorage,
+  deleteStorage,
+  uploadToStorage,
+  downloadUrlToStorage,
+  listStorageContent,
+  deleteStorageContent,
+  listFileRestore,
+  downloadFileRestore,
+  pruneBackups,
+} from './storage-management.js';
+
 // VM Query & Lifecycle tools
 export { getVMs, getVMStatus, getVMConfig, getLxcConfig, getStorage } from './vm-query.js';
 export {

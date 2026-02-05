@@ -3,7 +3,7 @@
 > Complete reference for all available tools and planned Proxmox API integrations
 
 **Current Version**: 0.1.5  
-**Total Tools**: 131  
+**Total Tools**: 143  
 **Last Updated**: 2026-02-05
 
 ---
@@ -16,6 +16,7 @@
   - [Node & Cluster (7 tools)](#node--cluster-7-tools)
   - [Node Management (8 tools)](#node-management-8-tools)
   - [Cluster Management (33 tools)](#cluster-management-33-tools)
+  - [Storage Management (12 tools)](#storage-management-12-tools)
   - [VM Query (5 tools)](#vm-query-5-tools)
 - [VM Lifecycle (12 tools)](#vm-lifecycle-12-tools)
 - [VM Modify (4 tools)](#vm-modify-4-tools)
@@ -45,6 +46,7 @@ This document provides a complete reference for all tools available in the Proxm
 | Node & Cluster | 7 | Mixed |
 | Node Management | 8 | Mixed |
 | Cluster Management | 33 | Mixed |
+| Storage Management | 12 | Mixed |
 | VM Query | 5 | Basic |
 | VM Lifecycle | 12 | Elevated |
 | VM Modify | 4 | Elevated |
@@ -56,7 +58,7 @@ This document provides a complete reference for all tools available in the Proxm
 | Command Execution | 1 | Elevated |
 | VM Creation | 3 | Mixed |
 | Node Disk Query | 4 | Basic |
-| **Total** | **131** | |
+| **Total** | **143** | |
 
 ---
 
@@ -1164,6 +1166,323 @@ Update cluster-wide options.
 {
   "console": "xtermjs",
   "language": "en"
+}
+```
+
+---
+
+### Storage Management (12 tools)
+
+#### `proxmox_list_storage_config`
+List storage configurations.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/storage` |
+| Parameters | None |
+
+**Example**:
+```json
+{}
+```
+
+---
+
+#### `proxmox_get_storage_config`
+Get a storage configuration by name.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/storage/{storage}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `storage` | string | Yes | Storage identifier |
+
+**Example**:
+```json
+{
+  "storage": "backup-nfs"
+}
+```
+
+---
+
+#### `proxmox_create_storage` 🔒
+Create a storage configuration.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/storage` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `storage` | string | Yes | Storage identifier |
+| `type` | string | Yes | Storage type (e.g., `dir`, `nfs`, `lvmthin`) |
+| `content` | string | No | Content types (comma-separated) |
+| `path` | string | No | Filesystem path for dir storage |
+| `server` | string | No | Remote server hostname/IP |
+| `export` | string | No | NFS export path |
+
+**Example**:
+```json
+{
+  "storage": "backup-nfs",
+  "type": "nfs",
+  "server": "10.0.0.10",
+  "export": "/exports/backups",
+  "content": "backup"
+}
+```
+
+---
+
+#### `proxmox_update_storage` 🔒
+Update a storage configuration.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/storage/{storage}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `storage` | string | Yes | Storage identifier |
+| `content` | string | No | Content types (comma-separated) |
+| `nodes` | string | No | Restrict storage to nodes |
+| `delete` | string | No | List of settings to delete |
+| `digest` | string | No | Config digest |
+
+**Example**:
+```json
+{
+  "storage": "backup-nfs",
+  "content": "backup,iso"
+}
+```
+
+---
+
+#### `proxmox_delete_storage` 🔒
+Delete a storage configuration.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/storage/{storage}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `storage` | string | Yes | Storage identifier |
+
+**Example**:
+```json
+{
+  "storage": "backup-nfs"
+}
+```
+
+---
+
+#### `proxmox_upload_to_storage` 🔒
+Upload an ISO or template to storage.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/storage/{storage}/upload` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `storage` | string | Yes | Storage identifier |
+| `content` | string | Yes | `iso`, `vztmpl`, or `backup` |
+| `filename` | string | Yes | Target filename |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "local",
+  "content": "iso",
+  "filename": "ubuntu.iso"
+}
+```
+
+---
+
+#### `proxmox_download_url_to_storage` 🔒
+Download a file from URL to storage.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/storage/{storage}/download-url` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `storage` | string | Yes | Storage identifier |
+| `url` | string | Yes | Source URL |
+| `content` | string | Yes | `iso`, `vztmpl`, or `backup` |
+| `filename` | string | No | Target filename |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "local",
+  "url": "https://example.com/ubuntu.iso",
+  "content": "iso",
+  "filename": "ubuntu.iso"
+}
+```
+
+---
+
+#### `proxmox_list_storage_content`
+List content stored on a storage.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/storage/{storage}/content` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `storage` | string | Yes | Storage identifier |
+| `content` | string | No | Filter by content type |
+| `vmid` | number | No | Filter by VMID |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "local",
+  "content": "iso"
+}
+```
+
+---
+
+#### `proxmox_delete_storage_content` 🔒
+Delete content from storage.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/storage/{storage}/content/{volume}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `storage` | string | Yes | Storage identifier |
+| `volume` | string | Yes | Volume identifier (volid) |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "local",
+  "volume": "local:iso/ubuntu.iso"
+}
+```
+
+---
+
+#### `proxmox_list_file_restore`
+List files inside a backup archive for restore.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/storage/{storage}/file-restore/list` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `storage` | string | Yes | Storage identifier |
+| `volume` | string | Yes | Backup volume identifier |
+| `path` | string | No | Directory path inside backup |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "backup-nfs",
+  "volume": "backup-nfs:backup/vzdump-qemu-100-2024_01_01-12_00_00.vma.zst"
+}
+```
+
+---
+
+#### `proxmox_download_file_restore`
+Download a file from a backup archive.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/storage/{storage}/file-restore/download` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `storage` | string | Yes | Storage identifier |
+| `volume` | string | Yes | Backup volume identifier |
+| `filepath` | string | Yes | File path inside backup |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "backup-nfs",
+  "volume": "backup-nfs:backup/vzdump-qemu-100-2024_01_01-12_00_00.vma.zst",
+  "filepath": "/etc/hosts"
+}
+```
+
+---
+
+#### `proxmox_prune_backups` 🔒
+Prune old backups on a storage.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/storage/{storage}/prunebackups` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `storage` | string | Yes | Storage identifier |
+| `keep-last` | number | No | Keep last N backups |
+| `keep-daily` | number | No | Keep daily backups |
+| `keep-weekly` | number | No | Keep weekly backups |
+| `keep-monthly` | number | No | Keep monthly backups |
+| `keep-yearly` | number | No | Keep yearly backups |
+| `dry-run` | boolean | No | Only simulate pruning |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "backup-nfs",
+  "keep-last": 3
 }
 ```
 
@@ -2467,16 +2786,6 @@ APIs that would significantly enhance functionality:
 ### Medium Priority
 
 APIs for specialized use cases:
-
-#### Storage Management
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/storage` | POST/PUT/DELETE | Storage configuration CRUD |
-| `/nodes/{node}/storage/{storage}/upload` | POST | Upload ISO/template files |
-| `/nodes/{node}/storage/{storage}/download-url` | POST | Download from URL |
-| `/nodes/{node}/storage/{storage}/file-restore` | GET/POST | File-level backup restore |
-| `/nodes/{node}/storage/{storage}/prunebackups` | DELETE | Prune old backups |
 
 #### Access Control
 

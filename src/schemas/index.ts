@@ -6,3 +6,4 @@ export * from './disk.js';
 export * from './network.js';
 export * from './cluster-management.js';
 export * from './vm-advanced.js';
+export * from './storage-management.js';
