@@ -1,8 +1,10 @@
 {
-  "active_plan": "/Users/snark/Documents/dev/proxmox-mcp/.sisyphus/plans/add-node-disk-tools.md",
-  "started_at": "2026-02-05T09:05:29.967Z",
+  "active_plan": "/Users/snark/Documents/dev/proxmox-mcp/.sisyphus/plans/update-readme-tool-counts.md",
+  "started_at": "2026-02-05T10:17:41.747Z",
+  "completed_at": "2026-02-05T10:27:00.000Z",
   "session_ids": [
     "ses_3d400eb1dffeKd4WDY8OIavIPs"
   ],
-  "plan_name": "add-node-disk-tools"
+  "plan_name": "update-readme-tool-counts",
+  "status": "complete"
 }

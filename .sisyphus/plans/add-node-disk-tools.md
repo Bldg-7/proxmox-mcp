@@ -57,10 +57,10 @@ Add 4 read-only node-level disk query tools following existing codebase patterns
 - `src/server.ts` - 4 new descriptions in TOOL_DESCRIPTIONS
 
 ### Definition of Done
-- [ ] `bun run typecheck` passes with no errors
-- [ ] `bun test` passes (all existing + 14+ new tests)
-- [ ] `bun run build` succeeds
-- [ ] Tool count is exactly 61 (verified by integration test)
+- [x] `bun run typecheck` passes with no errors
+- [x] `bun test` passes (all existing + 14+ new tests)
+- [x] `bun run build` succeeds
+- [x] Tool count is exactly 61 (verified by integration test)
 
 ### Must Have
 - All 4 tools implemented with full parameter support
@@ -650,7 +650,7 @@ Critical Path: Task 1 → Task 2 → Tasks 3-6 → Task 7
 
 ---
 
-- [ ] 7. Register tools and verify final count
+- [x] 7. Register tools and verify final count
 
   **What to do**:
   - Add 4 entries to `TOOL_NAMES` array in `src/types/tools.ts`
@@ -771,9 +771,9 @@ bun test src/__tests__/integration/server.test.ts
 ```
 
 ### Final Checklist
-- [ ] All 4 tools implemented and tested
-- [ ] Tool count is exactly 61
-- [ ] No elevated permission checks on these tools
-- [ ] All existing tests still pass
-- [ ] Build succeeds
-- [ ] TDD approach followed (tests written before implementation)
+- [x] All 4 tools implemented and tested
+- [x] Tool count is exactly 61
+- [x] No elevated permission checks on these tools
+- [x] All existing tests still pass
+- [x] Build succeeds
+- [x] TDD approach followed (tests written before implementation)
