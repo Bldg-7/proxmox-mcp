@@ -1,0 +1,6704 @@
+{
+  "generated_at": "2026-02-06T05:00:10.724Z",
+  "tool_count": 227,
+  "tools": [
+    {
+      "name": "proxmox_add_disk_vm",
+      "description": "Add a new disk to a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "disk",
+          "type": "string",
+          "required": true,
+          "description": "Disk name (e.g., scsi1, virtio1, sata1, ide1)"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage name (e.g., local-lvm)"
+        },
+        {
+          "name": "size",
+          "type": "string",
+          "required": true,
+          "description": "Disk size in GB (e.g., 10)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_add_mountpoint_lxc",
+      "description": "Add a mount point to an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number"
+        },
+        {
+          "name": "mp",
+          "type": "string",
+          "required": true,
+          "description": "Mount point name (e.g., mp0, mp1, mp2)"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage name (e.g., local-lvm)"
+        },
+        {
+          "name": "size",
+          "type": "string",
+          "required": true,
+          "description": "Mount point size in GB (e.g., 10)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_add_network_lxc",
+      "description": "Add network interface to LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number"
+        },
+        {
+          "name": "net",
+          "type": "string",
+          "required": true,
+          "description": "Network interface name (net0, net1, net2, etc.)"
+        },
+        {
+          "name": "bridge",
+          "type": "string",
+          "required": true,
+          "description": "Bridge name (e.g., vmbr0, vmbr1)"
+        },
+        {
+          "name": "ip",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "gw",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "firewall",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_add_network_vm",
+      "description": "Add network interface to QEMU VM (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "net",
+          "type": "string",
+          "required": true,
+          "description": "Network interface name (net0, net1, net2, etc.)"
+        },
+        {
+          "name": "bridge",
+          "type": "string",
+          "required": true,
+          "description": "Bridge name (e.g., vmbr0, vmbr1)"
+        },
+        {
+          "name": "model",
+          "type": "unknown",
+          "required": true,
+          "description": "Network model (virtio, e1000, rtl8139, vmxnet3)"
+        },
+        {
+          "name": "macaddr",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vlan",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "firewall",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_agent_exec",
+      "description": "Execute a command via QEMU guest agent (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "command",
+          "type": "string",
+          "required": true,
+          "description": "Command to execute"
+        },
+        {
+          "name": "args",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "input-data",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "capture-output",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "timeout",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_agent_exec_status",
+      "description": "Get status for a QEMU guest agent command",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "pid",
+          "type": "number",
+          "required": true,
+          "description": "Process ID returned by agent exec"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_agent_get_fsinfo",
+      "description": "Get guest filesystem information via QEMU guest agent",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_agent_get_memory_blocks",
+      "description": "Get guest memory block information via QEMU guest agent",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_agent_get_network_interfaces",
+      "description": "Get guest network interfaces via QEMU guest agent",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_agent_get_osinfo",
+      "description": "Get guest OS information via QEMU guest agent",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_agent_get_time",
+      "description": "Get guest time via QEMU guest agent",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_agent_get_timezone",
+      "description": "Get guest timezone via QEMU guest agent",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_agent_get_vcpus",
+      "description": "Get guest vCPU information via QEMU guest agent",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_agent_ping",
+      "description": "Ping the QEMU guest agent to verify availability",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_apply_network_config",
+      "description": "Apply or revert pending network changes on a Proxmox node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name to configure"
+        },
+        {
+          "name": "revert",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_apt_update",
+      "description": "Update APT package lists (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_apt_upgrade",
+      "description": "Upgrade packages via APT (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_apt_versions",
+      "description": "List installed/upgradable APT package versions",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "package",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_clone_lxc",
+      "description": "Clone an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID to clone from"
+        },
+        {
+          "name": "newid",
+          "type": "number",
+          "required": true,
+          "description": "New container ID"
+        },
+        {
+          "name": "hostname",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_clone_vm",
+      "description": "Clone a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID to clone from"
+        },
+        {
+          "name": "newid",
+          "type": "number",
+          "required": true,
+          "description": "New VM ID"
+        },
+        {
+          "name": "name",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_control_node_service",
+      "description": "Start/stop/restart a system service on a Proxmox node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "service",
+          "type": "string",
+          "required": true,
+          "description": "Service name (e.g., pveproxy, ssh, pvedaemon)"
+        },
+        {
+          "name": "command",
+          "type": "enum",
+          "required": true,
+          "description": "Service command"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_backup_lxc",
+      "description": "Create a backup of an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number"
+        },
+        {
+          "name": "storage",
+          "type": "unknown",
+          "required": true,
+          "description": "Storage location for backup"
+        },
+        {
+          "name": "mode",
+          "type": "unknown",
+          "required": true,
+          "description": "Backup mode"
+        },
+        {
+          "name": "compress",
+          "type": "unknown",
+          "required": true,
+          "description": "Compression algorithm"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_backup_vm",
+      "description": "Create a backup of a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "storage",
+          "type": "unknown",
+          "required": true,
+          "description": "Storage location for backup"
+        },
+        {
+          "name": "mode",
+          "type": "unknown",
+          "required": true,
+          "description": "Backup mode"
+        },
+        {
+          "name": "compress",
+          "type": "unknown",
+          "required": true,
+          "description": "Compression algorithm"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_ceph_fs",
+      "description": "Create a Ceph filesystem (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "CephFS name"
+        },
+        {
+          "name": "pool",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "data_pool",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "metadata_pool",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_ceph_mds",
+      "description": "Create a Ceph MDS daemon (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "MDS daemon name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_ceph_mon",
+      "description": "Create a Ceph monitor (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "monid",
+          "type": "string",
+          "required": true,
+          "description": "Monitor ID"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_ceph_osd",
+      "description": "Create a Ceph OSD (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "dev",
+          "type": "string",
+          "required": true,
+          "description": "OSD device path (e.g., /dev/sdb)"
+        },
+        {
+          "name": "osdid",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dbdev",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "waldev",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "crush-device-class",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "encrypted",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_ceph_pool",
+      "description": "Create a Ceph pool (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "Pool name"
+        },
+        {
+          "name": "pg_num",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "size",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "min_size",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "crush_rule",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "pg_autoscale_mode",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_cluster_backup_job",
+      "description": "Create a scheduled cluster backup job (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "starttime",
+          "type": "string",
+          "required": true,
+          "description": "Job start time (HH:MM)"
+        },
+        {
+          "name": "dow",
+          "type": "string",
+          "required": true,
+          "description": "Day of week selection"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        },
+        {
+          "name": "all",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bwlimit",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "compress",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dumpdir",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "enabled",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "exclude",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "exclude-path",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "id",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ionice",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "lockwait",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mailnotification",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mailto",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "maxfiles",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mode",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "node",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "notes-template",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "performance",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "pigz",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "pool",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "protected",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "prune-backups",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "quiet",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "remove",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "repeat-missed",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "script",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "stdexcludes",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "stop",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "stopwait",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "tmpdir",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vmid",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "zstd",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_cluster_firewall_group",
+      "description": "Create a cluster firewall group (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "group",
+          "type": "string",
+          "required": true,
+          "description": "Firewall group name"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "rename",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_cluster_firewall_rule",
+      "description": "Create a cluster-wide firewall rule (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "action",
+          "type": "string",
+          "required": true,
+          "description": "Rule action (ACCEPT, REJECT, DROP)"
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "required": true,
+          "description": "Rule type"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dport",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "enable",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "iface",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "log",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "macro",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "pos",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "proto",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "sport",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_cluster_replication_job",
+      "description": "Create a cluster replication job (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Replication job ID (<guest>-<jobnum>)"
+        },
+        {
+          "name": "target",
+          "type": "string",
+          "required": true,
+          "description": "Target node name"
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "required": true,
+          "description": "Replication type"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "disable",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "rate",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "remove_job",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "schedule",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_domain",
+      "description": "Create an authentication domain (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "realm",
+          "type": "string",
+          "required": true,
+          "description": "Auth domain (realm) name"
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "required": true,
+          "description": "Authentication domain type"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "default",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "server1",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "server2",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "port",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "secure",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "base_dn",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "user_attr",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bind_dn",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bind_password",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "group_filter",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "capath",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "sslversion",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_group",
+      "description": "Create a Proxmox group (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "groupid",
+          "type": "string",
+          "required": true,
+          "description": "Group identifier"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "users",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_ha_group",
+      "description": "Create a new HA group (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "group",
+          "type": "string",
+          "required": true,
+          "description": "HA group identifier"
+        },
+        {
+          "name": "nodes",
+          "type": "string",
+          "required": true,
+          "description": "Nodes list with optional priorities"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "nofailback",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "restricted",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_ha_resource",
+      "description": "Create a new HA resource (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "sid",
+          "type": "string",
+          "required": true,
+          "description": "HA resource ID (e.g., vm:100, ct:100)"
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "failback",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "group",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "max_relocate",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "max_restart",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "state",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_lxc",
+      "description": "Create a new LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container will be created"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number (must be unique, or use proxmox_get_next_vmid)"
+        },
+        {
+          "name": "ostemplate",
+          "type": "string",
+          "required": true,
+          "description": "OS template (e.g., local:vztmpl/debian-12-standard_12.2-1_amd64.tar.gz)"
+        },
+        {
+          "name": "hostname",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "password",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "memory",
+          "type": "unknown",
+          "required": true,
+          "description": "RAM in MB"
+        },
+        {
+          "name": "storage",
+          "type": "unknown",
+          "required": true,
+          "description": "Storage location"
+        },
+        {
+          "name": "rootfs",
+          "type": "unknown",
+          "required": true,
+          "description": "Root filesystem size in GB"
+        },
+        {
+          "name": "net0",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_lxc_firewall_rule",
+      "description": "Create an LXC firewall rule (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "action",
+          "type": "string",
+          "required": true,
+          "description": "Rule action (ACCEPT, REJECT, DROP)"
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "required": true,
+          "description": "Rule direction"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dport",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "enable",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "iface",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "log",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "macro",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "pos",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "proto",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "sport",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_network_iface",
+      "description": "Create a network interface on a Proxmox node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name to configure"
+        },
+        {
+          "name": "iface",
+          "type": "string",
+          "required": true,
+          "description": "Interface name (e.g., vmbr0, bond0, eth0.100)"
+        },
+        {
+          "name": "type",
+          "type": "string",
+          "required": true,
+          "description": "Interface type (bridge, bond, vlan, eth, OVSBridge, OVSBond, OVSIntPort, OVSPort)"
+        },
+        {
+          "name": "autostart",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "method",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "address",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "netmask",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "gateway",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "cidr",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mtu",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bridge_ports",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bridge_stp",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bridge_fd",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bond_mode",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bond_xmit_hash_policy",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bond_miimon",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bond_primary",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bond_slaves",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vlan-id",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vlan-raw-device",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_pool",
+      "description": "Create a resource pool (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "poolid",
+          "type": "string",
+          "required": true,
+          "description": "Pool identifier"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_role",
+      "description": "Create a Proxmox role (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "roleid",
+          "type": "string",
+          "required": true,
+          "description": "Role identifier"
+        },
+        {
+          "name": "privs",
+          "type": "string",
+          "required": true,
+          "description": "Comma-separated privileges"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_sdn_controller",
+      "description": "Create an SDN controller (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "controller",
+          "type": "string",
+          "required": true,
+          "description": "SDN controller identifier"
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ip",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "port",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "token",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "secret",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "zone",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_sdn_subnet",
+      "description": "Create an SDN subnet (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "subnet",
+          "type": "string",
+          "required": true,
+          "description": "SDN subnet identifier"
+        },
+        {
+          "name": "vnet",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "cidr",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "gateway",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dhcp",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "snat",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dns",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mtu",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ipam",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_sdn_vnet",
+      "description": "Create an SDN virtual network (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "vnet",
+          "type": "string",
+          "required": true,
+          "description": "SDN VNet identifier"
+        },
+        {
+          "name": "zone",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "alias",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "tag",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vlan",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vxlan",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mtu",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mac",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ipam",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_sdn_zone",
+      "description": "Create an SDN zone (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "zone",
+          "type": "string",
+          "required": true,
+          "description": "SDN zone identifier"
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bridge",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "nodes",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mtu",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vxlan",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "tag",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ipam",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_snapshot_lxc",
+      "description": "Create a snapshot of an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container/VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container/VM ID number"
+        },
+        {
+          "name": "snapname",
+          "type": "string",
+          "required": true,
+          "description": "Snapshot name"
+        },
+        {
+          "name": "description",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_snapshot_vm",
+      "description": "Create a snapshot of a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container/VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container/VM ID number"
+        },
+        {
+          "name": "snapname",
+          "type": "string",
+          "required": true,
+          "description": "Snapshot name"
+        },
+        {
+          "name": "description",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_storage",
+      "description": "Create a storage configuration (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "required": true,
+          "description": "Storage type"
+        },
+        {
+          "name": "content",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "path",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "server",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "export",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "share",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "username",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "password",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "domain",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "smbversion",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "nodes",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "shared",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "disable",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "maxfiles",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "prune-backups",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "pool",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vgname",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "thinpool",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "monhost",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "fsname",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "keyring",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "portal",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "target",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "options",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_template_lxc",
+      "description": "Convert an LXC container to a template (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_template_vm",
+      "description": "Convert a QEMU VM to a template (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_user",
+      "description": "Create a Proxmox user (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "userid",
+          "type": "string",
+          "required": true,
+          "description": "User ID with realm (e.g., user@pve)"
+        },
+        {
+          "name": "password",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "email",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "firstname",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "lastname",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "groups",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "expire",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "enable",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_vm",
+      "description": "Create a new QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM will be created"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number (must be unique, or use proxmox_get_next_vmid)"
+        },
+        {
+          "name": "name",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "memory",
+          "type": "unknown",
+          "required": true,
+          "description": "RAM in MB"
+        },
+        {
+          "name": "cores",
+          "type": "unknown",
+          "required": true,
+          "description": "Number of CPU cores"
+        },
+        {
+          "name": "sockets",
+          "type": "unknown",
+          "required": true,
+          "description": "Number of CPU sockets"
+        },
+        {
+          "name": "disk_size",
+          "type": "unknown",
+          "required": true,
+          "description": "Disk size (e.g., \"8G\", \"10G\")"
+        },
+        {
+          "name": "storage",
+          "type": "unknown",
+          "required": true,
+          "description": "Storage location for disk"
+        },
+        {
+          "name": "iso",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ostype",
+          "type": "unknown",
+          "required": true,
+          "description": "OS type (l26=Linux 2.6+, win10, etc)"
+        },
+        {
+          "name": "net0",
+          "type": "unknown",
+          "required": true,
+          "description": "Network interface config"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_create_vm_firewall_rule",
+      "description": "Create a VM firewall rule (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "action",
+          "type": "string",
+          "required": true,
+          "description": "Rule action (ACCEPT, REJECT, DROP)"
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "required": true,
+          "description": "Rule direction"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dport",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "enable",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "iface",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "log",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "macro",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "pos",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "proto",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "sport",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_backup",
+      "description": "Delete a backup file from storage (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage name (e.g., local)"
+        },
+        {
+          "name": "volume",
+          "type": "string",
+          "required": true,
+          "description": "Backup volume ID (e.g., local:backup/vzdump-lxc-100-2025_11_06-09_00_00.tar.zst)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_ceph_mds",
+      "description": "Delete a Ceph MDS daemon (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "MDS daemon name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_ceph_mon",
+      "description": "Delete a Ceph monitor (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "monid",
+          "type": "string",
+          "required": true,
+          "description": "Monitor ID"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_ceph_osd",
+      "description": "Delete a Ceph OSD (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "id",
+          "type": "number",
+          "required": true,
+          "description": "OSD ID"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_ceph_pool",
+      "description": "Delete a Ceph pool (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "Pool name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_cluster_backup_job",
+      "description": "Delete a scheduled cluster backup job (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Backup job ID"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_cluster_firewall_group",
+      "description": "Delete a cluster firewall group (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "group",
+          "type": "string",
+          "required": true,
+          "description": "Firewall group name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_cluster_firewall_rule",
+      "description": "Delete a cluster firewall rule (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "pos",
+          "type": "number",
+          "required": true,
+          "description": "Rule position"
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_cluster_replication_job",
+      "description": "Delete a cluster replication job (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Replication job ID"
+        },
+        {
+          "name": "force",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "keep",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_domain",
+      "description": "Delete an authentication domain (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "realm",
+          "type": "string",
+          "required": true,
+          "description": "Auth domain (realm) name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_group",
+      "description": "Delete a Proxmox group (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "groupid",
+          "type": "string",
+          "required": true,
+          "description": "Group identifier"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_ha_group",
+      "description": "Delete an HA group (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "group",
+          "type": "string",
+          "required": true,
+          "description": "HA group identifier"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_ha_resource",
+      "description": "Delete an HA resource (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "sid",
+          "type": "string",
+          "required": true,
+          "description": "HA resource ID"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_lxc",
+      "description": "Delete an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_lxc_firewall_rule",
+      "description": "Delete an LXC firewall rule (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "pos",
+          "type": "number",
+          "required": true,
+          "description": "Rule position"
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_network_iface",
+      "description": "Delete a network interface on a Proxmox node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name to configure"
+        },
+        {
+          "name": "iface",
+          "type": "string",
+          "required": true,
+          "description": "Interface name to delete (e.g., vmbr0, bond0, eth0.100)"
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_node_subscription",
+      "description": "Delete subscription information for a Proxmox node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_pool",
+      "description": "Delete a resource pool (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "poolid",
+          "type": "string",
+          "required": true,
+          "description": "Pool identifier"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_role",
+      "description": "Delete a Proxmox role (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "roleid",
+          "type": "string",
+          "required": true,
+          "description": "Role identifier"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_sdn_controller",
+      "description": "Delete an SDN controller (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "controller",
+          "type": "string",
+          "required": true,
+          "description": "SDN controller identifier"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_sdn_subnet",
+      "description": "Delete an SDN subnet (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "subnet",
+          "type": "string",
+          "required": true,
+          "description": "SDN subnet identifier"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_sdn_vnet",
+      "description": "Delete an SDN virtual network (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "vnet",
+          "type": "string",
+          "required": true,
+          "description": "SDN VNet identifier"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_sdn_zone",
+      "description": "Delete an SDN zone (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "zone",
+          "type": "string",
+          "required": true,
+          "description": "SDN zone identifier"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_snapshot_lxc",
+      "description": "Delete a snapshot of an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container/VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container/VM ID number"
+        },
+        {
+          "name": "snapname",
+          "type": "string",
+          "required": true,
+          "description": "Snapshot name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_snapshot_vm",
+      "description": "Delete a snapshot of a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container/VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container/VM ID number"
+        },
+        {
+          "name": "snapname",
+          "type": "string",
+          "required": true,
+          "description": "Snapshot name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_storage",
+      "description": "Delete a storage configuration (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_storage_content",
+      "description": "Delete content from storage (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        },
+        {
+          "name": "volume",
+          "type": "string",
+          "required": true,
+          "description": "Volume identifier (volid)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_user",
+      "description": "Delete a Proxmox user (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "userid",
+          "type": "string",
+          "required": true,
+          "description": "User ID with realm (e.g., user@pve)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_vm",
+      "description": "Delete a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_delete_vm_firewall_rule",
+      "description": "Delete a VM firewall rule (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "pos",
+          "type": "number",
+          "required": true,
+          "description": "Rule position"
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_download_file_restore",
+      "description": "Download a file from backup",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        },
+        {
+          "name": "volume",
+          "type": "string",
+          "required": true,
+          "description": "Backup volume identifier"
+        },
+        {
+          "name": "filepath",
+          "type": "string",
+          "required": true,
+          "description": "File path inside backup"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_download_url_to_storage",
+      "description": "Download a file from URL to storage (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        },
+        {
+          "name": "url",
+          "type": "string",
+          "required": true,
+          "description": "Source URL"
+        },
+        {
+          "name": "content",
+          "type": "enum",
+          "required": true,
+          "description": "Content type"
+        },
+        {
+          "name": "filename",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "checksum",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "checksum-algorithm",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "verify-certificates",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_execute_vm_command",
+      "description": "Execute a shell command on a QEMU VM via guest agent (requires QEMU Guest Agent; LXC unsupported)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "command",
+          "type": "string",
+          "required": true,
+          "description": "Shell command to execute"
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": true,
+          "description": "VM type"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_acl",
+      "description": "Get ACL entries",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "userid",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "groupid",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "roleid",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_ceph_status",
+      "description": "Get Ceph cluster status",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_cluster_backup_job",
+      "description": "Get a scheduled cluster backup job",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Backup job ID"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_cluster_firewall_group",
+      "description": "Get a cluster firewall group by name",
+      "parameters": [
+        {
+          "name": "group",
+          "type": "string",
+          "required": true,
+          "description": "Firewall group name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_cluster_firewall_rule",
+      "description": "Get a cluster firewall rule by position",
+      "parameters": [
+        {
+          "name": "pos",
+          "type": "number",
+          "required": true,
+          "description": "Rule position"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_cluster_options",
+      "description": "Get cluster-wide options",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_cluster_replication_job",
+      "description": "Get a cluster replication job by ID",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Replication job ID"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_cluster_status",
+      "description": "Get overall cluster status including nodes and resource usage",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_disk_smart",
+      "description": "Get SMART health data for a specific disk on a Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "disk",
+          "type": "string",
+          "required": true,
+          "description": "Block device path (e.g., /dev/sda)"
+        },
+        {
+          "name": "health_only",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_domain",
+      "description": "Get authentication domain details",
+      "parameters": [
+        {
+          "name": "realm",
+          "type": "string",
+          "required": true,
+          "description": "Auth domain (realm) name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_ha_group",
+      "description": "Get details for a specific HA group",
+      "parameters": [
+        {
+          "name": "group",
+          "type": "string",
+          "required": true,
+          "description": "HA group identifier"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_ha_groups",
+      "description": "List High Availability groups in the cluster",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_ha_resource",
+      "description": "Get details for a specific HA resource",
+      "parameters": [
+        {
+          "name": "sid",
+          "type": "string",
+          "required": true,
+          "description": "HA resource ID (e.g., vm:100, ct:100)"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_ha_resources",
+      "description": "List High Availability resources in the cluster",
+      "parameters": [
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_ha_status",
+      "description": "Get HA manager status information for the cluster",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_lxc_config",
+      "description": "Get hardware configuration for an LXC container (mount points, network, CPU, memory)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_lxc_firewall_rule",
+      "description": "Get an LXC firewall rule by position",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "pos",
+          "type": "number",
+          "required": true,
+          "description": "Rule position"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_lxc_rrddata",
+      "description": "Get performance metrics (RRD data) for an LXC container",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "timeframe",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "cf",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_lxc_term_proxy",
+      "description": "Get a terminal proxy ticket for an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where the guest is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM or container ID"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_get_lxc_vnc_proxy",
+      "description": "Get a VNC proxy ticket for an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where the guest is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM or container ID"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_get_network_iface",
+      "description": "Get details for a specific network interface on a Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "iface",
+          "type": "string",
+          "required": true,
+          "description": "Interface name (e.g., eth0, vmbr0, bond0)"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_next_vmid",
+      "description": "Get the next available VM/Container ID number",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_aplinfo",
+      "description": "List available appliance templates on a Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_disks",
+      "description": "List physical disks on a Proxmox node (SSD, HDD, NVMe) with health status",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "include_partitions",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "skip_smart",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_dns",
+      "description": "Get DNS configuration for a specific Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_hosts",
+      "description": "Get hosts file entries for a Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_journal",
+      "description": "Read systemd journal entries from a Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_lvm",
+      "description": "List LVM volume groups and physical volumes on a Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_netstat",
+      "description": "Get network connection statistics for a Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_network",
+      "description": "Get network interfaces for a specific Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_services",
+      "description": "List system services on a Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_status",
+      "description": "Get detailed status information for a specific Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name (e.g., pve1, proxmox-node2)"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_subscription",
+      "description": "Get subscription information for a Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_syslog",
+      "description": "Read syslog entries from a Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_task",
+      "description": "Get status details for a specific Proxmox node task",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "upid",
+          "type": "string",
+          "required": true,
+          "description": "Task UPID"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_tasks",
+      "description": "List recent tasks for a Proxmox node",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_time",
+      "description": "Get node time and timezone information",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_node_zfs",
+      "description": "List ZFS pools on a Proxmox node with health and capacity info",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_nodes",
+      "description": "List all Proxmox cluster nodes with their status and resources",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_pool",
+      "description": "Get a resource pool by ID",
+      "parameters": [
+        {
+          "name": "poolid",
+          "type": "string",
+          "required": true,
+          "description": "Pool identifier"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_sdn_controller",
+      "description": "Get an SDN controller by name",
+      "parameters": [
+        {
+          "name": "controller",
+          "type": "string",
+          "required": true,
+          "description": "SDN controller identifier"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_sdn_subnet",
+      "description": "Get an SDN subnet by name",
+      "parameters": [
+        {
+          "name": "subnet",
+          "type": "string",
+          "required": true,
+          "description": "SDN subnet identifier"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_sdn_vnet",
+      "description": "Get an SDN virtual network by name",
+      "parameters": [
+        {
+          "name": "vnet",
+          "type": "string",
+          "required": true,
+          "description": "SDN VNet identifier"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_sdn_zone",
+      "description": "Get an SDN zone by name",
+      "parameters": [
+        {
+          "name": "zone",
+          "type": "string",
+          "required": true,
+          "description": "SDN zone identifier"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_spice_proxy",
+      "description": "Get a SPICE proxy ticket for a QEMU VM (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where the guest is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM or container ID"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_get_storage",
+      "description": "List all storage pools and their usage across the cluster",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_storage_config",
+      "description": "Get a storage configuration by name",
+      "parameters": [
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_term_proxy",
+      "description": "Get a terminal proxy ticket for a QEMU VM (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where the guest is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM or container ID"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_get_user",
+      "description": "Get details for a Proxmox user",
+      "parameters": [
+        {
+          "name": "userid",
+          "type": "string",
+          "required": true,
+          "description": "User ID with realm (e.g., root@pam)"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_vm_config",
+      "description": "Get hardware configuration for a QEMU VM (disks, network, CPU, memory)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_vm_firewall_rule",
+      "description": "Get a VM firewall rule by position",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "pos",
+          "type": "number",
+          "required": true,
+          "description": "Rule position"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_vm_rrddata",
+      "description": "Get performance metrics (RRD data) for a QEMU VM",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "timeframe",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "cf",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_vm_status",
+      "description": "Get detailed status information for a specific VM",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": true,
+          "description": "VM type"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_vms",
+      "description": "List all virtual machines across the cluster with their status",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": true,
+          "description": "VM type filter"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_get_vnc_proxy",
+      "description": "Get a VNC proxy ticket for a QEMU VM (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where the guest is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM or container ID"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_list_backups",
+      "description": "List all backups on a storage (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "storage",
+          "type": "unknown",
+          "required": true,
+          "description": "Storage name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_list_ceph_fs",
+      "description": "List Ceph filesystems",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_ceph_mds",
+      "description": "List Ceph MDS daemons",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_ceph_mons",
+      "description": "List Ceph monitors",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_ceph_osds",
+      "description": "List Ceph OSDs",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_ceph_pools",
+      "description": "List Ceph pools",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_cluster_backup_jobs",
+      "description": "List scheduled cluster backup jobs",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_cluster_firewall_groups",
+      "description": "List cluster firewall security groups",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_cluster_firewall_rules",
+      "description": "List cluster-wide firewall rules",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_cluster_replication_jobs",
+      "description": "List cluster replication jobs",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_domains",
+      "description": "List authentication domains",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_file_restore",
+      "description": "List files in a backup for restore",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        },
+        {
+          "name": "volume",
+          "type": "string",
+          "required": true,
+          "description": "Backup volume identifier"
+        },
+        {
+          "name": "path",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_groups",
+      "description": "List Proxmox groups",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_lxc_firewall_rules",
+      "description": "List per-LXC firewall rules",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_pools",
+      "description": "List resource pools",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_roles",
+      "description": "List Proxmox roles",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_sdn_controllers",
+      "description": "List SDN controllers",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_sdn_subnets",
+      "description": "List SDN subnets",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_sdn_vnets",
+      "description": "List SDN virtual networks",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_sdn_zones",
+      "description": "List SDN zones",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_snapshots_lxc",
+      "description": "List all snapshots of an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_list_snapshots_vm",
+      "description": "List all snapshots of a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_list_storage_config",
+      "description": "List storage configurations available in Proxmox",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_storage_content",
+      "description": "List content stored on a storage",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        },
+        {
+          "name": "content",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vmid",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_templates",
+      "description": "List available LXC container templates on a storage",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "storage",
+          "type": "unknown",
+          "required": true,
+          "description": "Storage name (e.g., local)"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_users",
+      "description": "List Proxmox users",
+      "parameters": [],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_list_vm_firewall_rules",
+      "description": "List per-VM firewall rules",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "basic"
+    },
+    {
+      "name": "proxmox_migrate_all",
+      "description": "Migrate all VMs/containers to another node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "target",
+          "type": "string",
+          "required": true,
+          "description": "Target node name"
+        },
+        {
+          "name": "maxworkers",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "with-local-disks",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_migrate_lxc",
+      "description": "Migrate an LXC container to another node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Source node name"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID to migrate"
+        },
+        {
+          "name": "target",
+          "type": "string",
+          "required": true,
+          "description": "Target node name"
+        },
+        {
+          "name": "online",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "force",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bwlimit",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "with-local-disks",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "with-local-storage",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_migrate_vm",
+      "description": "Migrate a QEMU VM to another node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Source node name"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID to migrate"
+        },
+        {
+          "name": "target",
+          "type": "string",
+          "required": true,
+          "description": "Target node name"
+        },
+        {
+          "name": "online",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "force",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bwlimit",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "with-local-disks",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "with-local-storage",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_move_disk_lxc",
+      "description": "Move an LXC container disk to different storage (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number"
+        },
+        {
+          "name": "disk",
+          "type": "string",
+          "required": true,
+          "description": "Disk/volume name to move (rootfs, mp0, mp1, etc.)"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Target storage name"
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": true,
+          "description": "Delete source disk after move (default: true)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_move_disk_vm",
+      "description": "Move a QEMU VM disk to different storage (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "disk",
+          "type": "string",
+          "required": true,
+          "description": "Disk name to move (e.g., scsi0, virtio0, sata0, ide0)"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Target storage name"
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": true,
+          "description": "Delete source disk after move (default: true)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_pause_vm",
+      "description": "Pause a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_prune_backups",
+      "description": "Prune old backups from storage (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        },
+        {
+          "name": "keep-last",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "keep-hourly",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "keep-daily",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "keep-weekly",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "keep-monthly",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "keep-yearly",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "prune-backups",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dry-run",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vmid",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_reboot_lxc",
+      "description": "Reboot an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_reboot_vm",
+      "description": "Reboot a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_remove_disk_vm",
+      "description": "Remove a disk from a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "disk",
+          "type": "string",
+          "required": true,
+          "description": "Disk name to remove (e.g., scsi1, virtio1, sata1, ide1)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_remove_mountpoint_lxc",
+      "description": "Remove a mount point from an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number"
+        },
+        {
+          "name": "mp",
+          "type": "string",
+          "required": true,
+          "description": "Mount point name to remove (e.g., mp0, mp1, mp2)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_remove_network_lxc",
+      "description": "Remove network interface from LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number"
+        },
+        {
+          "name": "net",
+          "type": "string",
+          "required": true,
+          "description": "Network interface name to remove (net0, net1, net2, etc.)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_remove_network_vm",
+      "description": "Remove network interface from QEMU VM (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "net",
+          "type": "string",
+          "required": true,
+          "description": "Network interface name to remove (net0, net1, net2, etc.)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_resize_disk_lxc",
+      "description": "Resize an LXC container disk or mount point (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number"
+        },
+        {
+          "name": "disk",
+          "type": "string",
+          "required": true,
+          "description": "Disk name (rootfs, mp0, mp1, etc.)"
+        },
+        {
+          "name": "size",
+          "type": "string",
+          "required": true,
+          "description": "New size with + for relative or absolute (e.g., +10G or 50G)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_resize_disk_vm",
+      "description": "Resize a QEMU VM disk (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "disk",
+          "type": "string",
+          "required": true,
+          "description": "Disk name (e.g., scsi0, virtio0, sata0, ide0)"
+        },
+        {
+          "name": "size",
+          "type": "string",
+          "required": true,
+          "description": "New size with + for relative or absolute (e.g., +10G or 50G)"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_resize_lxc",
+      "description": "Resize an LXC container CPU/memory (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number"
+        },
+        {
+          "name": "memory",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "cores",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_resize_vm",
+      "description": "Resize a QEMU VM CPU/memory (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "memory",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "cores",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_restore_backup_lxc",
+      "description": "Restore an LXC container from backup (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container will be restored"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "New container ID for restored container"
+        },
+        {
+          "name": "archive",
+          "type": "string",
+          "required": true,
+          "description": "Backup archive path (e.g., local:backup/vzdump-lxc-100-2025_11_06-09_00_00.tar.zst)"
+        },
+        {
+          "name": "storage",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_restore_backup_vm",
+      "description": "Restore a QEMU virtual machine from backup (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM will be restored"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "New VM ID for restored VM"
+        },
+        {
+          "name": "archive",
+          "type": "string",
+          "required": true,
+          "description": "Backup archive path (e.g., local:backup/vzdump-qemu-100-2025_11_06-09_00_00.vma.zst)"
+        },
+        {
+          "name": "storage",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_resume_vm",
+      "description": "Resume a paused QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_rollback_snapshot_lxc",
+      "description": "Rollback an LXC container to a snapshot (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container/VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container/VM ID number"
+        },
+        {
+          "name": "snapname",
+          "type": "string",
+          "required": true,
+          "description": "Snapshot name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_rollback_snapshot_vm",
+      "description": "Rollback a QEMU virtual machine to a snapshot (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container/VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container/VM ID number"
+        },
+        {
+          "name": "snapname",
+          "type": "string",
+          "required": true,
+          "description": "Snapshot name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_set_node_subscription",
+      "description": "Set subscription information for a Proxmox node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "key",
+          "type": "string",
+          "required": true,
+          "description": "Subscription key"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_shutdown_lxc",
+      "description": "Gracefully shutdown an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_shutdown_vm",
+      "description": "Gracefully shutdown a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_start_all",
+      "description": "Start all VMs/containers on a node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_start_lxc",
+      "description": "Start an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_start_vm",
+      "description": "Start a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_stop_all",
+      "description": "Stop all VMs/containers on a node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_stop_lxc",
+      "description": "Stop an LXC container (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_stop_vm",
+      "description": "Stop a QEMU virtual machine (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_acl",
+      "description": "Update ACL entries (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "string",
+          "required": true,
+          "description": "ACL path (e.g., /vms)"
+        },
+        {
+          "name": "roles",
+          "type": "string",
+          "required": true,
+          "description": "Comma-separated roles"
+        },
+        {
+          "name": "users",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "groups",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "propagate",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_ceph_pool",
+      "description": "Update a Ceph pool (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "Pool name"
+        },
+        {
+          "name": "pg_num",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "size",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "min_size",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "crush_rule",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "pg_autoscale_mode",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_cluster_backup_job",
+      "description": "Update a scheduled cluster backup job (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Backup job ID"
+        },
+        {
+          "name": "starttime",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dow",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "storage",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "all",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bwlimit",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "compress",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dumpdir",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "enabled",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "exclude",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "exclude-path",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ionice",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "lockwait",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mailnotification",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mailto",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "maxfiles",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mode",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "node",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "notes-template",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "performance",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "pigz",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "pool",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "protected",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "prune-backups",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "quiet",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "remove",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "repeat-missed",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "script",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "stdexcludes",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "stop",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "stopwait",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "tmpdir",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vmid",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "zstd",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_cluster_firewall_group",
+      "description": "Update a cluster firewall group (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "group",
+          "type": "string",
+          "required": true,
+          "description": "Firewall group name"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "rename",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_cluster_firewall_rule",
+      "description": "Update a cluster firewall rule (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "pos",
+          "type": "number",
+          "required": true,
+          "description": "Rule position"
+        },
+        {
+          "name": "action",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dport",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "enable",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "iface",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "log",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "macro",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "moveto",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "proto",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "sport",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_cluster_options",
+      "description": "Update cluster-wide options (requires elevated permissions)",
+      "parameters": [],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_cluster_replication_job",
+      "description": "Update a cluster replication job (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "Replication job ID"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "disable",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "rate",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "remove_job",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "schedule",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_domain",
+      "description": "Update an authentication domain (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "realm",
+          "type": "string",
+          "required": true,
+          "description": "Auth domain (realm) name"
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "default",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "server1",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "server2",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "port",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "secure",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "base_dn",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "user_attr",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bind_dn",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bind_password",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "group_filter",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "capath",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "sslversion",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_group",
+      "description": "Update a Proxmox group (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "groupid",
+          "type": "string",
+          "required": true,
+          "description": "Group identifier"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "users",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "append",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_ha_group",
+      "description": "Update an HA group (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "group",
+          "type": "string",
+          "required": true,
+          "description": "HA group identifier"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "nodes",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "nofailback",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "restricted",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_ha_resource",
+      "description": "Update an HA resource (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "sid",
+          "type": "string",
+          "required": true,
+          "description": "HA resource ID"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "failback",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "group",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "max_relocate",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "max_restart",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "state",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_lxc_firewall_rule",
+      "description": "Update an LXC firewall rule (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "pos",
+          "type": "number",
+          "required": true,
+          "description": "Rule position"
+        },
+        {
+          "name": "action",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dport",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "enable",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "iface",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "log",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "macro",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "moveto",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "proto",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "sport",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_network_iface",
+      "description": "Update a network interface on a Proxmox node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name to configure"
+        },
+        {
+          "name": "iface",
+          "type": "string",
+          "required": true,
+          "description": "Interface name to update (e.g., vmbr0, bond0, eth0.100)"
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "autostart",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "method",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "address",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "netmask",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "gateway",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "cidr",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mtu",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bridge_ports",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bridge_stp",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bridge_fd",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bond_mode",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bond_xmit_hash_policy",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bond_miimon",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bond_primary",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bond_slaves",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vlan-id",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vlan-raw-device",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_network_lxc",
+      "description": "Update/modify LXC network interface configuration (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where container is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "Container ID number"
+        },
+        {
+          "name": "net",
+          "type": "string",
+          "required": true,
+          "description": "Network interface name to update (net0, net1, net2, etc.)"
+        },
+        {
+          "name": "bridge",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ip",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "gw",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "firewall",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_network_vm",
+      "description": "Update/modify VM network interface configuration (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "net",
+          "type": "string",
+          "required": true,
+          "description": "Network interface name to update (net0, net1, net2, etc.)"
+        },
+        {
+          "name": "bridge",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "model",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "macaddr",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vlan",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "firewall",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_node_dns",
+      "description": "Update DNS configuration on a Proxmox node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "search",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dns1",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dns2",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dns3",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_node_hosts",
+      "description": "Add/update a hosts entry on a Proxmox node (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "ip",
+          "type": "string",
+          "required": true,
+          "description": "IP address"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "description": "Hostname or alias"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_node_time",
+      "description": "Update node time or timezone (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "time",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "timezone",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_pool",
+      "description": "Update a resource pool (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "poolid",
+          "type": "string",
+          "required": true,
+          "description": "Pool identifier"
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_role",
+      "description": "Update a Proxmox role (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "roleid",
+          "type": "string",
+          "required": true,
+          "description": "Role identifier"
+        },
+        {
+          "name": "privs",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "append",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_sdn_controller",
+      "description": "Update an SDN controller (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "controller",
+          "type": "string",
+          "required": true,
+          "description": "SDN controller identifier"
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ip",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "port",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "token",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "secret",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "zone",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_sdn_subnet",
+      "description": "Update an SDN subnet (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "subnet",
+          "type": "string",
+          "required": true,
+          "description": "SDN subnet identifier"
+        },
+        {
+          "name": "vnet",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "cidr",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "gateway",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dhcp",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "snat",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dns",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mtu",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ipam",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_sdn_vnet",
+      "description": "Update an SDN virtual network (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "vnet",
+          "type": "string",
+          "required": true,
+          "description": "SDN VNet identifier"
+        },
+        {
+          "name": "zone",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "alias",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "tag",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vlan",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vxlan",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mtu",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mac",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ipam",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_sdn_zone",
+      "description": "Update an SDN zone (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "zone",
+          "type": "string",
+          "required": true,
+          "description": "SDN zone identifier"
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "bridge",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "nodes",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "mtu",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vxlan",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "tag",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "ipam",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_storage",
+      "description": "Update a storage configuration (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        },
+        {
+          "name": "content",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "path",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "server",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "export",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "share",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "username",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "password",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "domain",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "smbversion",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "nodes",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "shared",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "disable",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "maxfiles",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "prune-backups",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "pool",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "vgname",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "thinpool",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "monhost",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "fsname",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "keyring",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "portal",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "target",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "options",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_user",
+      "description": "Update a Proxmox user (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "userid",
+          "type": "string",
+          "required": true,
+          "description": "User ID with realm (e.g., user@pve)"
+        },
+        {
+          "name": "password",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "email",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "firstname",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "lastname",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "groups",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "append",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "expire",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "enable",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_update_vm_firewall_rule",
+      "description": "Update a VM firewall rule (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name where VM is located"
+        },
+        {
+          "name": "vmid",
+          "type": "number",
+          "required": true,
+          "description": "VM ID number"
+        },
+        {
+          "name": "pos",
+          "type": "number",
+          "required": true,
+          "description": "Rule position"
+        },
+        {
+          "name": "action",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "comment",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "delete",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "digest",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "dport",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "enable",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "iface",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "log",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "macro",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "moveto",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "proto",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "sport",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "type",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    },
+    {
+      "name": "proxmox_upload_to_storage",
+      "description": "Upload ISO/template to storage (requires elevated permissions)",
+      "parameters": [
+        {
+          "name": "node",
+          "type": "string",
+          "required": true,
+          "description": "Node name"
+        },
+        {
+          "name": "storage",
+          "type": "string",
+          "required": true,
+          "description": "Storage identifier"
+        },
+        {
+          "name": "content",
+          "type": "enum",
+          "required": true,
+          "description": "Upload content type"
+        },
+        {
+          "name": "filename",
+          "type": "string",
+          "required": true,
+          "description": "Filename to upload"
+        },
+        {
+          "name": "checksum",
+          "type": "unknown",
+          "required": false
+        },
+        {
+          "name": "checksum-algorithm",
+          "type": "unknown",
+          "required": false
+        }
+      ],
+      "permission": "elevated"
+    }
+  ]
+}
