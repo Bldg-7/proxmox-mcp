@@ -420,7 +420,7 @@ describe('MCP Server Integration', () => {
 
       const listHandler = getRequestHandlers(server).get('tools/list');
       const listResponse = await listHandler!({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
-      expect(listResponse.tools).toHaveLength(143);
+      expect(listResponse.tools).toHaveLength(227);
 
       const getNodesToolDef = listResponse.tools.find(
         (t: { name: string }) => t.name === 'proxmox_get_nodes'
