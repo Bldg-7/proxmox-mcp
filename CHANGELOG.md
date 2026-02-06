@@ -1,5 +1,11 @@
 # @bldg-7/proxmox-mcp
 
+## 0.4.2
+
+### Patch Changes
+
+- 066eed6: Clarify guest agent requirement in execute_vm_command tool description.
+
 ## 0.4.1
 
 ### Patch Changes
