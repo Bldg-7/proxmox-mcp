@@ -599,11 +599,11 @@ grep -c "^### \`proxmox_" docs/skills/proxmox-mcp.md  # Expected: >= 227
 ```
 
 ### Final Checklist
-- [ ] All 227 tools documented in main skill file
-- [ ] Workflow patterns cover VM, LXC, Cluster, Storage
-- [ ] API quirks documented (500 errors, encoding, LXC limitations)
-- [ ] AGENTS.md provides codebase overview
-- [ ] docs/TOOLS.md shows 227 tools
-- [ ] No manual documentation of individual tools (used extraction)
-- [ ] No Korean version (deferred)
-- [ ] No verbose prose (AI-optimized density)
+- [x] All 227 tools documented in main skill file
+- [x] Workflow patterns cover VM, LXC, Cluster, Storage
+- [x] API quirks documented (500 errors, encoding, LXC limitations)
+- [x] AGENTS.md provides codebase overview
+- [x] docs/TOOLS.md shows 227 tools
+- [x] No manual documentation of individual tools (used extraction)
+- [x] No Korean version (deferred)
+- [x] No verbose prose (AI-optimized density)
