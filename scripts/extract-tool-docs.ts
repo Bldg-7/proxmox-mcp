@@ -1,8 +1,364 @@
-import { writeFileSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { toolRegistry } from '../src/tools/registry.js';
 import type { ToolName } from '../src/types/tools.js';
 import { z } from 'zod';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DOMAIN MAPPING - Maps each tool to its domain file
+// ═══════════════════════════════════════════════════════════════════════════════
+
+type DomainFile =
+  | 'nodes'
+  | 'vm'
+  | 'lxc'
+  | 'vm-lxc-shared'
+  | 'snapshots-backups'
+  | 'storage'
+  | 'networking'
+  | 'cluster'
+  | 'access-control'
+  | 'ceph'
+  | 'pools';
+
+const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 1: proxmox-nodes.md (38 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_get_nodes: 'nodes',
+  proxmox_get_node_status: 'nodes',
+  proxmox_get_cluster_status: 'nodes',
+  proxmox_get_next_vmid: 'nodes',
+  proxmox_get_node_network: 'nodes',
+  proxmox_get_node_dns: 'nodes',
+  proxmox_get_network_iface: 'nodes',
+  proxmox_create_network_iface: 'nodes',
+  proxmox_update_network_iface: 'nodes',
+  proxmox_delete_network_iface: 'nodes',
+  proxmox_apply_network_config: 'nodes',
+  proxmox_get_node_time: 'nodes',
+  proxmox_update_node_time: 'nodes',
+  proxmox_update_node_dns: 'nodes',
+  proxmox_get_node_hosts: 'nodes',
+  proxmox_update_node_hosts: 'nodes',
+  proxmox_get_node_subscription: 'nodes',
+  proxmox_set_node_subscription: 'nodes',
+  proxmox_delete_node_subscription: 'nodes',
+  proxmox_apt_update: 'nodes',
+  proxmox_apt_upgrade: 'nodes',
+  proxmox_apt_versions: 'nodes',
+  proxmox_start_all: 'nodes',
+  proxmox_stop_all: 'nodes',
+  proxmox_migrate_all: 'nodes',
+  proxmox_get_vnc_proxy: 'nodes',
+  proxmox_get_spice_proxy: 'nodes',
+  proxmox_get_term_proxy: 'nodes',
+  proxmox_get_lxc_vnc_proxy: 'nodes',
+  proxmox_get_lxc_term_proxy: 'nodes',
+  proxmox_get_node_services: 'nodes',
+  proxmox_control_node_service: 'nodes',
+  proxmox_get_node_syslog: 'nodes',
+  proxmox_get_node_journal: 'nodes',
+  proxmox_get_node_tasks: 'nodes',
+  proxmox_get_node_task: 'nodes',
+  proxmox_get_node_aplinfo: 'nodes',
+  proxmox_get_node_netstat: 'nodes',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 2: proxmox-vm.md (25 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_get_vms: 'vm',
+  proxmox_get_vm_status: 'vm',
+  proxmox_get_vm_config: 'vm',
+  proxmox_get_storage: 'vm',
+  proxmox_create_vm: 'vm',
+  proxmox_list_templates: 'vm',
+  proxmox_start_vm: 'vm',
+  proxmox_stop_vm: 'vm',
+  proxmox_shutdown_vm: 'vm',
+  proxmox_reboot_vm: 'vm',
+  proxmox_pause_vm: 'vm',
+  proxmox_resume_vm: 'vm',
+  proxmox_delete_vm: 'vm',
+  proxmox_clone_vm: 'vm',
+  proxmox_resize_vm: 'vm',
+  proxmox_add_disk_vm: 'vm',
+  proxmox_resize_disk_vm: 'vm',
+  proxmox_remove_disk_vm: 'vm',
+  proxmox_move_disk_vm: 'vm',
+  proxmox_add_network_vm: 'vm',
+  proxmox_update_network_vm: 'vm',
+  proxmox_remove_network_vm: 'vm',
+  proxmox_execute_vm_command: 'vm',
+  proxmox_create_template_vm: 'vm',
+  proxmox_get_vm_rrddata: 'vm',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 3: proxmox-lxc.md (18 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_get_lxc_config: 'lxc',
+  proxmox_create_lxc: 'lxc',
+  proxmox_start_lxc: 'lxc',
+  proxmox_stop_lxc: 'lxc',
+  proxmox_shutdown_lxc: 'lxc',
+  proxmox_reboot_lxc: 'lxc',
+  proxmox_delete_lxc: 'lxc',
+  proxmox_clone_lxc: 'lxc',
+  proxmox_resize_lxc: 'lxc',
+  proxmox_add_mountpoint_lxc: 'lxc',
+  proxmox_resize_disk_lxc: 'lxc',
+  proxmox_remove_mountpoint_lxc: 'lxc',
+  proxmox_move_disk_lxc: 'lxc',
+  proxmox_add_network_lxc: 'lxc',
+  proxmox_update_network_lxc: 'lxc',
+  proxmox_remove_network_lxc: 'lxc',
+  proxmox_create_template_lxc: 'lxc',
+  proxmox_get_lxc_rrddata: 'lxc',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 4: proxmox-vm-lxc-shared.md (22 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_migrate_vm: 'vm-lxc-shared',
+  proxmox_migrate_lxc: 'vm-lxc-shared',
+  proxmox_agent_ping: 'vm-lxc-shared',
+  proxmox_agent_get_osinfo: 'vm-lxc-shared',
+  proxmox_agent_get_fsinfo: 'vm-lxc-shared',
+  proxmox_agent_get_memory_blocks: 'vm-lxc-shared',
+  proxmox_agent_get_network_interfaces: 'vm-lxc-shared',
+  proxmox_agent_get_time: 'vm-lxc-shared',
+  proxmox_agent_get_timezone: 'vm-lxc-shared',
+  proxmox_agent_get_vcpus: 'vm-lxc-shared',
+  proxmox_agent_exec: 'vm-lxc-shared',
+  proxmox_agent_exec_status: 'vm-lxc-shared',
+  proxmox_list_vm_firewall_rules: 'vm-lxc-shared',
+  proxmox_get_vm_firewall_rule: 'vm-lxc-shared',
+  proxmox_create_vm_firewall_rule: 'vm-lxc-shared',
+  proxmox_update_vm_firewall_rule: 'vm-lxc-shared',
+  proxmox_delete_vm_firewall_rule: 'vm-lxc-shared',
+  proxmox_list_lxc_firewall_rules: 'vm-lxc-shared',
+  proxmox_get_lxc_firewall_rule: 'vm-lxc-shared',
+  proxmox_create_lxc_firewall_rule: 'vm-lxc-shared',
+  proxmox_update_lxc_firewall_rule: 'vm-lxc-shared',
+  proxmox_delete_lxc_firewall_rule: 'vm-lxc-shared',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 5: proxmox-snapshots-backups.md (14 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_create_snapshot_vm: 'snapshots-backups',
+  proxmox_create_snapshot_lxc: 'snapshots-backups',
+  proxmox_list_snapshots_vm: 'snapshots-backups',
+  proxmox_list_snapshots_lxc: 'snapshots-backups',
+  proxmox_rollback_snapshot_vm: 'snapshots-backups',
+  proxmox_rollback_snapshot_lxc: 'snapshots-backups',
+  proxmox_delete_snapshot_vm: 'snapshots-backups',
+  proxmox_delete_snapshot_lxc: 'snapshots-backups',
+  proxmox_create_backup_vm: 'snapshots-backups',
+  proxmox_create_backup_lxc: 'snapshots-backups',
+  proxmox_list_backups: 'snapshots-backups',
+  proxmox_restore_backup_vm: 'snapshots-backups',
+  proxmox_restore_backup_lxc: 'snapshots-backups',
+  proxmox_delete_backup: 'snapshots-backups',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 6: proxmox-storage.md (16 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_list_storage_config: 'storage',
+  proxmox_get_storage_config: 'storage',
+  proxmox_create_storage: 'storage',
+  proxmox_update_storage: 'storage',
+  proxmox_delete_storage: 'storage',
+  proxmox_upload_to_storage: 'storage',
+  proxmox_download_url_to_storage: 'storage',
+  proxmox_list_storage_content: 'storage',
+  proxmox_delete_storage_content: 'storage',
+  proxmox_list_file_restore: 'storage',
+  proxmox_download_file_restore: 'storage',
+  proxmox_prune_backups: 'storage',
+  proxmox_get_node_disks: 'storage',
+  proxmox_get_disk_smart: 'storage',
+  proxmox_get_node_lvm: 'storage',
+  proxmox_get_node_zfs: 'storage',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 7: proxmox-networking.md (20 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_list_sdn_vnets: 'networking',
+  proxmox_get_sdn_vnet: 'networking',
+  proxmox_create_sdn_vnet: 'networking',
+  proxmox_update_sdn_vnet: 'networking',
+  proxmox_delete_sdn_vnet: 'networking',
+  proxmox_list_sdn_zones: 'networking',
+  proxmox_get_sdn_zone: 'networking',
+  proxmox_create_sdn_zone: 'networking',
+  proxmox_update_sdn_zone: 'networking',
+  proxmox_delete_sdn_zone: 'networking',
+  proxmox_list_sdn_controllers: 'networking',
+  proxmox_get_sdn_controller: 'networking',
+  proxmox_create_sdn_controller: 'networking',
+  proxmox_update_sdn_controller: 'networking',
+  proxmox_delete_sdn_controller: 'networking',
+  proxmox_list_sdn_subnets: 'networking',
+  proxmox_get_sdn_subnet: 'networking',
+  proxmox_create_sdn_subnet: 'networking',
+  proxmox_update_sdn_subnet: 'networking',
+  proxmox_delete_sdn_subnet: 'networking',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 8: proxmox-cluster.md (33 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_get_ha_resources: 'cluster',
+  proxmox_get_ha_resource: 'cluster',
+  proxmox_create_ha_resource: 'cluster',
+  proxmox_update_ha_resource: 'cluster',
+  proxmox_delete_ha_resource: 'cluster',
+  proxmox_get_ha_groups: 'cluster',
+  proxmox_get_ha_group: 'cluster',
+  proxmox_create_ha_group: 'cluster',
+  proxmox_update_ha_group: 'cluster',
+  proxmox_delete_ha_group: 'cluster',
+  proxmox_get_ha_status: 'cluster',
+  proxmox_list_cluster_firewall_rules: 'cluster',
+  proxmox_get_cluster_firewall_rule: 'cluster',
+  proxmox_create_cluster_firewall_rule: 'cluster',
+  proxmox_update_cluster_firewall_rule: 'cluster',
+  proxmox_delete_cluster_firewall_rule: 'cluster',
+  proxmox_list_cluster_firewall_groups: 'cluster',
+  proxmox_get_cluster_firewall_group: 'cluster',
+  proxmox_create_cluster_firewall_group: 'cluster',
+  proxmox_update_cluster_firewall_group: 'cluster',
+  proxmox_delete_cluster_firewall_group: 'cluster',
+  proxmox_list_cluster_backup_jobs: 'cluster',
+  proxmox_get_cluster_backup_job: 'cluster',
+  proxmox_create_cluster_backup_job: 'cluster',
+  proxmox_update_cluster_backup_job: 'cluster',
+  proxmox_delete_cluster_backup_job: 'cluster',
+  proxmox_list_cluster_replication_jobs: 'cluster',
+  proxmox_get_cluster_replication_job: 'cluster',
+  proxmox_create_cluster_replication_job: 'cluster',
+  proxmox_update_cluster_replication_job: 'cluster',
+  proxmox_delete_cluster_replication_job: 'cluster',
+  proxmox_get_cluster_options: 'cluster',
+  proxmox_update_cluster_options: 'cluster',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 9: proxmox-access-control.md (20 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_list_users: 'access-control',
+  proxmox_get_user: 'access-control',
+  proxmox_create_user: 'access-control',
+  proxmox_update_user: 'access-control',
+  proxmox_delete_user: 'access-control',
+  proxmox_list_groups: 'access-control',
+  proxmox_create_group: 'access-control',
+  proxmox_update_group: 'access-control',
+  proxmox_delete_group: 'access-control',
+  proxmox_list_roles: 'access-control',
+  proxmox_create_role: 'access-control',
+  proxmox_update_role: 'access-control',
+  proxmox_delete_role: 'access-control',
+  proxmox_get_acl: 'access-control',
+  proxmox_update_acl: 'access-control',
+  proxmox_list_domains: 'access-control',
+  proxmox_get_domain: 'access-control',
+  proxmox_create_domain: 'access-control',
+  proxmox_update_domain: 'access-control',
+  proxmox_delete_domain: 'access-control',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 10: proxmox-ceph.md (16 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_get_ceph_status: 'ceph',
+  proxmox_list_ceph_osds: 'ceph',
+  proxmox_create_ceph_osd: 'ceph',
+  proxmox_delete_ceph_osd: 'ceph',
+  proxmox_list_ceph_mons: 'ceph',
+  proxmox_create_ceph_mon: 'ceph',
+  proxmox_delete_ceph_mon: 'ceph',
+  proxmox_list_ceph_mds: 'ceph',
+  proxmox_create_ceph_mds: 'ceph',
+  proxmox_delete_ceph_mds: 'ceph',
+  proxmox_list_ceph_pools: 'ceph',
+  proxmox_create_ceph_pool: 'ceph',
+  proxmox_update_ceph_pool: 'ceph',
+  proxmox_delete_ceph_pool: 'ceph',
+  proxmox_list_ceph_fs: 'ceph',
+  proxmox_create_ceph_fs: 'ceph',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 11: proxmox-pools.md (5 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_list_pools: 'pools',
+  proxmox_get_pool: 'pools',
+  proxmox_create_pool: 'pools',
+  proxmox_update_pool: 'pools',
+  proxmox_delete_pool: 'pools',
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DOMAIN METADATA - Title and description for each domain file
+// ═══════════════════════════════════════════════════════════════════════════════
+
+interface DomainMeta {
+  title: string;
+  description: string;
+}
+
+const DOMAIN_METADATA: Record<DomainFile, DomainMeta> = {
+  nodes: {
+    title: 'Proxmox Nodes & Cluster',
+    description:
+      'Node management, cluster status, network configuration, system operations, console access, and node services.',
+  },
+  vm: {
+    title: 'Proxmox QEMU Virtual Machines',
+    description:
+      'QEMU VM creation, lifecycle management, disk operations, network configuration, and performance monitoring.',
+  },
+  lxc: {
+    title: 'Proxmox LXC Containers',
+    description:
+      'LXC container creation, lifecycle management, mount points, network configuration, and performance monitoring.',
+  },
+  'vm-lxc-shared': {
+    title: 'Proxmox VM/LXC Shared Operations',
+    description:
+      'Operations common to both VMs and containers: migration, guest agent, and firewall rules.',
+  },
+  'snapshots-backups': {
+    title: 'Proxmox Snapshots & Backups',
+    description: 'Snapshot creation/rollback and backup creation/restoration for VMs and containers.',
+  },
+  storage: {
+    title: 'Proxmox Storage',
+    description:
+      'Storage configuration, content management, file uploads, disk health monitoring, and LVM/ZFS pools.',
+  },
+  networking: {
+    title: 'Proxmox SDN Networking',
+    description: 'Software-Defined Networking: VNets, zones, controllers, and subnets.',
+  },
+  cluster: {
+    title: 'Proxmox Cluster Management',
+    description:
+      'High Availability, cluster firewall, backup jobs, replication jobs, and cluster-wide options.',
+  },
+  'access-control': {
+    title: 'Proxmox Access Control',
+    description: 'Users, groups, roles, ACLs, and authentication domains.',
+  },
+  ceph: {
+    title: 'Proxmox Ceph Integration',
+    description: 'Ceph cluster status, OSDs, monitors, MDS daemons, pools, and filesystems.',
+  },
+  pools: {
+    title: 'Proxmox Resource Pools',
+    description: 'Resource pool management for organizing VMs and containers.',
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TOOL DESCRIPTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
 
 const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_get_nodes: 'List all Proxmox cluster nodes with their status and resources',
@@ -269,6 +625,10 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_get_node_zfs: 'List ZFS pools on a Proxmox node with health and capacity info',
 };
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// TYPE DEFINITIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
 interface ToolParameter {
   name: string;
   type: string;
@@ -288,6 +648,10 @@ interface ToolDocsOutput {
   tool_count: number;
   tools: ToolDoc[];
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PARAMETER EXTRACTION
+// ═══════════════════════════════════════════════════════════════════════════════
 
 function extractParameters(schema: z.ZodSchema): ToolParameter[] {
   const parameters: ToolParameter[] = [];
@@ -339,6 +703,10 @@ function getPermissionLevel(toolName: string, description: string): string {
   return 'basic';
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// TOOL EXTRACTION
+// ═══════════════════════════════════════════════════════════════════════════════
+
 function extractToolDocs(): ToolDocsOutput {
   const tools: ToolDoc[] = [];
 
@@ -366,6 +734,10 @@ function extractToolDocs(): ToolDocsOutput {
     tools,
   };
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MARKDOWN GENERATION - Legacy (verb-based categories)
+// ═══════════════════════════════════════════════════════════════════════════════
 
 function generateMarkdown(docs: ToolDocsOutput): string {
   let markdown = `# Proxmox MCP Tools Documentation
@@ -420,22 +792,201 @@ Total Tools: ${docs.tool_count}
   return markdown;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// MARKDOWN GENERATION - Domain-based skill files
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function generateDomainMarkdown(domain: DomainFile, tools: ToolDoc[], generatedAt: string): string {
+  const meta = DOMAIN_METADATA[domain];
+  const toolCount = tools.length;
+
+  let markdown = `# ${meta.title}
+
+> ${meta.description}
+
+**Tools in this file:** ${toolCount}  
+**Generated:** ${generatedAt}
+
+---
+
+## Tools
+
+`;
+
+  // Sort tools alphabetically within domain
+  const sortedTools = [...tools].sort((a, b) => a.name.localeCompare(b.name));
+
+  for (const tool of sortedTools) {
+    markdown += `#### \`${tool.name}\`\n\n`;
+    markdown += `**Description:** ${tool.description}\n\n`;
+    markdown += `**Permission:** ${tool.permission}\n\n`;
+
+    if (tool.parameters.length > 0) {
+      markdown += `**Parameters:**\n\n`;
+      markdown += `| Name | Type | Required | Description |\n`;
+      markdown += `|------|------|----------|-------------|\n`;
+
+      for (const param of tool.parameters) {
+        const desc = param.description || '-';
+        markdown += `| \`${param.name}\` | ${param.type} | ${param.required ? 'Yes' : 'No'} | ${desc} |\n`;
+      }
+      markdown += `\n`;
+    } else {
+      markdown += `**Parameters:** None\n\n`;
+    }
+
+    markdown += `---\n\n`;
+  }
+
+  return markdown;
+}
+
+function generateIndexMarkdown(
+  domainCounts: Map<DomainFile, number>,
+  totalTools: number,
+  generatedAt: string
+): string {
+  const domainOrder: DomainFile[] = [
+    'nodes',
+    'vm',
+    'lxc',
+    'vm-lxc-shared',
+    'snapshots-backups',
+    'storage',
+    'networking',
+    'cluster',
+    'access-control',
+    'ceph',
+    'pools',
+  ];
+
+  let markdown = `# Proxmox MCP Server - Tool Reference
+
+> Model Context Protocol server providing **${totalTools} tools** for Proxmox Virtual Environment management.
+
+**Generated:** ${generatedAt}
+
+---
+
+## Quick Links
+
+| Domain | Tools | Description |
+|--------|-------|-------------|
+`;
+
+  for (const domain of domainOrder) {
+    const meta = DOMAIN_METADATA[domain];
+    const count = domainCounts.get(domain) || 0;
+    markdown += `| [${meta.title}](proxmox-${domain}.md) | ${count} | ${meta.description} |\n`;
+  }
+
+  markdown += `
+
+---
+
+## Overview
+
+This MCP server enables AI agents to manage Proxmox VE through the Model Context Protocol:
+
+- **QEMU VMs**: Create, configure, lifecycle management, snapshots, backups
+- **LXC Containers**: Create, configure, lifecycle management
+- **Cluster**: HA, replication, migration, backup jobs
+- **Storage**: Management, content listing, file operations
+- **Networking**: Interfaces, bridges, VLANs, SDN
+- **Access Control**: Users, groups, roles, ACLs, domains
+- **Ceph**: Storage cluster management
+- **Monitoring**: Nodes, services, tasks, logs
+
+## Permission Model
+
+- **Basic**: Read-only operations (list, get, status) - always allowed
+- **Elevated**: Create, modify, delete operations - require \`PROXMOX_ALLOW_ELEVATED=true\`
+
+## Domain Files
+
+`;
+
+  for (const domain of domainOrder) {
+    const meta = DOMAIN_METADATA[domain];
+    const count = domainCounts.get(domain) || 0;
+    markdown += `### [${meta.title}](proxmox-${domain}.md)\n`;
+    markdown += `${count} tools - ${meta.description}\n\n`;
+  }
+
+  markdown += `---
+
+*See individual domain files for complete tool documentation with parameters.*
+`;
+
+  return markdown;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
 function main() {
   try {
     console.log('Extracting tool documentation...');
 
     const docs = extractToolDocs();
+    const generatedAt = docs.generated_at;
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Generate JSON (unchanged)
+    // ═══════════════════════════════════════════════════════════════════════════
     const jsonPath = resolve('scripts/tool-docs.json');
     writeFileSync(jsonPath, JSON.stringify(docs, null, 2));
     console.log(`✓ Generated ${jsonPath} (${docs.tool_count} tools)`);
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Generate legacy markdown (unchanged)
+    // ═══════════════════════════════════════════════════════════════════════════
     const markdown = generateMarkdown(docs);
     const mdPath = resolve('scripts/tool-docs.md');
     writeFileSync(mdPath, markdown);
     console.log(`✓ Generated ${mdPath}`);
 
-    console.log(`\nExtraction complete: ${docs.tool_count} tools documented`);
+    // ═══════════════════════════════════════════════════════════════════════════
+    // Generate domain-based skill files
+    // ═══════════════════════════════════════════════════════════════════════════
+    const skillsDir = resolve('docs/skills');
+    if (!existsSync(skillsDir)) {
+      mkdirSync(skillsDir, { recursive: true });
+    }
+
+    // Group tools by domain
+    const toolsByDomain = new Map<DomainFile, ToolDoc[]>();
+    for (const tool of docs.tools) {
+      const domain = DOMAIN_MAPPING[tool.name as ToolName];
+      if (!toolsByDomain.has(domain)) {
+        toolsByDomain.set(domain, []);
+      }
+      toolsByDomain.get(domain)!.push(tool);
+    }
+
+    // Generate each domain file
+    const domainCounts = new Map<DomainFile, number>();
+    for (const [domain, tools] of toolsByDomain) {
+      const domainMarkdown = generateDomainMarkdown(domain, tools, generatedAt);
+      const domainPath = resolve(`docs/skills/proxmox-${domain}.md`);
+      writeFileSync(domainPath, domainMarkdown);
+      domainCounts.set(domain, tools.length);
+      console.log(`✓ Generated ${domainPath} (${tools.length} tools)`);
+    }
+
+    // Generate index file
+    const indexMarkdown = generateIndexMarkdown(domainCounts, docs.tool_count, generatedAt);
+    const indexPath = resolve('docs/skills/proxmox-mcp.md');
+    writeFileSync(indexPath, indexMarkdown);
+    console.log(`✓ Generated ${indexPath} (index)`);
+
+    // Summary
+    console.log(`\nExtraction complete:`);
+    console.log(`  • ${docs.tool_count} tools documented`);
+    console.log(`  • ${toolsByDomain.size} domain files generated`);
+    console.log(`  • 1 index file generated`);
+
     process.exit(0);
   } catch (error) {
     console.error('Error extracting tool docs:', error);
