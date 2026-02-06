@@ -1,5 +1,11 @@
 # @bldg-7/proxmox-mcp
 
+## 0.4.3
+
+### Patch Changes
+
+- 53479be: Add net0 parameter support to proxmox_create_lxc.
+
 ## 0.4.2
 
 ### Patch Changes
