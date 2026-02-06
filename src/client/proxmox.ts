@@ -5,6 +5,47 @@ import { logger } from '../utils/index.js';
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
+const encodeFormValue = (value: unknown): string => {
+  if (typeof value === 'boolean') {
+    return value ? '1' : '0';
+  }
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (typeof value === 'object' && value !== null) {
+    return JSON.stringify(value);
+  }
+  return String(value);
+};
+
+const toFormParams = (body: unknown): URLSearchParams => {
+  if (body instanceof URLSearchParams) {
+    return body;
+  }
+
+  const params = new URLSearchParams();
+  if (!body || typeof body !== 'object') {
+    return params;
+  }
+
+  for (const [key, rawValue] of Object.entries(body as Record<string, unknown>)) {
+    if (rawValue === undefined || rawValue === null) {
+      continue;
+    }
+
+    if (Array.isArray(rawValue)) {
+      for (const item of rawValue) {
+        params.append(key, encodeFormValue(item));
+      }
+      continue;
+    }
+
+    params.append(key, encodeFormValue(rawValue));
+  }
+
+  return params;
+};
+
 export class ProxmoxApiError extends Error {
   constructor(
     message: string,
@@ -46,22 +87,36 @@ export class ProxmoxApiClient {
   }
 
   async request<T>(endpoint: string, method = 'GET', body?: unknown): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+    const normalizedMethod = method.toUpperCase();
+    let url = `${this.baseUrl}${endpoint}`;
 
     const headers: Record<string, string> = {
       'Authorization': this.authHeader,
-      'Content-Type': 'application/json',
     };
 
     const options = {
-      method,
+      method: normalizedMethod,
       headers,
       signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
       dispatcher: this.dispatcher,
     } as unknown as RequestInit;
 
     if (body !== undefined) {
-      options.body = JSON.stringify(body);
+      const params = toFormParams(body);
+      if (normalizedMethod === 'DELETE') {
+        const query = params.toString();
+        if (query) {
+          url += url.includes('?') ? `&${query}` : `?${query}`;
+        }
+      } else if (normalizedMethod === 'POST' || normalizedMethod === 'PUT') {
+        headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        options.body = params.toString();
+      } else {
+        headers['Content-Type'] = 'application/json';
+        options.body = JSON.stringify(body);
+      }
+    } else if (normalizedMethod === 'POST' || normalizedMethod === 'PUT') {
+      headers['Content-Type'] = 'application/x-www-form-urlencoded';
     }
 
     logger.debug({ method, endpoint }, 'Proxmox API request');
