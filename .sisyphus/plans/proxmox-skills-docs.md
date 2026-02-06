@@ -201,7 +201,7 @@ Scenario: JSON output has required fields
 
 ---
 
-### - [ ] 2. Create Main Skill File
+### - [x] 2. Create Main Skill File
 
 **What to do**:
 - Create `docs/skills/proxmox-mcp.md`
@@ -273,7 +273,7 @@ Scenario: Skill file has required sections
 
 ---
 
-### - [ ] 3. Create Workflows Documentation
+### - [x] 3. Create Workflows Documentation
 
 **What to do**:
 - Create `docs/skills/proxmox-workflows.md`
@@ -346,7 +346,7 @@ Scenario: Workflows show step sequences
 
 ---
 
-### - [ ] 4. Create Troubleshooting Documentation
+### - [x] 4. Create Troubleshooting Documentation
 
 **What to do**:
 - Create `docs/skills/proxmox-troubleshooting.md`
@@ -422,7 +422,7 @@ Scenario: Error codes section exists
 
 ---
 
-### - [ ] 5. Create AGENTS.md
+### - [x] 5. Create AGENTS.md
 
 **What to do**:
 - Create `AGENTS.md` at project root
@@ -498,7 +498,7 @@ Scenario: AGENTS.md covers key directories
 
 ---
 
-### - [ ] 6. Update docs/TOOLS.md Tool Count
+### - [x] 6. Update docs/TOOLS.md Tool Count
 
 **What to do**:
 - Update `docs/TOOLS.md` header to show 227 tools (not 143)
