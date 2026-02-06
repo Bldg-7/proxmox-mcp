@@ -286,7 +286,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_remove_network_lxc: 'Remove network interface from LXC container (requires elevated permissions)',
 
   // Command
-  proxmox_execute_vm_command: 'Execute a shell command on a virtual machine via Proxmox API',
+  proxmox_execute_vm_command: 'Execute a shell command on a QEMU VM via guest agent (requires QEMU Guest Agent; LXC unsupported)',
 
    // Creation
    proxmox_list_templates: 'List available LXC container templates on a storage',
