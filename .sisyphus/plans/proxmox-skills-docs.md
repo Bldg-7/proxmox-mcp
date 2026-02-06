@@ -62,11 +62,11 @@ Create AI-optimized documentation that enables any AI agent to effectively use a
 6. Updated `docs/TOOLS.md` - 227 tools synced
 
 ### Definition of Done
-- [ ] Extraction script runs without errors: `bun run scripts/extract-tool-docs.ts`
-- [ ] All 227 tools documented in main skill file
-- [ ] Workflow examples tested against actual MCP
-- [ ] AGENTS.md includes all source directories
-- [ ] docs/TOOLS.md shows correct tool count (227)
+- [x] Extraction script runs without errors: `bun run scripts/extract-tool-docs.ts`
+- [x] All 227 tools documented in main skill file
+- [x] Workflow examples tested against actual MCP
+- [x] AGENTS.md includes all source directories
+- [x] docs/TOOLS.md shows correct tool count (227)
 
 ### Must Have
 - All 227 tools documented with: name, description, parameters, permission level
