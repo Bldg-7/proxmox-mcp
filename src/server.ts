@@ -23,6 +23,28 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_get_cluster_status: 'Get overall cluster status including nodes and resource usage',
   proxmox_get_next_vmid: 'Get the next available VM/Container ID number',
 
+  // Node Network Configuration
+  proxmox_create_network_iface: 'Create a network interface on a Proxmox node (requires elevated permissions)',
+  proxmox_update_network_iface: 'Update a network interface on a Proxmox node (requires elevated permissions)',
+  proxmox_delete_network_iface: 'Delete a network interface on a Proxmox node (requires elevated permissions)',
+  proxmox_apply_network_config: 'Apply or revert pending network changes on a Proxmox node (requires elevated permissions)',
+
+  // System Operations
+  proxmox_get_node_time: 'Get node time and timezone information',
+  proxmox_update_node_time: 'Update node time or timezone (requires elevated permissions)',
+  proxmox_update_node_dns: 'Update DNS configuration on a Proxmox node (requires elevated permissions)',
+  proxmox_get_node_hosts: 'Get hosts file entries for a Proxmox node',
+  proxmox_update_node_hosts: 'Add/update a hosts entry on a Proxmox node (requires elevated permissions)',
+  proxmox_get_node_subscription: 'Get subscription information for a Proxmox node',
+  proxmox_set_node_subscription: 'Set subscription information for a Proxmox node (requires elevated permissions)',
+  proxmox_delete_node_subscription: 'Delete subscription information for a Proxmox node (requires elevated permissions)',
+  proxmox_apt_update: 'Update APT package lists (requires elevated permissions)',
+  proxmox_apt_upgrade: 'Upgrade packages via APT (requires elevated permissions)',
+  proxmox_apt_versions: 'List installed/upgradable APT package versions',
+  proxmox_start_all: 'Start all VMs/containers on a node (requires elevated permissions)',
+  proxmox_stop_all: 'Stop all VMs/containers on a node (requires elevated permissions)',
+  proxmox_migrate_all: 'Migrate all VMs/containers to another node (requires elevated permissions)',
+
   // Cluster Management
   proxmox_get_ha_resources: 'List High Availability resources in the cluster',
   proxmox_get_ha_resource: 'Get details for a specific HA resource',
@@ -70,6 +92,57 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_get_cluster_options: 'Get cluster-wide options',
   proxmox_update_cluster_options: 'Update cluster-wide options (requires elevated permissions)',
 
+  // SDN
+  proxmox_list_sdn_vnets: 'List SDN virtual networks',
+  proxmox_get_sdn_vnet: 'Get an SDN virtual network by name',
+  proxmox_create_sdn_vnet: 'Create an SDN virtual network (requires elevated permissions)',
+  proxmox_update_sdn_vnet: 'Update an SDN virtual network (requires elevated permissions)',
+  proxmox_delete_sdn_vnet: 'Delete an SDN virtual network (requires elevated permissions)',
+  proxmox_list_sdn_zones: 'List SDN zones',
+  proxmox_get_sdn_zone: 'Get an SDN zone by name',
+  proxmox_create_sdn_zone: 'Create an SDN zone (requires elevated permissions)',
+  proxmox_update_sdn_zone: 'Update an SDN zone (requires elevated permissions)',
+  proxmox_delete_sdn_zone: 'Delete an SDN zone (requires elevated permissions)',
+  proxmox_list_sdn_controllers: 'List SDN controllers',
+  proxmox_get_sdn_controller: 'Get an SDN controller by name',
+  proxmox_create_sdn_controller: 'Create an SDN controller (requires elevated permissions)',
+  proxmox_update_sdn_controller: 'Update an SDN controller (requires elevated permissions)',
+  proxmox_delete_sdn_controller: 'Delete an SDN controller (requires elevated permissions)',
+  proxmox_list_sdn_subnets: 'List SDN subnets',
+  proxmox_get_sdn_subnet: 'Get an SDN subnet by name',
+  proxmox_create_sdn_subnet: 'Create an SDN subnet (requires elevated permissions)',
+  proxmox_update_sdn_subnet: 'Update an SDN subnet (requires elevated permissions)',
+  proxmox_delete_sdn_subnet: 'Delete an SDN subnet (requires elevated permissions)',
+
+  // Access Control
+  proxmox_list_users: 'List Proxmox users',
+  proxmox_get_user: 'Get details for a Proxmox user',
+  proxmox_create_user: 'Create a Proxmox user (requires elevated permissions)',
+  proxmox_update_user: 'Update a Proxmox user (requires elevated permissions)',
+  proxmox_delete_user: 'Delete a Proxmox user (requires elevated permissions)',
+  proxmox_list_groups: 'List Proxmox groups',
+  proxmox_create_group: 'Create a Proxmox group (requires elevated permissions)',
+  proxmox_update_group: 'Update a Proxmox group (requires elevated permissions)',
+  proxmox_delete_group: 'Delete a Proxmox group (requires elevated permissions)',
+  proxmox_list_roles: 'List Proxmox roles',
+  proxmox_create_role: 'Create a Proxmox role (requires elevated permissions)',
+  proxmox_update_role: 'Update a Proxmox role (requires elevated permissions)',
+  proxmox_delete_role: 'Delete a Proxmox role (requires elevated permissions)',
+  proxmox_get_acl: 'Get ACL entries',
+  proxmox_update_acl: 'Update ACL entries (requires elevated permissions)',
+  proxmox_list_domains: 'List authentication domains',
+  proxmox_get_domain: 'Get authentication domain details',
+  proxmox_create_domain: 'Create an authentication domain (requires elevated permissions)',
+  proxmox_update_domain: 'Update an authentication domain (requires elevated permissions)',
+  proxmox_delete_domain: 'Delete an authentication domain (requires elevated permissions)',
+
+  // Pool Management
+  proxmox_list_pools: 'List resource pools',
+  proxmox_get_pool: 'Get a resource pool by ID',
+  proxmox_create_pool: 'Create a resource pool (requires elevated permissions)',
+  proxmox_update_pool: 'Update a resource pool (requires elevated permissions)',
+  proxmox_delete_pool: 'Delete a resource pool (requires elevated permissions)',
+
   // Storage Management
   proxmox_list_storage_config: 'List storage configurations available in Proxmox',
   proxmox_get_storage_config: 'Get a storage configuration by name',
@@ -84,6 +157,31 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_list_file_restore: 'List files in a backup for restore',
   proxmox_download_file_restore: 'Download a file from backup',
   proxmox_prune_backups: 'Prune old backups from storage (requires elevated permissions)',
+
+  // Ceph Integration
+  proxmox_get_ceph_status: 'Get Ceph cluster status',
+  proxmox_list_ceph_osds: 'List Ceph OSDs',
+  proxmox_create_ceph_osd: 'Create a Ceph OSD (requires elevated permissions)',
+  proxmox_delete_ceph_osd: 'Delete a Ceph OSD (requires elevated permissions)',
+  proxmox_list_ceph_mons: 'List Ceph monitors',
+  proxmox_create_ceph_mon: 'Create a Ceph monitor (requires elevated permissions)',
+  proxmox_delete_ceph_mon: 'Delete a Ceph monitor (requires elevated permissions)',
+  proxmox_list_ceph_mds: 'List Ceph MDS daemons',
+  proxmox_create_ceph_mds: 'Create a Ceph MDS daemon (requires elevated permissions)',
+  proxmox_delete_ceph_mds: 'Delete a Ceph MDS daemon (requires elevated permissions)',
+  proxmox_list_ceph_pools: 'List Ceph pools',
+  proxmox_create_ceph_pool: 'Create a Ceph pool (requires elevated permissions)',
+  proxmox_update_ceph_pool: 'Update a Ceph pool (requires elevated permissions)',
+  proxmox_delete_ceph_pool: 'Delete a Ceph pool (requires elevated permissions)',
+  proxmox_list_ceph_fs: 'List Ceph filesystems',
+  proxmox_create_ceph_fs: 'Create a Ceph filesystem (requires elevated permissions)',
+
+  // Console Access
+  proxmox_get_vnc_proxy: 'Get a VNC proxy ticket for a QEMU VM (requires elevated permissions)',
+  proxmox_get_spice_proxy: 'Get a SPICE proxy ticket for a QEMU VM (requires elevated permissions)',
+  proxmox_get_term_proxy: 'Get a terminal proxy ticket for a QEMU VM (requires elevated permissions)',
+  proxmox_get_lxc_vnc_proxy: 'Get a VNC proxy ticket for an LXC container (requires elevated permissions)',
+  proxmox_get_lxc_term_proxy: 'Get a terminal proxy ticket for an LXC container (requires elevated permissions)',
 
   // Node Management
   proxmox_get_node_services: 'List system services on a Proxmox node',

@@ -16,6 +16,32 @@ export {
 } from './node.js';
 export { getClusterStatus, getNextVMID } from './cluster.js';
 
+// Node Network Configuration tools
+export {
+  createNetworkIface,
+  updateNetworkIface,
+  deleteNetworkIface,
+  applyNetworkConfig,
+} from './node-network.js';
+
+// System Operations tools
+export {
+  getNodeTime,
+  updateNodeTime,
+  updateNodeDns,
+  getNodeHosts,
+  updateNodeHosts,
+  getNodeSubscription,
+  setNodeSubscription,
+  deleteNodeSubscription,
+  aptUpdate,
+  aptUpgrade,
+  aptVersions,
+  startAll,
+  stopAll,
+  migrateAll,
+} from './system-operations.js';
+
 // Cluster Management tools
 export {
   getHaResources,
@@ -53,6 +79,63 @@ export {
   updateClusterOptions,
 } from './cluster-management.js';
 
+// SDN tools
+export {
+  listSdnVnets,
+  getSdnVnet,
+  createSdnVnet,
+  updateSdnVnet,
+  deleteSdnVnet,
+  listSdnZones,
+  getSdnZone,
+  createSdnZone,
+  updateSdnZone,
+  deleteSdnZone,
+  listSdnControllers,
+  getSdnController,
+  createSdnController,
+  updateSdnController,
+  deleteSdnController,
+  listSdnSubnets,
+  getSdnSubnet,
+  createSdnSubnet,
+  updateSdnSubnet,
+  deleteSdnSubnet,
+} from './sdn.js';
+
+// Access Control tools
+export {
+  listUsers,
+  getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  listGroups,
+  createGroup,
+  updateGroup,
+  deleteGroup,
+  listRoles,
+  createRole,
+  updateRole,
+  deleteRole,
+  getAcl,
+  updateAcl,
+  listDomains,
+  getDomain,
+  createDomain,
+  updateDomain,
+  deleteDomain,
+} from './access-control.js';
+
+// Pool Management tools
+export {
+  listPools,
+  getPool,
+  createPool,
+  updatePool,
+  deletePool,
+} from './pool-management.js';
+
 // Storage Management tools
 export {
   listStorageConfig,
@@ -68,6 +151,35 @@ export {
   downloadFileRestore,
   pruneBackups,
 } from './storage-management.js';
+
+// Ceph Integration tools
+export {
+  getCephStatus,
+  listCephOsds,
+  createCephOsd,
+  deleteCephOsd,
+  listCephMons,
+  createCephMon,
+  deleteCephMon,
+  listCephMds,
+  createCephMds,
+  deleteCephMds,
+  listCephPools,
+  createCephPool,
+  updateCephPool,
+  deleteCephPool,
+  listCephFs,
+  createCephFs,
+} from './ceph.js';
+
+// Console Access tools
+export {
+  getVncProxy,
+  getSpiceProxy,
+  getTermProxy,
+  getLxcVncProxy,
+  getLxcTermProxy,
+} from './console-access.js';
 
 // VM Query & Lifecycle tools
 export { getVMs, getVMStatus, getVMConfig, getLxcConfig, getStorage } from './vm-query.js';

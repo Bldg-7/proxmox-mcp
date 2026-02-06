@@ -18,6 +18,24 @@ import {
   getNodeTask,
   getNodeAplinfo,
   getNodeNetstat,
+  createNetworkIface,
+  updateNetworkIface,
+  deleteNetworkIface,
+  applyNetworkConfig,
+  getNodeTime,
+  updateNodeTime,
+  updateNodeDns,
+  getNodeHosts,
+  updateNodeHosts,
+  getNodeSubscription,
+  setNodeSubscription,
+  deleteNodeSubscription,
+  aptUpdate,
+  aptUpgrade,
+  aptVersions,
+  startAll,
+  stopAll,
+  migrateAll,
   getClusterStatus,
   getNextVMID,
   getHaResources,
@@ -53,6 +71,51 @@ import {
   deleteClusterReplicationJob,
   getClusterOptions,
   updateClusterOptions,
+  listSdnVnets,
+  getSdnVnet,
+  createSdnVnet,
+  updateSdnVnet,
+  deleteSdnVnet,
+  listSdnZones,
+  getSdnZone,
+  createSdnZone,
+  updateSdnZone,
+  deleteSdnZone,
+  listSdnControllers,
+  getSdnController,
+  createSdnController,
+  updateSdnController,
+  deleteSdnController,
+  listSdnSubnets,
+  getSdnSubnet,
+  createSdnSubnet,
+  updateSdnSubnet,
+  deleteSdnSubnet,
+  listUsers,
+  getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  listGroups,
+  createGroup,
+  updateGroup,
+  deleteGroup,
+  listRoles,
+  createRole,
+  updateRole,
+  deleteRole,
+  getAcl,
+  updateAcl,
+  listDomains,
+  getDomain,
+  createDomain,
+  updateDomain,
+  deleteDomain,
+  listPools,
+  getPool,
+  createPool,
+  updatePool,
+  deletePool,
   listStorageConfig,
   getStorageConfig,
   createStorage,
@@ -65,6 +128,22 @@ import {
   listFileRestore,
   downloadFileRestore,
   pruneBackups,
+  getCephStatus,
+  listCephOsds,
+  createCephOsd,
+  deleteCephOsd,
+  listCephMons,
+  createCephMon,
+  deleteCephMon,
+  listCephMds,
+  createCephMds,
+  deleteCephMds,
+  listCephPools,
+  createCephPool,
+  updateCephPool,
+  deleteCephPool,
+  listCephFs,
+  createCephFs,
   getVMs,
   getVMStatus,
   getVMConfig,
@@ -112,6 +191,11 @@ import {
   createLxcFirewallRule,
   updateLxcFirewallRule,
   deleteLxcFirewallRule,
+  getVncProxy,
+  getSpiceProxy,
+  getTermProxy,
+  getLxcVncProxy,
+  getLxcTermProxy,
   createSnapshotLxc,
   createSnapshotVM,
   listSnapshotsLxc,
@@ -169,6 +253,28 @@ import {
   getNextVmidSchema,
 } from '../schemas/node.js';
 import {
+  createNetworkIfaceSchema,
+  updateNetworkIfaceSchema,
+  deleteNetworkIfaceSchema,
+  applyNetworkConfigSchema,
+} from '../schemas/node-network.js';
+import {
+  getNodeTimeSchema,
+  updateNodeTimeSchema,
+  updateNodeDnsSchema,
+  getNodeHostsSchema,
+  updateNodeHostsSchema,
+  getNodeSubscriptionSchema,
+  setNodeSubscriptionSchema,
+  deleteNodeSubscriptionSchema,
+  aptUpdateSchema,
+  aptUpgradeSchema,
+  aptVersionsSchema,
+  startAllSchema,
+  stopAllSchema,
+  migrateAllSchema,
+} from '../schemas/system-operations.js';
+import {
   getHaResourcesSchema,
   getHaResourceSchema,
   createHaResourceSchema,
@@ -204,6 +310,57 @@ import {
   updateClusterOptionsSchema,
 } from '../schemas/cluster-management.js';
 import {
+  listSdnVnetsSchema,
+  getSdnVnetSchema,
+  createSdnVnetSchema,
+  updateSdnVnetSchema,
+  deleteSdnVnetSchema,
+  listSdnZonesSchema,
+  getSdnZoneSchema,
+  createSdnZoneSchema,
+  updateSdnZoneSchema,
+  deleteSdnZoneSchema,
+  listSdnControllersSchema,
+  getSdnControllerSchema,
+  createSdnControllerSchema,
+  updateSdnControllerSchema,
+  deleteSdnControllerSchema,
+  listSdnSubnetsSchema,
+  getSdnSubnetSchema,
+  createSdnSubnetSchema,
+  updateSdnSubnetSchema,
+  deleteSdnSubnetSchema,
+} from '../schemas/sdn.js';
+import {
+  listUsersSchema,
+  getUserSchema,
+  createUserSchema,
+  updateUserSchema,
+  deleteUserSchema,
+  listGroupsSchema,
+  createGroupSchema,
+  updateGroupSchema,
+  deleteGroupSchema,
+  listRolesSchema,
+  createRoleSchema,
+  updateRoleSchema,
+  deleteRoleSchema,
+  getAclSchema,
+  updateAclSchema,
+  listDomainsSchema,
+  getDomainSchema,
+  createDomainSchema,
+  updateDomainSchema,
+  deleteDomainSchema,
+} from '../schemas/access-control.js';
+import {
+  listPoolsSchema,
+  getPoolSchema,
+  createPoolSchema,
+  updatePoolSchema,
+  deletePoolSchema,
+} from '../schemas/pool-management.js';
+import {
   listStorageConfigSchema,
   getStorageConfigSchema,
   createStorageSchema,
@@ -217,6 +374,24 @@ import {
   downloadFileRestoreSchema,
   pruneBackupsSchema,
 } from '../schemas/storage-management.js';
+import {
+  getCephStatusSchema,
+  listCephOsdsSchema,
+  createCephOsdSchema,
+  deleteCephOsdSchema,
+  listCephMonsSchema,
+  createCephMonSchema,
+  deleteCephMonSchema,
+  listCephMdsSchema,
+  createCephMdsSchema,
+  deleteCephMdsSchema,
+  listCephPoolsSchema,
+  createCephPoolSchema,
+  updateCephPoolSchema,
+  deleteCephPoolSchema,
+  listCephFsSchema,
+  createCephFsSchema,
+} from '../schemas/ceph.js';
 import {
   getVmsSchema,
   getVmStatusSchema,
@@ -312,6 +487,13 @@ import {
   removeNetworkVmSchema,
   removeNetworkLxcSchema,
 } from '../schemas/network.js';
+import {
+  getVncProxySchema,
+  getSpiceProxySchema,
+  getTermProxySchema,
+  getLxcVncProxySchema,
+  getLxcTermProxySchema,
+} from '../schemas/console-access.js';
 
 // Tool handler type - accepts any input type for flexibility
 export type ToolHandler = (
@@ -336,6 +518,52 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_get_network_iface: { handler: getNetworkIface, schema: getNetworkIfaceSchema },
   proxmox_get_cluster_status: { handler: getClusterStatus, schema: getClusterStatusSchema },
   proxmox_get_next_vmid: { handler: getNextVMID, schema: getNextVmidSchema },
+
+  // Node Network Configuration
+  proxmox_create_network_iface: {
+    handler: createNetworkIface,
+    schema: createNetworkIfaceSchema,
+  },
+  proxmox_update_network_iface: {
+    handler: updateNetworkIface,
+    schema: updateNetworkIfaceSchema,
+  },
+  proxmox_delete_network_iface: {
+    handler: deleteNetworkIface,
+    schema: deleteNetworkIfaceSchema,
+  },
+  proxmox_apply_network_config: {
+    handler: applyNetworkConfig,
+    schema: applyNetworkConfigSchema,
+  },
+
+  // System Operations
+  proxmox_get_node_time: { handler: getNodeTime, schema: getNodeTimeSchema },
+  proxmox_update_node_time: { handler: updateNodeTime, schema: updateNodeTimeSchema },
+  proxmox_update_node_dns: { handler: updateNodeDns, schema: updateNodeDnsSchema },
+  proxmox_get_node_hosts: { handler: getNodeHosts, schema: getNodeHostsSchema },
+  proxmox_update_node_hosts: {
+    handler: updateNodeHosts,
+    schema: updateNodeHostsSchema,
+  },
+  proxmox_get_node_subscription: {
+    handler: getNodeSubscription,
+    schema: getNodeSubscriptionSchema,
+  },
+  proxmox_set_node_subscription: {
+    handler: setNodeSubscription,
+    schema: setNodeSubscriptionSchema,
+  },
+  proxmox_delete_node_subscription: {
+    handler: deleteNodeSubscription,
+    schema: deleteNodeSubscriptionSchema,
+  },
+  proxmox_apt_update: { handler: aptUpdate, schema: aptUpdateSchema },
+  proxmox_apt_upgrade: { handler: aptUpgrade, schema: aptUpgradeSchema },
+  proxmox_apt_versions: { handler: aptVersions, schema: aptVersionsSchema },
+  proxmox_start_all: { handler: startAll, schema: startAllSchema },
+  proxmox_stop_all: { handler: stopAll, schema: stopAllSchema },
+  proxmox_migrate_all: { handler: migrateAll, schema: migrateAllSchema },
 
   // Cluster Management
   proxmox_get_ha_resources: { handler: getHaResources, schema: getHaResourcesSchema },
@@ -435,6 +663,69 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
     schema: updateClusterOptionsSchema,
   },
 
+  // SDN
+  proxmox_list_sdn_vnets: { handler: listSdnVnets, schema: listSdnVnetsSchema },
+  proxmox_get_sdn_vnet: { handler: getSdnVnet, schema: getSdnVnetSchema },
+  proxmox_create_sdn_vnet: { handler: createSdnVnet, schema: createSdnVnetSchema },
+  proxmox_update_sdn_vnet: { handler: updateSdnVnet, schema: updateSdnVnetSchema },
+  proxmox_delete_sdn_vnet: { handler: deleteSdnVnet, schema: deleteSdnVnetSchema },
+  proxmox_list_sdn_zones: { handler: listSdnZones, schema: listSdnZonesSchema },
+  proxmox_get_sdn_zone: { handler: getSdnZone, schema: getSdnZoneSchema },
+  proxmox_create_sdn_zone: { handler: createSdnZone, schema: createSdnZoneSchema },
+  proxmox_update_sdn_zone: { handler: updateSdnZone, schema: updateSdnZoneSchema },
+  proxmox_delete_sdn_zone: { handler: deleteSdnZone, schema: deleteSdnZoneSchema },
+  proxmox_list_sdn_controllers: {
+    handler: listSdnControllers,
+    schema: listSdnControllersSchema,
+  },
+  proxmox_get_sdn_controller: { handler: getSdnController, schema: getSdnControllerSchema },
+  proxmox_create_sdn_controller: {
+    handler: createSdnController,
+    schema: createSdnControllerSchema,
+  },
+  proxmox_update_sdn_controller: {
+    handler: updateSdnController,
+    schema: updateSdnControllerSchema,
+  },
+  proxmox_delete_sdn_controller: {
+    handler: deleteSdnController,
+    schema: deleteSdnControllerSchema,
+  },
+  proxmox_list_sdn_subnets: { handler: listSdnSubnets, schema: listSdnSubnetsSchema },
+  proxmox_get_sdn_subnet: { handler: getSdnSubnet, schema: getSdnSubnetSchema },
+  proxmox_create_sdn_subnet: { handler: createSdnSubnet, schema: createSdnSubnetSchema },
+  proxmox_update_sdn_subnet: { handler: updateSdnSubnet, schema: updateSdnSubnetSchema },
+  proxmox_delete_sdn_subnet: { handler: deleteSdnSubnet, schema: deleteSdnSubnetSchema },
+
+  // Access Control
+  proxmox_list_users: { handler: listUsers, schema: listUsersSchema },
+  proxmox_get_user: { handler: getUser, schema: getUserSchema },
+  proxmox_create_user: { handler: createUser, schema: createUserSchema },
+  proxmox_update_user: { handler: updateUser, schema: updateUserSchema },
+  proxmox_delete_user: { handler: deleteUser, schema: deleteUserSchema },
+  proxmox_list_groups: { handler: listGroups, schema: listGroupsSchema },
+  proxmox_create_group: { handler: createGroup, schema: createGroupSchema },
+  proxmox_update_group: { handler: updateGroup, schema: updateGroupSchema },
+  proxmox_delete_group: { handler: deleteGroup, schema: deleteGroupSchema },
+  proxmox_list_roles: { handler: listRoles, schema: listRolesSchema },
+  proxmox_create_role: { handler: createRole, schema: createRoleSchema },
+  proxmox_update_role: { handler: updateRole, schema: updateRoleSchema },
+  proxmox_delete_role: { handler: deleteRole, schema: deleteRoleSchema },
+  proxmox_get_acl: { handler: getAcl, schema: getAclSchema },
+  proxmox_update_acl: { handler: updateAcl, schema: updateAclSchema },
+  proxmox_list_domains: { handler: listDomains, schema: listDomainsSchema },
+  proxmox_get_domain: { handler: getDomain, schema: getDomainSchema },
+  proxmox_create_domain: { handler: createDomain, schema: createDomainSchema },
+  proxmox_update_domain: { handler: updateDomain, schema: updateDomainSchema },
+  proxmox_delete_domain: { handler: deleteDomain, schema: deleteDomainSchema },
+
+  // Pool Management
+  proxmox_list_pools: { handler: listPools, schema: listPoolsSchema },
+  proxmox_get_pool: { handler: getPool, schema: getPoolSchema },
+  proxmox_create_pool: { handler: createPool, schema: createPoolSchema },
+  proxmox_update_pool: { handler: updatePool, schema: updatePoolSchema },
+  proxmox_delete_pool: { handler: deletePool, schema: deletePoolSchema },
+
   // Storage Management
   proxmox_list_storage_config: {
     handler: listStorageConfig,
@@ -463,6 +754,37 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
     schema: downloadFileRestoreSchema,
   },
   proxmox_prune_backups: { handler: pruneBackups, schema: pruneBackupsSchema },
+
+  // Ceph Integration
+  proxmox_get_ceph_status: { handler: getCephStatus, schema: getCephStatusSchema },
+  proxmox_list_ceph_osds: { handler: listCephOsds, schema: listCephOsdsSchema },
+  proxmox_create_ceph_osd: { handler: createCephOsd, schema: createCephOsdSchema },
+  proxmox_delete_ceph_osd: { handler: deleteCephOsd, schema: deleteCephOsdSchema },
+  proxmox_list_ceph_mons: { handler: listCephMons, schema: listCephMonsSchema },
+  proxmox_create_ceph_mon: { handler: createCephMon, schema: createCephMonSchema },
+  proxmox_delete_ceph_mon: { handler: deleteCephMon, schema: deleteCephMonSchema },
+  proxmox_list_ceph_mds: { handler: listCephMds, schema: listCephMdsSchema },
+  proxmox_create_ceph_mds: { handler: createCephMds, schema: createCephMdsSchema },
+  proxmox_delete_ceph_mds: { handler: deleteCephMds, schema: deleteCephMdsSchema },
+  proxmox_list_ceph_pools: { handler: listCephPools, schema: listCephPoolsSchema },
+  proxmox_create_ceph_pool: { handler: createCephPool, schema: createCephPoolSchema },
+  proxmox_update_ceph_pool: { handler: updateCephPool, schema: updateCephPoolSchema },
+  proxmox_delete_ceph_pool: { handler: deleteCephPool, schema: deleteCephPoolSchema },
+  proxmox_list_ceph_fs: { handler: listCephFs, schema: listCephFsSchema },
+  proxmox_create_ceph_fs: { handler: createCephFs, schema: createCephFsSchema },
+
+  // Console Access
+  proxmox_get_vnc_proxy: { handler: getVncProxy, schema: getVncProxySchema },
+  proxmox_get_spice_proxy: { handler: getSpiceProxy, schema: getSpiceProxySchema },
+  proxmox_get_term_proxy: { handler: getTermProxy, schema: getTermProxySchema },
+  proxmox_get_lxc_vnc_proxy: {
+    handler: getLxcVncProxy,
+    schema: getLxcVncProxySchema,
+  },
+  proxmox_get_lxc_term_proxy: {
+    handler: getLxcTermProxy,
+    schema: getLxcTermProxySchema,
+  },
 
   // Node Management
   proxmox_get_node_services: { handler: getNodeServices, schema: getNodeServicesSchema },
@@ -619,10 +941,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 143 tools are registered
+// Validate all 227 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 143) {
+if (registeredCount !== 227) {
   throw new Error(
-    `Tool registry incomplete: expected 143 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 227 tools, got ${registeredCount}`
   );
 }

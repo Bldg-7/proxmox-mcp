@@ -39,7 +39,7 @@ describe('MCP Server Integration', () => {
   });
 
   describe('ListTools Handler', () => {
-    it('returns all 143 tools', async () => {
+    it('returns all 227 tools', async () => {
       const server = createServer(client, config);
 
       const handler = getRequestHandlers(server).get('tools/list');
@@ -49,7 +49,7 @@ describe('MCP Server Integration', () => {
       expect(response).toBeDefined();
       expect(response.tools).toBeDefined();
       expect(Array.isArray(response.tools)).toBe(true);
-      expect(response.tools).toHaveLength(143);
+      expect(response.tools).toHaveLength(227);
     });
 
     it('includes correct tool properties', async () => {
