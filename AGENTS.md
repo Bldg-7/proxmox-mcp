@@ -516,7 +516,19 @@ bun run lint
 ## Related Documentation
 
 - **Tools Reference**: `docs/TOOLS.md` - Complete list of 227 tools
-- **Skills Documentation**: `docs/skills/proxmox-mcp.md` - AI-optimized reference
+- **Skills Documentation Index**: `docs/skills/proxmox-mcp.md` - AI-optimized reference
+- **Domain-Specific Skills**:
+  - `docs/skills/proxmox-nodes.md` - Node management (38 tools)
+  - `docs/skills/proxmox-vm.md` - QEMU VM operations (25 tools)
+  - `docs/skills/proxmox-lxc.md` - LXC container operations (18 tools)
+  - `docs/skills/proxmox-vm-lxc-shared.md` - Shared VM/LXC operations (22 tools)
+  - `docs/skills/proxmox-snapshots-backups.md` - Snapshots and backups (14 tools)
+  - `docs/skills/proxmox-storage.md` - Storage management (16 tools)
+  - `docs/skills/proxmox-networking.md` - Network configuration (20 tools)
+  - `docs/skills/proxmox-cluster.md` - Cluster operations (33 tools)
+  - `docs/skills/proxmox-access-control.md` - Users, roles, ACLs (20 tools)
+  - `docs/skills/proxmox-ceph.md` - Ceph storage cluster (16 tools)
+  - `docs/skills/proxmox-pools.md` - Resource pools (5 tools)
 - **Workflows**: `docs/skills/proxmox-workflows.md` - Common patterns
 - **Troubleshooting**: `docs/skills/proxmox-troubleshooting.md` - API quirks and solutions
 - **README**: `README.md` - User-facing documentation
