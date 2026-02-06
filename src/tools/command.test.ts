@@ -12,6 +12,7 @@ describe('Command Tools', () => {
         node: 'pve1',
         vmid: 100,
         command: 'ls -la',
+        type: 'qemu',
       });
 
       expect(result.isError).toBe(true);
@@ -27,6 +28,7 @@ describe('Command Tools', () => {
         node: 'pve1',
         vmid: 100,
         command: 'ls -la',
+        type: 'qemu',
       });
 
       expect(result.content[0].text).toContain('⚡');
@@ -39,7 +41,7 @@ describe('Command Tools', () => {
     it('executes command on LXC container', async () => {
       const client = createMockProxmoxClient();
       const config = createTestConfig({ allowElevated: true });
-      client.request.mockResolvedValue({ pid: 54321 });
+      client.request.mockResolvedValue('UPID:pve1:0000ABCD:00000000:00000000:00000000:00000000:root@pam:');
 
       const result = await executeVMCommand(client, config, {
         node: 'pve1',
@@ -49,7 +51,8 @@ describe('Command Tools', () => {
       });
 
       expect(result.content[0].text).toContain('⚡');
-      expect(result.content[0].text).toContain('54321');
+      expect(result.content[0].text).toContain('Task ID');
+      expect(result.content[0].text).toContain('UPID');
       expect(result.content[0].text).toContain('whoami');
       expect(result.content[0].text).toContain('LXC');
       expect(result.isError).toBe(false);
@@ -63,6 +66,7 @@ describe('Command Tools', () => {
         node: 'pve1',
         vmid: 100,
         command: 'ls; rm -rf /',
+        type: 'qemu',
       });
 
       expect(result.isError).toBe(true);
@@ -77,6 +81,7 @@ describe('Command Tools', () => {
         node: 'pve1',
         vmid: 100,
         command: 'cat /etc/passwd | grep root',
+        type: 'qemu',
       });
 
       expect(result.isError).toBe(true);
@@ -91,6 +96,7 @@ describe('Command Tools', () => {
         node: 'pve1',
         vmid: 100,
         command: 'echo `whoami`',
+        type: 'qemu',
       });
 
       expect(result.isError).toBe(true);
@@ -105,6 +111,7 @@ describe('Command Tools', () => {
         node: 'invalid@node',
         vmid: 100,
         command: 'ls',
+        type: 'qemu',
       });
 
       expect(result.isError).toBe(true);
@@ -119,6 +126,7 @@ describe('Command Tools', () => {
         node: 'pve1',
         vmid: 50,
         command: 'ls',
+        type: 'qemu',
       });
 
       expect(result.isError).toBe(true);

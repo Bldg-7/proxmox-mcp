@@ -24,6 +24,29 @@ export async function executeVMCommand(
     const safeCommand = validateCommand(validated.command);
     const type = validated.type || 'qemu';
 
+    const escapeShellArg = (value: string): string => {
+      return `'${value.replace(/'/g, `'\\''`)}'`;
+    };
+
+    if (type === 'lxc') {
+      const wrappedCommand = `pct exec ${safeVmid} -- sh -c ${escapeShellArg(safeCommand)}`;
+      const result = await client.request(
+        `/nodes/${safeNode}/execute`,
+        'POST',
+        { commands: wrappedCommand }
+      );
+
+      const output =
+        `⚡ **Command Execution Started**\n\n` +
+        `• **Container ID**: ${safeVmid}\n` +
+        `• **Type**: LXC\n` +
+        `• **Command**: \`${safeCommand}\`\n` +
+        `• **Task ID**: ${result || 'N/A'}\n\n` +
+        `**Note**: LXC exec runs via host \`pct exec\` and returns a task ID.`;
+
+      return formatToolResponse(output);
+    }
+
     const result = (await client.request(
       `/nodes/${safeNode}/${type}/${safeVmid}/agent/exec`,
       'POST',
