@@ -3,8 +3,8 @@
 > Complete reference for all available tools and planned Proxmox API integrations
 
 **Current Version**: 0.1.5  
-**Total Tools**: 143  
-**Last Updated**: 2026-02-05
+**Total Tools**: 227  
+**Last Updated**: 2026-02-06
 
 ---
 
@@ -15,19 +15,25 @@
 - [Implemented Tools](#implemented-tools)
   - [Node & Cluster (7 tools)](#node--cluster-7-tools)
   - [Node Management (8 tools)](#node-management-8-tools)
+  - [Node Network Configuration (4 tools)](#node-network-configuration-4-tools)
+  - [System Operations (14 tools)](#system-operations-14-tools)
   - [Cluster Management (33 tools)](#cluster-management-33-tools)
   - [Storage Management (12 tools)](#storage-management-12-tools)
   - [VM Query (5 tools)](#vm-query-5-tools)
-- [VM Lifecycle (12 tools)](#vm-lifecycle-12-tools)
-- [VM Modify (4 tools)](#vm-modify-4-tools)
-- [VM/LXC Advanced (26 tools)](#vmlxc-advanced-26-tools)
-- [Snapshots (8 tools)](#snapshots-8-tools)
+  - [VM Lifecycle (12 tools)](#vm-lifecycle-12-tools)
+  - [VM Modify (4 tools)](#vm-modify-4-tools)
+  - [VM/LXC Advanced (26 tools)](#vmlxc-advanced-26-tools)
+  - [Snapshots (8 tools)](#snapshots-8-tools)
   - [Backups (6 tools)](#backups-6-tools)
-  - [Disks (8 tools)](#disks-8-tools)
-  - [VM/LXC Network (6 tools)](#vmlxc-network-6-tools)
-  - [Command Execution (1 tool)](#command-execution-1-tool)
-  - [VM Creation (3 tools)](#vm-creation-3-tools)
-  - [Node Disk Query (4 tools)](#node-disk-query-4-tools)
+  - [Disks (12 tools)](#disks-12-tools)
+  - [Network (6 tools)](#network-6-tools)
+  - [Command (1 tool)](#command-1-tool)
+  - [Creation (3 tools)](#creation-3-tools)
+  - [Console Access (5 tools)](#console-access-5-tools)
+  - [Pool Management (5 tools)](#pool-management-5-tools)
+  - [Access Control (20 tools)](#access-control-20-tools)
+  - [SDN (20 tools)](#sdn-20-tools)
+  - [Ceph Integration (16 tools)](#ceph-integration-16-tools)
 - [Unimplemented Proxmox APIs](#unimplemented-proxmox-apis)
   - [High Priority](#high-priority)
   - [Medium Priority](#medium-priority)
@@ -45,6 +51,8 @@ This document provides a complete reference for all tools available in the Proxm
 |----------|-------|------------|
 | Node & Cluster | 7 | Mixed |
 | Node Management | 8 | Mixed |
+| Node Network Configuration | 4 | Mixed |
+| System Operations | 14 | Mixed |
 | Cluster Management | 33 | Mixed |
 | Storage Management | 12 | Mixed |
 | VM Query | 5 | Basic |
@@ -53,12 +61,16 @@ This document provides a complete reference for all tools available in the Proxm
 | VM/LXC Advanced | 26 | Mixed |
 | Snapshots | 8 | Mixed |
 | Backups | 6 | Elevated |
-| Disks | 8 | Elevated |
-| VM/LXC Network | 6 | Elevated |
-| Command Execution | 1 | Elevated |
-| VM Creation | 3 | Mixed |
-| Node Disk Query | 4 | Basic |
-| **Total** | **143** | |
+| Disks | 12 | Elevated |
+| Network | 6 | Elevated |
+| Command | 1 | Elevated |
+| Creation | 3 | Mixed |
+| Console Access | 5 | Mixed |
+| Pool Management | 5 | Mixed |
+| Access Control | 20 | Mixed |
+| SDN | 20 | Mixed |
+| Ceph Integration | 16 | Mixed |
+| **Total** | **227** | |
 
 ---
 
