@@ -1,5 +1,11 @@
 # @bldg-7/proxmox-mcp
 
+## 0.4.1
+
+### Patch Changes
+
+- 14947a7: Send Proxmox POST/PUT as form-encoded and move DELETE params into query string.
+
 ## 0.4.0
 
 ### Minor Changes
