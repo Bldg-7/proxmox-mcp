@@ -87,6 +87,8 @@ export async function createLxc(
       rootfs: `${validated.storage || 'local-lvm'}:${validated.rootfs || 8}`,
     };
 
+    if (validated.net0) body.net0 = validated.net0;
+
     const result = await client.request(
       `/nodes/${safeNode}/lxc`,
       'POST',
@@ -100,7 +102,8 @@ export async function createLxc(
       `• **Template**: ${validated.ostemplate}\n` +
       `• **Memory**: ${body.memory} MB\n` +
       `• **Storage**: ${body.storage}\n` +
-      `• **Root FS**: ${body.rootfs}\n`;
+      `• **Root FS**: ${body.rootfs}\n` +
+      (validated.net0 ? `• **Network**: ${validated.net0}\n` : '');
 
     if (isPasswordGenerated) {
       output += `• **🔐 Generated Password**: \`${password}\`\n`;

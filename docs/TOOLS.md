@@ -2676,6 +2676,7 @@ Create a new LXC container.
 | `memory` | number | No | Memory in MB (default: 512) |
 | `storage` | string | No | Storage name (default: `local-lvm`) |
 | `rootfs_size` | string | No | Root filesystem size in GB (default: `8`) |
+| `net0` | string | No | Network interface config (e.g., `name=eth0,bridge=vmbr0,ip=dhcp`) |
 
 ---
 

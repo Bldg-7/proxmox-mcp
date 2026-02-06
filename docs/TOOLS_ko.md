@@ -2676,6 +2676,7 @@ Proxmox API를 통해 가상 머신에서 셸 명령어를 실행합니다.
 | `memory` | number | 아니오 | 메모리 MB (기본값: 512) |
 | `storage` | string | 아니오 | 스토리지 이름 (기본값: `local-lvm`) |
 | `rootfs_size` | string | 아니오 | 루트 파일시스템 크기 GB (기본값: `8`) |
+| `net0` | string | 아니오 | 네트워크 인터페이스 설정 (예: `name=eth0,bridge=vmbr0,ip=dhcp`) |
 
 ---
 

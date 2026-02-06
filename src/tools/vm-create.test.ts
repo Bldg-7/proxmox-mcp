@@ -133,11 +133,20 @@ describe('VM Creation Tools', () => {
         memory: 1024,
         storage: 'local-lvm',
         rootfs: '16',
+        net0: 'name=eth0,bridge=vmbr0,ip=dhcp',
       });
 
       expect(result.content[0].text).toContain('mycontainer');
       expect(result.content[0].text).toContain('1024 MB');
       expect(result.content[0].text).toContain('local-lvm:16');
+      expect(result.content[0].text).toContain('name=eth0');
+      expect(client.request).toHaveBeenCalledWith(
+        '/nodes/pve1/lxc',
+        'POST',
+        expect.objectContaining({
+          net0: 'name=eth0,bridge=vmbr0,ip=dhcp',
+        })
+      );
       expect(result.isError).toBe(false);
     });
 

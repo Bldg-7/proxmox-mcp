@@ -74,9 +74,13 @@ export const createLxcSchema = z.object({
   memory: z.number().default(512).describe('RAM in MB'),
   storage: z.string().default('local-lvm').describe('Storage location'),
   rootfs: z.string().default('8').describe('Root filesystem size in GB'),
+  net0: z
+    .string()
+    .optional()
+    .describe('Network interface config (e.g., name=eth0,bridge=vmbr0,ip=dhcp)'),
 });
 
-export type CreateLxcInput = z.infer<typeof createLxcSchema>;
+export type CreateLxcInput = z.input<typeof createLxcSchema>;
 
 // proxmox_create_vm - Create a new QEMU VM
 export const createVmSchema = z.object({
@@ -93,7 +97,7 @@ export const createVmSchema = z.object({
   net0: z.string().default('virtio,bridge=vmbr0').describe('Network interface config'),
 });
 
-export type CreateVmInput = z.infer<typeof createVmSchema>;
+export type CreateVmInput = z.input<typeof createVmSchema>;
 
 // proxmox_start_lxc - Start an LXC container
 export const startLxcSchema = baseVmSchema;
