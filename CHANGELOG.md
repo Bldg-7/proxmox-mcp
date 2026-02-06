@@ -1,5 +1,25 @@
 # @bldg-7/proxmox-mcp
 
+## 0.4.0
+
+### Minor Changes
+
+- 3aee411: Add access control tools for users, groups, roles, ACLs, and authentication domains.
+- e598767: Add Ceph integration tools for status, OSDs, monitors, MDS, pools, and CephFS management.
+- 42538d3: Add cluster management tools for HA resources/groups, cluster firewall rules/groups, backup jobs, replication jobs, and cluster options.
+- 17b25da: Add console access tools for VM and LXC proxy tickets (VNC, SPICE, and terminal).
+- 07d591f: Add node management tools for services, logs, tasks, appliance templates, and netstat, and make ESLint v9 configuration compatible.
+- 998cafe: Add node network configuration tools for creating, updating, deleting, and applying node interface changes.
+- 063e253: Add pool management tools for listing, creating, updating, and deleting resource pools.
+- b742af2: Add SDN tools for managing vnets, zones, controllers, and subnets.
+- 2ec70e7: Add storage management tools for configuration CRUD, content operations, and backup restore/pruning.
+- 653d097: Add system operations tools for node time, DNS, hosts, subscriptions, APT operations, and bulk guest actions.
+- ae6b6b5: Add VM/LXC advanced tools for migrations, templates, guest agent commands, firewall rules, and RRD performance metrics.
+
+### Patch Changes
+
+- 6ba344a: Fix LXC command execution by routing through host execute API with pct exec.
+
 ## 0.3.0
 
 ### Minor Changes
