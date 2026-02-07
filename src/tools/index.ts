@@ -289,3 +289,13 @@ export {
   dumpCloudInit,
   regenerateCloudInit,
 } from './cloud-init.js';
+
+// QEMU Agent tools (file operations, user management, power control)
+export {
+  agentFileRead,
+  agentFileWrite,
+  agentGetHostname,
+  agentGetUsers,
+  agentSetUserPassword,
+  agentShutdown,
+} from './vm-advanced.js';

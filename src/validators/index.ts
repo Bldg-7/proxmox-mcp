@@ -406,6 +406,72 @@ export function validateInterfaceName(iface: unknown): string {
 }
 
 /**
+ * Validates a file path.
+ * Prevents path traversal attacks and enforces maximum length.
+ * Maximum length: 4096 characters.
+ *
+ * @throws {Error} If file path is invalid
+ */
+export function validateFilePath(path: unknown): string {
+  if (typeof path !== 'string') {
+    throw new Error('File path is required and must be a string');
+  }
+
+  const trimmedPath = path.trim();
+
+  if (trimmedPath.length === 0) {
+    throw new Error('File path cannot be empty or whitespace-only');
+  }
+
+  if (trimmedPath.length > 4096) {
+    throw new Error('File path too long (max 4096 characters)');
+  }
+
+  // Prevent path traversal attacks
+  if (trimmedPath.includes('..')) {
+    throw new Error('File path contains invalid path traversal sequence (..)');
+  }
+
+  return trimmedPath;
+}
+
+/**
+ * Validates a Linux username.
+ * Follows Linux username conventions: starts with lowercase letter or underscore,
+ * followed by lowercase letters, digits, hyphens, or underscores.
+ * Optional trailing $ for system accounts.
+ * Maximum length: 32 characters.
+ *
+ * @throws {Error} If username is invalid
+ */
+export function validateUsername(username: unknown): string {
+  if (typeof username !== 'string') {
+    throw new Error('Username is required and must be a string');
+  }
+
+  const trimmedUsername = username.trim();
+
+  if (trimmedUsername.length === 0) {
+    throw new Error('Username cannot be empty or whitespace-only');
+  }
+
+  if (trimmedUsername.length > 32) {
+    throw new Error('Username too long (max 32 characters)');
+  }
+
+  // Linux username format: starts with lowercase letter or underscore,
+  // followed by lowercase letters, digits, hyphens, or underscores,
+  // optional trailing $ for system accounts
+  if (!/^[a-z_][a-z0-9_-]*\$?$/.test(trimmedUsername)) {
+    throw new Error(
+      'Invalid username format. Must start with lowercase letter or underscore, followed by lowercase letters, digits, hyphens, or underscores. Optional trailing $ for system accounts.'
+    );
+  }
+
+  return trimmedUsername;
+}
+
+/**
  * Generates a secure random password using Node.js crypto.
  * Length: 16 characters.
  * Character set: A-Z, a-z, 0-9, !@#$%^&*

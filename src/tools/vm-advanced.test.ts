@@ -32,6 +32,12 @@ import {
   agentGetVcpus,
   agentExec,
   agentExecStatus,
+  agentFileRead,
+  agentFileWrite,
+  agentGetHostname,
+  agentGetUsers,
+  agentSetUserPassword,
+  agentShutdown,
   listVmFirewallRules,
   getVmFirewallRule,
   createVmFirewallRule,
@@ -370,17 +376,258 @@ describe('VM/LXC Advanced Tools', () => {
     expect(result.content[0].text).toContain('LXC Firewall Rule Updated');
   });
 
-  it('deletes an LXC firewall rule with elevated permissions', async () => {
-    const config = createTestConfig({ allowElevated: true });
-    client.request.mockResolvedValue('OK');
+   it('deletes an LXC firewall rule with elevated permissions', async () => {
+     const config = createTestConfig({ allowElevated: true });
+     client.request.mockResolvedValue('OK');
 
-    const result = await deleteLxcFirewallRule(client, config, {
-      node: 'pve1',
-      vmid: 200,
-      pos: 0,
-    });
+     const result = await deleteLxcFirewallRule(client, config, {
+       node: 'pve1',
+       vmid: 200,
+       pos: 0,
+     });
 
-    expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('LXC Firewall Rule Deleted');
-  });
+     expect(result.isError).toBe(false);
+     expect(result.content[0].text).toContain('LXC Firewall Rule Deleted');
+   });
+
+   describe('agentFileRead', () => {
+     it('should read file content from guest', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       const mockResponse = {
+         content: Buffer.from('Hello, World!').toString('base64'),
+         'bytes-read': 13,
+       };
+       client.request.mockResolvedValue(mockResponse);
+
+       const result = await agentFileRead(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+         file: '/etc/hostname',
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/file-read',
+         'GET',
+         { file: '/etc/hostname' }
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('Hello, World!');
+       expect(result.content[0].text).toContain('13');
+     });
+
+     it('should handle truncated files', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       const mockResponse = {
+         content: Buffer.from('truncated...').toString('base64'),
+         'bytes-read': 16777216,
+         truncated: true,
+       };
+       client.request.mockResolvedValue(mockResponse);
+
+       const result = await agentFileRead(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+         file: '/var/log/huge.log',
+       });
+
+       expect(result.content[0].text).toContain('truncated');
+       expect(result.content[0].text).toContain('16 MiB');
+     });
+
+     it('should require elevated permissions', async () => {
+       const restrictedConfig = createTestConfig({ allowElevated: false });
+
+       const result = await agentFileRead(client, restrictedConfig, {
+         node: 'pve1',
+         vmid: 100,
+         file: '/etc/shadow',
+       });
+
+       expect(result.isError).toBe(true);
+       expect(result.content[0].text).toContain('Permission denied');
+     });
+   });
+
+   describe('agentFileWrite', () => {
+     it('should write content to file in guest', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       client.request.mockResolvedValue(null);
+
+       const result = await agentFileWrite(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+         file: '/tmp/test.txt',
+         content: 'Hello, World!',
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/file-write',
+         'POST',
+         {
+           file: '/tmp/test.txt',
+           content: Buffer.from('Hello, World!').toString('base64'),
+           encode: true,
+         }
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('successfully written');
+     });
+
+     it('should reject content larger than 60 KiB', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       const largeContent = 'x'.repeat(61441);
+
+       const result = await agentFileWrite(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+         file: '/tmp/large.txt',
+         content: largeContent,
+       });
+
+       expect(result.isError).toBe(true);
+       expect(result.content[0].text).toContain('too large');
+       expect(result.content[0].text).toContain('60 KiB');
+     });
+
+     it('should require elevated permissions', async () => {
+       const restrictedConfig = createTestConfig({ allowElevated: false });
+
+       const result = await agentFileWrite(client, restrictedConfig, {
+         node: 'pve1',
+         vmid: 100,
+         file: '/etc/config',
+         content: 'data',
+       });
+
+       expect(result.isError).toBe(true);
+       expect(result.content[0].text).toContain('Permission denied');
+     });
+   });
+
+   describe('agentGetHostname', () => {
+     it('should get hostname from guest', async () => {
+       const mockConfig = createTestConfig();
+       const mockResponse = { 'host-name': 'webserver01' };
+       client.request.mockResolvedValue(mockResponse);
+
+       const result = await agentGetHostname(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/get-host-name'
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('webserver01');
+     });
+   });
+
+   describe('agentGetUsers', () => {
+     it('should list logged-in users', async () => {
+       const mockConfig = createTestConfig();
+       const mockResponse = [
+         { user: 'root', 'login-time': 1609459200 },
+         { user: 'admin', 'login-time': 1609462800, domain: 'WORKGROUP' },
+       ];
+       client.request.mockResolvedValue(mockResponse);
+
+       const result = await agentGetUsers(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/get-users'
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('root');
+       expect(result.content[0].text).toContain('admin');
+       expect(result.content[0].text).toContain('WORKGROUP');
+     });
+
+     it('should handle no logged-in users', async () => {
+       const mockConfig = createTestConfig();
+       client.request.mockResolvedValue([]);
+
+       const result = await agentGetUsers(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('No users currently logged in');
+     });
+   });
+
+   describe('agentSetUserPassword', () => {
+     it('should set user password', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       client.request.mockResolvedValue(null);
+
+       const result = await agentSetUserPassword(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+         username: 'testuser',
+         password: 'newpassword123',
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/set-user-password',
+         'POST',
+         {
+           username: 'testuser',
+           password: 'newpassword123',
+           crypted: false,
+         }
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('successfully updated');
+     });
+
+     it('should require elevated permissions', async () => {
+       const restrictedConfig = createTestConfig({ allowElevated: false });
+
+       const result = await agentSetUserPassword(client, restrictedConfig, {
+         node: 'pve1',
+         vmid: 100,
+         username: 'testuser',
+         password: 'newpassword123',
+       });
+
+       expect(result.isError).toBe(true);
+       expect(result.content[0].text).toContain('Permission denied');
+     });
+   });
+
+   describe('agentShutdown', () => {
+     it('should shutdown guest via agent', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       client.request.mockResolvedValue(null);
+
+       const result = await agentShutdown(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/shutdown',
+         'POST'
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('Graceful shutdown');
+     });
+
+     it('should require elevated permissions', async () => {
+       const restrictedConfig = createTestConfig({ allowElevated: false });
+
+       const result = await agentShutdown(client, restrictedConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(result.isError).toBe(true);
+       expect(result.content[0].text).toContain('Permission denied');
+     });
+   });
 });

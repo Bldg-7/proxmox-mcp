@@ -117,6 +117,46 @@ export const agentExecStatusSchema = baseVmSchema.extend({
 
 export type AgentExecStatusInput = z.input<typeof agentExecStatusSchema>;
 
+// proxmox_agent_file_read - Read file content from guest
+export const agentFileReadSchema = baseVmSchema.extend({
+  file: z.string().min(1).describe('Path to file in guest filesystem'),
+});
+
+export type AgentFileReadInput = z.input<typeof agentFileReadSchema>;
+
+// proxmox_agent_file_write - Write content to file in guest
+export const agentFileWriteSchema = baseVmSchema.extend({
+  file: z.string().min(1).describe('Path to file in guest filesystem'),
+  content: z.string().describe('Content to write to file'),
+  encode: z.boolean().optional().describe('Base64 encode content (default: true)'),
+});
+
+export type AgentFileWriteInput = z.input<typeof agentFileWriteSchema>;
+
+// proxmox_agent_get_hostname - Get guest hostname
+export const agentGetHostnameSchema = baseVmSchema;
+
+export type AgentGetHostnameInput = z.input<typeof agentGetHostnameSchema>;
+
+// proxmox_agent_get_users - List logged-in users
+export const agentGetUsersSchema = baseVmSchema;
+
+export type AgentGetUsersInput = z.input<typeof agentGetUsersSchema>;
+
+// proxmox_agent_set_user_password - Change user password
+export const agentSetUserPasswordSchema = baseVmSchema.extend({
+  username: z.string().min(1).max(32).describe('Username to set password for'),
+  password: z.string().min(5).max(1024).describe('New password (5-1024 characters)'),
+  crypted: z.boolean().optional().describe('Whether password is already crypted (default: false)'),
+});
+
+export type AgentSetUserPasswordInput = z.input<typeof agentSetUserPasswordSchema>;
+
+// proxmox_agent_shutdown - Graceful shutdown via agent
+export const agentShutdownSchema = baseVmSchema;
+
+export type AgentShutdownInput = z.input<typeof agentShutdownSchema>;
+
 // proxmox_list_vm_firewall_rules - List VM firewall rules
 export const listVmFirewallRulesSchema = baseVmSchema;
 

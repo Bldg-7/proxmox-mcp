@@ -179,9 +179,15 @@ import {
   agentGetTime,
   agentGetTimezone,
   agentGetVcpus,
-  agentExec,
-  agentExecStatus,
-  listVmFirewallRules,
+   agentExec,
+   agentExecStatus,
+   agentFileRead,
+   agentFileWrite,
+   agentGetHostname,
+   agentGetUsers,
+   agentSetUserPassword,
+   agentShutdown,
+   listVmFirewallRules,
   getVmFirewallRule,
   createVmFirewallRule,
   updateVmFirewallRule,
@@ -437,9 +443,15 @@ import {
   agentGetTimeSchema,
   agentGetTimezoneSchema,
   agentGetVcpusSchema,
-  agentExecSchema,
-  agentExecStatusSchema,
-  listVmFirewallRulesSchema,
+   agentExecSchema,
+   agentExecStatusSchema,
+   agentFileReadSchema,
+   agentFileWriteSchema,
+   agentGetHostnameSchema,
+   agentGetUsersSchema,
+   agentSetUserPasswordSchema,
+   agentShutdownSchema,
+   listVmFirewallRulesSchema,
   getVmFirewallRuleSchema,
   createVmFirewallRuleSchema,
   updateVmFirewallRuleSchema,
@@ -855,9 +867,15 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_agent_get_time: { handler: agentGetTime, schema: agentGetTimeSchema },
   proxmox_agent_get_timezone: { handler: agentGetTimezone, schema: agentGetTimezoneSchema },
   proxmox_agent_get_vcpus: { handler: agentGetVcpus, schema: agentGetVcpusSchema },
-  proxmox_agent_exec: { handler: agentExec, schema: agentExecSchema },
-  proxmox_agent_exec_status: { handler: agentExecStatus, schema: agentExecStatusSchema },
-  proxmox_list_vm_firewall_rules: {
+   proxmox_agent_exec: { handler: agentExec, schema: agentExecSchema },
+   proxmox_agent_exec_status: { handler: agentExecStatus, schema: agentExecStatusSchema },
+   proxmox_agent_file_read: { handler: agentFileRead, schema: agentFileReadSchema },
+   proxmox_agent_file_write: { handler: agentFileWrite, schema: agentFileWriteSchema },
+   proxmox_agent_get_hostname: { handler: agentGetHostname, schema: agentGetHostnameSchema },
+   proxmox_agent_get_users: { handler: agentGetUsers, schema: agentGetUsersSchema },
+   proxmox_agent_set_user_password: { handler: agentSetUserPassword, schema: agentSetUserPasswordSchema },
+   proxmox_agent_shutdown: { handler: agentShutdown, schema: agentShutdownSchema },
+   proxmox_list_vm_firewall_rules: {
     handler: listVmFirewallRules,
     schema: listVmFirewallRulesSchema,
   },
@@ -954,10 +972,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 230 tools are registered
+// Validate all 236 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 230) {
+if (registeredCount !== 236) {
   throw new Error(
-    `Tool registry incomplete: expected 230 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 236 tools, got ${registeredCount}`
   );
 }

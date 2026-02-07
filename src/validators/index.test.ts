@@ -12,6 +12,8 @@ import {
   validateNetworkId,
   validateBridgeName,
   validateInterfaceName,
+  validateFilePath,
+  validateUsername,
 } from './index.js';
 
 describe('validateNodeName', () => {
@@ -356,5 +358,144 @@ describe('validateInterfaceName', () => {
     expect(() => validateInterfaceName('eth$0')).toThrow('Invalid interface name format');
     expect(() => validateInterfaceName('eth/0')).toThrow('Invalid interface name format');
     expect(() => validateInterfaceName('eth:0')).toThrow('Invalid interface name format');
+  });
+});
+
+describe('validateFilePath', () => {
+  it('accepts valid file paths', () => {
+    expect(validateFilePath('/etc/passwd')).toBe('/etc/passwd');
+    expect(validateFilePath('/home/user/file.txt')).toBe('/home/user/file.txt');
+    expect(validateFilePath('relative/path/file.txt')).toBe('relative/path/file.txt');
+    expect(validateFilePath('/var/log/syslog')).toBe('/var/log/syslog');
+  });
+
+  it('accepts paths with whitespace and trims them', () => {
+    expect(validateFilePath('  /etc/passwd  ')).toBe('/etc/passwd');
+    expect(validateFilePath('\t/home/user/file.txt\n')).toBe('/home/user/file.txt');
+  });
+
+  it('rejects non-string input', () => {
+    expect(() => validateFilePath(null)).toThrow('File path is required and must be a string');
+    expect(() => validateFilePath(undefined)).toThrow('File path is required and must be a string');
+    expect(() => validateFilePath(123)).toThrow('File path is required and must be a string');
+    expect(() => validateFilePath({})).toThrow('File path is required and must be a string');
+  });
+
+  it('rejects empty or whitespace-only paths', () => {
+    expect(() => validateFilePath('')).toThrow('File path cannot be empty or whitespace-only');
+    expect(() => validateFilePath('   ')).toThrow('File path cannot be empty or whitespace-only');
+    expect(() => validateFilePath('\t\n')).toThrow('File path cannot be empty or whitespace-only');
+  });
+
+  it('rejects paths with path traversal (..) sequences', () => {
+    expect(() => validateFilePath('/etc/../passwd')).toThrow('contains invalid path traversal sequence');
+    expect(() => validateFilePath('../../../etc/passwd')).toThrow('contains invalid path traversal sequence');
+    expect(() => validateFilePath('/home/user/../../etc/passwd')).toThrow('contains invalid path traversal sequence');
+    expect(() => validateFilePath('..')).toThrow('contains invalid path traversal sequence');
+    expect(() => validateFilePath('file..txt')).toThrow('contains invalid path traversal sequence');
+  });
+
+  it('rejects paths exceeding 4096 characters', () => {
+    const longPath = '/path/' + 'a'.repeat(4092);
+    expect(() => validateFilePath(longPath)).toThrow('File path too long (max 4096 characters)');
+  });
+
+  it('accepts paths at maximum length (4096 characters)', () => {
+    const maxPath = '/path/' + 'a'.repeat(4090);
+    expect(validateFilePath(maxPath)).toBe(maxPath);
+  });
+
+  it('accepts paths with special characters (except ..)', () => {
+    expect(validateFilePath('/home/user-name/file_name.txt')).toBe('/home/user-name/file_name.txt');
+    expect(validateFilePath('/var/log/app@service.log')).toBe('/var/log/app@service.log');
+    expect(validateFilePath('/home/user/file (1).txt')).toBe('/home/user/file (1).txt');
+  });
+});
+
+describe('validateUsername', () => {
+  it('accepts valid Linux usernames', () => {
+    expect(validateUsername('root')).toBe('root');
+    expect(validateUsername('user')).toBe('user');
+    expect(validateUsername('user123')).toBe('user123');
+    expect(validateUsername('user_name')).toBe('user_name');
+    expect(validateUsername('user-name')).toBe('user-name');
+    expect(validateUsername('_user')).toBe('_user');
+    expect(validateUsername('_')).toBe('_');
+  });
+
+  it('accepts system account usernames with trailing $', () => {
+    expect(validateUsername('user$')).toBe('user$');
+    expect(validateUsername('_user$')).toBe('_user$');
+    expect(validateUsername('system_account$')).toBe('system_account$');
+  });
+
+  it('accepts usernames with whitespace and trims them', () => {
+    expect(validateUsername('  user  ')).toBe('user');
+    expect(validateUsername('\troot\n')).toBe('root');
+  });
+
+  it('rejects non-string input', () => {
+    expect(() => validateUsername(null)).toThrow('Username is required and must be a string');
+    expect(() => validateUsername(undefined)).toThrow('Username is required and must be a string');
+    expect(() => validateUsername(123)).toThrow('Username is required and must be a string');
+    expect(() => validateUsername({})).toThrow('Username is required and must be a string');
+  });
+
+  it('rejects empty or whitespace-only usernames', () => {
+    expect(() => validateUsername('')).toThrow('Username cannot be empty or whitespace-only');
+    expect(() => validateUsername('   ')).toThrow('Username cannot be empty or whitespace-only');
+    expect(() => validateUsername('\t\n')).toThrow('Username cannot be empty or whitespace-only');
+  });
+
+  it('rejects usernames exceeding 32 characters', () => {
+    const longUsername = 'a'.repeat(33);
+    expect(() => validateUsername(longUsername)).toThrow('Username too long (max 32 characters)');
+  });
+
+  it('accepts usernames at maximum length (32 characters)', () => {
+    const maxUsername = 'a'.repeat(32);
+    expect(validateUsername(maxUsername)).toBe(maxUsername);
+  });
+
+  it('rejects usernames starting with uppercase letters', () => {
+    expect(() => validateUsername('User')).toThrow('Invalid username format');
+    expect(() => validateUsername('ROOT')).toThrow('Invalid username format');
+    expect(() => validateUsername('Admin')).toThrow('Invalid username format');
+  });
+
+  it('rejects usernames starting with numbers', () => {
+    expect(() => validateUsername('1user')).toThrow('Invalid username format');
+    expect(() => validateUsername('123')).toThrow('Invalid username format');
+  });
+
+  it('rejects usernames starting with hyphens or dots', () => {
+    expect(() => validateUsername('-user')).toThrow('Invalid username format');
+    expect(() => validateUsername('.user')).toThrow('Invalid username format');
+  });
+
+  it('rejects usernames with uppercase letters in the middle', () => {
+    expect(() => validateUsername('userNAME')).toThrow('Invalid username format');
+    expect(() => validateUsername('user_NAME')).toThrow('Invalid username format');
+  });
+
+  it('rejects usernames with invalid characters', () => {
+    expect(() => validateUsername('user@domain')).toThrow('Invalid username format');
+    expect(() => validateUsername('user.name')).toThrow('Invalid username format');
+    expect(() => validateUsername('user name')).toThrow('Invalid username format');
+    expect(() => validateUsername('user#name')).toThrow('Invalid username format');
+    expect(() => validateUsername('user/name')).toThrow('Invalid username format');
+  });
+
+  it('rejects usernames with multiple trailing $', () => {
+    expect(() => validateUsername('user$$')).toThrow('Invalid username format');
+    expect(() => validateUsername('user$name')).toThrow('Invalid username format');
+  });
+
+  it('accepts complex valid usernames', () => {
+    expect(validateUsername('user_123')).toBe('user_123');
+    expect(validateUsername('user-123')).toBe('user-123');
+    expect(validateUsername('_user_123')).toBe('_user_123');
+    expect(validateUsername('_user-123')).toBe('_user-123');
+    expect(validateUsername('user_123$')).toBe('user_123$');
   });
 });

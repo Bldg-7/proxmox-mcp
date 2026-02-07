@@ -4,7 +4,7 @@ import type { ToolResponse } from '../types/index.js';
 import type { ProxmoxFirewallRule } from '../types/proxmox.js';
 import { formatToolResponse, formatErrorResponse } from '../formatters/index.js';
 import { requireElevated } from '../middleware/index.js';
-import { validateNodeName, validateVMID, validateFirewallRulePos } from '../validators/index.js';
+import { validateNodeName, validateVMID, validateFirewallRulePos, validateFilePath, validateUsername } from '../validators/index.js';
 import {
   migrateVmSchema,
   migrateLxcSchema,
@@ -22,6 +22,12 @@ import {
   agentGetVcpusSchema,
   agentExecSchema,
   agentExecStatusSchema,
+  agentFileReadSchema,
+  agentFileWriteSchema,
+  agentGetHostnameSchema,
+  agentGetUsersSchema,
+  agentSetUserPasswordSchema,
+  agentShutdownSchema,
   listVmFirewallRulesSchema,
   getVmFirewallRuleSchema,
   createVmFirewallRuleSchema,
@@ -50,6 +56,12 @@ import type {
   AgentGetVcpusInput,
   AgentExecInput,
   AgentExecStatusInput,
+  AgentFileReadInput,
+  AgentFileWriteInput,
+  AgentGetHostnameInput,
+  AgentGetUsersInput,
+  AgentSetUserPasswordInput,
+  AgentShutdownInput,
   ListVmFirewallRulesInput,
   GetVmFirewallRuleInput,
   CreateVmFirewallRuleInput,
@@ -597,6 +609,272 @@ export async function agentExecStatus(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Agent Exec Status');
+  }
+}
+
+/**
+ * Read file content from guest via QEMU agent.
+ * Returns base64-decoded content (or base64 if binary).
+ */
+export async function agentFileRead(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentFileReadInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'read files from guest');
+
+    const validated = agentFileReadSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safeFile = validateFilePath(validated.file);
+
+    const result = await client.request<{
+      content: string;
+      'bytes-read': number;
+      truncated?: boolean;
+    }>(`/nodes/${safeNode}/qemu/${safeVmid}/agent/file-read`, 'GET', {
+      file: safeFile,
+    });
+
+    // Decode base64 content
+    let decodedContent: string;
+    let isBinary = false;
+    try {
+      decodedContent = Buffer.from(result.content, 'base64').toString('utf-8');
+    } catch {
+      // Binary content - show base64
+      decodedContent = result.content;
+      isBinary = true;
+    }
+
+    const truncatedWarning = result.truncated
+      ? '\n\n⚠️ **Warning**: Content was truncated (>16 MiB limit)'
+      : '';
+
+    const output =
+      `📄 **File Read from Guest**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **File**: ${safeFile}\n` +
+      `• **Bytes Read**: ${result['bytes-read']}\n` +
+      (isBinary ? `• **Format**: Binary (base64 encoded)\n` : '') +
+      truncatedWarning +
+      `\n\n\`\`\`\n${decodedContent}\n\`\`\``;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent File Read');
+  }
+}
+
+/**
+ * Write content to file in guest via QEMU agent.
+ * Content is base64-encoded before sending.
+ */
+export async function agentFileWrite(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentFileWriteInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'write files to guest');
+
+    const validated = agentFileWriteSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safeFile = validateFilePath(validated.file);
+
+    // Validate content size (60 KiB max before encoding)
+    const contentBytes = Buffer.byteLength(validated.content, 'utf-8');
+    if (contentBytes > 61440) {
+      throw new Error(
+        `Content too large: ${contentBytes} bytes (max 60 KiB = 61,440 bytes)`
+      );
+    }
+
+    // Base64 encode content if encode is true (default)
+    const encode = validated.encode !== false;
+    const content = encode
+      ? Buffer.from(validated.content).toString('base64')
+      : validated.content;
+
+    await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/file-write`,
+      'POST',
+      {
+        file: safeFile,
+        content,
+        encode,
+      }
+    );
+
+    const output =
+      `📝 **File Written to Guest**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **File**: ${safeFile}\n` +
+      `• **Size**: ${contentBytes} bytes\n` +
+      `• **Encoded**: ${encode ? 'Yes (base64)' : 'No'}\n\n` +
+      `File has been successfully written.`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent File Write');
+  }
+}
+
+/**
+ * Get hostname from guest via QEMU agent.
+ */
+export async function agentGetHostname(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentGetHostnameInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentGetHostnameSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const result = await client.request<{ 'host-name': string }>(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/get-host-name`
+    );
+
+    const output =
+      `🖥️ **Guest Hostname**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **Hostname**: ${result['host-name']}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Get Hostname');
+  }
+}
+
+/**
+ * Get list of logged-in users from guest via QEMU agent.
+ */
+export async function agentGetUsers(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentGetUsersInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentGetUsersSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const result = await client.request<
+      Array<{
+        user: string;
+        'login-time': number;
+        domain?: string;
+      }>
+    >(`/nodes/${safeNode}/qemu/${safeVmid}/agent/get-users`);
+
+    if (result.length === 0) {
+      const output =
+        `👥 **Logged-in Users**\n\n` +
+        `• **Node**: ${safeNode}\n` +
+        `• **VM ID**: ${safeVmid}\n\n` +
+        `No users currently logged in.`;
+      return formatToolResponse(output);
+    }
+
+    const userList = result
+      .map((u) => {
+        const loginTime = new Date(u['login-time'] * 1000).toISOString();
+        const domain = u.domain ? ` (${u.domain})` : '';
+        return `  - **${u.user}**${domain} — logged in at ${loginTime}`;
+      })
+      .join('\n');
+
+    const output =
+      `👥 **Logged-in Users**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **Count**: ${result.length}\n\n` +
+      userList;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Get Users');
+  }
+}
+
+/**
+ * Set user password in guest via QEMU agent.
+ * WARNING: Password is sent in plain text via API.
+ */
+export async function agentSetUserPassword(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentSetUserPasswordInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'set user password in guest');
+
+    const validated = agentSetUserPasswordSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const safeUsername = validateUsername(validated.username);
+
+    // Note: Password is intentionally NOT logged
+    await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/set-user-password`,
+      'POST',
+      {
+        username: safeUsername,
+        password: validated.password,
+        crypted: validated.crypted ?? false,
+      }
+    );
+
+    const output =
+      `🔐 **User Password Updated**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **Username**: ${safeUsername}\n` +
+      `• **Crypted**: ${validated.crypted ? 'Yes' : 'No'}\n\n` +
+      `Password has been successfully updated.`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Set User Password');
+  }
+}
+
+/**
+ * Shutdown guest via QEMU agent (graceful shutdown from inside guest).
+ */
+export async function agentShutdown(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentShutdownInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'shutdown guest via agent');
+
+    const validated = agentShutdownSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/shutdown`,
+      'POST'
+    );
+
+    const output =
+      `🔌 **Guest Shutdown Initiated**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n\n` +
+      `Graceful shutdown has been initiated via guest agent.`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Shutdown');
   }
 }
 
