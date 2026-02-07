@@ -38,6 +38,14 @@ import {
   agentGetUsers,
   agentSetUserPassword,
   agentShutdown,
+  agentFsfreezeStatus,
+  agentFsfreezeFreeze,
+  agentFsfreezeThaw,
+  agentFstrim,
+  agentGetMemoryBlockInfo,
+  agentSuspendDisk,
+  agentSuspendRam,
+  agentSuspendHybrid,
   listVmFirewallRules,
   getVmFirewallRule,
   createVmFirewallRule,
@@ -622,6 +630,234 @@ describe('VM/LXC Advanced Tools', () => {
        const restrictedConfig = createTestConfig({ allowElevated: false });
 
        const result = await agentShutdown(client, restrictedConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+      expect(result.isError).toBe(true);
+        expect(result.content[0].text).toContain('Permission denied');
+      });
+   });
+
+   describe('agentFsfreezeStatus', () => {
+     it('should get filesystem freeze status', async () => {
+       const mockConfig = createTestConfig();
+       client.request.mockResolvedValue('thawed');
+
+       const result = await agentFsfreezeStatus(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/fsfreeze-status',
+         'POST'
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('Filesystem Freeze Status');
+       expect(result.content[0].text).toContain('thawed');
+     });
+   });
+
+   describe('agentFsfreezeFreeze', () => {
+     it('should freeze guest filesystems', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       client.request.mockResolvedValue(3);
+
+       const result = await agentFsfreezeFreeze(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/fsfreeze-freeze',
+         'POST'
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('Filesystem Freeze');
+       expect(result.content[0].text).toContain('3');
+     });
+
+     it('should require elevated permissions', async () => {
+       const restrictedConfig = createTestConfig({ allowElevated: false });
+
+       const result = await agentFsfreezeFreeze(client, restrictedConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(result.isError).toBe(true);
+       expect(result.content[0].text).toContain('Permission denied');
+     });
+   });
+
+   describe('agentFsfreezeThaw', () => {
+     it('should thaw guest filesystems', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       client.request.mockResolvedValue(3);
+
+       const result = await agentFsfreezeThaw(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/fsfreeze-thaw',
+         'POST'
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('Filesystem Thaw');
+       expect(result.content[0].text).toContain('3');
+     });
+
+     it('should require elevated permissions', async () => {
+       const restrictedConfig = createTestConfig({ allowElevated: false });
+
+       const result = await agentFsfreezeThaw(client, restrictedConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(result.isError).toBe(true);
+       expect(result.content[0].text).toContain('Permission denied');
+     });
+   });
+
+   describe('agentFstrim', () => {
+     it('should trim guest filesystems', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       client.request.mockResolvedValue({ paths: [{ path: '/', trimmed: 1024, minimum: 0, error: '' }] });
+
+       const result = await agentFstrim(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/fstrim',
+         'POST'
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('Filesystem Trim');
+     });
+
+     it('should require elevated permissions', async () => {
+       const restrictedConfig = createTestConfig({ allowElevated: false });
+
+       const result = await agentFstrim(client, restrictedConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(result.isError).toBe(true);
+       expect(result.content[0].text).toContain('Permission denied');
+     });
+   });
+
+   describe('agentGetMemoryBlockInfo', () => {
+     it('should get memory block info', async () => {
+       const mockConfig = createTestConfig();
+       client.request.mockResolvedValue({ size: 134217728 });
+
+       const result = await agentGetMemoryBlockInfo(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/get-memory-block-info',
+         'GET'
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('Memory Block Info');
+       expect(result.content[0].text).toContain('134217728');
+     });
+   });
+
+   describe('agentSuspendDisk', () => {
+     it('should suspend guest to disk', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       client.request.mockResolvedValue(null);
+
+       const result = await agentSuspendDisk(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/suspend-disk',
+         'POST'
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('Guest Suspended to Disk');
+     });
+
+     it('should require elevated permissions', async () => {
+       const restrictedConfig = createTestConfig({ allowElevated: false });
+
+       const result = await agentSuspendDisk(client, restrictedConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(result.isError).toBe(true);
+       expect(result.content[0].text).toContain('Permission denied');
+     });
+   });
+
+   describe('agentSuspendRam', () => {
+     it('should suspend guest to RAM', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       client.request.mockResolvedValue(null);
+
+       const result = await agentSuspendRam(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/suspend-ram',
+         'POST'
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('Guest Suspended to RAM');
+     });
+
+     it('should require elevated permissions', async () => {
+       const restrictedConfig = createTestConfig({ allowElevated: false });
+
+       const result = await agentSuspendRam(client, restrictedConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(result.isError).toBe(true);
+       expect(result.content[0].text).toContain('Permission denied');
+     });
+   });
+
+   describe('agentSuspendHybrid', () => {
+     it('should hybrid suspend guest', async () => {
+       const mockConfig = createTestConfig({ allowElevated: true });
+       client.request.mockResolvedValue(null);
+
+       const result = await agentSuspendHybrid(client, mockConfig, {
+         node: 'pve1',
+         vmid: 100,
+       });
+
+       expect(client.request).toHaveBeenCalledWith(
+         '/nodes/pve1/qemu/100/agent/suspend-hybrid',
+         'POST'
+       );
+       expect(result.isError).toBe(false);
+       expect(result.content[0].text).toContain('Guest Hybrid Suspended');
+     });
+
+     it('should require elevated permissions', async () => {
+       const restrictedConfig = createTestConfig({ allowElevated: false });
+
+       const result = await agentSuspendHybrid(client, restrictedConfig, {
          node: 'pve1',
          vmid: 100,
        });

@@ -28,6 +28,14 @@ import {
   agentGetUsersSchema,
   agentSetUserPasswordSchema,
   agentShutdownSchema,
+  agentFsfreezeStatusSchema,
+  agentFsfreezeFreezeSchema,
+  agentFsfreezeThawSchema,
+  agentFstrimSchema,
+  agentGetMemoryBlockInfoSchema,
+  agentSuspendDiskSchema,
+  agentSuspendRamSchema,
+  agentSuspendHybridSchema,
   listVmFirewallRulesSchema,
   getVmFirewallRuleSchema,
   createVmFirewallRuleSchema,
@@ -62,6 +70,14 @@ import type {
   AgentGetUsersInput,
   AgentSetUserPasswordInput,
   AgentShutdownInput,
+  AgentFsfreezeStatusInput,
+  AgentFsfreezeFreezeInput,
+  AgentFsfreezeThawInput,
+  AgentFstrimInput,
+  AgentGetMemoryBlockInfoInput,
+  AgentSuspendDiskInput,
+  AgentSuspendRamInput,
+  AgentSuspendHybridInput,
   ListVmFirewallRulesInput,
   GetVmFirewallRuleInput,
   CreateVmFirewallRuleInput,
@@ -875,6 +891,269 @@ export async function agentShutdown(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Agent Shutdown');
+  }
+}
+
+/**
+ * Get filesystem freeze status via QEMU agent.
+ */
+export async function agentFsfreezeStatus(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentFsfreezeStatusInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentFsfreezeStatusSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const status = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/fsfreeze-status`,
+      'POST'
+    );
+
+    const output =
+      `❄️ **Filesystem Freeze Status**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **Status**: ${status}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Fsfreeze Status');
+  }
+}
+
+/**
+ * Freeze guest filesystems via QEMU agent for consistent backup.
+ */
+export async function agentFsfreezeFreeze(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentFsfreezeFreezeInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'freeze guest filesystems');
+
+    const validated = agentFsfreezeFreezeSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const result = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/fsfreeze-freeze`,
+      'POST'
+    );
+
+    const output =
+      `❄️ **Filesystem Freeze**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **Frozen Filesystems**: ${result}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Fsfreeze Freeze');
+  }
+}
+
+/**
+ * Thaw (unfreeze) guest filesystems via QEMU agent.
+ */
+export async function agentFsfreezeThaw(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentFsfreezeThawInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'thaw guest filesystems');
+
+    const validated = agentFsfreezeThawSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const result = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/fsfreeze-thaw`,
+      'POST'
+    );
+
+    const output =
+      `❄️ **Filesystem Thaw**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **Thawed Filesystems**: ${result}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Fsfreeze Thaw');
+  }
+}
+
+/**
+ * Discard unused blocks on guest filesystems via QEMU agent.
+ */
+export async function agentFstrim(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentFstrimInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'trim guest filesystems');
+
+    const validated = agentFstrimSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const result = await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/fstrim`,
+      'POST'
+    );
+
+    let output =
+      `💾 **Filesystem Trim**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n`;
+
+    if (result && typeof result === 'object') {
+      output += `\n\`\`\`json\n${JSON.stringify(result, null, 2)}\n\`\`\``;
+    } else {
+      output += `• **Result**: ${result}`;
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Fstrim');
+  }
+}
+
+/**
+ * Get memory block size information via QEMU agent.
+ */
+export async function agentGetMemoryBlockInfo(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: AgentGetMemoryBlockInfoInput
+): Promise<ToolResponse> {
+  try {
+    const validated = agentGetMemoryBlockInfoSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const result = (await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/get-memory-block-info`,
+      'GET'
+    )) as { size?: number; [key: string]: unknown };
+
+    let output =
+      `🧠 **Memory Block Info**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n`;
+
+    if (result?.size) {
+      const sizeMB = result.size / (1024 * 1024);
+      output += `• **Block Size**: ${result.size} bytes (${sizeMB} MB)`;
+    } else {
+      output += `\n\`\`\`json\n${JSON.stringify(result, null, 2)}\n\`\`\``;
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Get Memory Block Info');
+  }
+}
+
+/**
+ * Suspend guest to disk (hibernate) via QEMU agent.
+ */
+export async function agentSuspendDisk(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentSuspendDiskInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'suspend guest to disk');
+
+    const validated = agentSuspendDiskSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/suspend-disk`,
+      'POST'
+    );
+
+    const output =
+      `🔌 **Guest Suspended to Disk**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n\n` +
+      `Guest has been hibernated (suspended to disk).`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Suspend Disk');
+  }
+}
+
+/**
+ * Suspend guest to RAM (sleep) via QEMU agent.
+ */
+export async function agentSuspendRam(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentSuspendRamInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'suspend guest to RAM');
+
+    const validated = agentSuspendRamSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/suspend-ram`,
+      'POST'
+    );
+
+    const output =
+      `🔌 **Guest Suspended to RAM**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n\n` +
+      `Guest has been put to sleep (suspended to RAM).`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Suspend RAM');
+  }
+}
+
+/**
+ * Hybrid suspend guest (RAM + disk) via QEMU agent.
+ */
+export async function agentSuspendHybrid(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentSuspendHybridInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'hybrid suspend guest');
+
+    const validated = agentSuspendHybridSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/agent/suspend-hybrid`,
+      'POST'
+    );
+
+    const output =
+      `🔌 **Guest Hybrid Suspended**\n\n` +
+      `• **Node**: ${safeNode}\n` +
+      `• **VM ID**: ${safeVmid}\n\n` +
+      `Guest has been hybrid suspended (RAM + disk).`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Suspend Hybrid');
   }
 }
 

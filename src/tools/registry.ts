@@ -187,6 +187,14 @@ import {
    agentGetUsers,
    agentSetUserPassword,
    agentShutdown,
+   agentFsfreezeStatus,
+   agentFsfreezeFreeze,
+   agentFsfreezeThaw,
+   agentFstrim,
+   agentGetMemoryBlockInfo,
+   agentSuspendDisk,
+   agentSuspendRam,
+   agentSuspendHybrid,
    listVmFirewallRules,
   getVmFirewallRule,
   createVmFirewallRule,
@@ -451,6 +459,14 @@ import {
    agentGetUsersSchema,
    agentSetUserPasswordSchema,
    agentShutdownSchema,
+  agentFsfreezeStatusSchema,
+  agentFsfreezeFreezeSchema,
+  agentFsfreezeThawSchema,
+  agentFstrimSchema,
+  agentGetMemoryBlockInfoSchema,
+  agentSuspendDiskSchema,
+  agentSuspendRamSchema,
+  agentSuspendHybridSchema,
    listVmFirewallRulesSchema,
   getVmFirewallRuleSchema,
   createVmFirewallRuleSchema,
@@ -875,6 +891,14 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
    proxmox_agent_get_users: { handler: agentGetUsers, schema: agentGetUsersSchema },
    proxmox_agent_set_user_password: { handler: agentSetUserPassword, schema: agentSetUserPasswordSchema },
    proxmox_agent_shutdown: { handler: agentShutdown, schema: agentShutdownSchema },
+   proxmox_agent_fsfreeze_status: { handler: agentFsfreezeStatus, schema: agentFsfreezeStatusSchema },
+   proxmox_agent_fsfreeze_freeze: { handler: agentFsfreezeFreeze, schema: agentFsfreezeFreezeSchema },
+   proxmox_agent_fsfreeze_thaw: { handler: agentFsfreezeThaw, schema: agentFsfreezeThawSchema },
+   proxmox_agent_fstrim: { handler: agentFstrim, schema: agentFstrimSchema },
+   proxmox_agent_get_memory_block_info: { handler: agentGetMemoryBlockInfo, schema: agentGetMemoryBlockInfoSchema },
+   proxmox_agent_suspend_disk: { handler: agentSuspendDisk, schema: agentSuspendDiskSchema },
+   proxmox_agent_suspend_ram: { handler: agentSuspendRam, schema: agentSuspendRamSchema },
+   proxmox_agent_suspend_hybrid: { handler: agentSuspendHybrid, schema: agentSuspendHybridSchema },
    proxmox_list_vm_firewall_rules: {
     handler: listVmFirewallRules,
     schema: listVmFirewallRulesSchema,
@@ -972,10 +996,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 236 tools are registered
+// Validate all 244 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 236) {
+if (registeredCount !== 244) {
   throw new Error(
-    `Tool registry incomplete: expected 236 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 244 tools, got ${registeredCount}`
   );
 }

@@ -298,4 +298,12 @@ export {
   agentGetUsers,
   agentSetUserPassword,
   agentShutdown,
+  agentFsfreezeStatus,
+  agentFsfreezeFreeze,
+  agentFsfreezeThaw,
+  agentFstrim,
+  agentGetMemoryBlockInfo,
+  agentSuspendDisk,
+  agentSuspendRam,
+  agentSuspendHybrid,
 } from './vm-advanced.js';

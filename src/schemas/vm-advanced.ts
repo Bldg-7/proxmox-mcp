@@ -157,6 +157,38 @@ export const agentShutdownSchema = baseVmSchema;
 
 export type AgentShutdownInput = z.input<typeof agentShutdownSchema>;
 
+// proxmox_agent_fsfreeze_status - Get filesystem freeze status via QEMU agent
+export const agentFsfreezeStatusSchema = baseVmSchema;
+export type AgentFsfreezeStatusInput = z.input<typeof agentFsfreezeStatusSchema>;
+
+// proxmox_agent_fsfreeze_freeze - Freeze guest filesystems via QEMU agent
+export const agentFsfreezeFreezeSchema = baseVmSchema;
+export type AgentFsfreezeFreezeInput = z.input<typeof agentFsfreezeFreezeSchema>;
+
+// proxmox_agent_fsfreeze_thaw - Thaw guest filesystems via QEMU agent
+export const agentFsfreezeThawSchema = baseVmSchema;
+export type AgentFsfreezeThawInput = z.input<typeof agentFsfreezeThawSchema>;
+
+// proxmox_agent_fstrim - Trim guest filesystems via QEMU agent
+export const agentFstrimSchema = baseVmSchema;
+export type AgentFstrimInput = z.input<typeof agentFstrimSchema>;
+
+// proxmox_agent_get_memory_block_info - Get memory block size via QEMU agent
+export const agentGetMemoryBlockInfoSchema = baseVmSchema;
+export type AgentGetMemoryBlockInfoInput = z.input<typeof agentGetMemoryBlockInfoSchema>;
+
+// proxmox_agent_suspend_disk - Suspend guest to disk via QEMU agent
+export const agentSuspendDiskSchema = baseVmSchema;
+export type AgentSuspendDiskInput = z.input<typeof agentSuspendDiskSchema>;
+
+// proxmox_agent_suspend_ram - Suspend guest to RAM via QEMU agent
+export const agentSuspendRamSchema = baseVmSchema;
+export type AgentSuspendRamInput = z.input<typeof agentSuspendRamSchema>;
+
+// proxmox_agent_suspend_hybrid - Hybrid suspend guest via QEMU agent
+export const agentSuspendHybridSchema = baseVmSchema;
+export type AgentSuspendHybridInput = z.input<typeof agentSuspendHybridSchema>;
+
 // proxmox_list_vm_firewall_rules - List VM firewall rules
 export const listVmFirewallRulesSchema = baseVmSchema;
 
