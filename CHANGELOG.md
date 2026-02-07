@@ -1,5 +1,13 @@
 # @bldg-7/proxmox-mcp
 
+## 0.5.0
+
+### Minor Changes
+
+- a5f2b79: Add cloud-init tools: get config, dump rendered config, and regenerate cloud-init drive for QEMU VMs (3 new tools).
+- a5f2b79: Add QEMU agent tools: file read/write, get hostname, get users, set user password, and guest shutdown via QEMU guest agent (6 new tools). Includes new validateFilePath and validateUsername validators.
+- f423758: Add remaining QEMU Guest Agent tools: filesystem freeze/thaw/trim, memory block info, and suspend operations (disk/RAM/hybrid). Total agent tools: 24. Total tools: 244.
+
 ## 0.4.3
 
 ### Patch Changes
