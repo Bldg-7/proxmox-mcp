@@ -182,6 +182,84 @@ npx skills add Bldg-7/proxmox-mcp
 
 Skills provide progressive disclosure: metadata (~100 tokens) → instructions (<5000 tokens) → detailed references (on demand).
 
+## SubAgents
+
+This package includes **SubAgents** - specialized AI agents for executing domain-specific Proxmox operations. While Skills provide knowledge ("here are the tools and how to use them"), SubAgents provide action ("I'll do this for you"). SubAgents automatically load the relevant skills and execute operations using MCP tools.
+
+### Available SubAgents
+
+| SubAgent | Domain | Description |
+|----------|--------|-------------|
+| **vm-manager** | QEMU VMs | VM lifecycle management (create, configure, start/stop, snapshots, backups, cloning, templates) |
+| **lxc-manager** | LXC Containers | Container lifecycle management (create, configure, mount points, snapshots, backups, cloning) |
+| **cluster-admin** | Cluster Operations | High availability, VM/LXC migration, replication jobs, cluster firewall, cluster backup jobs |
+| **storage-admin** | Storage Infrastructure | Storage backends (NFS, iSCSI, Ceph), ISO/template management, backup pruning, disk operations |
+| **network-admin** | Network Infrastructure | SDN (VNets, zones, controllers, subnets), node network interfaces, DNS configuration |
+| **access-admin** | Access Control | Users, groups, roles, ACLs, authentication domains (PAM, LDAP, AD) |
+| **monitor** | Monitoring | Read-only health checks, status monitoring, log analysis, task tracking (delegates actions to other agents) |
+
+### How SubAgents Work
+
+SubAgents use **auto-delegation** in Claude Code and compatible platforms:
+
+1. **User makes request**: "Create a new Ubuntu VM with 4 cores and 8GB RAM"
+2. **Claude analyzes request**: Matches request to vm-manager agent based on example blocks
+3. **Auto-delegates**: Invokes vm-manager agent with full context
+4. **Agent executes**: vm-manager loads skills, calls MCP tools, completes operation
+5. **Returns result**: Structured response with operation details
+
+### Prerequisites
+
+- **MCP Server**: The Proxmox MCP server must be connected and configured
+- **Skills**: SubAgents automatically load `proxmox-mcp-tools` and `proxmox-admin` skills
+- **Permissions**: Elevated operations require `PROXMOX_ALLOW_ELEVATED=true` in MCP server config
+
+### Installation
+
+SubAgents are included when you install the plugin:
+
+**For Claude Code Plugin**:
+```bash
+/plugin marketplace add Bldg-7/proxmox-mcp
+```
+
+**For Agent Skills Standard** (if supported):
+```bash
+npx skills add Bldg-7/proxmox-mcp
+```
+
+### Usage Examples
+
+**Create a VM** (auto-delegates to vm-manager):
+```
+User: "Create a new Ubuntu VM with 4 cores, 8GB RAM, and a 50GB disk on node pve1"
+→ vm-manager executes: get next VMID → create VM → add disk → add network → start
+```
+
+**Enable HA** (auto-delegates to cluster-admin):
+```
+User: "Enable high availability for VM 100 with priority 100"
+→ cluster-admin executes: check HA config → add HA resource → verify
+```
+
+**Monitor cluster** (auto-delegates to monitor):
+```
+User: "Show me the current cluster status and any issues"
+→ monitor executes: get cluster status → get HA status → get nodes → report
+```
+
+### Agent Domain Boundaries
+
+Each SubAgent has clear responsibilities to avoid overlap:
+
+- **vm-manager**: Only QEMU VMs (not LXC). Delegates cluster ops to cluster-admin.
+- **lxc-manager**: Only LXC containers (not VMs). Delegates cluster ops to cluster-admin.
+- **cluster-admin**: Cluster-wide operations only. Delegates per-VM/LXC ops to respective managers.
+- **storage-admin**: Storage infrastructure only. Delegates VM disk operations to vm-manager.
+- **network-admin**: Network infrastructure only. Delegates per-VM/LXC NICs to respective managers.
+- **access-admin**: Access control only. No delegation to other agents.
+- **monitor**: Read-only monitoring. Delegates ALL actions to appropriate agents.
+
 ## Error Handling
 
 All tools return structured responses following the MCP protocol:
