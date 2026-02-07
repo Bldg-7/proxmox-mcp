@@ -1,0 +1,75 @@
+name: Release Skills
+
+on:
+  push:
+    branches: [main]
+    paths: ['skills/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-skills:
+    name: Package and Release Skills
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: echo "version=$(jq -r .version package.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Package skills as zip files
+        run: |
+          mkdir -p dist-skills
+          cd skills
+          for skill_dir in */; do
+            skill_name="${skill_dir%/}"
+            if [ -f "${skill_name}/SKILL.md" ]; then
+              echo "Packaging ${skill_name}..."
+              zip -r "../dist-skills/${skill_name}.zip" "${skill_name}/"
+              echo "  Created ${skill_name}.zip"
+            fi
+          done
+          cd ..
+          echo "--- Packaged skills ---"
+          ls -la dist-skills/
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          {
+            echo "body<<NOTES_EOF"
+            echo "## Agent Skills v${{ steps.version.outputs.version }}"
+            echo ""
+            echo "Download \`.zip\` files below and upload to Claude Desktop via **Settings → Capabilities → Upload skill**."
+            echo ""
+            echo "Or install via CLI:"
+            echo "\`\`\`bash"
+            echo "npx skills add Bldg-7/proxmox-mcp"
+            echo "\`\`\`"
+            echo ""
+            echo "### Included Skills"
+            echo ""
+            for skill_dir in skills/*/; do
+              skill_name="$(basename "$skill_dir")"
+              if [ -f "${skill_dir}SKILL.md" ]; then
+                description=$(grep -A1 '^description:' "${skill_dir}SKILL.md" | head -1 | sed 's/^description: *//')
+                echo "- **${skill_name}** — ${description}"
+              fi
+            done
+            echo "NOTES_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: skills-v${{ steps.version.outputs.version }}
+          name: Skills v${{ steps.version.outputs.version }}
+          body: ${{ steps.notes.outputs.body }}
+          files: dist-skills/*.zip
+          make_latest: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
