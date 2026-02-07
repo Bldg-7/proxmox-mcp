@@ -293,11 +293,16 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
    proxmox_create_lxc: 'Create a new LXC container (requires elevated permissions)',
    proxmox_create_vm: 'Create a new QEMU virtual machine (requires elevated permissions)',
 
-   // Node Disk Query
-   proxmox_get_node_disks: 'List physical disks on a Proxmox node (SSD, HDD, NVMe) with health status',
-   proxmox_get_disk_smart: 'Get SMART health data for a specific disk on a Proxmox node',
-   proxmox_get_node_lvm: 'List LVM volume groups and physical volumes on a Proxmox node',
-   proxmox_get_node_zfs: 'List ZFS pools on a Proxmox node with health and capacity info',
+    // Node Disk Query
+    proxmox_get_node_disks: 'List physical disks on a Proxmox node (SSD, HDD, NVMe) with health status',
+    proxmox_get_disk_smart: 'Get SMART health data for a specific disk on a Proxmox node',
+    proxmox_get_node_lvm: 'List LVM volume groups and physical volumes on a Proxmox node',
+    proxmox_get_node_zfs: 'List ZFS pools on a Proxmox node with health and capacity info',
+
+    // Cloud-Init
+    proxmox_get_cloudinit_config: 'Get cloud-init configuration items for a QEMU VM',
+    proxmox_dump_cloudinit: 'Dump rendered cloud-init config (user-data, network-config, or meta-data) for a QEMU VM',
+    proxmox_regenerate_cloudinit: 'Regenerate the cloud-init drive for a QEMU VM (requires elevated permissions)',
 };
 
 export function createServer(client: ProxmoxApiClient, config: Config): Server {

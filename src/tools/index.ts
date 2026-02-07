@@ -282,3 +282,10 @@ export { executeVMCommand } from './command.js';
 
 // Creation tools
 export { listTemplates, createLxc, createVM } from './vm-create.js';
+
+// Cloud-Init tools
+export {
+  getCloudInitConfig,
+  dumpCloudInit,
+  regenerateCloudInit,
+} from './cloud-init.js';

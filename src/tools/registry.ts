@@ -232,6 +232,9 @@ import {
   listTemplates,
   createLxc,
   createVM,
+  getCloudInitConfig,
+  dumpCloudInit,
+  regenerateCloudInit,
 } from './index.js';
 
 // Import all schemas
@@ -494,6 +497,11 @@ import {
   getLxcVncProxySchema,
   getLxcTermProxySchema,
 } from '../schemas/console-access.js';
+import {
+  getCloudInitConfigSchema,
+  dumpCloudInitSchema,
+  regenerateCloudInitSchema,
+} from '../schemas/cloud-init.js';
 
 // Tool handler type - accepts any input type for flexibility
 export type ToolHandler = (
@@ -930,10 +938,15 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   // Command
   proxmox_execute_vm_command: { handler: executeVMCommand, schema: executeVmCommandSchema },
 
-  // Creation
-  proxmox_list_templates: { handler: listTemplates, schema: listTemplatesSchema },
-  proxmox_create_lxc: { handler: createLxc, schema: createLxcSchema },
-  proxmox_create_vm: { handler: createVM, schema: createVmSchema },
+   // Creation
+   proxmox_list_templates: { handler: listTemplates, schema: listTemplatesSchema },
+   proxmox_create_lxc: { handler: createLxc, schema: createLxcSchema },
+   proxmox_create_vm: { handler: createVM, schema: createVmSchema },
+
+   // Cloud-Init
+   proxmox_get_cloudinit_config: { handler: getCloudInitConfig, schema: getCloudInitConfigSchema },
+   proxmox_dump_cloudinit: { handler: dumpCloudInit, schema: dumpCloudInitSchema },
+   proxmox_regenerate_cloudinit: { handler: regenerateCloudInit, schema: regenerateCloudInitSchema },
 };
 
 // Helper to get tool handler
@@ -941,10 +954,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 227 tools are registered
+// Validate all 230 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 227) {
+if (registeredCount !== 230) {
   throw new Error(
-    `Tool registry incomplete: expected 227 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 230 tools, got ${registeredCount}`
   );
 }

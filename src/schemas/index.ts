@@ -14,3 +14,4 @@ export * from './node-network.js';
 export * from './system-operations.js';
 export * from './console-access.js';
 export * from './sdn.js';
+export * from './cloud-init.js';

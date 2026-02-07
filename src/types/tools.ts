@@ -226,6 +226,10 @@ export const TOOL_NAMES = [
   'proxmox_get_disk_smart',
   'proxmox_get_node_lvm',
   'proxmox_get_node_zfs',
+  // Cloud-Init
+  'proxmox_get_cloudinit_config',
+  'proxmox_dump_cloudinit',
+  'proxmox_regenerate_cloudinit',
 ] as const;
 
 export type ToolName = (typeof TOOL_NAMES)[number];
