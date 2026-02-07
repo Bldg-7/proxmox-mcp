@@ -182,6 +182,61 @@ npx skills add Bldg-7/proxmox-mcp
 
 Skills provide progressive disclosure: metadata (~100 tokens) → instructions (<5000 tokens) → detailed references (on demand).
 
+### How Skills Work
+
+Once installed, skills are automatically loaded into the agent's context. The agent learns Proxmox tool usage, workflows, and best practices — so you can give natural language instructions and the agent translates them into the right MCP tool calls.
+
+**Example — Creating a VM** (agent uses `proxmox-mcp-tools` skill):
+```
+You: "Create an Ubuntu VM with 4 cores, 8GB RAM, and 50GB disk on pve1"
+
+Agent knows the workflow from the skill:
+  1. proxmox_get_next_vmid        → gets available VM ID (e.g., 105)
+  2. proxmox_create_vm            → creates VM 105 with 4 cores, 8GB RAM
+  3. proxmox_add_disk_vm          → attaches 50GB virtio disk
+  4. proxmox_add_network_vm       → adds network interface on vmbr0
+  5. proxmox_start_vm             → powers on the VM
+```
+
+**Example — Setting up HA** (agent uses `proxmox-admin` skill):
+```
+You: "Make VM 100 highly available"
+
+Agent knows the operational playbook:
+  1. proxmox_get_ha_groups        → checks existing HA groups
+  2. proxmox_create_ha_resource   → adds VM 100 to HA with priority
+  3. proxmox_get_ha_status        → verifies HA is active
+```
+
+**Example — Troubleshooting** (agent uses both skills together):
+```
+You: "VM 100 won't start, help me figure out why"
+
+Agent combines tool knowledge + operational expertise:
+  1. proxmox_get_vm_status        → checks current state
+  2. proxmox_get_vm_config        → reviews configuration
+  3. proxmox_get_node_status      → checks node resource availability
+  4. proxmox_get_node_tasks       → finds recent failed tasks
+  → Diagnoses: "Node pve1 has insufficient memory. VM requires 8GB but only 2GB free."
+  → Suggests: resize VM memory, migrate to another node, or free resources
+```
+
+### Skill Contents
+
+**proxmox-mcp-tools** — Tool Reference:
+- 227 tools organized into 11 domains (VMs, LXC, cluster, storage, networking, Ceph, access control, pools)
+- Parameters, types, and descriptions for every tool
+- Permission levels (basic vs elevated 🔒)
+- Common workflow patterns (create VM, backup/restore, clone, migrate)
+
+**proxmox-admin** — Operational Expertise:
+- VM & LXC lifecycle playbooks (create → configure → monitor → backup → decommission)
+- Storage management strategies (Ceph, NFS, LVM, ZFS)
+- HA configuration and failover procedures
+- Troubleshooting guides for common API quirks
+- Security best practices (permission model, token management)
+- Performance monitoring and optimization
+
 ## SubAgents
 
 This package includes **SubAgents** - specialized AI agents for executing domain-specific Proxmox operations. While Skills provide knowledge ("here are the tools and how to use them"), SubAgents provide action ("I'll do this for you"). SubAgents automatically load the relevant skills and execute operations using MCP tools.
