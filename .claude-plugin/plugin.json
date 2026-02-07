@@ -1,0 +1,22 @@
+{
+  "name": "proxmox-mcp",
+  "version": "0.4.2",
+  "description": "Proxmox Virtual Environment management skills for AI agents - 227 MCP tools + operational expertise",
+  "author": {
+    "name": "Bldg-7",
+    "url": "https://github.com/Bldg-7"
+  },
+  "homepage": "https://github.com/Bldg-7/proxmox-mcp",
+  "repository": "https://github.com/Bldg-7/proxmox-mcp",
+  "license": "MIT",
+  "keywords": [
+    "proxmox",
+    "virtualization",
+    "infrastructure",
+    "mcp",
+    "vm",
+    "lxc",
+    "cluster"
+  ],
+  "skills": "./skills"
+}
