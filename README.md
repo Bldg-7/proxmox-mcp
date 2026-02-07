@@ -148,6 +148,40 @@ This server provides **143 comprehensive tools** for Proxmox management:
 
 📖 **[Full Tools Reference →](docs/TOOLS.md)**
 
+## Agent Skills
+
+This package includes **Agent Skills** - AI-optimized documentation that teaches agents how to use Proxmox MCP tools and operational best practices. Skills follow the [agentskills.io](https://agentskills.io) open standard and work across multiple AI agent platforms.
+
+### Available Skills
+
+| Skill | Description | Tools/Topics |
+|-------|-------------|--------------|
+| **proxmox-mcp-tools** | Complete MCP tool reference for Proxmox VE | 227 tools across 11 domains (VMs, LXC, cluster, storage, networking, Ceph) |
+| **proxmox-admin** | Operational expertise for Proxmox infrastructure | VM lifecycle, storage management, HA configuration, troubleshooting |
+
+### Installation
+
+**For Agent Skills Standard** (Claude Code, OpenCode, Cursor, Codex, Gemini CLI, VS Code):
+```bash
+npx skills add Bldg-7/proxmox-mcp
+```
+
+**For Claude Code Plugin**:
+```bash
+/plugin marketplace add Bldg-7/proxmox-mcp
+```
+
+### Supported Agents
+
+- **Claude Code** - Anthropic's official CLI
+- **OpenCode** - Open-source Claude Code alternative
+- **Cursor** - AI-powered code editor
+- **Codex** - GitHub Copilot CLI
+- **Gemini CLI** - Google's AI assistant
+- **VS Code** - With agent skills extensions
+
+Skills provide progressive disclosure: metadata (~100 tokens) → instructions (<5000 tokens) → detailed references (on demand).
+
 ## Error Handling
 
 All tools return structured responses following the MCP protocol:

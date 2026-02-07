@@ -3,7 +3,7 @@
 > Operations common to both VMs and containers: migration, guest agent, and firewall rules.
 
 **Tools in this file:** 22  
-**Generated:** 2026-02-06T10:49:51.723Z
+**Generated:** 2026-02-06T10:53:57.669Z
 
 ---
 
