@@ -98,11 +98,16 @@ export {
    listClusterFirewallIpsets,
    createClusterFirewallIpset,
    deleteClusterFirewallIpset,
-   listClusterFirewallIpsetEntries,
-   addClusterFirewallIpsetEntry,
-   updateClusterFirewallIpsetEntry,
-   deleteClusterFirewallIpsetEntry,
- } from './cluster-management.js';
+    listClusterFirewallIpsetEntries,
+    addClusterFirewallIpsetEntry,
+    updateClusterFirewallIpsetEntry,
+    deleteClusterFirewallIpsetEntry,
+    getClusterConfig,
+    listClusterConfigNodes,
+    getClusterConfigNode,
+    joinCluster,
+    getClusterTotem,
+  } from './cluster-management.js';
 
 // SDN tools
 export {

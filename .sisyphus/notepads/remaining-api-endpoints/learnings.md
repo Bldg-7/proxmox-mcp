@@ -635,3 +635,72 @@
 - PUT /nodes/{node}/disks/wipedisk (wipe disk data)
 - GET /nodes/{node}/disks/lvmthin (list LVM thin pools)
 - GET /nodes/{node}/disks/directory (list directory-based storage)
+
+## Task 11: Cluster Config (COMPLETED)
+
+### Implementation Pattern
+- **Schemas**: 5 new schemas in cluster-management.ts
+  - `getClusterConfigSchema`: Empty object (no params)
+  - `listClusterConfigNodesSchema`: Empty object (no params)
+  - `getClusterConfigNodeSchema`: node parameter (string, min 1)
+  - `joinClusterSchema`: hostname, password (required), fingerprint, force (optional)
+  - `getClusterTotemSchema`: Empty object (no params)
+
+- **Handlers**: 5 functions in cluster-management.ts
+  - Get config: Returns key-value pairs from API
+  - List nodes: Returns array with name/nodeid fields
+  - Get node: Returns specific node config by name
+  - Join cluster: Requires elevated, **REDACTS password in output**
+  - Get totem: Returns totem configuration as key-value pairs
+
+- **Tests**: 6 tests total
+  - 5 success cases (one per tool)
+  - 1 elevated permission denial test (joinCluster only)
+  - Pattern: Mock client, verify API calls, check output formatting
+
+### Key Learnings
+1. **Password redaction pattern**: Critical for security
+   - Create safe copy: `const safePayload = { ...payload, password: '[REDACTED]' };`
+   - Display safe version in output, never show actual password
+   - Applied in joinCluster handler
+   
+2. **Cluster config structure**: Similar to cluster options
+   - GET returns all config as key-value pairs
+   - No special encoding needed for node names in this context
+   - Nodes have name and nodeid fields
+   
+3. **Elevated operations**: Only joinCluster requires elevated permissions
+   - Get/list operations are read-only (no elevated check)
+   - Join is destructive (adds node to cluster)
+   - Tests verify both permission denial and successful execution
+   
+4. **Tool count tracking**: Updated 3 places
+   - registry.ts: Tool count assertion (282→287)
+   - integration tests: Two assertions for tool count (282→287)
+   
+5. **Emoji icons**: Consistent with existing patterns
+   - 🔧 for config
+   - 🖥️ for nodes
+   - ⚙️ for totem
+
+### Files Modified
+- src/schemas/cluster-management.ts: +5 schemas
+- src/tools/cluster-management.ts: +5 handlers
+- src/tools/index.ts: +5 exports
+- src/types/tools.ts: +5 tool names
+- src/server.ts: +5 tool descriptions
+- src/tools/registry.ts: +5 registrations, updated tool count (282→287)
+- src/tools/cluster-management.test.ts: +6 tests
+- src/__tests__/integration/server.test.ts: Updated 2 assertions (282→287)
+
+### Verification
+- ✅ pnpm build: No errors
+- ✅ pnpm test: 746 tests pass (including 6 new tests)
+- ✅ Tool count: 282 → 287 (5 new tools)
+
+### API Endpoints Implemented
+- GET /cluster/config (get cluster config)
+- GET /cluster/config/nodes (list cluster config nodes)
+- GET /cluster/config/nodes/{node} (get cluster config node)
+- POST /cluster/config/join (join cluster - ELEVATED)
+- GET /cluster/config/totem (get cluster totem config)

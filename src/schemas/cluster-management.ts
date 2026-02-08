@@ -494,3 +494,35 @@ export const deleteClusterFirewallIpsetEntrySchema = z.object({
 });
 
 export type DeleteClusterFirewallIpsetEntryInput = z.infer<typeof deleteClusterFirewallIpsetEntrySchema>;
+
+// proxmox_get_cluster_config - Get cluster config
+export const getClusterConfigSchema = z.object({});
+
+export type GetClusterConfigInput = z.infer<typeof getClusterConfigSchema>;
+
+// proxmox_list_cluster_config_nodes - List cluster config nodes
+export const listClusterConfigNodesSchema = z.object({});
+
+export type ListClusterConfigNodesInput = z.infer<typeof listClusterConfigNodesSchema>;
+
+// proxmox_get_cluster_config_node - Get cluster config node
+export const getClusterConfigNodeSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetClusterConfigNodeInput = z.infer<typeof getClusterConfigNodeSchema>;
+
+// proxmox_join_cluster - Join cluster
+export const joinClusterSchema = z.object({
+  hostname: z.string().min(1).describe('Hostname of cluster node to join'),
+  password: z.string().min(1).describe('Cluster password'),
+  fingerprint: z.string().optional().describe('SSL certificate fingerprint'),
+  force: z.boolean().optional().describe('Force join even if node exists'),
+});
+
+export type JoinClusterInput = z.infer<typeof joinClusterSchema>;
+
+// proxmox_get_cluster_totem - Get cluster totem config
+export const getClusterTotemSchema = z.object({});
+
+export type GetClusterTotemInput = z.infer<typeof getClusterTotemSchema>;

@@ -112,9 +112,16 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
    proxmox_list_cluster_firewall_ipset_entries: 'List entries in a cluster firewall IP set',
    proxmox_add_cluster_firewall_ipset_entry: 'Add an entry to a cluster firewall IP set (requires elevated permissions)',
    proxmox_update_cluster_firewall_ipset_entry: 'Update an entry in a cluster firewall IP set (requires elevated permissions)',
-   proxmox_delete_cluster_firewall_ipset_entry: 'Delete an entry from a cluster firewall IP set (requires elevated permissions)',
+    proxmox_delete_cluster_firewall_ipset_entry: 'Delete an entry from a cluster firewall IP set (requires elevated permissions)',
 
-   // SDN
+    // Cluster Config
+    proxmox_get_cluster_config: 'Get cluster configuration',
+    proxmox_list_cluster_config_nodes: 'List cluster configuration nodes',
+    proxmox_get_cluster_config_node: 'Get cluster configuration for a specific node',
+    proxmox_join_cluster: 'Join a cluster (requires elevated permissions)',
+    proxmox_get_cluster_totem: 'Get cluster totem configuration',
+
+    // SDN
   proxmox_list_sdn_vnets: 'List SDN virtual networks',
   proxmox_get_sdn_vnet: 'Get an SDN virtual network by name',
   proxmox_create_sdn_vnet: 'Create an SDN virtual network (requires elevated permissions)',

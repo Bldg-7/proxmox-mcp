@@ -55,72 +55,82 @@ import {
   updateClusterOptionsSchema,
   getClusterFirewallOptionsSchema,
   updateClusterFirewallOptionsSchema,
-   listClusterFirewallMacrosSchema,
-   listClusterFirewallRefsSchema,
-   listClusterFirewallAliasesSchema,
-   getClusterFirewallAliasSchema,
-   createClusterFirewallAliasSchema,
-   updateClusterFirewallAliasSchema,
-   deleteClusterFirewallAliasSchema,
-   listClusterFirewallIpsetsSchema,
-   createClusterFirewallIpsetSchema,
-   deleteClusterFirewallIpsetSchema,
-   listClusterFirewallIpsetEntriesSchema,
-   addClusterFirewallIpsetEntrySchema,
-   updateClusterFirewallIpsetEntrySchema,
-   deleteClusterFirewallIpsetEntrySchema,
- } from '../schemas/cluster-management.js';
+    listClusterFirewallMacrosSchema,
+    listClusterFirewallRefsSchema,
+    listClusterFirewallAliasesSchema,
+    getClusterFirewallAliasSchema,
+    createClusterFirewallAliasSchema,
+    updateClusterFirewallAliasSchema,
+    deleteClusterFirewallAliasSchema,
+    listClusterFirewallIpsetsSchema,
+    createClusterFirewallIpsetSchema,
+    deleteClusterFirewallIpsetSchema,
+    listClusterFirewallIpsetEntriesSchema,
+    addClusterFirewallIpsetEntrySchema,
+    updateClusterFirewallIpsetEntrySchema,
+    deleteClusterFirewallIpsetEntrySchema,
+    getClusterConfigSchema,
+    listClusterConfigNodesSchema,
+    getClusterConfigNodeSchema,
+    joinClusterSchema,
+    getClusterTotemSchema,
+  } from '../schemas/cluster-management.js';
 import type {
-  GetHaResourcesInput,
-  GetHaResourceInput,
-  CreateHaResourceInput,
-  UpdateHaResourceInput,
-  DeleteHaResourceInput,
-  GetHaGroupsInput,
-  GetHaGroupInput,
-  CreateHaGroupInput,
-  UpdateHaGroupInput,
-  DeleteHaGroupInput,
-  GetHaStatusInput,
-  ListClusterFirewallRulesInput,
-  GetClusterFirewallRuleInput,
-  CreateClusterFirewallRuleInput,
-  UpdateClusterFirewallRuleInput,
-  DeleteClusterFirewallRuleInput,
-  ListClusterFirewallGroupsInput,
-  GetClusterFirewallGroupInput,
-  CreateClusterFirewallGroupInput,
-  UpdateClusterFirewallGroupInput,
-  DeleteClusterFirewallGroupInput,
-  ListClusterBackupJobsInput,
-  GetClusterBackupJobInput,
-  CreateClusterBackupJobInput,
-  UpdateClusterBackupJobInput,
-  DeleteClusterBackupJobInput,
-  ListClusterReplicationJobsInput,
-  GetClusterReplicationJobInput,
-  CreateClusterReplicationJobInput,
-  UpdateClusterReplicationJobInput,
-  DeleteClusterReplicationJobInput,
-  GetClusterOptionsInput,
-  UpdateClusterOptionsInput,
-  GetClusterFirewallOptionsInput,
-  UpdateClusterFirewallOptionsInput,
-   ListClusterFirewallMacrosInput,
-   ListClusterFirewallRefsInput,
-   ListClusterFirewallAliasesInput,
-   GetClusterFirewallAliasInput,
-   CreateClusterFirewallAliasInput,
-   UpdateClusterFirewallAliasInput,
-   DeleteClusterFirewallAliasInput,
-   ListClusterFirewallIpsetsInput,
-   CreateClusterFirewallIpsetInput,
-   DeleteClusterFirewallIpsetInput,
-   ListClusterFirewallIpsetEntriesInput,
-   AddClusterFirewallIpsetEntryInput,
-   UpdateClusterFirewallIpsetEntryInput,
-   DeleteClusterFirewallIpsetEntryInput,
- } from '../schemas/cluster-management.js';
+   GetHaResourcesInput,
+   GetHaResourceInput,
+   CreateHaResourceInput,
+   UpdateHaResourceInput,
+   DeleteHaResourceInput,
+   GetHaGroupsInput,
+   GetHaGroupInput,
+   CreateHaGroupInput,
+   UpdateHaGroupInput,
+   DeleteHaGroupInput,
+   GetHaStatusInput,
+   ListClusterFirewallRulesInput,
+   GetClusterFirewallRuleInput,
+   CreateClusterFirewallRuleInput,
+   UpdateClusterFirewallRuleInput,
+   DeleteClusterFirewallRuleInput,
+   ListClusterFirewallGroupsInput,
+   GetClusterFirewallGroupInput,
+   CreateClusterFirewallGroupInput,
+   UpdateClusterFirewallGroupInput,
+   DeleteClusterFirewallGroupInput,
+   ListClusterBackupJobsInput,
+   GetClusterBackupJobInput,
+   CreateClusterBackupJobInput,
+   UpdateClusterBackupJobInput,
+   DeleteClusterBackupJobInput,
+   ListClusterReplicationJobsInput,
+   GetClusterReplicationJobInput,
+   CreateClusterReplicationJobInput,
+   UpdateClusterReplicationJobInput,
+   DeleteClusterReplicationJobInput,
+   GetClusterOptionsInput,
+   UpdateClusterOptionsInput,
+   GetClusterFirewallOptionsInput,
+   UpdateClusterFirewallOptionsInput,
+    ListClusterFirewallMacrosInput,
+    ListClusterFirewallRefsInput,
+    ListClusterFirewallAliasesInput,
+    GetClusterFirewallAliasInput,
+    CreateClusterFirewallAliasInput,
+    UpdateClusterFirewallAliasInput,
+    DeleteClusterFirewallAliasInput,
+    ListClusterFirewallIpsetsInput,
+    CreateClusterFirewallIpsetInput,
+    DeleteClusterFirewallIpsetInput,
+    ListClusterFirewallIpsetEntriesInput,
+    AddClusterFirewallIpsetEntryInput,
+    UpdateClusterFirewallIpsetEntryInput,
+    DeleteClusterFirewallIpsetEntryInput,
+    GetClusterConfigInput,
+    ListClusterConfigNodesInput,
+    GetClusterConfigNodeInput,
+    JoinClusterInput,
+    GetClusterTotemInput,
+  } from '../schemas/cluster-management.js';
 
 /**
  * List HA resources.
@@ -1837,5 +1847,163 @@ export async function deleteClusterFirewallIpsetEntry(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Delete Cluster Firewall IP Set Entry');
+  }
+}
+
+/**
+ * Get cluster config.
+ */
+export async function getClusterConfig(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetClusterConfigInput
+): Promise<ToolResponse> {
+  try {
+    getClusterConfigSchema.parse(input);
+    const config = (await client.request('/cluster/config')) as Record<string, unknown>;
+
+    let output = '🔧 **Cluster Config**\n\n';
+    const entries = Object.entries(config ?? {});
+
+    if (entries.length === 0) {
+      output += 'No cluster config found.';
+      return formatToolResponse(output);
+    }
+
+    for (const [key, value] of entries) {
+      output += `• **${key}**: ${typeof value === 'string' ? value : JSON.stringify(value)}\n`;
+    }
+
+    return formatToolResponse(output.trimEnd());
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Cluster Config');
+  }
+}
+
+/**
+ * List cluster config nodes.
+ */
+export async function listClusterConfigNodes(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: ListClusterConfigNodesInput
+): Promise<ToolResponse> {
+  try {
+    listClusterConfigNodesSchema.parse(input);
+    const nodes = (await client.request('/cluster/config/nodes')) as Array<Record<string, unknown>>;
+
+    let output = '🖥️  **Cluster Config Nodes**\n\n';
+
+    if (!nodes || nodes.length === 0) {
+      output += 'No cluster nodes found.';
+      return formatToolResponse(output);
+    }
+
+    for (const node of nodes) {
+      const name = node.name ?? 'unknown';
+      output += `• **${name}**`;
+      if (node.nodeid) output += ` (ID: ${node.nodeid})`;
+      output += '\n';
+    }
+
+    output += `\n**Total**: ${nodes.length} node(s)`;
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'List Cluster Config Nodes');
+  }
+}
+
+/**
+ * Get cluster config node.
+ */
+export async function getClusterConfigNode(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetClusterConfigNodeInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getClusterConfigNodeSchema.parse(input);
+    const safeNode = validated.node;
+    const node = (await client.request(
+      `/cluster/config/nodes/${encodeURIComponent(safeNode)}`
+    )) as Record<string, unknown>;
+
+    let output = '🖥️  **Cluster Config Node**\n\n';
+    output += `• **Node**: ${safeNode}\n`;
+    const entries = Object.entries(node ?? {});
+
+    for (const [key, value] of entries) {
+      output += `• **${key}**: ${typeof value === 'string' ? value : JSON.stringify(value)}\n`;
+    }
+
+    return formatToolResponse(output.trimEnd());
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Cluster Config Node');
+  }
+}
+
+/**
+ * Join cluster.
+ */
+export async function joinCluster(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: JoinClusterInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'join cluster');
+
+    const validated = joinClusterSchema.parse(input);
+    const payload: Record<string, unknown> = {
+      hostname: validated.hostname,
+      password: validated.password,
+    };
+
+    if (validated.fingerprint) payload.fingerprint = validated.fingerprint;
+    if (validated.force !== undefined) payload.force = validated.force;
+
+    const result = await client.request('/cluster/config/join', 'POST', payload);
+
+    const safePayload = { ...payload, password: '[REDACTED]' };
+    let output = '✅ **Joined Cluster**\n\n';
+    output += `• **Hostname**: ${validated.hostname}\n`;
+    output += `• **Password**: ${safePayload.password}\n`;
+    if (validated.fingerprint) output += `• **Fingerprint**: ${validated.fingerprint}\n`;
+    if (validated.force) output += `• **Force**: yes\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Join Cluster');
+  }
+}
+
+/**
+ * Get cluster totem config.
+ */
+export async function getClusterTotem(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetClusterTotemInput
+): Promise<ToolResponse> {
+  try {
+    getClusterTotemSchema.parse(input);
+    const totem = (await client.request('/cluster/config/totem')) as Record<string, unknown>;
+
+    let output = '⚙️  **Cluster Totem Config**\n\n';
+    const entries = Object.entries(totem ?? {});
+
+    if (entries.length === 0) {
+      output += 'No totem config found.';
+      return formatToolResponse(output);
+    }
+
+    for (const [key, value] of entries) {
+      output += `• **${key}**: ${typeof value === 'string' ? value : JSON.stringify(value)}\n`;
+    }
+
+    return formatToolResponse(output.trimEnd());
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Cluster Totem');
   }
 }

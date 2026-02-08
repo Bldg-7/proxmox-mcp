@@ -34,11 +34,16 @@ import {
    listClusterFirewallIpsets,
    createClusterFirewallIpset,
    deleteClusterFirewallIpset,
-   listClusterFirewallIpsetEntries,
-   addClusterFirewallIpsetEntry,
-   updateClusterFirewallIpsetEntry,
-   deleteClusterFirewallIpsetEntry,
- } from './cluster-management.js';
+    listClusterFirewallIpsetEntries,
+    addClusterFirewallIpsetEntry,
+    updateClusterFirewallIpsetEntry,
+    deleteClusterFirewallIpsetEntry,
+    getClusterConfig,
+    listClusterConfigNodes,
+    getClusterConfigNode,
+    joinCluster,
+    getClusterTotem,
+  } from './cluster-management.js';
 
 describe('getHaResources', () => {
   let client: ReturnType<typeof createMockProxmoxClient>;
@@ -728,5 +733,95 @@ describe('listClusterFirewallRefs', () => {
        '/cluster/firewall/ipset/trusted/192.168.1.0%2F24',
        'DELETE'
      );
+   });
+ });
+
+ describe('Cluster Config', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+   let config: ReturnType<typeof createTestConfig>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+     config = createTestConfig();
+   });
+
+   it('should get cluster config', async () => {
+     const mockConfig = { cluster_name: 'pve-cluster', corosync_conf: 'data' };
+     (client.request as jest.Mock).mockResolvedValue(mockConfig);
+
+     const result = await getClusterConfig(client, config, {});
+
+     expect(client.request).toHaveBeenCalledWith('/cluster/config');
+     expect(result.content[0].text).toContain('🔧 **Cluster Config**');
+     expect(result.content[0].text).toContain('cluster_name');
+   });
+
+   it('should list cluster config nodes', async () => {
+     const mockNodes = [
+       { name: 'pve1', nodeid: 1 },
+       { name: 'pve2', nodeid: 2 },
+     ];
+     (client.request as jest.Mock).mockResolvedValue(mockNodes);
+
+     const result = await listClusterConfigNodes(client, config, {});
+
+     expect(client.request).toHaveBeenCalledWith('/cluster/config/nodes');
+     expect(result.content[0].text).toContain('🖥️  **Cluster Config Nodes**');
+     expect(result.content[0].text).toContain('pve1');
+     expect(result.content[0].text).toContain('**Total**: 2');
+   });
+
+   it('should get cluster config node', async () => {
+     const mockNode = { name: 'pve1', nodeid: 1, type: 'node' };
+     (client.request as jest.Mock).mockResolvedValue(mockNode);
+
+     const result = await getClusterConfigNode(client, config, { node: 'pve1' });
+
+     expect(client.request).toHaveBeenCalledWith('/cluster/config/nodes/pve1');
+     expect(result.content[0].text).toContain('🖥️  **Cluster Config Node**');
+     expect(result.content[0].text).toContain('pve1');
+   });
+
+   it('should join cluster', async () => {
+     const elevatedConfig = { ...config, allowElevated: true };
+     (client.request as jest.Mock).mockResolvedValue('OK');
+
+     const result = await joinCluster(client, elevatedConfig, {
+       hostname: 'pve2.example.com',
+       password: 'secret123',
+       fingerprint: 'abc123',
+     });
+
+     expect(client.request).toHaveBeenCalledWith('/cluster/config/join', 'POST', {
+       hostname: 'pve2.example.com',
+       password: 'secret123',
+       fingerprint: 'abc123',
+     });
+     expect(result.content[0].text).toContain('✅ **Joined Cluster**');
+     expect(result.content[0].text).toContain('[REDACTED]');
+     expect(result.content[0].text).not.toContain('secret123');
+   });
+
+   it('should deny join cluster without elevated permissions', async () => {
+     const basicConfig = { ...config, allowElevated: false };
+
+     const result = await joinCluster(client, basicConfig, {
+       hostname: 'pve2.example.com',
+       password: 'secret123',
+     });
+
+     expect(result.isError).toBe(true);
+     expect(result.content[0].text).toContain('Permission denied');
+   });
+
+   it('should get cluster totem config', async () => {
+     const mockTotem = { version: 2, cluster_name: 'pve-cluster' };
+     (client.request as jest.Mock).mockResolvedValue(mockTotem);
+
+     const result = await getClusterTotem(client, config, {});
+
+     expect(client.request).toHaveBeenCalledWith('/cluster/config/totem');
+     expect(result.content[0].text).toContain('⚙️  **Cluster Totem Config**');
+     expect(result.content[0].text).toContain('version');
    });
  });
