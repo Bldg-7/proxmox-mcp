@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_agent_exec`
+#### `proxmox_execute_vm_command`
 
 **Description:** Execute a command via QEMU guest agent (requires elevated permissions)
 

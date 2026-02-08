@@ -67,7 +67,7 @@ export const executeVmCommandSchema = z.object({
   node: z.string().min(1).describe('Node name where VM is located'),
   vmid: z.coerce.number().describe('VM ID number'),
   command: z.string().min(1).describe('Shell command to execute'),
-  type: z.enum(['qemu', 'lxc']).default('qemu').describe('VM type'),
+  type: z.enum(['qemu']).default('qemu').describe('VM type (QEMU only — LXC containers do not have an exec API)'),
 });
 
 export type ExecuteVmCommandInput = z.infer<typeof executeVmCommandSchema>;

@@ -38,25 +38,20 @@ describe('Command Tools', () => {
       expect(result.isError).toBe(false);
     });
 
-    it('executes command on LXC container', async () => {
-      const client = createMockProxmoxClient();
-      const config = createTestConfig({ allowElevated: true });
-      client.request.mockResolvedValue('UPID:pve1:0000ABCD:00000000:00000000:00000000:00000000:root@pam:');
+     it('rejects LXC type', async () => {
+       const client = createMockProxmoxClient();
+       const config = createTestConfig({ allowElevated: true });
 
-      const result = await executeVMCommand(client, config, {
-        node: 'pve1',
-        vmid: 100,
-        command: 'whoami',
-        type: 'lxc',
-      });
+       const result = await executeVMCommand(client, config, {
+         node: 'pve1',
+         vmid: 100,
+         command: 'whoami',
+         type: 'lxc' as any,
+       });
 
-      expect(result.content[0].text).toContain('⚡');
-      expect(result.content[0].text).toContain('Task ID');
-      expect(result.content[0].text).toContain('UPID');
-      expect(result.content[0].text).toContain('whoami');
-      expect(result.content[0].text).toContain('LXC');
-      expect(result.isError).toBe(false);
-    });
+       expect(result.isError).toBe(true);
+       expect(result.content[0].text).toContain('Invalid');
+     });
 
     it('validates command for dangerous characters', async () => {
       const client = createMockProxmoxClient();

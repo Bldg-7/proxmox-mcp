@@ -3679,10 +3679,10 @@ Execute a shell command on a virtual machine via Proxmox API.
 |------|------|----------|-------------|
 | `node` | string | Yes | Node name |
 | `vmid` | number | Yes | VM/Container ID |
-| `type` | string | Yes | `qemu` or `lxc` |
+| `type` | string | No | VM type (default: `qemu`, QEMU only) |
 | `command` | string | Yes | Shell command to execute |
 
-**Note**: Requires QEMU Guest Agent or LXC exec capability. Command validation blocks potentially dangerous characters.
+**Note**: Requires QEMU Guest Agent running inside the VM. LXC containers are not supported (no exec API).
 
 ---
 

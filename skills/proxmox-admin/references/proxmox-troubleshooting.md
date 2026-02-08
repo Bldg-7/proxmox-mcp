@@ -63,7 +63,7 @@ GET /api2/json/nodes/pve1/qemu/999/status
 
 ### LXC Command Execution Not Available
 
-**Issue**: LXC containers do not support command execution via the Proxmox API. Only QEMU VMs with guest agent support `proxmox_agent_exec`.
+**Issue**: LXC containers do not support command execution via the Proxmox API. Only QEMU VMs with guest agent support `proxmox_execute_vm_command`.
 
 **Why**: The Proxmox API only exposes QEMU guest agent functionality, not LXC `pct exec`.
 
@@ -74,7 +74,7 @@ pct exec 200 -- /bin/bash -c "your-command"
 ```
 
 **Tools Affected**:
-- ❌ `proxmox_agent_exec` - Only works with QEMU VMs
+- ❌ `proxmox_execute_vm_command` - Only works with QEMU VMs
 - ✅ `proxmox_start_lxc`, `proxmox_stop_lxc` - Work fine
 - ✅ `proxmox_get_lxc_status` - Works fine
 
@@ -330,7 +330,7 @@ The MCP server operates on individual resources. For bulk operations, call tools
 
 ### No Streaming Output
 
-Command execution (`proxmox_agent_exec`) does not stream output. Results are returned after command completes.
+Command execution (`proxmox_execute_vm_command`) does not stream output. Results are returned after command completes.
 
 ### No File Upload via MCP
 

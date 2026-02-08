@@ -2644,10 +2644,10 @@ Proxmox API를 통해 가상 머신에서 셸 명령어를 실행합니다.
 |------|------|------|------|
 | `node` | string | 예 | 노드 이름 |
 | `vmid` | number | 예 | VM/컨테이너 ID |
-| `type` | string | 예 | `qemu` 또는 `lxc` |
+| `type` | string | 아니오 | VM 유형 (기본값: `qemu`, QEMU 전용) |
 | `command` | string | 예 | 실행할 셸 명령어 |
 
-**참고**: QEMU Guest Agent 또는 LXC exec 기능이 필요합니다. 명령어 검증으로 잠재적으로 위험한 문자를 차단합니다.
+**참고**: VM 내부에 QEMU Guest Agent가 실행 중이어야 합니다. LXC 컨테이너는 지원되지 않습니다 (exec API 없음).
 
 ---
 
