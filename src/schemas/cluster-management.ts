@@ -439,3 +439,58 @@ export const deleteClusterFirewallAliasSchema = z.object({
 });
 
 export type DeleteClusterFirewallAliasInput = z.infer<typeof deleteClusterFirewallAliasSchema>;
+
+// proxmox_list_cluster_firewall_ipsets - List cluster firewall IP sets
+export const listClusterFirewallIpsetsSchema = z.object({});
+
+export type ListClusterFirewallIpsetsInput = z.infer<typeof listClusterFirewallIpsetsSchema>;
+
+// proxmox_create_cluster_firewall_ipset - Create cluster firewall IP set
+export const createClusterFirewallIpsetSchema = z.object({
+  name: z.string().min(1).describe('IP set name'),
+  comment: z.string().optional().describe('Description'),
+});
+
+export type CreateClusterFirewallIpsetInput = z.infer<typeof createClusterFirewallIpsetSchema>;
+
+// proxmox_delete_cluster_firewall_ipset - Delete cluster firewall IP set
+export const deleteClusterFirewallIpsetSchema = z.object({
+  name: z.string().min(1).describe('IP set name'),
+});
+
+export type DeleteClusterFirewallIpsetInput = z.infer<typeof deleteClusterFirewallIpsetSchema>;
+
+// proxmox_list_cluster_firewall_ipset_entries - List IP set entries
+export const listClusterFirewallIpsetEntriesSchema = z.object({
+  name: z.string().min(1).describe('IP set name'),
+});
+
+export type ListClusterFirewallIpsetEntriesInput = z.infer<typeof listClusterFirewallIpsetEntriesSchema>;
+
+// proxmox_add_cluster_firewall_ipset_entry - Add IP set entry
+export const addClusterFirewallIpsetEntrySchema = z.object({
+  name: z.string().min(1).describe('IP set name'),
+  cidr: z.string().min(1).describe('CIDR network address'),
+  comment: z.string().optional().describe('Description'),
+  nomatch: z.boolean().optional().describe('Invert match (exclude this entry)'),
+});
+
+export type AddClusterFirewallIpsetEntryInput = z.infer<typeof addClusterFirewallIpsetEntrySchema>;
+
+// proxmox_update_cluster_firewall_ipset_entry - Update IP set entry
+export const updateClusterFirewallIpsetEntrySchema = z.object({
+  name: z.string().min(1).describe('IP set name'),
+  cidr: z.string().min(1).describe('CIDR network address'),
+  comment: z.string().optional().describe('Description'),
+  nomatch: z.boolean().optional().describe('Invert match (exclude this entry)'),
+});
+
+export type UpdateClusterFirewallIpsetEntryInput = z.infer<typeof updateClusterFirewallIpsetEntrySchema>;
+
+// proxmox_delete_cluster_firewall_ipset_entry - Delete IP set entry
+export const deleteClusterFirewallIpsetEntrySchema = z.object({
+  name: z.string().min(1).describe('IP set name'),
+  cidr: z.string().min(1).describe('CIDR network address'),
+});
+
+export type DeleteClusterFirewallIpsetEntryInput = z.infer<typeof deleteClusterFirewallIpsetEntrySchema>;

@@ -80,6 +80,13 @@ import {
    createClusterFirewallAlias,
    updateClusterFirewallAlias,
    deleteClusterFirewallAlias,
+   listClusterFirewallIpsets,
+   createClusterFirewallIpset,
+   deleteClusterFirewallIpset,
+   listClusterFirewallIpsetEntries,
+   addClusterFirewallIpsetEntry,
+   updateClusterFirewallIpsetEntry,
+   deleteClusterFirewallIpsetEntry,
    listSdnVnets,
   getSdnVnet,
   createSdnVnet,
@@ -343,6 +350,13 @@ import {
    createClusterFirewallAliasSchema,
    updateClusterFirewallAliasSchema,
    deleteClusterFirewallAliasSchema,
+   listClusterFirewallIpsetsSchema,
+   createClusterFirewallIpsetSchema,
+   deleteClusterFirewallIpsetSchema,
+   listClusterFirewallIpsetEntriesSchema,
+   addClusterFirewallIpsetEntrySchema,
+   updateClusterFirewallIpsetEntrySchema,
+   deleteClusterFirewallIpsetEntrySchema,
  } from '../schemas/cluster-management.js';
 import {
   listSdnVnetsSchema,
@@ -752,6 +766,34 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
      handler: deleteClusterFirewallAlias,
      schema: deleteClusterFirewallAliasSchema,
    },
+   proxmox_list_cluster_firewall_ipsets: {
+     handler: listClusterFirewallIpsets,
+     schema: listClusterFirewallIpsetsSchema,
+   },
+   proxmox_create_cluster_firewall_ipset: {
+     handler: createClusterFirewallIpset,
+     schema: createClusterFirewallIpsetSchema,
+   },
+   proxmox_delete_cluster_firewall_ipset: {
+     handler: deleteClusterFirewallIpset,
+     schema: deleteClusterFirewallIpsetSchema,
+   },
+   proxmox_list_cluster_firewall_ipset_entries: {
+     handler: listClusterFirewallIpsetEntries,
+     schema: listClusterFirewallIpsetEntriesSchema,
+   },
+   proxmox_add_cluster_firewall_ipset_entry: {
+     handler: addClusterFirewallIpsetEntry,
+     schema: addClusterFirewallIpsetEntrySchema,
+   },
+   proxmox_update_cluster_firewall_ipset_entry: {
+     handler: updateClusterFirewallIpsetEntry,
+     schema: updateClusterFirewallIpsetEntrySchema,
+   },
+   proxmox_delete_cluster_firewall_ipset_entry: {
+     handler: deleteClusterFirewallIpsetEntry,
+     schema: deleteClusterFirewallIpsetEntrySchema,
+   },
 
   // SDN
   proxmox_list_sdn_vnets: { handler: listSdnVnets, schema: listSdnVnetsSchema },
@@ -1050,10 +1092,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 253 tools are registered
+// Validate all 260 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 253) {
+if (registeredCount !== 260) {
   throw new Error(
-    `Tool registry incomplete: expected 253 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 260 tools, got ${registeredCount}`
   );
 }

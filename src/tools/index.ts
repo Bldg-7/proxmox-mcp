@@ -86,6 +86,13 @@ export {
    createClusterFirewallAlias,
    updateClusterFirewallAlias,
    deleteClusterFirewallAlias,
+   listClusterFirewallIpsets,
+   createClusterFirewallIpset,
+   deleteClusterFirewallIpset,
+   listClusterFirewallIpsetEntries,
+   addClusterFirewallIpsetEntry,
+   updateClusterFirewallIpsetEntry,
+   deleteClusterFirewallIpsetEntry,
  } from './cluster-management.js';
 
 // SDN tools

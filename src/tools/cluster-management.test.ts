@@ -31,6 +31,13 @@ import {
    createClusterFirewallAlias,
    updateClusterFirewallAlias,
    deleteClusterFirewallAlias,
+   listClusterFirewallIpsets,
+   createClusterFirewallIpset,
+   deleteClusterFirewallIpset,
+   listClusterFirewallIpsetEntries,
+   addClusterFirewallIpsetEntry,
+   updateClusterFirewallIpsetEntry,
+   deleteClusterFirewallIpsetEntry,
  } from './cluster-management.js';
 
 describe('getHaResources', () => {
@@ -507,5 +514,219 @@ describe('listClusterFirewallRefs', () => {
      await deleteClusterFirewallAlias(client, config, { name: 'office' });
 
      expect(client.request).toHaveBeenCalledWith('/cluster/firewall/aliases/office', 'DELETE');
+   });
+ });
+
+ describe('listClusterFirewallIpsets', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('returns formatted IP sets', async () => {
+     const config = createTestConfig();
+     client.request.mockResolvedValue([
+       { name: 'trusted', comment: 'Trusted hosts' },
+       { name: 'blocked' },
+     ]);
+
+     const result = await listClusterFirewallIpsets(client, config, {});
+
+     expect(result.isError).toBe(false);
+     expect(result.content[0].text).toContain('Firewall IP Sets');
+     expect(result.content[0].text).toContain('trusted');
+     expect(result.content[0].text).toContain('blocked');
+   });
+ });
+
+ describe('createClusterFirewallIpset', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('requires elevated permissions', async () => {
+     const config = createTestConfig({ allowElevated: false });
+
+     const result = await createClusterFirewallIpset(client, config, { name: 'trusted' });
+
+     expect(result.isError).toBe(true);
+     expect(result.content[0].text).toContain('Permission');
+   });
+
+   it('calls correct API endpoint', async () => {
+     const config = createTestConfig({ allowElevated: true });
+     client.request.mockResolvedValue('OK');
+
+     await createClusterFirewallIpset(client, config, { name: 'trusted', comment: 'Trusted hosts' });
+
+     expect(client.request).toHaveBeenCalledWith('/cluster/firewall/ipset', 'POST', {
+       name: 'trusted',
+       comment: 'Trusted hosts',
+     });
+   });
+ });
+
+ describe('deleteClusterFirewallIpset', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('requires elevated permissions', async () => {
+     const config = createTestConfig({ allowElevated: false });
+
+     const result = await deleteClusterFirewallIpset(client, config, { name: 'trusted' });
+
+     expect(result.isError).toBe(true);
+     expect(result.content[0].text).toContain('Permission');
+   });
+
+   it('calls correct API endpoint', async () => {
+     const config = createTestConfig({ allowElevated: true });
+     client.request.mockResolvedValue('OK');
+
+     await deleteClusterFirewallIpset(client, config, { name: 'trusted' });
+
+     expect(client.request).toHaveBeenCalledWith('/cluster/firewall/ipset/trusted', 'DELETE');
+   });
+ });
+
+ describe('listClusterFirewallIpsetEntries', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('returns formatted IP set entries', async () => {
+     const config = createTestConfig();
+     client.request.mockResolvedValue([
+       { cidr: '192.168.1.0/24', comment: 'Office network' },
+       { cidr: '10.0.0.1', nomatch: true },
+     ]);
+
+     const result = await listClusterFirewallIpsetEntries(client, config, { name: 'trusted' });
+
+     expect(result.isError).toBe(false);
+     expect(result.content[0].text).toContain('IP Set Entries: trusted');
+     expect(result.content[0].text).toContain('192.168.1.0/24');
+     expect(result.content[0].text).toContain('10.0.0.1');
+     expect(result.content[0].text).toContain('nomatch');
+   });
+ });
+
+ describe('addClusterFirewallIpsetEntry', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('requires elevated permissions', async () => {
+     const config = createTestConfig({ allowElevated: false });
+
+     const result = await addClusterFirewallIpsetEntry(client, config, {
+       name: 'trusted',
+       cidr: '192.168.1.0/24',
+     });
+
+     expect(result.isError).toBe(true);
+     expect(result.content[0].text).toContain('Permission');
+   });
+
+   it('calls correct API endpoint', async () => {
+     const config = createTestConfig({ allowElevated: true });
+     client.request.mockResolvedValue('OK');
+
+     await addClusterFirewallIpsetEntry(client, config, {
+       name: 'trusted',
+       cidr: '192.168.1.0/24',
+       comment: 'Office network',
+       nomatch: false,
+     });
+
+     expect(client.request).toHaveBeenCalledWith('/cluster/firewall/ipset/trusted', 'POST', {
+       cidr: '192.168.1.0/24',
+       comment: 'Office network',
+       nomatch: false,
+     });
+   });
+ });
+
+ describe('updateClusterFirewallIpsetEntry', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('requires elevated permissions', async () => {
+     const config = createTestConfig({ allowElevated: false });
+
+     const result = await updateClusterFirewallIpsetEntry(client, config, {
+       name: 'trusted',
+       cidr: '192.168.1.0/24',
+     });
+
+     expect(result.isError).toBe(true);
+     expect(result.content[0].text).toContain('Permission');
+   });
+
+   it('calls correct API endpoint with URL encoding', async () => {
+     const config = createTestConfig({ allowElevated: true });
+     client.request.mockResolvedValue('OK');
+
+     await updateClusterFirewallIpsetEntry(client, config, {
+       name: 'trusted',
+       cidr: '192.168.1.0/24',
+       comment: 'Updated comment',
+     });
+
+     expect(client.request).toHaveBeenCalledWith(
+       '/cluster/firewall/ipset/trusted/192.168.1.0%2F24',
+       'PUT',
+       {
+         comment: 'Updated comment',
+       }
+     );
+   });
+ });
+
+ describe('deleteClusterFirewallIpsetEntry', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('requires elevated permissions', async () => {
+     const config = createTestConfig({ allowElevated: false });
+
+     const result = await deleteClusterFirewallIpsetEntry(client, config, {
+       name: 'trusted',
+       cidr: '192.168.1.0/24',
+     });
+
+     expect(result.isError).toBe(true);
+     expect(result.content[0].text).toContain('Permission');
+   });
+
+   it('calls correct API endpoint with URL encoding', async () => {
+     const config = createTestConfig({ allowElevated: true });
+     client.request.mockResolvedValue('OK');
+
+     await deleteClusterFirewallIpsetEntry(client, config, {
+       name: 'trusted',
+       cidr: '192.168.1.0/24',
+     });
+
+     expect(client.request).toHaveBeenCalledWith(
+       '/cluster/firewall/ipset/trusted/192.168.1.0%2F24',
+       'DELETE'
+     );
    });
  });

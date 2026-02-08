@@ -62,6 +62,13 @@ import {
    createClusterFirewallAliasSchema,
    updateClusterFirewallAliasSchema,
    deleteClusterFirewallAliasSchema,
+   listClusterFirewallIpsetsSchema,
+   createClusterFirewallIpsetSchema,
+   deleteClusterFirewallIpsetSchema,
+   listClusterFirewallIpsetEntriesSchema,
+   addClusterFirewallIpsetEntrySchema,
+   updateClusterFirewallIpsetEntrySchema,
+   deleteClusterFirewallIpsetEntrySchema,
  } from '../schemas/cluster-management.js';
 import type {
   GetHaResourcesInput,
@@ -106,6 +113,13 @@ import type {
    CreateClusterFirewallAliasInput,
    UpdateClusterFirewallAliasInput,
    DeleteClusterFirewallAliasInput,
+   ListClusterFirewallIpsetsInput,
+   CreateClusterFirewallIpsetInput,
+   DeleteClusterFirewallIpsetInput,
+   ListClusterFirewallIpsetEntriesInput,
+   AddClusterFirewallIpsetEntryInput,
+   UpdateClusterFirewallIpsetEntryInput,
+   DeleteClusterFirewallIpsetEntryInput,
  } from '../schemas/cluster-management.js';
 
 /**
@@ -1581,5 +1595,247 @@ export async function deleteClusterFirewallAlias(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Delete Cluster Firewall Alias');
+  }
+}
+
+/**
+ * List cluster firewall IP sets.
+ */
+export async function listClusterFirewallIpsets(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: ListClusterFirewallIpsetsInput
+): Promise<ToolResponse> {
+  try {
+    listClusterFirewallIpsetsSchema.parse(input);
+    const ipsets = (await client.request('/cluster/firewall/ipset')) as Array<{
+      name?: string;
+      comment?: string;
+    }>;
+
+    let output = '📋 **Cluster Firewall IP Sets**\n\n';
+
+    if (!ipsets || ipsets.length === 0) {
+      output += 'No firewall IP sets found.';
+      return formatToolResponse(output);
+    }
+
+    for (const ipset of ipsets) {
+      const name = ipset.name ?? 'unknown';
+      output += `• **${name}**`;
+      if (ipset.comment) output += ` - ${ipset.comment}`;
+      output += '\n';
+    }
+
+    output += `\n**Total**: ${ipsets.length} IP set(s)`;
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'List Cluster Firewall IP Sets');
+  }
+}
+
+/**
+ * Create cluster firewall IP set.
+ */
+export async function createClusterFirewallIpset(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CreateClusterFirewallIpsetInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'create cluster firewall IP set');
+
+    const validated = createClusterFirewallIpsetSchema.parse(input);
+    const safeName = validated.name;
+    const payload: Record<string, unknown> = {
+      name: safeName,
+    };
+
+    if (validated.comment) payload.comment = validated.comment;
+
+    const result = await client.request('/cluster/firewall/ipset', 'POST', payload);
+
+    let output = '✅ **Cluster Firewall IP Set Created**\n\n';
+    output += `• **Name**: ${safeName}\n`;
+    if (validated.comment) output += `• **Comment**: ${validated.comment}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Create Cluster Firewall IP Set');
+  }
+}
+
+/**
+ * Delete cluster firewall IP set.
+ */
+export async function deleteClusterFirewallIpset(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: DeleteClusterFirewallIpsetInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'delete cluster firewall IP set');
+
+    const validated = deleteClusterFirewallIpsetSchema.parse(input);
+    const safeName = validated.name;
+    const result = await client.request(
+      `/cluster/firewall/ipset/${encodeURIComponent(safeName)}`,
+      'DELETE'
+    );
+
+    let output = '🗑️  **Cluster Firewall IP Set Deleted**\n\n';
+    output += `• **Name**: ${safeName}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Delete Cluster Firewall IP Set');
+  }
+}
+
+/**
+ * List cluster firewall IP set entries.
+ */
+export async function listClusterFirewallIpsetEntries(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: ListClusterFirewallIpsetEntriesInput
+): Promise<ToolResponse> {
+  try {
+    const validated = listClusterFirewallIpsetEntriesSchema.parse(input);
+    const safeName = validated.name;
+    const entries = (await client.request(
+      `/cluster/firewall/ipset/${encodeURIComponent(safeName)}`
+    )) as Array<{
+      cidr?: string;
+      comment?: string;
+      nomatch?: boolean;
+    }>;
+
+    let output = `📋 **IP Set Entries: ${safeName}**\n\n`;
+
+    if (!entries || entries.length === 0) {
+      output += 'No entries found.';
+      return formatToolResponse(output);
+    }
+
+    for (const entry of entries) {
+      const cidr = entry.cidr ?? 'unknown';
+      output += `• **${cidr}**`;
+      if (entry.nomatch) output += ' (nomatch)';
+      if (entry.comment) output += ` - ${entry.comment}`;
+      output += '\n';
+    }
+
+    output += `\n**Total**: ${entries.length} entry(ies)`;
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'List Cluster Firewall IP Set Entries');
+  }
+}
+
+/**
+ * Add cluster firewall IP set entry.
+ */
+export async function addClusterFirewallIpsetEntry(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AddClusterFirewallIpsetEntryInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'add cluster firewall IP set entry');
+
+    const validated = addClusterFirewallIpsetEntrySchema.parse(input);
+    const safeName = validated.name;
+    const payload: Record<string, unknown> = {
+      cidr: validated.cidr,
+    };
+
+    if (validated.comment) payload.comment = validated.comment;
+    if (validated.nomatch !== undefined) payload.nomatch = validated.nomatch;
+
+    const result = await client.request(
+      `/cluster/firewall/ipset/${encodeURIComponent(safeName)}`,
+      'POST',
+      payload
+    );
+
+    let output = '✅ **IP Set Entry Added**\n\n';
+    output += `• **IP Set**: ${safeName}\n`;
+    output += `• **CIDR**: ${validated.cidr}\n`;
+    if (validated.nomatch) output += `• **Nomatch**: yes\n`;
+    if (validated.comment) output += `• **Comment**: ${validated.comment}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Add Cluster Firewall IP Set Entry');
+  }
+}
+
+/**
+ * Update cluster firewall IP set entry.
+ */
+export async function updateClusterFirewallIpsetEntry(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: UpdateClusterFirewallIpsetEntryInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'update cluster firewall IP set entry');
+
+    const validated = updateClusterFirewallIpsetEntrySchema.parse(input);
+    const safeName = validated.name;
+    const safeCidr = validated.cidr;
+    const payload: Record<string, unknown> = {};
+
+    if (validated.comment) payload.comment = validated.comment;
+    if (validated.nomatch !== undefined) payload.nomatch = validated.nomatch;
+
+    const result = await client.request(
+      `/cluster/firewall/ipset/${encodeURIComponent(safeName)}/${encodeURIComponent(safeCidr)}`,
+      'PUT',
+      payload
+    );
+
+    let output = '✅ **IP Set Entry Updated**\n\n';
+    output += `• **IP Set**: ${safeName}\n`;
+    output += `• **CIDR**: ${safeCidr}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Update Cluster Firewall IP Set Entry');
+  }
+}
+
+/**
+ * Delete cluster firewall IP set entry.
+ */
+export async function deleteClusterFirewallIpsetEntry(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: DeleteClusterFirewallIpsetEntryInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'delete cluster firewall IP set entry');
+
+    const validated = deleteClusterFirewallIpsetEntrySchema.parse(input);
+    const safeName = validated.name;
+    const safeCidr = validated.cidr;
+    const result = await client.request(
+      `/cluster/firewall/ipset/${encodeURIComponent(safeName)}/${encodeURIComponent(safeCidr)}`,
+      'DELETE'
+    );
+
+    let output = '🗑️  **IP Set Entry Deleted**\n\n';
+    output += `• **IP Set**: ${safeName}\n`;
+    output += `• **CIDR**: ${safeCidr}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Delete Cluster Firewall IP Set Entry');
   }
 }

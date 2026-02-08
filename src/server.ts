@@ -100,6 +100,13 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
    proxmox_create_cluster_firewall_alias: 'Create a cluster firewall alias (requires elevated permissions)',
    proxmox_update_cluster_firewall_alias: 'Update a cluster firewall alias (requires elevated permissions)',
    proxmox_delete_cluster_firewall_alias: 'Delete a cluster firewall alias (requires elevated permissions)',
+   proxmox_list_cluster_firewall_ipsets: 'List cluster firewall IP sets',
+   proxmox_create_cluster_firewall_ipset: 'Create a cluster firewall IP set (requires elevated permissions)',
+   proxmox_delete_cluster_firewall_ipset: 'Delete a cluster firewall IP set (requires elevated permissions)',
+   proxmox_list_cluster_firewall_ipset_entries: 'List entries in a cluster firewall IP set',
+   proxmox_add_cluster_firewall_ipset_entry: 'Add an entry to a cluster firewall IP set (requires elevated permissions)',
+   proxmox_update_cluster_firewall_ipset_entry: 'Update an entry in a cluster firewall IP set (requires elevated permissions)',
+   proxmox_delete_cluster_firewall_ipset_entry: 'Delete an entry from a cluster firewall IP set (requires elevated permissions)',
 
    // SDN
   proxmox_list_sdn_vnets: 'List SDN virtual networks',

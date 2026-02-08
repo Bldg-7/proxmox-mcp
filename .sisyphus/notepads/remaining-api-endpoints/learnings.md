@@ -110,3 +110,78 @@
 - ✅ pnpm build: No errors
 - ✅ pnpm test: 673 tests pass (including 8 new tests)
 - ✅ Tool count: 248 → 253 (5 new tools)
+
+## Task 3: Cluster Firewall IP Sets CRUD (COMPLETED)
+
+### Implementation Pattern
+- **Schemas**: 7 new schemas in cluster-management.ts
+  - `listClusterFirewallIpsetsSchema`: Empty object (no params)
+  - `createClusterFirewallIpsetSchema`: name (required), comment (optional)
+  - `deleteClusterFirewallIpsetSchema`: name parameter
+  - `listClusterFirewallIpsetEntriesSchema`: name parameter (IP set name)
+  - `addClusterFirewallIpsetEntrySchema`: name, cidr (required), comment, nomatch (optional)
+  - `updateClusterFirewallIpsetEntrySchema`: name, cidr (required), comment, nomatch (optional)
+  - `deleteClusterFirewallIpsetEntrySchema`: name, cidr (required)
+
+- **Handlers**: 7 functions in cluster-management.ts
+  - List ipsets: Returns array with name/comment fields
+  - Create ipset: Requires elevated, builds payload from name/comment
+  - Delete ipset: Requires elevated, uses `encodeURIComponent(name)` in URL
+  - List entries: Returns entries for specific IP set using `encodeURIComponent(name)`
+  - Add entry: Requires elevated, uses `encodeURIComponent(name)` in URL, supports nomatch flag
+  - Update entry: Requires elevated, uses **double encoding** for both name and cidr
+  - Delete entry: Requires elevated, uses **double encoding** for both name and cidr
+
+- **Tests**: 12 tests total
+  - 7 success cases (one per tool)
+  - 5 elevated permission denial tests (for create/update/delete operations)
+  - Pattern: Mock client, verify API calls, check output formatting
+
+### Key Learnings
+1. **2-level URL encoding**: IP set entries require encoding BOTH name AND cidr
+   - Pattern: `/cluster/firewall/ipset/${encodeURIComponent(name)}/${encodeURIComponent(cidr)}`
+   - Critical for CIDR notation (e.g., `192.168.1.0/24` → `192.168.1.0%2F24`)
+   - Applied in update and delete entry handlers
+   
+2. **Nested resource pattern**: IP sets have 2 levels
+   - Level 1: IP set itself (name-based CRUD)
+   - Level 2: Entries within IP set (name + cidr based CRUD)
+   - Similar to firewall groups but with additional nesting
+   
+3. **Nomatch flag**: IP set entries support inversion
+   - `nomatch: true` means "exclude this entry" (inverted match)
+   - Optional boolean field in add/update operations
+   - Displayed in list output with "(nomatch)" indicator
+   
+4. **Tool count tracking**: Updated 3 places
+   - registry.ts: Tool count assertion (253→260)
+   - integration tests: Two assertions for tool count (253→260)
+   
+5. **Elevated operations**: 5 tools require elevated permissions
+   - Create IP set, delete IP set
+   - Add entry, update entry, delete entry
+   - Tests verify both permission denial and successful execution
+
+### Files Modified
+- src/schemas/cluster-management.ts: +7 schemas
+- src/tools/cluster-management.ts: +7 handlers
+- src/tools/index.ts: +7 exports
+- src/types/tools.ts: +7 tool names
+- src/server.ts: +7 tool descriptions
+- src/tools/registry.ts: +7 registrations, updated tool count (253→260)
+- src/tools/cluster-management.test.ts: +12 tests
+- src/__tests__/integration/server.test.ts: Updated 2 assertions (253→260)
+
+### Verification
+- ✅ pnpm build: No errors
+- ✅ pnpm test: 685 tests pass (including 12 new tests)
+- ✅ Tool count: 253 → 260 (7 new tools)
+
+### API Endpoints Implemented
+- GET /cluster/firewall/ipset (list IP sets)
+- POST /cluster/firewall/ipset (create IP set)
+- DELETE /cluster/firewall/ipset/{name} (delete IP set)
+- GET /cluster/firewall/ipset/{name} (list entries)
+- POST /cluster/firewall/ipset/{name} (add entry)
+- PUT /cluster/firewall/ipset/{name}/{cidr} (update entry)
+- DELETE /cluster/firewall/ipset/{name}/{cidr} (delete entry)
