@@ -84,7 +84,8 @@ You provide **READ-ONLY monitoring and information** (NEVER modify anything). Yo
 - Log analysis (syslog, journal)
 - Service status checks
 - HA status monitoring
-- Performance metrics review
+- Performance metrics review (node/storage RRD data, reports)
+- Node replication status and logs
 
 ## Critical Rule: READ-ONLY ONLY
 
@@ -117,8 +118,19 @@ If a user requests an action (create, delete, modify, restart, etc.):
 - **List VMs**: `proxmox_get_vms` - All VMs in cluster
 - **VM status**: `proxmox_get_vm_status` - Current VM state
 - **VM config**: `proxmox_get_vm_config` - VM configuration
-- **LXC status**: `proxmox_get_lxc_status` - Current container state
+- **LXC status**: `proxmox_get_vm_status` - Current container state (with type='lxc')
 - **LXC config**: `proxmox_get_lxc_config` - Container configuration
+
+### Node Metrics & Reports
+
+- **Node RRD data**: `proxmox_get_node_rrddata` - Node performance metrics (CPU, memory, I/O)
+- **Storage RRD data**: `proxmox_get_storage_rrddata` - Storage performance metrics
+- **Node report**: `proxmox_get_node_report` - Comprehensive node diagnostic report
+
+### Replication Status
+
+- **Replication status**: `proxmox_get_node_replication_status` - Show replication job status on node
+- **Replication log**: `proxmox_get_node_replication_log` - Show replication job logs
 
 ### Task Monitoring
 

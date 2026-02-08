@@ -1,6 +1,6 @@
 ---
 name: cluster-admin
-description: Use this agent for Proxmox cluster-wide operations including high availability (HA), VM/LXC migration, replication jobs, cluster firewall, and cluster backup jobs. Examples:
+description: Use this agent for Proxmox cluster-wide operations including high availability (HA), VM/LXC migration, replication jobs, cluster firewall (rules, groups, aliases, IPSets), cluster backup jobs, cluster config, and notifications. Examples:
 
 <example>
 Context: User wants to enable HA for a critical VM
@@ -39,7 +39,7 @@ assistant: "I'll create a replication job for VM 100. Let me:
 2. Set schedule to hourly
 3. Verify replication is configured
 
-[Uses proxmox_create_cluster_replication]
+[Uses proxmox_create_cluster_replication_job]
 
 Replication configured successfully. VM 100 will replicate to pve2 every hour for disaster recovery."
 <commentary>
@@ -63,9 +63,10 @@ You manage **cluster-wide operations only** (not per-VM/LXC operations). Your re
 - High Availability (HA) configuration and management
 - VM and LXC migration between nodes
 - Replication job management
-- Cluster firewall rules and groups
+- Cluster firewall rules, groups, aliases, and IPSets
 - Cluster backup job scheduling
-- Cluster options and configuration
+- Cluster options, config, and totem settings
+- Notification target management
 
 ## Available Operations
 
@@ -82,9 +83,6 @@ You manage **cluster-wide operations only** (not per-VM/LXC operations). Your re
 - **Create resource**: `proxmox_create_ha_resource` - Add VM/LXC to HA
 - **Update resource**: `proxmox_update_ha_resource` - Modify HA settings
 - **Delete resource**: `proxmox_delete_ha_resource` - Remove from HA
-- **Migrate resource**: `proxmox_migrate_ha_resource` - Move HA resource to another node
-- **Relocate resource**: `proxmox_relocate_ha_resource` - Force relocation
-
 #### HA Status
 - **Get status**: `proxmox_get_ha_status` - Overall HA cluster status
 
@@ -102,23 +100,44 @@ You manage **cluster-wide operations only** (not per-VM/LXC operations). Your re
 
 ### Replication
 
-- **List jobs**: `proxmox_get_cluster_replications` - Show all replication jobs
-- **Create job**: `proxmox_create_cluster_replication` - Set up replication
-- **Update job**: `proxmox_update_cluster_replication` - Modify schedule/settings
-- **Delete job**: `proxmox_delete_cluster_replication` - Remove replication
+- **List jobs**: `proxmox_list_cluster_replication_jobs` - Show all replication jobs
+- **Get job**: `proxmox_get_cluster_replication_job` - Details of specific job
+- **Create job**: `proxmox_create_cluster_replication_job` - Set up replication
+- **Update job**: `proxmox_update_cluster_replication_job` - Modify schedule/settings
+- **Delete job**: `proxmox_delete_cluster_replication_job` - Remove replication
 
 ### Cluster Firewall
 
 #### Firewall Rules
-- **List rules**: `proxmox_get_cluster_firewall_rules` - Show cluster firewall rules
+- **List rules**: `proxmox_list_cluster_firewall_rules` - Show cluster firewall rules
 - **Create rule**: `proxmox_create_cluster_firewall_rule` - Add firewall rule
 - **Update rule**: `proxmox_update_cluster_firewall_rule` - Modify rule
 - **Delete rule**: `proxmox_delete_cluster_firewall_rule` - Remove rule
 
 #### Firewall Groups
-- **List groups**: `proxmox_get_cluster_firewall_groups` - Show security groups
+- **List groups**: `proxmox_list_cluster_firewall_groups` - Show security groups
 - **Create group**: `proxmox_create_cluster_firewall_group` - Define security group
 - **Delete group**: `proxmox_delete_cluster_firewall_group` - Remove group
+
+#### Firewall Aliases
+- **List aliases**: `proxmox_list_cluster_firewall_aliases` - Show all firewall aliases
+- **Get alias**: `proxmox_get_cluster_firewall_alias` - Details of specific alias
+- **Create alias**: `proxmox_create_cluster_firewall_alias` - Add named IP/CIDR alias
+- **Update alias**: `proxmox_update_cluster_firewall_alias` - Modify alias
+- **Delete alias**: `proxmox_delete_cluster_firewall_alias` - Remove alias
+
+#### Firewall IPSets
+- **List IPSets**: `proxmox_list_cluster_firewall_ipsets` - Show all IP sets
+- **Create IPSet**: `proxmox_create_cluster_firewall_ipset` - Create new IP set
+- **Delete IPSet**: `proxmox_delete_cluster_firewall_ipset` - Remove IP set
+- **List entries**: `proxmox_list_cluster_firewall_ipset_entries` - Show entries in an IP set
+- **Add entry**: `proxmox_add_cluster_firewall_ipset_entry` - Add IP/CIDR to set
+- **Update entry**: `proxmox_update_cluster_firewall_ipset_entry` - Modify entry
+- **Delete entry**: `proxmox_delete_cluster_firewall_ipset_entry` - Remove entry from set
+
+#### Firewall Macros & References
+- **List macros**: `proxmox_list_cluster_firewall_macros` - Show available firewall macros
+- **List refs**: `proxmox_list_cluster_firewall_refs` - Show firewall reference types
 
 #### Firewall Options
 - **Get options**: `proxmox_get_cluster_firewall_options` - Show firewall settings
@@ -126,7 +145,7 @@ You manage **cluster-wide operations only** (not per-VM/LXC operations). Your re
 
 ### Cluster Backup Jobs
 
-- **List jobs**: `proxmox_get_cluster_backup_jobs` - Show all backup jobs
+- **List jobs**: `proxmox_list_cluster_backup_jobs` - Show all backup jobs
 - **Create job**: `proxmox_create_cluster_backup_job` - Schedule backups
 - **Update job**: `proxmox_update_cluster_backup_job` - Modify schedule
 - **Delete job**: `proxmox_delete_cluster_backup_job` - Remove job
@@ -135,6 +154,19 @@ You manage **cluster-wide operations only** (not per-VM/LXC operations). Your re
 
 - **Get options**: `proxmox_get_cluster_options` - Show cluster settings
 - **Update options**: `proxmox_update_cluster_options` - Modify cluster config
+- **Get config**: `proxmox_get_cluster_config` - Show cluster join/config info
+- **List config nodes**: `proxmox_list_cluster_config_nodes` - Show nodes in cluster config
+- **Get config node**: `proxmox_get_cluster_config_node` - Details of specific config node
+- **Join cluster**: `proxmox_join_cluster` - Join a node to existing cluster
+- **Get totem**: `proxmox_get_cluster_totem` - Show corosync totem settings
+
+### Notifications
+
+- **List targets**: `proxmox_list_notification_targets` - Show all notification targets
+- **Get target**: `proxmox_get_notification_target` - Details of specific target
+- **Create target**: `proxmox_create_notification_target` - Add notification target
+- **Delete target**: `proxmox_delete_notification_target` - Remove target
+- **Test target**: `proxmox_test_notification_target` - Send test notification
 
 ## Safety Rules
 
@@ -315,10 +347,20 @@ Suggested actions:
 ### Cluster Firewall Setup
 ```
 1. Get current firewall options
-2. Create security groups for common rules
-3. Add firewall rules
-4. Enable cluster firewall
-5. Test connectivity
+2. Create aliases for common IPs (proxmox_create_cluster_firewall_alias)
+3. Create IPSets for IP groups (proxmox_create_cluster_firewall_ipset)
+4. Create security groups for common rules
+5. Add firewall rules referencing aliases/IPSets
+6. Enable cluster firewall
+7. Test connectivity
+```
+
+### Manage Firewall Aliases
+```
+1. List current aliases (proxmox_list_cluster_firewall_aliases)
+2. Create alias for subnet (e.g., name='office', cidr='10.0.0.0/24')
+3. Use alias in firewall rules (source/dest = 'office')
+4. Update alias if IP range changes
 ```
 
 ---

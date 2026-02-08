@@ -392,6 +392,120 @@
 
 ---
 
+## Certificate Management
+
+### Certificate Installation and Renewal
+
+**Workflow**: View certificates → Install/Order → Verify active
+
+```
+1. View current certificates
+   proxmox_get_node_certificates({node})
+
+2. Install certificate (choose one):
+   Option A: Upload custom certificate
+   proxmox_upload_custom_certificate({node, certificates, key})
+   
+   Option B: Order ACME certificate
+   proxmox_order_acme_certificate({node, domains})
+
+3. Verify new certificate active
+   proxmox_get_node_certificates({node})
+```
+
+---
+
+## ACME Setup
+
+### ACME Provider Configuration and Certificate Ordering
+
+**Workflow**: List providers → Register account → Configure plugins → Order certificate
+
+```
+1. List available ACME providers
+   proxmox_get_acme_directories()
+
+2. Register with ACME provider
+   proxmox_create_acme_account({name, contact, directory})
+
+3. Check available challenge plugins
+   proxmox_list_acme_plugins()
+
+4. Order certificate
+   proxmox_order_acme_certificate({node, domains})
+
+5. Set up renewal
+   proxmox_renew_acme_certificate({node})
+```
+
+---
+
+## Notification Setup
+
+### Notification Target Configuration and Testing
+
+**Workflow**: View targets → Create target → Test delivery
+
+```
+1. View existing notification targets
+   proxmox_list_notification_targets()
+
+2. Create notification target (SMTP/Gotify/Sendmail)
+   proxmox_create_notification_target({name, type, ...config})
+
+3. Verify delivery
+   proxmox_test_notification_target({name})
+```
+
+---
+
+## Firewall Alias/IPSet Management
+
+### Cluster Firewall Aliases and IP Sets
+
+**Workflow**: List aliases → Create alias → Create IP set → Add entries
+
+```
+1. List existing aliases
+   proxmox_list_cluster_firewall_aliases()
+
+2. Create alias
+   proxmox_create_cluster_firewall_alias({name, cidr, comment})
+
+3. List IP sets
+   proxmox_list_cluster_firewall_ipsets()
+
+4. Create IP set
+   proxmox_create_cluster_firewall_ipset({name, comment})
+
+5. Add entries to IP set
+   proxmox_add_cluster_firewall_ipset_entry({name, cidr, comment})
+```
+
+---
+
+## API Token Management
+
+### User API Token Lifecycle
+
+**Workflow**: List tokens → Create token → Verify → Revoke when needed
+
+```
+1. List existing tokens
+   proxmox_list_user_tokens({userid})
+
+2. Create new token with permissions
+   proxmox_create_user_token({userid, tokenid, privsep, expire, comment})
+
+3. Verify token details
+   proxmox_get_user_token({userid, tokenid})
+
+4. Revoke when no longer needed
+   proxmox_delete_user_token({userid, tokenid})
+```
+
+---
+
 ## Key Workflow Patterns
 
 ### Error Handling Pattern

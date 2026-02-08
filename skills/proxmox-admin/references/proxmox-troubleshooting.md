@@ -342,6 +342,48 @@ Interactive console access (VNC/SPICE) is not available via MCP. Use Proxmox UI 
 
 ---
 
+## Certificate Issues
+
+### ACME Certificate Order Fails
+
+**Problem**: ACME certificate order fails or times out
+
+**Common Causes**:
+- DNS not resolving correctly
+- Port 80/443 blocked by firewall
+- ACME rate limits exceeded
+
+**Solution**:
+1. Check DNS resolution for domain
+2. Verify firewall allows HTTP/HTTPS
+3. Use staging ACME directory first for testing
+4. Check ACME account status
+
+**Tools**: `proxmox_order_acme_certificate`, `proxmox_get_node_acme_config`, `proxmox_get_acme_directories`
+
+---
+
+## Notification Delivery Failures
+
+### Test Notification Not Received
+
+**Problem**: Test notification not received or delivery fails
+
+**Common Causes**:
+- SMTP configuration incorrect
+- Gotify URL unreachable
+- Authentication failed
+
+**Solution**:
+1. Verify target configuration
+2. Check network connectivity
+3. Test with `proxmox_test_notification_target`
+4. Review notification target details
+
+**Tools**: `proxmox_get_notification_target`, `proxmox_test_notification_target`
+
+---
+
 ## Getting Help
 
 ### Check Documentation

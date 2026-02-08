@@ -26,6 +26,9 @@ This skill provides AI agents with operational expertise for Proxmox VE, coverin
 - **Storage operations** - Configuration, content management, backup strategies
 - **High Availability** - HA groups, resource management, failover
 - **Cluster operations** - Multi-node management, migration, replication
+- **Certificate management** - Installation, renewal, ACME integration
+- **ACME configuration** - Provider setup, certificate ordering, automation
+- **Notifications** - Target configuration, delivery verification, alerting
 - **Troubleshooting** - Common issues, API quirks, resolution patterns
 - **Security** - Permission models, API token best practices
 - **Performance** - Monitoring, resource optimization

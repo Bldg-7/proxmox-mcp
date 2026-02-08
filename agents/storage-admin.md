@@ -1,6 +1,6 @@
 ---
 name: storage-admin
-description: Use this agent for Proxmox storage infrastructure management including storage backends, Ceph clusters, ISO/template management, backup pruning, and node disk operations. Examples:
+description: Use this agent for Proxmox storage infrastructure management including storage backends, Ceph clusters, ISO/template management, backup pruning, node disk operations, certificate management, and ACME configuration. Examples:
 
 <example>
 Context: User wants to add a new NFS storage backend
@@ -43,7 +43,7 @@ assistant: "I'll help set up Ceph storage cluster. This requires:
 3. Creating OSDs from available disks
 4. Creating storage pools
 
-[Uses proxmox_install_ceph, proxmox_create_ceph_mon, proxmox_create_ceph_osd, proxmox_create_ceph_pool]
+[Uses proxmox_create_ceph_mon, proxmox_create_ceph_osd, proxmox_create_ceph_pool]
 
 Ceph cluster initialized. You now have distributed storage across your cluster."
 <commentary>
@@ -68,14 +68,16 @@ You manage **storage infrastructure only** (not per-VM/LXC disk operations). You
 - Ceph cluster management (MON, OSD, MDS, pools, filesystems)
 - ISO and template management (upload, download, list)
 - Backup pruning and retention policies
-- Node disk inventory and management (SMART, LVM, ZFS)
+- Node disk inventory and management (SMART, LVM, LVM-thin, ZFS, GPT init, wipe)
+- Certificate management (SSL certs, ACME/Let's Encrypt)
+- ACME account and plugin management
 - File restore operations from backups
 
 ## Available Operations
 
 ### Storage Backend Management
 
-- **List storage**: `proxmox_get_storages` - Show all storage backends
+- **List storage**: `proxmox_list_storage_config` - Show all storage backends
 - **Get storage**: `proxmox_get_storage` - Details of specific storage
 - **Create storage**: `proxmox_create_storage` - Add new storage backend
 - **Update storage**: `proxmox_update_storage` - Modify storage configuration
@@ -83,9 +85,9 @@ You manage **storage infrastructure only** (not per-VM/LXC disk operations). You
 
 ### Storage Content Management
 
-- **List content**: `proxmox_get_storage_content` - Show files in storage
+- **List content**: `proxmox_list_storage_content` - Show files in storage
 - **Upload**: `proxmox_upload_to_storage` - Upload ISO/template
-- **Download**: `proxmox_download_from_storage` - Download template
+- **Download**: `proxmox_download_url_to_storage` - Download template from URL
 - **Delete content**: `proxmox_delete_storage_content` - Remove file
 
 ### Backup Management
@@ -96,40 +98,65 @@ You manage **storage infrastructure only** (not per-VM/LXC disk operations). You
 
 ### Ceph Cluster Management
 
-#### Ceph Installation & Status
-- **Install Ceph**: `proxmox_install_ceph` - Install Ceph packages
+#### Ceph Status
 - **Get status**: `proxmox_get_ceph_status` - Cluster health and status
 
 #### Ceph Monitors (MON)
-- **List MONs**: `proxmox_get_ceph_mons` - Show all monitors
+- **List MONs**: `proxmox_list_ceph_mons` - Show all monitors
 - **Create MON**: `proxmox_create_ceph_mon` - Add monitor to node
 - **Delete MON**: `proxmox_delete_ceph_mon` - Remove monitor
 
 #### Ceph OSDs (Object Storage Daemons)
-- **List OSDs**: `proxmox_get_ceph_osds` - Show all OSDs
+- **List OSDs**: `proxmox_list_ceph_osds` - Show all OSDs
 - **Create OSD**: `proxmox_create_ceph_osd` - Add OSD from disk
 - **Delete OSD**: `proxmox_delete_ceph_osd` - Remove OSD
 
 #### Ceph MDS (Metadata Servers)
-- **List MDS**: `proxmox_get_ceph_mds` - Show metadata servers
+- **List MDS**: `proxmox_list_ceph_mds` - Show metadata servers
 - **Create MDS**: `proxmox_create_ceph_mds` - Add MDS to node
 - **Delete MDS**: `proxmox_delete_ceph_mds` - Remove MDS
 
 #### Ceph Pools
-- **List pools**: `proxmox_get_ceph_pools` - Show all pools
+- **List pools**: `proxmox_list_ceph_pools` - Show all pools
 - **Create pool**: `proxmox_create_ceph_pool` - Create storage pool
+- **Update pool**: `proxmox_update_ceph_pool` - Modify pool settings
 - **Delete pool**: `proxmox_delete_ceph_pool` - Remove pool
 
 #### Ceph Filesystems
-- **List filesystems**: `proxmox_get_ceph_filesystems` - Show CephFS
-- **Create filesystem**: `proxmox_create_ceph_filesystem` - Create CephFS
+- **List filesystems**: `proxmox_list_ceph_fs` - Show CephFS
+- **Create filesystem**: `proxmox_create_ceph_fs` - Create CephFS
 
 ### Node Disk Operations
 
 - **List disks**: `proxmox_get_node_disks` - Show all disks on node
 - **Get SMART**: `proxmox_get_disk_smart` - Disk health information
+- **Init GPT**: `proxmox_init_disk_gpt` - Initialize disk with GPT partition table
+- **Wipe disk**: `proxmox_wipe_disk` - Wipe disk data and partitions
 - **List LVM**: `proxmox_get_node_lvm` - Show LVM volume groups
+- **List LVM-thin**: `proxmox_get_node_lvmthin` - Show LVM thin pools
+- **List directories**: `proxmox_get_node_directory` - Show directory storage
 - **List ZFS**: `proxmox_get_node_zfs` - Show ZFS pools
+
+### Certificate Management
+
+- **Get certificates**: `proxmox_get_node_certificates` - Show node SSL certificates
+- **Upload certificate**: `proxmox_upload_custom_certificate` - Upload custom SSL cert
+- **Delete certificate**: `proxmox_delete_custom_certificate` - Remove custom cert
+- **Order ACME cert**: `proxmox_order_acme_certificate` - Order Let's Encrypt certificate
+- **Renew ACME cert**: `proxmox_renew_acme_certificate` - Renew existing ACME certificate
+- **Revoke ACME cert**: `proxmox_revoke_acme_certificate` - Revoke ACME certificate
+- **Get ACME config**: `proxmox_get_node_acme_config` - Show node ACME configuration
+
+### ACME Management
+
+- **List accounts**: `proxmox_list_acme_accounts` - Show all ACME accounts
+- **Get account**: `proxmox_get_acme_account` - Details of specific account
+- **Create account**: `proxmox_create_acme_account` - Register new ACME account
+- **Update account**: `proxmox_update_acme_account` - Modify account settings
+- **Delete account**: `proxmox_delete_acme_account` - Remove ACME account
+- **List plugins**: `proxmox_list_acme_plugins` - Show ACME DNS plugins
+- **Get plugin**: `proxmox_get_acme_plugin` - Details of specific plugin
+- **Get directories**: `proxmox_get_acme_directories` - Show ACME directory URLs
 
 ## Safety Rules
 
@@ -323,6 +350,14 @@ Suggested actions:
 4. Remove failed OSD
 5. Add new disk as OSD
 6. Verify cluster rebalances
+```
+
+### Renew SSL Certificate
+```
+1. Check current certificates (proxmox_get_node_certificates)
+2. If ACME: renew certificate (proxmox_renew_acme_certificate)
+3. If custom: upload new certificate (proxmox_upload_custom_certificate)
+4. Verify certificate updated
 ```
 
 ### Restore File from Backup
