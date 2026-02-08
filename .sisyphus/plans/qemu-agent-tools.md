@@ -53,11 +53,11 @@ Add 6 QEMU Agent MCP tools following the established 230-tool codebase pattern, 
 - All properly typed, validated, and registered
 
 ### Definition of Done
-- [ ] All 6 tools registered and functional
-- [ ] 2 new validators implemented with tests
-- [ ] `pnpm build` succeeds with no errors
-- [ ] `pnpm test` passes (all existing + new tests)
-- [ ] Tool count assertion updated to 236 and doesn't throw
+- [x] All 6 tools registered and functional
+- [x] 2 new validators implemented with tests
+- [x] `pnpm build` succeeds with no errors
+- [x] `pnpm test` passes (all existing + new tests)
+- [x] Tool count assertion updated to 236 and doesn't throw
 
 ### Must Have
 - Zod schemas with `.describe()` on every field
@@ -144,7 +144,7 @@ Wave 4 (After Wave 3):
 
 ## TODOs
 
-- [ ] 1. Add validators — `validateFilePath()` and `validateUsername()` with tests
+- [x] 1. Add validators — `validateFilePath()` and `validateUsername()` with tests
 
   **What to do**:
   Add two new validators to `src/validators/index.ts`:
@@ -296,11 +296,11 @@ Wave 4 (After Wave 3):
   - `src/validators/index.test.ts:1-50` — Test structure pattern
 
   **Acceptance Criteria**:
-  - [ ] File exists: `test -f src/validators/index.ts` (already exists, modified)
-  - [ ] Exports 2 new functions: `validateFilePath`, `validateUsername`
-  - [ ] Tests exist: `grep -c "describe('validateFilePath'" src/validators/index.test.ts` equals 1
-  - [ ] Tests exist: `grep -c "describe('validateUsername'" src/validators/index.test.ts` equals 1
-  - [ ] Tests pass: `bun test src/validators/index.test.ts` exits with code 0
+  - [x] File exists: `test -f src/validators/index.ts` (already exists, modified)
+  - [x] Exports 2 new functions: `validateFilePath`, `validateUsername`
+  - [x] Tests exist: `grep -c "describe('validateFilePath'" src/validators/index.test.ts` equals 1
+  - [x] Tests exist: `grep -c "describe('validateUsername'" src/validators/index.test.ts` equals 1
+  - [x] Tests pass: `bun test src/validators/index.test.ts` exits with code 0
 
   **Agent-Executed QA Scenarios**:
 
@@ -329,7 +329,7 @@ Wave 4 (After Wave 3):
 
 ---
 
-- [ ] 2. Create schemas — Add 6 Zod schemas to `src/schemas/vm-advanced.ts`
+- [x] 2. Create schemas — Add 6 Zod schemas to `src/schemas/vm-advanced.ts`
 
   **What to do**:
   Add 6 new schemas to `src/schemas/vm-advanced.ts` (after existing agent schemas, around line 118):
@@ -397,11 +397,11 @@ Wave 4 (After Wave 3):
   - `docs/proxmox-qemu-agent-endpoints.md:238-245` — shutdown spec
 
   **Acceptance Criteria**:
-  - [ ] File modified: `test -f src/schemas/vm-advanced.ts`
-  - [ ] Exports 6 new schemas: `grep -c "export const agent.*Schema" src/schemas/vm-advanced.ts` increased by 6
-  - [ ] Exports 6 new types: `grep -c "export type Agent.*Input" src/schemas/vm-advanced.ts` increased by 6
-  - [ ] Every field has `.describe()`
-  - [ ] Password field has min(5) and max(1024) constraints
+  - [x] File modified: `test -f src/schemas/vm-advanced.ts`
+  - [x] Exports 6 new schemas: `grep -c "export const agent.*Schema" src/schemas/vm-advanced.ts` increased by 6
+  - [x] Exports 6 new types: `grep -c "export type Agent.*Input" src/schemas/vm-advanced.ts` increased by 6
+  - [x] Every field has `.describe()`
+  - [x] Password field has min(5) and max(1024) constraints
 
   **Agent-Executed QA Scenarios**:
 
@@ -431,7 +431,7 @@ Wave 4 (After Wave 3):
 
 ---
 
-- [ ] 3. Create handlers — Add 6 handler functions to `src/tools/vm-advanced.ts`
+- [x] 3. Create handlers — Add 6 handler functions to `src/tools/vm-advanced.ts`
 
   **What to do**:
   Add 6 new handler functions to `src/tools/vm-advanced.ts` (after existing agent handlers, around line 600):
@@ -729,14 +729,14 @@ Wave 4 (After Wave 3):
   - `src/middleware/index.ts:9-13` — `requireElevated(config: Config, action: string): void`
 
   **Acceptance Criteria**:
-  - [ ] File modified: `test -f src/tools/vm-advanced.ts`
-  - [ ] Exports 6 new functions: `grep -c "export async function agent" src/tools/vm-advanced.ts` increased by 6
-  - [ ] All handlers call `requireElevated` where appropriate (file_read, file_write, set_user_password, shutdown)
-  - [ ] All handlers validate node and vmid
-  - [ ] file_read decodes base64 content
-  - [ ] file_write encodes content and validates size
-  - [ ] set_user_password does NOT log password value
-  - [ ] No `config` usage in read-only handlers except passing to elevated check
+  - [x] File modified: `test -f src/tools/vm-advanced.ts`
+  - [x] Exports 6 new functions: `grep -c "export async function agent" src/tools/vm-advanced.ts` increased by 6
+  - [x] All handlers call `requireElevated` where appropriate (file_read, file_write, set_user_password, shutdown)
+  - [x] All handlers validate node and vmid
+  - [x] file_read decodes base64 content
+  - [x] file_write encodes content and validates size
+  - [x] set_user_password does NOT log password value
+  - [x] No `config` usage in read-only handlers except passing to elevated check
 
   **Agent-Executed QA Scenarios**:
 
@@ -766,7 +766,7 @@ Wave 4 (After Wave 3):
 
 ---
 
-- [ ] 4. Register tools — Modify 3 existing files
+- [x] 4. Register tools — Modify 3 existing files
 
   **What to do**:
 
@@ -860,10 +860,10 @@ Wave 4 (After Wave 3):
   - `src/server.ts:231-240` — Existing agent descriptions
 
   **Acceptance Criteria**:
-  - [ ] `TOOL_NAMES` array has 236 entries: `grep -c "proxmox_" src/types/tools.ts` equals 236
-  - [ ] Registry imports all 6 handlers and schemas: `grep -E "(agentFileRead|agentFileWrite|agentGetHostname|agentGetUsers|agentSetUserPassword|agentShutdown)" src/tools/registry.ts | wc -l` >= 12
-  - [ ] Registry count updated: `grep "236" src/tools/registry.ts`
-  - [ ] Server has 6 descriptions: `grep -c "proxmox_agent_" src/server.ts` increased by 6
+  - [x] `TOOL_NAMES` array has 236 entries: `grep -c "proxmox_" src/types/tools.ts` equals 236
+  - [x] Registry imports all 6 handlers and schemas: `grep -E "(agentFileRead|agentFileWrite|agentGetHostname|agentGetUsers|agentSetUserPassword|agentShutdown)" src/tools/registry.ts | wc -l` >= 12
+  - [x] Registry count updated: `grep "236" src/tools/registry.ts`
+  - [x] Server has 6 descriptions: `grep -c "proxmox_agent_" src/server.ts` increased by 6
 
   **Agent-Executed QA Scenarios**:
 
@@ -893,7 +893,7 @@ Wave 4 (After Wave 3):
 
 ---
 
-- [ ] 5. Add unit tests — Add tests for 6 new handlers
+- [x] 5. Add unit tests — Add tests for 6 new handlers
 
   **What to do**:
   Add unit tests to `src/tools/vm-advanced.test.ts` for all 6 new handlers:
@@ -1153,9 +1153,9 @@ Wave 4 (After Wave 3):
   - `src/tools/vm-advanced.test.ts:100-200` — Mock setup pattern
 
   **Acceptance Criteria**:
-  - [ ] Tests added: `grep -c "describe('agent" src/tools/vm-advanced.test.ts` increased by 6
-  - [ ] Tests pass: `bun test src/tools/vm-advanced.test.ts` exits with code 0
-  - [ ] All elevated operations have permission tests
+  - [x] Tests added: `grep -c "describe('agent" src/tools/vm-advanced.test.ts` increased by 6
+  - [x] Tests pass: `bun test src/tools/vm-advanced.test.ts` exits with code 0
+  - [x] All elevated operations have permission tests
 
   **Agent-Executed QA Scenarios**:
 
@@ -1175,7 +1175,7 @@ Wave 4 (After Wave 3):
 
 ---
 
-- [ ] 6. Build, verify, and commit
+- [x] 6. Build, verify, and commit
 
   **What to do**:
   1. Run `pnpm build` — must succeed with no errors
@@ -1203,10 +1203,10 @@ Wave 4 (After Wave 3):
   - `package.json` — Build/test scripts
 
   **Acceptance Criteria**:
-  - [ ] `pnpm build` exits with code 0
-  - [ ] `pnpm test` exits with code 0 (all tests pass)
-  - [ ] Commit exists with message: `feat: add qemu agent tools (file ops, user mgmt, shutdown)`
-  - [ ] Commit includes exactly these files:
+  - [x] `pnpm build` exits with code 0
+  - [x] `pnpm test` exits with code 0 (all tests pass)
+  - [x] Commit exists with message: `feat: add qemu agent tools (file ops, user mgmt, shutdown)`
+  - [x] Commit includes exactly these files:
     - `src/validators/index.ts` (modified)
     - `src/validators/index.test.ts` (modified)
     - `src/schemas/vm-advanced.ts` (modified)
@@ -1215,7 +1215,7 @@ Wave 4 (After Wave 3):
     - `src/tools/registry.ts` (modified)
     - `src/server.ts` (modified)
     - `src/tools/vm-advanced.test.ts` (modified)
-  - [ ] Working directory clean after commit: `git status --porcelain` is empty
+  - [x] Working directory clean after commit: `git status --porcelain` is empty
 
   **Agent-Executed QA Scenarios**:
 
@@ -1306,14 +1306,14 @@ git status --porcelain  # Expected: empty after commit
 ```
 
 ### Final Checklist
-- [ ] `src/validators/index.ts` modified with 2 new validators
-- [ ] `src/validators/index.test.ts` modified with tests for 2 validators
-- [ ] `src/schemas/vm-advanced.ts` modified with 6 new schemas
-- [ ] `src/tools/vm-advanced.ts` modified with 6 new handlers
-- [ ] `src/types/tools.ts` has 6 new tool names (total: 236)
-- [ ] `src/tools/registry.ts` has 6 new entries, count updated to 236
-- [ ] `src/server.ts` has 6 new tool descriptions
-- [ ] `src/tools/vm-advanced.test.ts` modified with tests for 6 handlers
-- [ ] `pnpm build` succeeds
-- [ ] `pnpm test` passes
-- [ ] Single commit with all 8 files
+- [x] `src/validators/index.ts` modified with 2 new validators
+- [x] `src/validators/index.test.ts` modified with tests for 2 validators
+- [x] `src/schemas/vm-advanced.ts` modified with 6 new schemas
+- [x] `src/tools/vm-advanced.ts` modified with 6 new handlers
+- [x] `src/types/tools.ts` has 6 new tool names (total: 236)
+- [x] `src/tools/registry.ts` has 6 new entries, count updated to 236
+- [x] `src/server.ts` has 6 new tool descriptions
+- [x] `src/tools/vm-advanced.test.ts` modified with tests for 6 handlers
+- [x] `pnpm build` succeeds
+- [x] `pnpm test` passes
+- [x] Single commit with all 8 files

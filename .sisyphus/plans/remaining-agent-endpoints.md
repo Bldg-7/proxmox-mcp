@@ -53,10 +53,10 @@ Add the final 8 QEMU Guest Agent endpoints to complete agent API coverage.
 - Changeset: `.changeset/remaining-agent-tools.md`
 
 ### Definition of Done
-- [ ] `pnpm build` succeeds
-- [ ] `pnpm test` passes (all existing + 14 new tests)
-- [ ] Tool count assertion updated and passes (244)
-- [ ] Changeset file exists
+- [x] `pnpm build` succeeds
+- [x] `pnpm test` passes (all existing + 14 new tests)
+- [x] Tool count assertion updated and passes (244)
+- [x] Changeset file exists
 
 ### Must Have
 - All 8 endpoints implemented
@@ -149,7 +149,7 @@ Task 9: Create changeset + commit
 
 ## TODOs
 
-- [ ] 1. Add 8 Zod Schemas
+- [x] 1. Add 8 Zod Schemas
 
   **What to do**:
   - Add 8 schema definitions to `src/schemas/vm-advanced.ts`
@@ -199,15 +199,15 @@ Task 9: Create changeset + commit
   - `src/schemas/vm-advanced.ts:3-6` — `baseVmSchema` definition
 
   **Acceptance Criteria**:
-  - [ ] 8 schemas exported from `src/schemas/vm-advanced.ts`
-  - [ ] 8 corresponding TypeScript types exported
-  - [ ] All schemas use `baseVmSchema` (node + vmid only)
+  - [x] 8 schemas exported from `src/schemas/vm-advanced.ts`
+  - [x] 8 corresponding TypeScript types exported
+  - [x] All schemas use `baseVmSchema` (node + vmid only)
 
   **Commit**: NO (groups with Task 9)
 
 ---
 
-- [ ] 2. Add 8 Handler Functions
+- [x] 2. Add 8 Handler Functions
 
   **What to do**:
   - Add 8 handler functions to `src/tools/vm-advanced.ts`
@@ -294,17 +294,17 @@ Task 9: Create changeset + commit
   - `docs/proxmox-qemu-agent-endpoints.md` — Full API endpoint reference with response shapes
 
   **Acceptance Criteria**:
-  - [ ] 8 handler functions exported from `src/tools/vm-advanced.ts`
-  - [ ] 6 handlers call `requireElevated()` (freeze, thaw, fstrim, suspend-*)
-  - [ ] 2 handlers do NOT call `requireElevated()` (fsfreeze-status, get-memory-block-info)
-  - [ ] All handlers use `validateNodeName()` and `validateVMID()`
-  - [ ] All handlers use `formatToolResponse()` and `formatErrorResponse()`
+  - [x] 8 handler functions exported from `src/tools/vm-advanced.ts`
+  - [x] 6 handlers call `requireElevated()` (freeze, thaw, fstrim, suspend-*)
+  - [x] 2 handlers do NOT call `requireElevated()` (fsfreeze-status, get-memory-block-info)
+  - [x] All handlers use `validateNodeName()` and `validateVMID()`
+  - [x] All handlers use `formatToolResponse()` and `formatErrorResponse()`
 
   **Commit**: NO (groups with Task 9)
 
 ---
 
-- [ ] 3. Export Handlers from tools/index.ts
+- [x] 3. Export Handlers from tools/index.ts
 
   **What to do**:
   - Add 8 new handler exports to `src/tools/index.ts`
@@ -337,13 +337,13 @@ Task 9: Create changeset + commit
   - `src/tools/index.ts` — Find the existing vm-advanced export block with agent handlers. Add new exports alongside existing ones like `agentShutdown`, `agentFileRead`, etc.
 
   **Acceptance Criteria**:
-  - [ ] All 8 new handlers exported from `src/tools/index.ts`
+  - [x] All 8 new handlers exported from `src/tools/index.ts`
 
   **Commit**: NO (groups with Task 9)
 
 ---
 
-- [ ] 4. Add Tool Names to types/tools.ts
+- [x] 4. Add Tool Names to types/tools.ts
 
   **What to do**:
   - Add 8 tool name strings to `TOOL_NAMES` array in `src/types/tools.ts`
@@ -373,14 +373,14 @@ Task 9: Create changeset + commit
   - `src/types/tools.ts:1-239` — `TOOL_NAMES` array. Find where existing `proxmox_agent_*` names end and add after them.
 
   **Acceptance Criteria**:
-  - [ ] 8 new tool names in `TOOL_NAMES` array
-  - [ ] Array order: after existing agent tool names
+  - [x] 8 new tool names in `TOOL_NAMES` array
+  - [x] Array order: after existing agent tool names
 
   **Commit**: NO (groups with Task 9)
 
 ---
 
-- [ ] 5. Add Tool Descriptions to server.ts
+- [x] 5. Add Tool Descriptions to server.ts
 
   **What to do**:
   - Add 8 description entries to `TOOL_DESCRIPTIONS` in `src/server.ts`
@@ -411,15 +411,15 @@ Task 9: Create changeset + commit
   - `src/server.ts:16-312` — `TOOL_DESCRIPTIONS` record. Find existing `proxmox_agent_*` descriptions and add after them.
 
   **Acceptance Criteria**:
-  - [ ] 8 new descriptions in `TOOL_DESCRIPTIONS`
-  - [ ] 6 include "(requires elevated permissions)"
-  - [ ] 2 do NOT include elevated text (fsfreeze-status, get-memory-block-info)
+  - [x] 8 new descriptions in `TOOL_DESCRIPTIONS`
+  - [x] 6 include "(requires elevated permissions)"
+  - [x] 2 do NOT include elevated text (fsfreeze-status, get-memory-block-info)
 
   **Commit**: NO (groups with Task 9)
 
 ---
 
-- [ ] 6. Register in Registry + Update Count
+- [x] 6. Register in Registry + Update Count
 
   **What to do**:
   - Add 8 import lines for handlers (from `./index.js`) in `src/tools/registry.ts`
@@ -461,16 +461,16 @@ Task 9: Create changeset + commit
   - `src/tools/registry.ts:975-981` — Tool count assertion to update
 
   **Acceptance Criteria**:
-  - [ ] 8 new handler imports added
-  - [ ] 8 new schema imports added
-  - [ ] 8 new registry entries added
-  - [ ] Count assertion: `registeredCount !== 244`
+  - [x] 8 new handler imports added
+  - [x] 8 new schema imports added
+  - [x] 8 new registry entries added
+  - [x] Count assertion: `registeredCount !== 244`
 
   **Commit**: NO (groups with Task 9)
 
 ---
 
-- [ ] 7. Add Tests
+- [x] 7. Add Tests
 
   **What to do**:
   - Add tests to `src/tools/vm-advanced.test.ts`
@@ -547,15 +547,15 @@ Task 9: Create changeset + commit
   - `src/tools/vm-advanced.test.ts:1-20` — Test file imports and setup
 
   **Acceptance Criteria**:
-  - [ ] 8 success case tests (one per tool)
-  - [ ] 6 elevated permission tests
-  - [ ] All tests pass: `pnpm test`
+  - [x] 8 success case tests (one per tool)
+  - [x] 6 elevated permission tests
+  - [x] All tests pass: `pnpm test`
 
   **Commit**: NO (groups with Task 9)
 
 ---
 
-- [ ] 8. Build + Test Verification
+- [x] 8. Build + Test Verification
 
   **What to do**:
   - Run full build and test suite
@@ -572,16 +572,16 @@ Task 9: Create changeset + commit
   - **Skills**: []
 
   **Acceptance Criteria**:
-  - [ ] `pnpm build` exits with code 0
-  - [ ] `pnpm test` exits with code 0
-  - [ ] No TypeScript errors
-  - [ ] Tool registry validates 244 tools
+  - [x] `pnpm build` exits with code 0
+  - [x] `pnpm test` exits with code 0
+  - [x] No TypeScript errors
+  - [x] Tool registry validates 244 tools
 
   **Commit**: NO (groups with Task 9)
 
 ---
 
-- [ ] 9. Create Changeset + Commit
+- [x] 9. Create Changeset + Commit
 
   **What to do**:
   - Create changeset file `.changeset/remaining-agent-tools.md`
@@ -616,10 +616,10 @@ Task 9: Create changeset + commit
   - **Skills**: [`git-master`]
 
   **Acceptance Criteria**:
-  - [ ] Changeset file exists at `.changeset/remaining-agent-tools.md`
-  - [ ] Contains `"@bldg-7/proxmox-mcp": minor`
-  - [ ] All files committed
-  - [ ] Commit message follows conventional commits format
+  - [x] Changeset file exists at `.changeset/remaining-agent-tools.md`
+  - [x] Contains `"@bldg-7/proxmox-mcp": minor`
+  - [x] All files committed
+  - [x] Commit message follows conventional commits format
 
   **Commit**: YES
   - Message: `feat(agent): add remaining qemu agent tools (fsfreeze, fstrim, suspend, memory-block-info)`
@@ -645,10 +645,10 @@ pnpm test      # Expected: exit 0, all tests pass
 ```
 
 ### Final Checklist
-- [ ] 8 new tools implemented (244 total)
-- [ ] 6 tools require elevated permissions
-- [ ] 2 tools are read-only
-- [ ] 14+ new tests pass
-- [ ] Build succeeds
-- [ ] Changeset created
-- [ ] Single commit with conventional message
+- [x] 8 new tools implemented (244 total)
+- [x] 6 tools require elevated permissions
+- [x] 2 tools are read-only
+- [x] 14+ new tests pass
+- [x] Build succeeds
+- [x] Changeset created
+- [x] Single commit with conventional message

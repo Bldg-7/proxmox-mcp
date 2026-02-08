@@ -44,10 +44,10 @@ Add 3 Cloud-Init MCP tools following the established 227-tool codebase pattern, 
 - All properly typed, validated, and registered
 
 ### Definition of Done
-- [ ] All 3 tools registered and functional
-- [ ] `pnpm build` succeeds with no errors
-- [ ] `pnpm test` passes
-- [ ] Tool count assertion updated to 230 and doesn't throw
+- [x] All 3 tools registered and functional
+- [x] `pnpm build` succeeds with no errors
+- [x] `pnpm test` passes
+- [x] Tool count assertion updated to 230 and doesn't throw
 
 ### Must Have
 - Zod schemas with `.describe()` on every field
@@ -120,7 +120,7 @@ Wave 3 (After Wave 2):
 
 ## TODOs
 
-- [ ] 1. Create `src/schemas/cloud-init.ts` — Zod schemas for 3 tools
+- [x] 1. Create `src/schemas/cloud-init.ts` — Zod schemas for 3 tools
 
   **What to do**:
   Create the schema file with these exact schemas:
@@ -175,11 +175,11 @@ Wave 3 (After Wave 2):
   - Proxmox API: `PUT /nodes/{node}/qemu/{vmid}/cloudinit` — no params beyond node/vmid
 
   **Acceptance Criteria**:
-  - [ ] File exists: `test -f src/schemas/cloud-init.ts`
-  - [ ] Exports 3 schemas: `getCloudInitConfigSchema`, `dumpCloudInitSchema`, `regenerateCloudInitSchema`
-  - [ ] Exports 3 types: `GetCloudInitConfigInput`, `DumpCloudInitInput`, `RegenerateCloudInitInput`
-  - [ ] `dumpCloudInitSchema` has `type` field with `z.enum(['user', 'network', 'meta'])`
-  - [ ] Every field has `.describe()`
+  - [x] File exists: `test -f src/schemas/cloud-init.ts`
+  - [x] Exports 3 schemas: `getCloudInitConfigSchema`, `dumpCloudInitSchema`, `regenerateCloudInitSchema`
+  - [x] Exports 3 types: `GetCloudInitConfigInput`, `DumpCloudInitInput`, `RegenerateCloudInitInput`
+  - [x] `dumpCloudInitSchema` has `type` field with `z.enum(['user', 'network', 'meta'])`
+  - [x] Every field has `.describe()`
 
   **Agent-Executed QA Scenarios**:
 
@@ -211,7 +211,7 @@ Wave 3 (After Wave 2):
 
 ---
 
-- [ ] 2. Create `src/tools/cloud-init.ts` — Handler functions for 3 tools
+- [x] 2. Create `src/tools/cloud-init.ts` — Handler functions for 3 tools
 
   **What to do**:
   Create the handler file with 3 functions following the exact pattern from `vm-advanced.ts`:
@@ -369,12 +369,12 @@ Wave 3 (After Wave 2):
   - **Solution**: Build the URL directly: `` `/nodes/${safeNode}/qemu/${safeVmid}/cloudinit/dump?type=${input.type}` ``
 
   **Acceptance Criteria**:
-  - [ ] File exists: `test -f src/tools/cloud-init.ts`
-  - [ ] Exports 3 functions: `getCloudInitConfig`, `dumpCloudInit`, `regenerateCloudInit`
-  - [ ] `regenerateCloudInit` calls `requireElevated`
-  - [ ] All handlers validate node and vmid
-  - [ ] Dump handler uses query string (NOT body) for type parameter
-  - [ ] No `config` usage in read-only handlers except passing to elevated check
+  - [x] File exists: `test -f src/tools/cloud-init.ts`
+  - [x] Exports 3 functions: `getCloudInitConfig`, `dumpCloudInit`, `regenerateCloudInit`
+  - [x] `regenerateCloudInit` calls `requireElevated`
+  - [x] All handlers validate node and vmid
+  - [x] Dump handler uses query string (NOT body) for type parameter
+  - [x] No `config` usage in read-only handlers except passing to elevated check
 
   **Agent-Executed QA Scenarios**:
 
@@ -408,7 +408,7 @@ Wave 3 (After Wave 2):
 
 ---
 
-- [ ] 3. Register tools — Modify 5 existing files
+- [x] 3. Register tools — Modify 5 existing files
 
   **What to do**:
 
@@ -517,12 +517,12 @@ Wave 3 (After Wave 2):
   - `src/server.ts:16-301` — TOOL_DESCRIPTIONS record (add before closing `}`)
 
   **Acceptance Criteria**:
-  - [ ] `TOOL_NAMES` array has 230 entries: `grep -c "proxmox_" src/types/tools.ts` equals 230
-  - [ ] `src/schemas/index.ts` exports cloud-init: `grep "cloud-init" src/schemas/index.ts`
-  - [ ] `src/tools/index.ts` exports cloud-init handlers: `grep "cloud-init" src/tools/index.ts`
-  - [ ] Registry imports all 3 handlers and schemas: `grep "CloudInit\|cloudinit\|cloud-init" src/tools/registry.ts | wc -l` >= 6
-  - [ ] Registry count updated: `grep "230" src/tools/registry.ts`
-  - [ ] Server has 3 descriptions: `grep "cloudinit" src/server.ts | wc -l` equals 3
+  - [x] `TOOL_NAMES` array has 230 entries: `grep -c "proxmox_" src/types/tools.ts` equals 230
+  - [x] `src/schemas/index.ts` exports cloud-init: `grep "cloud-init" src/schemas/index.ts`
+  - [x] `src/tools/index.ts` exports cloud-init handlers: `grep "cloud-init" src/tools/index.ts`
+  - [x] Registry imports all 3 handlers and schemas: `grep "CloudInit\|cloudinit\|cloud-init" src/tools/registry.ts | wc -l` >= 6
+  - [x] Registry count updated: `grep "230" src/tools/registry.ts`
+  - [x] Server has 3 descriptions: `grep "cloudinit" src/server.ts | wc -l` equals 3
 
   **Agent-Executed QA Scenarios**:
 
@@ -565,7 +565,7 @@ Wave 3 (After Wave 2):
 
 ---
 
-- [ ] 4. Build, verify, and commit
+- [x] 4. Build, verify, and commit
 
   **What to do**:
   1. Run `pnpm build` — must succeed with no errors
@@ -593,10 +593,10 @@ Wave 3 (After Wave 2):
   - `package.json` — Build/test scripts (`pnpm build`, `pnpm test`)
 
   **Acceptance Criteria**:
-  - [ ] `pnpm build` exits with code 0
-  - [ ] `pnpm test` exits with code 0 (all tests pass)
-  - [ ] Commit exists with message: `feat: add cloud-init tools (get config, dump, regenerate)`
-  - [ ] Commit includes exactly these files:
+  - [x] `pnpm build` exits with code 0
+  - [x] `pnpm test` exits with code 0 (all tests pass)
+  - [x] Commit exists with message: `feat: add cloud-init tools (get config, dump, regenerate)`
+  - [x] Commit includes exactly these files:
     - `src/schemas/cloud-init.ts` (new)
     - `src/tools/cloud-init.ts` (new)
     - `src/types/tools.ts` (modified)
@@ -604,7 +604,7 @@ Wave 3 (After Wave 2):
     - `src/tools/index.ts` (modified)
     - `src/schemas/index.ts` (modified)
     - `src/server.ts` (modified)
-  - [ ] Working directory clean after commit: `git status --porcelain` is empty
+  - [x] Working directory clean after commit: `git status --porcelain` is empty
 
   **Agent-Executed QA Scenarios**:
 
@@ -691,13 +691,13 @@ git status --porcelain  # Expected: empty after commit
 ```
 
 ### Final Checklist
-- [ ] `src/schemas/cloud-init.ts` created with 3 schemas
-- [ ] `src/tools/cloud-init.ts` created with 3 handlers
-- [ ] `src/types/tools.ts` has 3 new tool names (total: 230)
-- [ ] `src/tools/registry.ts` has 3 new entries, count updated to 230
-- [ ] `src/tools/index.ts` re-exports cloud-init handlers
-- [ ] `src/schemas/index.ts` re-exports cloud-init schemas
-- [ ] `src/server.ts` has 3 new tool descriptions
-- [ ] `pnpm build` succeeds
-- [ ] `pnpm test` passes
-- [ ] Single commit with all 7 files
+- [x] `src/schemas/cloud-init.ts` created with 3 schemas
+- [x] `src/tools/cloud-init.ts` created with 3 handlers
+- [x] `src/types/tools.ts` has 3 new tool names (total: 230)
+- [x] `src/tools/registry.ts` has 3 new entries, count updated to 230
+- [x] `src/tools/index.ts` re-exports cloud-init handlers
+- [x] `src/schemas/index.ts` re-exports cloud-init schemas
+- [x] `src/server.ts` has 3 new tool descriptions
+- [x] `pnpm build` succeeds
+- [x] `pnpm test` passes
+- [x] Single commit with all 7 files
