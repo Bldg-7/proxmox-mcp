@@ -86,7 +86,7 @@ export const createLxcSchema = z.object({
   vmid: z.coerce.number().describe('Container ID number (must be unique, or use proxmox_get_next_vmid)'),
   ostemplate: z.string().min(1).describe('OS template (e.g., local:vztmpl/debian-12-standard_12.2-1_amd64.tar.gz)'),
   hostname: z.string().min(1).optional().describe('Container hostname'),
-  password: z.string().min(1).optional().describe('Root password'),
+  password: z.string().min(5).optional().describe('Root password (minimum 5 characters)'),
   memory: z.number().default(512).describe('RAM in MB'),
   storage: z.string().default('local-lvm').describe('Storage location'),
   rootfs: z.string().default('8').describe('Root filesystem size in GB'),
