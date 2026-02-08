@@ -1,5 +1,189 @@
 # @bldg-7/proxmox-mcp
 
+## 0.6.0
+
+### Minor Changes
+
+- 7f326b3: Add ACME account, plugin, and directory management tools
+
+  - Add `proxmox_list_acme_accounts` - List ACME accounts
+  - Add `proxmox_get_acme_account` - Get ACME account details
+  - Add `proxmox_create_acme_account` - Create ACME account (elevated, contact redacted)
+  - Add `proxmox_update_acme_account` - Update ACME account (elevated, contact redacted)
+  - Add `proxmox_delete_acme_account` - Delete ACME account (elevated)
+  - Add `proxmox_list_acme_plugins` - List ACME DNS plugins
+  - Add `proxmox_get_acme_plugin` - Get ACME plugin details
+  - Add `proxmox_get_acme_directories` - Get ACME CA directories
+
+  New domain files created:
+
+  - src/tools/acme.ts
+  - src/schemas/acme.ts
+  - src/tools/acme.test.ts
+
+  Tool count: 294 → 302
+  Tests: 767 → 791 (+24)
+
+- 2bcc06e: Add advanced disk operation tools for GPT initialization, disk wiping, LVM thin pools, and directory management
+
+  - Add `proxmox_init_disk_gpt` - Initialize disk with GPT partition table
+  - Add `proxmox_wipe_disk` - Wipe disk signatures
+  - Add `proxmox_get_node_lvmthin` - List LVM thin pools on node
+  - Add `proxmox_get_node_directory` - List directory storage on node
+
+  Tool count: 278 → 282
+  Tests: 734 → 740 (+6)
+
+- d754430: Add user API token CRUD tools
+
+  Implements 5 new tools for user API token management:
+
+  - `proxmox_list_user_tokens` - List all API tokens for a user
+  - `proxmox_get_user_token` - Get specific token info
+  - `proxmox_create_user_token` - Create new API token (elevated, displays one-time value)
+  - `proxmox_update_user_token` - Update token metadata (elevated)
+  - `proxmox_delete_user_token` - Delete API token (elevated)
+
+  Tool count: 260 → 265
+
+- ab46a2f: Add node certificate and ACME certificate management tools
+
+  - Add `proxmox_get_node_certificates` - Get node SSL certificate information
+  - Add `proxmox_upload_custom_certificate` - Upload custom SSL certificate (elevated)
+  - Add `proxmox_delete_custom_certificate` - Delete custom SSL certificate (elevated)
+  - Add `proxmox_order_acme_certificate` - Order ACME/Let's Encrypt certificate (elevated)
+  - Add `proxmox_renew_acme_certificate` - Renew ACME certificate (elevated)
+  - Add `proxmox_revoke_acme_certificate` - Revoke ACME certificate (elevated)
+  - Add `proxmox_get_node_acme_config` - Get node ACME configuration
+
+  New domain files created:
+
+  - src/tools/certificate.ts
+  - src/schemas/certificate.ts
+  - src/tools/certificate.test.ts
+
+  Tool count: 287 → 294
+  Tests: 746 → 767 (+21)
+
+- 42be7a3: Add cluster configuration management tools
+
+  - Add `proxmox_get_cluster_config` - Get cluster configuration
+  - Add `proxmox_list_cluster_config_nodes` - List cluster nodes
+  - Add `proxmox_get_cluster_config_node` - Get specific node configuration
+  - Add `proxmox_join_cluster` - Join node to cluster (elevated, password redacted)
+  - Add `proxmox_get_cluster_totem` - Get totem configuration
+
+  Tool count: 282 → 287
+  Tests: 740 → 746 (+6)
+
+- 120c9a7: Add VM and LXC feature check tools
+
+  Implements 2 new tools for checking feature availability:
+
+  - `proxmox_check_vm_feature` - Check if feature is available for QEMU VMs
+  - `proxmox_check_lxc_feature` - Check if feature is available for LXC containers
+
+  Features: snapshot, clone, copy
+
+  Tool count: 276 → 278
+
+- 61ea8eb: Add cluster firewall alias CRUD tools
+
+  Implements 5 new tools for cluster firewall alias management:
+
+  - `proxmox_list_cluster_firewall_aliases` - List all cluster firewall aliases
+  - `proxmox_get_cluster_firewall_alias` - Get specific alias by name
+  - `proxmox_create_cluster_firewall_alias` - Create new alias (elevated)
+  - `proxmox_update_cluster_firewall_alias` - Update alias CIDR/comment/rename (elevated)
+  - `proxmox_delete_cluster_firewall_alias` - Delete alias (elevated)
+
+  Tool count: 248 → 253
+
+- bec651a: Add cluster firewall IP set and entry CRUD tools
+
+  Implements 7 new tools for cluster firewall IP set management:
+
+  - `proxmox_list_cluster_firewall_ipsets` - List all IP sets
+  - `proxmox_create_cluster_firewall_ipset` - Create IP set (elevated)
+  - `proxmox_delete_cluster_firewall_ipset` - Delete IP set (elevated)
+  - `proxmox_list_cluster_firewall_ipset_entries` - List entries in an IP set
+  - `proxmox_add_cluster_firewall_ipset_entry` - Add entry to IP set (elevated)
+  - `proxmox_update_cluster_firewall_ipset_entry` - Update entry (elevated)
+  - `proxmox_delete_cluster_firewall_ipset_entry` - Delete entry (elevated)
+
+  Tool count: 253 → 260
+
+- eb6dc8f: Add cluster firewall options, macros, and refs tools
+
+  Implements 4 new tools for cluster-level firewall management:
+
+  - `proxmox_get_cluster_firewall_options` - Get cluster firewall options
+  - `proxmox_update_cluster_firewall_options` - Update cluster firewall options (elevated)
+  - `proxmox_list_cluster_firewall_macros` - List available firewall macros
+  - `proxmox_list_cluster_firewall_refs` - List firewall references (aliases/ipsets)
+
+  Tool count: 244 → 248
+
+- a9e7d6b: Add node and storage RRD metrics tools
+
+  Implements 3 new tools for node metrics and diagnostics:
+
+  - `proxmox_get_node_rrddata` - Get node RRD performance metrics
+  - `proxmox_get_storage_rrddata` - Get storage RRD performance metrics
+  - `proxmox_get_node_report` - Get node diagnostic report
+
+  Tool count: 268 → 271
+
+- 85ccf97: Add node power management tools (shutdown, reboot, wake-on-lan)
+
+  Implements 3 new tools for node power management:
+
+  - `proxmox_node_shutdown` - Shut down a node (elevated)
+  - `proxmox_node_reboot` - Reboot a node (elevated)
+  - `proxmox_node_wakeonlan` - Wake a node via WOL (elevated)
+
+  Tool count: 265 → 268
+
+- 5da79b8: Add node replication status, log, and schedule tools
+
+  Implements 3 new tools for node replication management:
+
+  - `proxmox_get_node_replication_status` - Get replication job status
+  - `proxmox_get_node_replication_log` - Get replication job log
+  - `proxmox_schedule_node_replication` - Trigger immediate replication (elevated)
+
+  Tool count: 271 → 274
+
+- c4a2889: Add notification target CRUD and test tools
+
+  - Add `proxmox_list_notification_targets` - List all notification targets
+  - Add `proxmox_get_notification_target` - Get notification target configuration
+  - Add `proxmox_create_notification_target` - Create notification target (elevated)
+  - Add `proxmox_delete_notification_target` - Delete notification target (elevated)
+  - Add `proxmox_test_notification_target` - Test notification target (elevated)
+
+  Supports SMTP, Gotify, and Sendmail notification types with type discriminator.
+
+  New domain files created:
+
+  - src/tools/notifications.ts
+  - src/schemas/notifications.ts
+  - src/tools/notifications.test.ts
+
+  Tool count: 302 → 307 (FINAL TARGET REACHED!)
+  Tests: 791 → 808 (+17)
+
+  This completes the remaining-api-endpoints implementation plan.
+
+- bc156b1: Add VM and LXC pending changes tools
+
+  Implements 2 new tools for viewing pending configuration changes:
+
+  - `proxmox_get_vm_pending` - Get pending changes for QEMU VMs
+  - `proxmox_get_lxc_pending` - Get pending changes for LXC containers
+
+  Tool count: 274 → 276
+
 ## 0.5.0
 
 ### Minor Changes
