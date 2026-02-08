@@ -2,8 +2,8 @@
 
 > Users, groups, roles, ACLs, and authentication domains.
 
-**Tools in this file:** 20  
-**Generated:** 2026-02-06T10:53:57.669Z
+**Tools in this file:** 25  
+**Generated:** 2026-02-08T04:04:42.008Z
 
 ---
 
@@ -91,6 +91,24 @@
 
 ---
 
+#### `proxmox_create_user_token`
+
+**Description:** Create a new API token for a user (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., root@pam) |
+| `tokenid` | string | Yes | Token ID |
+| `comment` | unknown | No | - |
+| `expire` | unknown | No | - |
+| `privsep` | unknown | No | - |
+
+---
+
 #### `proxmox_delete_domain`
 
 **Description:** Delete an authentication domain (requires elevated permissions)
@@ -147,6 +165,21 @@
 
 ---
 
+#### `proxmox_delete_user_token`
+
+**Description:** Delete a user API token (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., root@pam) |
+| `tokenid` | string | Yes | Token ID |
+
+---
+
 #### `proxmox_get_acl`
 
 **Description:** Get ACL entries
@@ -192,6 +225,21 @@
 
 ---
 
+#### `proxmox_get_user_token`
+
+**Description:** Get details of a specific user API token
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., root@pam) |
+| `tokenid` | string | Yes | Token ID |
+
+---
+
 #### `proxmox_list_domains`
 
 **Description:** List authentication domains
@@ -219,6 +267,20 @@
 **Permission:** basic
 
 **Parameters:** None
+
+---
+
+#### `proxmox_list_user_tokens`
+
+**Description:** List API tokens for a user
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., root@pam) |
 
 ---
 
@@ -342,6 +404,23 @@
 | `enable` | unknown | No | - |
 | `delete` | unknown | No | - |
 | `digest` | unknown | No | - |
+
+---
+
+#### `proxmox_update_user_token`
+
+**Description:** Update a user API token (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., root@pam) |
+| `tokenid` | string | Yes | Token ID |
+| `comment` | unknown | No | - |
+| `expire` | unknown | No | - |
 
 ---
 

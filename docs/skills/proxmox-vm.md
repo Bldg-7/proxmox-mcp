@@ -2,8 +2,8 @@
 
 > QEMU VM creation, lifecycle management, disk operations, network configuration, and performance monitoring.
 
-**Tools in this file:** 25  
-**Generated:** 2026-02-06T10:53:57.669Z
+**Tools in this file:** 30  
+**Generated:** 2026-02-08T04:04:42.008Z
 
 ---
 
@@ -45,6 +45,22 @@
 | `macaddr` | unknown | No | - |
 | `vlan` | unknown | No | - |
 | `firewall` | unknown | No | - |
+
+---
+
+#### `proxmox_check_vm_feature`
+
+**Description:** Check if a feature (snapshot, clone, copy) is available for a QEMU VM
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+| `feature` | enum | Yes | Feature to check (snapshot, clone, copy) |
 
 ---
 
@@ -119,6 +135,22 @@
 
 ---
 
+#### `proxmox_dump_cloudinit`
+
+**Description:** Dump rendered cloud-init config (user-data, network-config, or meta-data) for a QEMU VM
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+| `type` | enum | Yes | Cloud-init config type to dump (user, network, or meta) |
+
+---
+
 #### `proxmox_execute_vm_command`
 
 **Description:** Execute a shell command on a QEMU VM via guest agent (requires QEMU Guest Agent; LXC unsupported)
@@ -133,6 +165,21 @@
 | `vmid` | number | Yes | VM ID number |
 | `command` | string | Yes | Shell command to execute |
 | `type` | unknown | Yes | VM type |
+
+---
+
+#### `proxmox_get_cloudinit_config`
+
+**Description:** Get cloud-init configuration items for a QEMU VM
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
 
 ---
 
@@ -153,6 +200,21 @@
 #### `proxmox_get_vm_config`
 
 **Description:** Get hardware configuration for a QEMU VM (disks, network, CPU, memory)
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
+---
+
+#### `proxmox_get_vm_pending`
+
+**Description:** Get pending configuration changes for a QEMU VM
 
 **Permission:** basic
 
@@ -264,6 +326,21 @@
 #### `proxmox_reboot_vm`
 
 **Description:** Reboot a QEMU virtual machine (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
+---
+
+#### `proxmox_regenerate_cloudinit`
+
+**Description:** Regenerate the cloud-init drive for a QEMU VM (requires elevated permissions)
 
 **Permission:** elevated
 

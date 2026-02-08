@@ -2,12 +2,29 @@
 
 > High Availability, cluster firewall, backup jobs, replication jobs, and cluster-wide options.
 
-**Tools in this file:** 33  
-**Generated:** 2026-02-06T10:53:57.669Z
+**Tools in this file:** 54  
+**Generated:** 2026-02-08T04:04:42.008Z
 
 ---
 
 ## Tools
+
+#### `proxmox_add_cluster_firewall_ipset_entry`
+
+**Description:** Add an entry to a cluster firewall IP set (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `cidr` | string | Yes | CIDR network address |
+| `comment` | unknown | No | - |
+| `nomatch` | unknown | No | - |
+
+---
 
 #### `proxmox_create_cluster_backup_job`
 
@@ -57,6 +74,22 @@
 
 ---
 
+#### `proxmox_create_cluster_firewall_alias`
+
+**Description:** Create a cluster firewall alias (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+| `cidr` | string | Yes | IP address or CIDR network |
+| `comment` | unknown | No | - |
+
+---
+
 #### `proxmox_create_cluster_firewall_group`
 
 **Description:** Create a cluster firewall group (requires elevated permissions)
@@ -70,6 +103,21 @@
 | `group` | string | Yes | Firewall group name |
 | `comment` | unknown | No | - |
 | `rename` | unknown | No | - |
+
+---
+
+#### `proxmox_create_cluster_firewall_ipset`
+
+**Description:** Create a cluster firewall IP set (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `comment` | unknown | No | - |
 
 ---
 
@@ -175,6 +223,20 @@
 
 ---
 
+#### `proxmox_delete_cluster_firewall_alias`
+
+**Description:** Delete a cluster firewall alias (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+
+---
+
 #### `proxmox_delete_cluster_firewall_group`
 
 **Description:** Delete a cluster firewall group (requires elevated permissions)
@@ -186,6 +248,35 @@
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `group` | string | Yes | Firewall group name |
+
+---
+
+#### `proxmox_delete_cluster_firewall_ipset`
+
+**Description:** Delete a cluster firewall IP set (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+
+---
+
+#### `proxmox_delete_cluster_firewall_ipset_entry`
+
+**Description:** Delete an entry from a cluster firewall IP set (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `cidr` | string | Yes | CIDR network address |
 
 ---
 
@@ -262,6 +353,44 @@
 
 ---
 
+#### `proxmox_get_cluster_config`
+
+**Description:** Get cluster configuration
+
+**Permission:** basic
+
+**Parameters:** None
+
+---
+
+#### `proxmox_get_cluster_config_node`
+
+**Description:** Get cluster configuration for a specific node
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_get_cluster_firewall_alias`
+
+**Description:** Get a cluster firewall alias by name
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+
+---
+
 #### `proxmox_get_cluster_firewall_group`
 
 **Description:** Get a cluster firewall group by name
@@ -273,6 +402,16 @@
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `group` | string | Yes | Firewall group name |
+
+---
+
+#### `proxmox_get_cluster_firewall_options`
+
+**Description:** Get cluster firewall options
+
+**Permission:** basic
+
+**Parameters:** None
 
 ---
 
@@ -311,6 +450,16 @@
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `id` | string | Yes | Replication job ID |
+
+---
+
+#### `proxmox_get_cluster_totem`
+
+**Description:** Get cluster totem configuration
+
+**Permission:** basic
+
+**Parameters:** None
 
 ---
 
@@ -376,9 +525,46 @@
 
 ---
 
+#### `proxmox_join_cluster`
+
+**Description:** Join a cluster (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `hostname` | string | Yes | Hostname of cluster node to join |
+| `password` | string | Yes | Cluster password |
+| `fingerprint` | unknown | No | - |
+| `force` | unknown | No | - |
+
+---
+
 #### `proxmox_list_cluster_backup_jobs`
 
 **Description:** List scheduled cluster backup jobs
+
+**Permission:** basic
+
+**Parameters:** None
+
+---
+
+#### `proxmox_list_cluster_config_nodes`
+
+**Description:** List cluster configuration nodes
+
+**Permission:** basic
+
+**Parameters:** None
+
+---
+
+#### `proxmox_list_cluster_firewall_aliases`
+
+**Description:** List cluster firewall aliases
 
 **Permission:** basic
 
@@ -393,6 +579,54 @@
 **Permission:** basic
 
 **Parameters:** None
+
+---
+
+#### `proxmox_list_cluster_firewall_ipset_entries`
+
+**Description:** List entries in a cluster firewall IP set
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+
+---
+
+#### `proxmox_list_cluster_firewall_ipsets`
+
+**Description:** List cluster firewall IP sets
+
+**Permission:** basic
+
+**Parameters:** None
+
+---
+
+#### `proxmox_list_cluster_firewall_macros`
+
+**Description:** List available firewall macros
+
+**Permission:** basic
+
+**Parameters:** None
+
+---
+
+#### `proxmox_list_cluster_firewall_refs`
+
+**Description:** List firewall references (aliases/ipsets)
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | unknown | No | - |
 
 ---
 
@@ -466,6 +700,23 @@
 
 ---
 
+#### `proxmox_update_cluster_firewall_alias`
+
+**Description:** Update a cluster firewall alias (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+| `cidr` | string | Yes | IP address or CIDR network |
+| `comment` | unknown | No | - |
+| `rename` | unknown | No | - |
+
+---
+
 #### `proxmox_update_cluster_firewall_group`
 
 **Description:** Update a cluster firewall group (requires elevated permissions)
@@ -481,6 +732,40 @@
 | `rename` | unknown | No | - |
 | `delete` | unknown | No | - |
 | `digest` | unknown | No | - |
+
+---
+
+#### `proxmox_update_cluster_firewall_ipset_entry`
+
+**Description:** Update an entry in a cluster firewall IP set (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `cidr` | string | Yes | CIDR network address |
+| `comment` | unknown | No | - |
+| `nomatch` | unknown | No | - |
+
+---
+
+#### `proxmox_update_cluster_firewall_options`
+
+**Description:** Update cluster firewall options (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `enable` | unknown | No | - |
+| `policy_in` | unknown | No | - |
+| `policy_out` | unknown | No | - |
+| `log_ratelimit` | unknown | No | - |
 
 ---
 

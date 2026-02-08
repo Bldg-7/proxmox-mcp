@@ -2,8 +2,8 @@
 
 > Node management, cluster status, network configuration, system operations, console access, and node services.
 
-**Tools in this file:** 38  
-**Generated:** 2026-02-06T10:53:57.669Z
+**Tools in this file:** 47  
+**Generated:** 2026-02-08T04:04:42.008Z
 
 ---
 
@@ -297,6 +297,66 @@
 
 ---
 
+#### `proxmox_get_node_replication_log`
+
+**Description:** Get node replication job log
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `id` | string | Yes | Replication job ID |
+
+---
+
+#### `proxmox_get_node_replication_status`
+
+**Description:** Get node replication job status
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `id` | string | Yes | Replication job ID |
+
+---
+
+#### `proxmox_get_node_report`
+
+**Description:** Get node diagnostic report with system information
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_get_node_rrddata`
+
+**Description:** Get node RRD performance metrics (CPU, memory, disk I/O)
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `timeframe` | unknown | No | - |
+| `cf` | unknown | No | - |
+
+---
+
 #### `proxmox_get_node_services`
 
 **Description:** List system services on a Proxmox node
@@ -421,6 +481,23 @@
 
 ---
 
+#### `proxmox_get_storage_rrddata`
+
+**Description:** Get storage RRD performance metrics (read/write throughput, usage)
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `storage` | string | Yes | Storage name |
+| `timeframe` | unknown | No | - |
+| `cf` | unknown | No | - |
+
+---
+
 #### `proxmox_get_term_proxy`
 
 **Description:** Get a terminal proxy ticket for a QEMU VM (requires elevated permissions)
@@ -465,6 +542,63 @@
 | `target` | string | Yes | Target node name |
 | `maxworkers` | unknown | No | - |
 | `with-local-disks` | unknown | No | - |
+
+---
+
+#### `proxmox_node_reboot`
+
+**Description:** Reboot a node (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_node_shutdown`
+
+**Description:** Shutdown a node (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_node_wakeonlan`
+
+**Description:** Wake a node via Wake-on-LAN (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_schedule_node_replication`
+
+**Description:** Schedule immediate node replication (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `id` | string | Yes | Replication job ID |
 
 ---
 

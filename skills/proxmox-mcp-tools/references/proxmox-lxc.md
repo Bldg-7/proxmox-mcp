@@ -2,8 +2,8 @@
 
 > LXC container creation, lifecycle management, mount points, network configuration, and performance monitoring.
 
-**Tools in this file:** 18  
-**Generated:** 2026-02-06T10:53:57.669Z
+**Tools in this file:** 20  
+**Generated:** 2026-02-08T04:04:42.008Z
 
 ---
 
@@ -44,6 +44,22 @@
 | `ip` | unknown | No | - |
 | `gw` | unknown | No | - |
 | `firewall` | unknown | No | - |
+
+---
+
+#### `proxmox_check_lxc_feature`
+
+**Description:** Check if a feature (snapshot, clone, copy) is available for an LXC container
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where container is located |
+| `vmid` | number | Yes | Container ID number |
+| `feature` | enum | Yes | Feature to check (snapshot, clone, copy) |
 
 ---
 
@@ -119,6 +135,21 @@
 #### `proxmox_get_lxc_config`
 
 **Description:** Get hardware configuration for an LXC container (mount points, network, CPU, memory)
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where container is located |
+| `vmid` | number | Yes | Container ID number |
+
+---
+
+#### `proxmox_get_lxc_pending`
+
+**Description:** Get pending configuration changes for an LXC container
 
 **Permission:** basic
 

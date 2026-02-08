@@ -19,11 +19,14 @@ type DomainFile =
   | 'cluster'
   | 'access-control'
   | 'ceph'
-  | 'pools';
+  | 'pools'
+  | 'certificates'
+  | 'acme'
+  | 'notifications';
 
 const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
   // ═══════════════════════════════════════════════════════════════════════════
-  // File 1: proxmox-nodes.md (38 tools)
+  // File 1: proxmox-nodes.md (47 tools)
   // ═══════════════════════════════════════════════════════════════════════════
   proxmox_get_nodes: 'nodes',
   proxmox_get_node_status: 'nodes',
@@ -63,9 +66,18 @@ const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
   proxmox_get_node_task: 'nodes',
   proxmox_get_node_aplinfo: 'nodes',
   proxmox_get_node_netstat: 'nodes',
+  proxmox_node_shutdown: 'nodes',
+  proxmox_node_reboot: 'nodes',
+  proxmox_node_wakeonlan: 'nodes',
+  proxmox_get_node_rrddata: 'nodes',
+  proxmox_get_storage_rrddata: 'nodes',
+  proxmox_get_node_report: 'nodes',
+  proxmox_get_node_replication_status: 'nodes',
+  proxmox_get_node_replication_log: 'nodes',
+  proxmox_schedule_node_replication: 'nodes',
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // File 2: proxmox-vm.md (25 tools)
+  // File 2: proxmox-vm.md (30 tools)
   // ═══════════════════════════════════════════════════════════════════════════
   proxmox_get_vms: 'vm',
   proxmox_get_vm_status: 'vm',
@@ -92,9 +104,14 @@ const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
   proxmox_execute_vm_command: 'vm',
   proxmox_create_template_vm: 'vm',
   proxmox_get_vm_rrddata: 'vm',
+  proxmox_get_vm_pending: 'vm',
+  proxmox_check_vm_feature: 'vm',
+  proxmox_get_cloudinit_config: 'vm',
+  proxmox_dump_cloudinit: 'vm',
+  proxmox_regenerate_cloudinit: 'vm',
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // File 3: proxmox-lxc.md (18 tools)
+  // File 3: proxmox-lxc.md (20 tools)
   // ═══════════════════════════════════════════════════════════════════════════
   proxmox_get_lxc_config: 'lxc',
   proxmox_create_lxc: 'lxc',
@@ -114,9 +131,11 @@ const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
   proxmox_remove_network_lxc: 'lxc',
   proxmox_create_template_lxc: 'lxc',
   proxmox_get_lxc_rrddata: 'lxc',
+  proxmox_get_lxc_pending: 'lxc',
+  proxmox_check_lxc_feature: 'lxc',
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // File 4: proxmox-vm-lxc-shared.md (22 tools)
+  // File 4: proxmox-vm-lxc-shared.md (36 tools)
   // ═══════════════════════════════════════════════════════════════════════════
   proxmox_migrate_vm: 'vm-lxc-shared',
   proxmox_migrate_lxc: 'vm-lxc-shared',
@@ -140,6 +159,20 @@ const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
   proxmox_create_lxc_firewall_rule: 'vm-lxc-shared',
   proxmox_update_lxc_firewall_rule: 'vm-lxc-shared',
   proxmox_delete_lxc_firewall_rule: 'vm-lxc-shared',
+  proxmox_agent_file_read: 'vm-lxc-shared',
+  proxmox_agent_file_write: 'vm-lxc-shared',
+  proxmox_agent_get_hostname: 'vm-lxc-shared',
+  proxmox_agent_get_users: 'vm-lxc-shared',
+  proxmox_agent_set_user_password: 'vm-lxc-shared',
+  proxmox_agent_shutdown: 'vm-lxc-shared',
+  proxmox_agent_fsfreeze_status: 'vm-lxc-shared',
+  proxmox_agent_fsfreeze_freeze: 'vm-lxc-shared',
+  proxmox_agent_fsfreeze_thaw: 'vm-lxc-shared',
+  proxmox_agent_fstrim: 'vm-lxc-shared',
+  proxmox_agent_get_memory_block_info: 'vm-lxc-shared',
+  proxmox_agent_suspend_disk: 'vm-lxc-shared',
+  proxmox_agent_suspend_ram: 'vm-lxc-shared',
+  proxmox_agent_suspend_hybrid: 'vm-lxc-shared',
 
   // ═══════════════════════════════════════════════════════════════════════════
   // File 5: proxmox-snapshots-backups.md (14 tools)
@@ -160,7 +193,7 @@ const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
   proxmox_delete_backup: 'snapshots-backups',
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // File 6: proxmox-storage.md (16 tools)
+  // File 6: proxmox-storage.md (20 tools)
   // ═══════════════════════════════════════════════════════════════════════════
   proxmox_list_storage_config: 'storage',
   proxmox_get_storage_config: 'storage',
@@ -178,6 +211,10 @@ const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
   proxmox_get_disk_smart: 'storage',
   proxmox_get_node_lvm: 'storage',
   proxmox_get_node_zfs: 'storage',
+  proxmox_init_disk_gpt: 'storage',
+  proxmox_wipe_disk: 'storage',
+  proxmox_get_node_lvmthin: 'storage',
+  proxmox_get_node_directory: 'storage',
 
   // ═══════════════════════════════════════════════════════════════════════════
   // File 7: proxmox-networking.md (20 tools)
@@ -204,7 +241,7 @@ const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
   proxmox_delete_sdn_subnet: 'networking',
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // File 8: proxmox-cluster.md (33 tools)
+  // File 8: proxmox-cluster.md (54 tools)
   // ═══════════════════════════════════════════════════════════════════════════
   proxmox_get_ha_resources: 'cluster',
   proxmox_get_ha_resource: 'cluster',
@@ -239,9 +276,30 @@ const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
   proxmox_delete_cluster_replication_job: 'cluster',
   proxmox_get_cluster_options: 'cluster',
   proxmox_update_cluster_options: 'cluster',
+  proxmox_get_cluster_firewall_options: 'cluster',
+  proxmox_update_cluster_firewall_options: 'cluster',
+  proxmox_list_cluster_firewall_macros: 'cluster',
+  proxmox_list_cluster_firewall_refs: 'cluster',
+  proxmox_list_cluster_firewall_aliases: 'cluster',
+  proxmox_get_cluster_firewall_alias: 'cluster',
+  proxmox_create_cluster_firewall_alias: 'cluster',
+  proxmox_update_cluster_firewall_alias: 'cluster',
+  proxmox_delete_cluster_firewall_alias: 'cluster',
+  proxmox_list_cluster_firewall_ipsets: 'cluster',
+  proxmox_create_cluster_firewall_ipset: 'cluster',
+  proxmox_delete_cluster_firewall_ipset: 'cluster',
+  proxmox_list_cluster_firewall_ipset_entries: 'cluster',
+  proxmox_add_cluster_firewall_ipset_entry: 'cluster',
+  proxmox_update_cluster_firewall_ipset_entry: 'cluster',
+  proxmox_delete_cluster_firewall_ipset_entry: 'cluster',
+  proxmox_get_cluster_config: 'cluster',
+  proxmox_list_cluster_config_nodes: 'cluster',
+  proxmox_get_cluster_config_node: 'cluster',
+  proxmox_join_cluster: 'cluster',
+  proxmox_get_cluster_totem: 'cluster',
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // File 9: proxmox-access-control.md (20 tools)
+  // File 9: proxmox-access-control.md (25 tools)
   // ═══════════════════════════════════════════════════════════════════════════
   proxmox_list_users: 'access-control',
   proxmox_get_user: 'access-control',
@@ -263,6 +321,11 @@ const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
   proxmox_create_domain: 'access-control',
   proxmox_update_domain: 'access-control',
   proxmox_delete_domain: 'access-control',
+  proxmox_list_user_tokens: 'access-control',
+  proxmox_get_user_token: 'access-control',
+  proxmox_create_user_token: 'access-control',
+  proxmox_update_user_token: 'access-control',
+  proxmox_delete_user_token: 'access-control',
 
   // ═══════════════════════════════════════════════════════════════════════════
   // File 10: proxmox-ceph.md (16 tools)
@@ -292,6 +355,38 @@ const DOMAIN_MAPPING: Record<ToolName, DomainFile> = {
   proxmox_create_pool: 'pools',
   proxmox_update_pool: 'pools',
   proxmox_delete_pool: 'pools',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 12: proxmox-certificates.md (7 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_get_node_certificates: 'certificates',
+  proxmox_upload_custom_certificate: 'certificates',
+  proxmox_delete_custom_certificate: 'certificates',
+  proxmox_order_acme_certificate: 'certificates',
+  proxmox_renew_acme_certificate: 'certificates',
+  proxmox_revoke_acme_certificate: 'certificates',
+  proxmox_get_node_acme_config: 'certificates',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 13: proxmox-acme.md (8 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_list_acme_accounts: 'acme',
+  proxmox_get_acme_account: 'acme',
+  proxmox_create_acme_account: 'acme',
+  proxmox_update_acme_account: 'acme',
+  proxmox_delete_acme_account: 'acme',
+  proxmox_list_acme_plugins: 'acme',
+  proxmox_get_acme_plugin: 'acme',
+  proxmox_get_acme_directories: 'acme',
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // File 14: proxmox-notifications.md (5 tools)
+  // ═══════════════════════════════════════════════════════════════════════════
+  proxmox_list_notification_targets: 'notifications',
+  proxmox_get_notification_target: 'notifications',
+  proxmox_create_notification_target: 'notifications',
+  proxmox_delete_notification_target: 'notifications',
+  proxmox_test_notification_target: 'notifications',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -353,6 +448,21 @@ const DOMAIN_METADATA: Record<DomainFile, DomainMeta> = {
   pools: {
     title: 'Proxmox Resource Pools',
     description: 'Resource pool management for organizing VMs and containers.',
+  },
+  certificates: {
+    title: 'Proxmox Certificate Management',
+    description:
+      'Node certificate management, custom certificate upload, and ACME certificate ordering/renewal.',
+  },
+  acme: {
+    title: 'Proxmox ACME Management',
+    description:
+      'ACME account and plugin management for automated Let\'s Encrypt certificates.',
+  },
+  notifications: {
+    title: 'Proxmox Notification Management',
+    description:
+      'Notification target management for alerts and system notifications.',
   },
 };
 
@@ -623,6 +733,96 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_get_disk_smart: 'Get SMART health data for a specific disk on a Proxmox node',
   proxmox_get_node_lvm: 'List LVM volume groups and physical volumes on a Proxmox node',
   proxmox_get_node_zfs: 'List ZFS pools on a Proxmox node with health and capacity info',
+
+  proxmox_node_shutdown: 'Shutdown a node (requires elevated permissions)',
+  proxmox_node_reboot: 'Reboot a node (requires elevated permissions)',
+  proxmox_node_wakeonlan: 'Wake a node via Wake-on-LAN (requires elevated permissions)',
+  proxmox_get_node_rrddata: 'Get node RRD performance metrics (CPU, memory, disk I/O)',
+  proxmox_get_storage_rrddata: 'Get storage RRD performance metrics (read/write throughput, usage)',
+  proxmox_get_node_report: 'Get node diagnostic report with system information',
+  proxmox_get_node_replication_status: 'Get node replication job status',
+  proxmox_get_node_replication_log: 'Get node replication job log',
+  proxmox_schedule_node_replication: 'Schedule immediate node replication (requires elevated permissions)',
+
+  proxmox_get_vm_pending: 'Get pending configuration changes for a QEMU VM',
+  proxmox_check_vm_feature: 'Check if a feature (snapshot, clone, copy) is available for a QEMU VM',
+  proxmox_get_cloudinit_config: 'Get cloud-init configuration items for a QEMU VM',
+  proxmox_dump_cloudinit: 'Dump rendered cloud-init config (user-data, network-config, or meta-data) for a QEMU VM',
+  proxmox_regenerate_cloudinit: 'Regenerate the cloud-init drive for a QEMU VM (requires elevated permissions)',
+
+  proxmox_get_lxc_pending: 'Get pending configuration changes for an LXC container',
+  proxmox_check_lxc_feature: 'Check if a feature (snapshot, clone, copy) is available for an LXC container',
+
+  proxmox_agent_file_read: 'Read file content from guest via QEMU agent (requires elevated permissions)',
+  proxmox_agent_file_write: 'Write content to file in guest via QEMU agent (requires elevated permissions)',
+  proxmox_agent_get_hostname: 'Get hostname from guest via QEMU agent',
+  proxmox_agent_get_users: 'Get list of logged-in users from guest via QEMU agent',
+  proxmox_agent_set_user_password: 'Set user password in guest via QEMU agent (requires elevated permissions)',
+  proxmox_agent_shutdown: 'Shutdown guest via QEMU agent (requires elevated permissions)',
+  proxmox_agent_fsfreeze_status: 'Get guest filesystem freeze status via QEMU agent',
+  proxmox_agent_fsfreeze_freeze: 'Freeze guest filesystems for consistent backup via QEMU agent (requires elevated permissions)',
+  proxmox_agent_fsfreeze_thaw: 'Thaw (unfreeze) guest filesystems via QEMU agent (requires elevated permissions)',
+  proxmox_agent_fstrim: 'Discard unused blocks on guest filesystems via QEMU agent (requires elevated permissions)',
+  proxmox_agent_get_memory_block_info: 'Get guest memory block size information via QEMU agent',
+  proxmox_agent_suspend_disk: 'Suspend guest to disk (hibernate) via QEMU agent (requires elevated permissions)',
+  proxmox_agent_suspend_ram: 'Suspend guest to RAM (sleep) via QEMU agent (requires elevated permissions)',
+  proxmox_agent_suspend_hybrid: 'Hybrid suspend guest (RAM + disk) via QEMU agent (requires elevated permissions)',
+
+  proxmox_init_disk_gpt: 'Initialize GPT partition table on a disk (requires elevated permissions, destructive)',
+  proxmox_wipe_disk: 'Wipe all data from a disk (requires elevated permissions, destructive)',
+  proxmox_get_node_lvmthin: 'List LVM thin pools on a Proxmox node with capacity info',
+  proxmox_get_node_directory: 'List directory-based storage on a Proxmox node',
+
+  proxmox_get_cluster_firewall_options: 'Get cluster firewall options',
+  proxmox_update_cluster_firewall_options: 'Update cluster firewall options (requires elevated permissions)',
+  proxmox_list_cluster_firewall_macros: 'List available firewall macros',
+  proxmox_list_cluster_firewall_refs: 'List firewall references (aliases/ipsets)',
+  proxmox_list_cluster_firewall_aliases: 'List cluster firewall aliases',
+  proxmox_get_cluster_firewall_alias: 'Get a cluster firewall alias by name',
+  proxmox_create_cluster_firewall_alias: 'Create a cluster firewall alias (requires elevated permissions)',
+  proxmox_update_cluster_firewall_alias: 'Update a cluster firewall alias (requires elevated permissions)',
+  proxmox_delete_cluster_firewall_alias: 'Delete a cluster firewall alias (requires elevated permissions)',
+  proxmox_list_cluster_firewall_ipsets: 'List cluster firewall IP sets',
+  proxmox_create_cluster_firewall_ipset: 'Create a cluster firewall IP set (requires elevated permissions)',
+  proxmox_delete_cluster_firewall_ipset: 'Delete a cluster firewall IP set (requires elevated permissions)',
+  proxmox_list_cluster_firewall_ipset_entries: 'List entries in a cluster firewall IP set',
+  proxmox_add_cluster_firewall_ipset_entry: 'Add an entry to a cluster firewall IP set (requires elevated permissions)',
+  proxmox_update_cluster_firewall_ipset_entry: 'Update an entry in a cluster firewall IP set (requires elevated permissions)',
+  proxmox_delete_cluster_firewall_ipset_entry: 'Delete an entry from a cluster firewall IP set (requires elevated permissions)',
+  proxmox_get_cluster_config: 'Get cluster configuration',
+  proxmox_list_cluster_config_nodes: 'List cluster configuration nodes',
+  proxmox_get_cluster_config_node: 'Get cluster configuration for a specific node',
+  proxmox_join_cluster: 'Join a cluster (requires elevated permissions)',
+  proxmox_get_cluster_totem: 'Get cluster totem configuration',
+
+  proxmox_list_user_tokens: 'List API tokens for a user',
+  proxmox_get_user_token: 'Get details of a specific user API token',
+  proxmox_create_user_token: 'Create a new API token for a user (requires elevated permissions)',
+  proxmox_update_user_token: 'Update a user API token (requires elevated permissions)',
+  proxmox_delete_user_token: 'Delete a user API token (requires elevated permissions)',
+
+  proxmox_get_node_certificates: 'Get SSL certificate information for a Proxmox node',
+  proxmox_upload_custom_certificate: 'Upload a custom SSL certificate to a Proxmox node (requires elevated permissions)',
+  proxmox_delete_custom_certificate: 'Delete the custom SSL certificate from a Proxmox node (requires elevated permissions)',
+  proxmox_order_acme_certificate: 'Order a new ACME (Let\'s Encrypt) certificate for a Proxmox node (requires elevated permissions)',
+  proxmox_renew_acme_certificate: 'Renew the ACME certificate for a Proxmox node (requires elevated permissions)',
+  proxmox_revoke_acme_certificate: 'Revoke the ACME certificate for a Proxmox node (requires elevated permissions)',
+  proxmox_get_node_acme_config: 'Get ACME configuration for a Proxmox node',
+
+  proxmox_list_acme_accounts: 'List all ACME accounts configured in the cluster',
+  proxmox_get_acme_account: 'Get detailed information about a specific ACME account',
+  proxmox_create_acme_account: 'Create a new ACME account (requires elevated permissions)',
+  proxmox_update_acme_account: 'Update an existing ACME account (requires elevated permissions)',
+  proxmox_delete_acme_account: 'Delete an ACME account (requires elevated permissions)',
+  proxmox_list_acme_plugins: 'List all ACME challenge plugins configured in the cluster',
+  proxmox_get_acme_plugin: 'Get detailed configuration for a specific ACME plugin',
+  proxmox_get_acme_directories: 'Get available ACME directory endpoints (Let\'s Encrypt, etc.)',
+
+  proxmox_list_notification_targets: 'List all notification targets (SMTP, Gotify, Sendmail)',
+  proxmox_get_notification_target: 'Get detailed configuration for a specific notification target',
+  proxmox_create_notification_target: 'Create a new notification target (requires elevated permissions)',
+  proxmox_delete_notification_target: 'Delete a notification target (requires elevated permissions)',
+  proxmox_test_notification_target: 'Send a test notification to a target (requires elevated permissions)',
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -858,6 +1058,9 @@ function generateIndexMarkdown(
     'access-control',
     'ceph',
     'pools',
+    'certificates',
+    'acme',
+    'notifications',
   ];
 
   let markdown = `# Proxmox MCP Server - Tool Reference

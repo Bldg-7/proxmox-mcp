@@ -1,11 +1,26 @@
 # Proxmox MCP Tools Documentation
 
-Generated: 2026-02-06T10:53:57.669Z
-Total Tools: 227
+Generated: 2026-02-08T04:04:42.008Z
+Total Tools: 307
 
 ## Tools by Category
 
 ### Add
+
+#### `proxmox_add_cluster_firewall_ipset_entry`
+
+**Description:** Add an entry to a cluster firewall IP set (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `cidr` | string | Yes | CIDR network address |
+| `comment` | unknown | No | - |
+| `nomatch` | unknown | No | - |
 
 #### `proxmox_add_disk_vm`
 
@@ -110,9 +125,117 @@ Total Tools: 227
 | `vmid` | number | Yes | VM ID number |
 | `pid` | number | Yes | Process ID returned by agent exec |
 
+#### `proxmox_agent_file_read`
+
+**Description:** Read file content from guest via QEMU agent (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+| `file` | string | Yes | Path to file in guest filesystem |
+
+#### `proxmox_agent_file_write`
+
+**Description:** Write content to file in guest via QEMU agent (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+| `file` | string | Yes | Path to file in guest filesystem |
+| `content` | string | Yes | Content to write to file |
+| `encode` | unknown | No | - |
+
+#### `proxmox_agent_fsfreeze_freeze`
+
+**Description:** Freeze guest filesystems for consistent backup via QEMU agent (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
+#### `proxmox_agent_fsfreeze_status`
+
+**Description:** Get guest filesystem freeze status via QEMU agent
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
+#### `proxmox_agent_fsfreeze_thaw`
+
+**Description:** Thaw (unfreeze) guest filesystems via QEMU agent (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
+#### `proxmox_agent_fstrim`
+
+**Description:** Discard unused blocks on guest filesystems via QEMU agent (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
 #### `proxmox_agent_get_fsinfo`
 
 **Description:** Get guest filesystem information via QEMU guest agent
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
+#### `proxmox_agent_get_hostname`
+
+**Description:** Get hostname from guest via QEMU agent
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
+#### `proxmox_agent_get_memory_block_info`
+
+**Description:** Get guest memory block size information via QEMU agent
 
 **Permission:** basic
 
@@ -188,6 +311,19 @@ Total Tools: 227
 | `node` | string | Yes | Node name where VM is located |
 | `vmid` | number | Yes | VM ID number |
 
+#### `proxmox_agent_get_users`
+
+**Description:** Get list of logged-in users from guest via QEMU agent
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
 #### `proxmox_agent_get_vcpus`
 
 **Description:** Get guest vCPU information via QEMU guest agent
@@ -206,6 +342,74 @@ Total Tools: 227
 **Description:** Ping the QEMU guest agent to verify availability
 
 **Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
+#### `proxmox_agent_set_user_password`
+
+**Description:** Set user password in guest via QEMU agent (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+| `username` | string | Yes | Username to set password for |
+| `password` | string | Yes | New password (5-1024 characters) |
+| `crypted` | unknown | No | - |
+
+#### `proxmox_agent_shutdown`
+
+**Description:** Shutdown guest via QEMU agent (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
+#### `proxmox_agent_suspend_disk`
+
+**Description:** Suspend guest to disk (hibernate) via QEMU agent (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
+#### `proxmox_agent_suspend_hybrid`
+
+**Description:** Hybrid suspend guest (RAM + disk) via QEMU agent (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
+#### `proxmox_agent_suspend_ram`
+
+**Description:** Suspend guest to RAM (sleep) via QEMU agent (requires elevated permissions)
+
+**Permission:** elevated
 
 **Parameters:**
 
@@ -268,6 +472,36 @@ Total Tools: 227
 | `node` | string | Yes | Node name |
 | `package` | unknown | No | - |
 
+### Check
+
+#### `proxmox_check_lxc_feature`
+
+**Description:** Check if a feature (snapshot, clone, copy) is available for an LXC container
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where container is located |
+| `vmid` | number | Yes | Container ID number |
+| `feature` | enum | Yes | Feature to check (snapshot, clone, copy) |
+
+#### `proxmox_check_vm_feature`
+
+**Description:** Check if a feature (snapshot, clone, copy) is available for a QEMU VM
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+| `feature` | enum | Yes | Feature to check (snapshot, clone, copy) |
+
 ### Clone
 
 #### `proxmox_clone_lxc`
@@ -317,6 +551,21 @@ Total Tools: 227
 | `command` | enum | Yes | Service command |
 
 ### Create
+
+#### `proxmox_create_acme_account`
+
+**Description:** Create a new ACME account (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | unknown | No | - |
+| `contact` | string | Yes | Contact email address |
+| `tos_url` | unknown | No | - |
+| `directory` | unknown | No | - |
 
 #### `proxmox_create_backup_lxc`
 
@@ -474,6 +723,20 @@ Total Tools: 227
 | `vmid` | unknown | No | - |
 | `zstd` | unknown | No | - |
 
+#### `proxmox_create_cluster_firewall_alias`
+
+**Description:** Create a cluster firewall alias (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+| `cidr` | string | Yes | IP address or CIDR network |
+| `comment` | unknown | No | - |
+
 #### `proxmox_create_cluster_firewall_group`
 
 **Description:** Create a cluster firewall group (requires elevated permissions)
@@ -487,6 +750,19 @@ Total Tools: 227
 | `group` | string | Yes | Firewall group name |
 | `comment` | unknown | No | - |
 | `rename` | unknown | No | - |
+
+#### `proxmox_create_cluster_firewall_ipset`
+
+**Description:** Create a cluster firewall IP set (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `comment` | unknown | No | - |
 
 #### `proxmox_create_cluster_firewall_rule`
 
@@ -685,6 +961,31 @@ Total Tools: 227
 | `bond_slaves` | unknown | No | - |
 | `vlan-id` | unknown | No | - |
 | `vlan-raw-device` | unknown | No | - |
+
+#### `proxmox_create_notification_target`
+
+**Description:** Create a new notification target (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | enum | Yes | Notification target type |
+| `name` | string | Yes | Notification target name |
+| `comment` | unknown | No | - |
+| `disable` | unknown | No | - |
+| `server` | unknown | No | - |
+| `port` | unknown | No | - |
+| `username` | unknown | No | - |
+| `password` | unknown | No | - |
+| `mode` | unknown | No | - |
+| `token` | unknown | No | - |
+| `mailto` | unknown | No | - |
+| `mailto-user` | unknown | No | - |
+| `from` | unknown | No | - |
+| `author` | unknown | No | - |
 
 #### `proxmox_create_pool`
 
@@ -907,6 +1208,22 @@ Total Tools: 227
 | `expire` | unknown | No | - |
 | `enable` | unknown | No | - |
 
+#### `proxmox_create_user_token`
+
+**Description:** Create a new API token for a user (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., root@pam) |
+| `tokenid` | string | Yes | Token ID |
+| `comment` | unknown | No | - |
+| `expire` | unknown | No | - |
+| `privsep` | unknown | No | - |
+
 #### `proxmox_create_vm`
 
 **Description:** Create a new QEMU virtual machine (requires elevated permissions)
@@ -956,6 +1273,18 @@ Total Tools: 227
 | `sport` | unknown | No | - |
 
 ### Delete
+
+#### `proxmox_delete_acme_account`
+
+**Description:** Delete an ACME account (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | ACME account name |
 
 #### `proxmox_delete_backup`
 
@@ -1035,6 +1364,18 @@ Total Tools: 227
 |------|------|----------|-------------|
 | `id` | string | Yes | Backup job ID |
 
+#### `proxmox_delete_cluster_firewall_alias`
+
+**Description:** Delete a cluster firewall alias (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+
 #### `proxmox_delete_cluster_firewall_group`
 
 **Description:** Delete a cluster firewall group (requires elevated permissions)
@@ -1046,6 +1387,31 @@ Total Tools: 227
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `group` | string | Yes | Firewall group name |
+
+#### `proxmox_delete_cluster_firewall_ipset`
+
+**Description:** Delete a cluster firewall IP set (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+
+#### `proxmox_delete_cluster_firewall_ipset_entry`
+
+**Description:** Delete an entry from a cluster firewall IP set (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `cidr` | string | Yes | CIDR network address |
 
 #### `proxmox_delete_cluster_firewall_rule`
 
@@ -1073,6 +1439,18 @@ Total Tools: 227
 | `id` | string | Yes | Replication job ID |
 | `force` | unknown | No | - |
 | `keep` | unknown | No | - |
+
+#### `proxmox_delete_custom_certificate`
+
+**Description:** Delete the custom SSL certificate from a Proxmox node (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
 
 #### `proxmox_delete_domain`
 
@@ -1175,6 +1553,19 @@ Total Tools: 227
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `node` | string | Yes | Node name |
+
+#### `proxmox_delete_notification_target`
+
+**Description:** Delete a notification target (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | enum | Yes | Notification target type |
+| `name` | string | Yes | Notification target name |
 
 #### `proxmox_delete_pool`
 
@@ -1314,6 +1705,19 @@ Total Tools: 227
 |------|------|----------|-------------|
 | `userid` | string | Yes | User ID with realm (e.g., user@pve) |
 
+#### `proxmox_delete_user_token`
+
+**Description:** Delete a user API token (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., root@pam) |
+| `tokenid` | string | Yes | Token ID |
+
 #### `proxmox_delete_vm`
 
 **Description:** Delete a QEMU virtual machine (requires elevated permissions)
@@ -1378,6 +1782,22 @@ Total Tools: 227
 | `checksum-algorithm` | unknown | No | - |
 | `verify-certificates` | unknown | No | - |
 
+### Dump
+
+#### `proxmox_dump_cloudinit`
+
+**Description:** Dump rendered cloud-init config (user-data, network-config, or meta-data) for a QEMU VM
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+| `type` | enum | Yes | Cloud-init config type to dump (user, network, or meta) |
+
 ### Execute
 
 #### `proxmox_execute_vm_command`
@@ -1412,6 +1832,38 @@ Total Tools: 227
 | `groupid` | unknown | No | - |
 | `roleid` | unknown | No | - |
 
+#### `proxmox_get_acme_account`
+
+**Description:** Get detailed information about a specific ACME account
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | ACME account name |
+
+#### `proxmox_get_acme_directories`
+
+**Description:** Get available ACME directory endpoints (Let's Encrypt, etc.)
+
+**Permission:** basic
+
+**Parameters:** None
+
+#### `proxmox_get_acme_plugin`
+
+**Description:** Get detailed configuration for a specific ACME plugin
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | ACME plugin ID |
+
 #### `proxmox_get_ceph_status`
 
 **Description:** Get Ceph cluster status
@@ -1423,6 +1875,19 @@ Total Tools: 227
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `node` | string | Yes | Node name |
+
+#### `proxmox_get_cloudinit_config`
+
+**Description:** Get cloud-init configuration items for a QEMU VM
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
 
 #### `proxmox_get_cluster_backup_job`
 
@@ -1436,6 +1901,38 @@ Total Tools: 227
 |------|------|----------|-------------|
 | `id` | string | Yes | Backup job ID |
 
+#### `proxmox_get_cluster_config`
+
+**Description:** Get cluster configuration
+
+**Permission:** basic
+
+**Parameters:** None
+
+#### `proxmox_get_cluster_config_node`
+
+**Description:** Get cluster configuration for a specific node
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+#### `proxmox_get_cluster_firewall_alias`
+
+**Description:** Get a cluster firewall alias by name
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+
 #### `proxmox_get_cluster_firewall_group`
 
 **Description:** Get a cluster firewall group by name
@@ -1447,6 +1944,14 @@ Total Tools: 227
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `group` | string | Yes | Firewall group name |
+
+#### `proxmox_get_cluster_firewall_options`
+
+**Description:** Get cluster firewall options
+
+**Permission:** basic
+
+**Parameters:** None
 
 #### `proxmox_get_cluster_firewall_rule`
 
@@ -1483,6 +1988,14 @@ Total Tools: 227
 #### `proxmox_get_cluster_status`
 
 **Description:** Get overall cluster status including nodes and resource usage
+
+**Permission:** basic
+
+**Parameters:** None
+
+#### `proxmox_get_cluster_totem`
+
+**Description:** Get cluster totem configuration
 
 **Permission:** basic
 
@@ -1593,6 +2106,19 @@ Total Tools: 227
 | `vmid` | number | Yes | VM ID number |
 | `pos` | number | Yes | Rule position |
 
+#### `proxmox_get_lxc_pending`
+
+**Description:** Get pending configuration changes for an LXC container
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where container is located |
+| `vmid` | number | Yes | Container ID number |
+
 #### `proxmox_get_lxc_rrddata`
 
 **Description:** Get performance metrics (RRD data) for an LXC container
@@ -1655,9 +2181,45 @@ Total Tools: 227
 
 **Parameters:** None
 
+#### `proxmox_get_node_acme_config`
+
+**Description:** Get ACME configuration for a Proxmox node
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
 #### `proxmox_get_node_aplinfo`
 
 **Description:** List available appliance templates on a Proxmox node
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+#### `proxmox_get_node_certificates`
+
+**Description:** Get SSL certificate information for a Proxmox node
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+#### `proxmox_get_node_directory`
+
+**Description:** List directory-based storage on a Proxmox node
 
 **Permission:** basic
 
@@ -1730,6 +2292,18 @@ Total Tools: 227
 |------|------|----------|-------------|
 | `node` | string | Yes | Node name |
 
+#### `proxmox_get_node_lvmthin`
+
+**Description:** List LVM thin pools on a Proxmox node with capacity info
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
 #### `proxmox_get_node_netstat`
 
 **Description:** Get network connection statistics for a Proxmox node
@@ -1754,6 +2328,58 @@ Total Tools: 227
 |------|------|----------|-------------|
 | `node` | string | Yes | Node name |
 | `type` | unknown | No | - |
+
+#### `proxmox_get_node_replication_log`
+
+**Description:** Get node replication job log
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `id` | string | Yes | Replication job ID |
+
+#### `proxmox_get_node_replication_status`
+
+**Description:** Get node replication job status
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `id` | string | Yes | Replication job ID |
+
+#### `proxmox_get_node_report`
+
+**Description:** Get node diagnostic report with system information
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+#### `proxmox_get_node_rrddata`
+
+**Description:** Get node RRD performance metrics (CPU, memory, disk I/O)
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `timeframe` | unknown | No | - |
+| `cf` | unknown | No | - |
 
 #### `proxmox_get_node_services`
 
@@ -1860,6 +2486,19 @@ Total Tools: 227
 
 **Parameters:** None
 
+#### `proxmox_get_notification_target`
+
+**Description:** Get detailed configuration for a specific notification target
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | enum | Yes | Notification target type |
+| `name` | string | Yes | Notification target name |
+
 #### `proxmox_get_pool`
 
 **Description:** Get a resource pool by ID
@@ -1957,6 +2596,21 @@ Total Tools: 227
 |------|------|----------|-------------|
 | `storage` | string | Yes | Storage identifier |
 
+#### `proxmox_get_storage_rrddata`
+
+**Description:** Get storage RRD performance metrics (read/write throughput, usage)
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `storage` | string | Yes | Storage name |
+| `timeframe` | unknown | No | - |
+| `cf` | unknown | No | - |
+
 #### `proxmox_get_term_proxy`
 
 **Description:** Get a terminal proxy ticket for a QEMU VM (requires elevated permissions)
@@ -1981,6 +2635,19 @@ Total Tools: 227
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `userid` | string | Yes | User ID with realm (e.g., root@pam) |
+
+#### `proxmox_get_user_token`
+
+**Description:** Get details of a specific user API token
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., root@pam) |
+| `tokenid` | string | Yes | Token ID |
 
 #### `proxmox_get_vm_config`
 
@@ -2008,6 +2675,19 @@ Total Tools: 227
 | `node` | string | Yes | Node name where VM is located |
 | `vmid` | number | Yes | VM ID number |
 | `pos` | number | Yes | Rule position |
+
+#### `proxmox_get_vm_pending`
+
+**Description:** Get pending configuration changes for a QEMU VM
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
 
 #### `proxmox_get_vm_rrddata`
 
@@ -2064,7 +2744,56 @@ Total Tools: 227
 | `node` | string | Yes | Node name where the guest is located |
 | `vmid` | number | Yes | VM or container ID |
 
+### Init
+
+#### `proxmox_init_disk_gpt`
+
+**Description:** Initialize GPT partition table on a disk (requires elevated permissions, destructive)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `disk` | string | Yes | Block device path (e.g., /dev/sdb) |
+| `uuid` | unknown | No | - |
+
+### Join
+
+#### `proxmox_join_cluster`
+
+**Description:** Join a cluster (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `hostname` | string | Yes | Hostname of cluster node to join |
+| `password` | string | Yes | Cluster password |
+| `fingerprint` | unknown | No | - |
+| `force` | unknown | No | - |
+
 ### List
+
+#### `proxmox_list_acme_accounts`
+
+**Description:** List all ACME accounts configured in the cluster
+
+**Permission:** basic
+
+**Parameters:** None
+
+#### `proxmox_list_acme_plugins`
+
+**Description:** List all ACME challenge plugins configured in the cluster
+
+**Permission:** basic
+
+**Parameters:** None
 
 #### `proxmox_list_backups`
 
@@ -2147,6 +2876,22 @@ Total Tools: 227
 
 **Parameters:** None
 
+#### `proxmox_list_cluster_config_nodes`
+
+**Description:** List cluster configuration nodes
+
+**Permission:** basic
+
+**Parameters:** None
+
+#### `proxmox_list_cluster_firewall_aliases`
+
+**Description:** List cluster firewall aliases
+
+**Permission:** basic
+
+**Parameters:** None
+
 #### `proxmox_list_cluster_firewall_groups`
 
 **Description:** List cluster firewall security groups
@@ -2154,6 +2899,46 @@ Total Tools: 227
 **Permission:** basic
 
 **Parameters:** None
+
+#### `proxmox_list_cluster_firewall_ipset_entries`
+
+**Description:** List entries in a cluster firewall IP set
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+
+#### `proxmox_list_cluster_firewall_ipsets`
+
+**Description:** List cluster firewall IP sets
+
+**Permission:** basic
+
+**Parameters:** None
+
+#### `proxmox_list_cluster_firewall_macros`
+
+**Description:** List available firewall macros
+
+**Permission:** basic
+
+**Parameters:** None
+
+#### `proxmox_list_cluster_firewall_refs`
+
+**Description:** List firewall references (aliases/ipsets)
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | unknown | No | - |
 
 #### `proxmox_list_cluster_firewall_rules`
 
@@ -2214,6 +2999,14 @@ Total Tools: 227
 |------|------|----------|-------------|
 | `node` | string | Yes | Node name where VM is located |
 | `vmid` | number | Yes | VM ID number |
+
+#### `proxmox_list_notification_targets`
+
+**Description:** List all notification targets (SMTP, Gotify, Sendmail)
+
+**Permission:** basic
+
+**Parameters:** None
 
 #### `proxmox_list_pools`
 
@@ -2325,6 +3118,18 @@ Total Tools: 227
 | `node` | string | Yes | Node name |
 | `storage` | unknown | Yes | Storage name (e.g., local) |
 
+#### `proxmox_list_user_tokens`
+
+**Description:** List API tokens for a user
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., root@pam) |
+
 #### `proxmox_list_users`
 
 **Description:** List Proxmox users
@@ -2435,6 +3240,59 @@ Total Tools: 227
 | `storage` | string | Yes | Target storage name |
 | `delete` | unknown | Yes | Delete source disk after move (default: true) |
 
+### Node
+
+#### `proxmox_node_reboot`
+
+**Description:** Reboot a node (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+#### `proxmox_node_shutdown`
+
+**Description:** Shutdown a node (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+#### `proxmox_node_wakeonlan`
+
+**Description:** Wake a node via Wake-on-LAN (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+### Order
+
+#### `proxmox_order_acme_certificate`
+
+**Description:** Order a new ACME (Let's Encrypt) certificate for a Proxmox node (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `force` | unknown | No | - |
+
 ### Pause
 
 #### `proxmox_pause_vm`
@@ -2503,6 +3361,21 @@ Total Tools: 227
 | `node` | string | Yes | Node name where VM is located |
 | `vmid` | number | Yes | VM ID number |
 
+### Regenerate
+
+#### `proxmox_regenerate_cloudinit`
+
+**Description:** Regenerate the cloud-init drive for a QEMU VM (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+
 ### Remove
 
 #### `proxmox_remove_disk_vm`
@@ -2560,6 +3433,21 @@ Total Tools: 227
 | `node` | string | Yes | Node name where VM is located |
 | `vmid` | number | Yes | VM ID number |
 | `net` | string | Yes | Network interface name to remove (net0, net1, net2, etc.) |
+
+### Renew
+
+#### `proxmox_renew_acme_certificate`
+
+**Description:** Renew the ACME certificate for a Proxmox node (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `force` | unknown | No | - |
 
 ### Resize
 
@@ -2670,6 +3558,20 @@ Total Tools: 227
 | `node` | string | Yes | Node name where VM is located |
 | `vmid` | number | Yes | VM ID number |
 
+### Revoke
+
+#### `proxmox_revoke_acme_certificate`
+
+**Description:** Revoke the ACME certificate for a Proxmox node (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
 ### Rollback
 
 #### `proxmox_rollback_snapshot_lxc`
@@ -2699,6 +3601,21 @@ Total Tools: 227
 | `node` | string | Yes | Node name where container/VM is located |
 | `vmid` | number | Yes | Container/VM ID number |
 | `snapname` | string | Yes | Snapshot name |
+
+### Schedule
+
+#### `proxmox_schedule_node_replication`
+
+**Description:** Schedule immediate node replication (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `id` | string | Yes | Replication job ID |
 
 ### Set
 
@@ -2823,6 +3740,20 @@ Total Tools: 227
 | `node` | string | Yes | Node name where VM is located |
 | `vmid` | number | Yes | VM ID number |
 
+### Test
+
+#### `proxmox_test_notification_target`
+
+**Description:** Send a test notification to a target (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Notification target name |
+
 ### Update
 
 #### `proxmox_update_acl`
@@ -2842,6 +3773,19 @@ Total Tools: 227
 | `propagate` | unknown | No | - |
 | `delete` | unknown | No | - |
 | `digest` | unknown | No | - |
+
+#### `proxmox_update_acme_account`
+
+**Description:** Update an existing ACME account (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | ACME account name |
+| `contact` | unknown | No | - |
 
 #### `proxmox_update_ceph_pool`
 
@@ -2909,6 +3853,21 @@ Total Tools: 227
 | `vmid` | unknown | No | - |
 | `zstd` | unknown | No | - |
 
+#### `proxmox_update_cluster_firewall_alias`
+
+**Description:** Update a cluster firewall alias (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+| `cidr` | string | Yes | IP address or CIDR network |
+| `comment` | unknown | No | - |
+| `rename` | unknown | No | - |
+
 #### `proxmox_update_cluster_firewall_group`
 
 **Description:** Update a cluster firewall group (requires elevated permissions)
@@ -2924,6 +3883,36 @@ Total Tools: 227
 | `rename` | unknown | No | - |
 | `delete` | unknown | No | - |
 | `digest` | unknown | No | - |
+
+#### `proxmox_update_cluster_firewall_ipset_entry`
+
+**Description:** Update an entry in a cluster firewall IP set (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `cidr` | string | Yes | CIDR network address |
+| `comment` | unknown | No | - |
+| `nomatch` | unknown | No | - |
+
+#### `proxmox_update_cluster_firewall_options`
+
+**Description:** Update cluster firewall options (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `enable` | unknown | No | - |
+| `policy_in` | unknown | No | - |
+| `policy_out` | unknown | No | - |
+| `log_ratelimit` | unknown | No | - |
 
 #### `proxmox_update_cluster_firewall_rule`
 
@@ -3392,6 +4381,21 @@ Total Tools: 227
 | `delete` | unknown | No | - |
 | `digest` | unknown | No | - |
 
+#### `proxmox_update_user_token`
+
+**Description:** Update a user API token (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., root@pam) |
+| `tokenid` | string | Yes | Token ID |
+| `comment` | unknown | No | - |
+| `expire` | unknown | No | - |
+
 #### `proxmox_update_vm_firewall_rule`
 
 **Description:** Update a VM firewall rule (requires elevated permissions)
@@ -3423,6 +4427,22 @@ Total Tools: 227
 
 ### Upload
 
+#### `proxmox_upload_custom_certificate`
+
+**Description:** Upload a custom SSL certificate to a Proxmox node (requires elevated permissions)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `certificates` | string | Yes | PEM encoded certificate(s) |
+| `key` | unknown | No | - |
+| `force` | unknown | No | - |
+| `restart` | unknown | No | - |
+
 #### `proxmox_upload_to_storage`
 
 **Description:** Upload ISO/template to storage (requires elevated permissions)
@@ -3439,4 +4459,19 @@ Total Tools: 227
 | `filename` | string | Yes | Filename to upload |
 | `checksum` | unknown | No | - |
 | `checksum-algorithm` | unknown | No | - |
+
+### Wipe
+
+#### `proxmox_wipe_disk`
+
+**Description:** Wipe all data from a disk (requires elevated permissions, destructive)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `disk` | string | Yes | Block device path (e.g., /dev/sdb) |
 

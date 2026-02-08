@@ -2,8 +2,8 @@
 
 > Storage configuration, content management, file uploads, disk health monitoring, and LVM/ZFS pools.
 
-**Tools in this file:** 16  
-**Generated:** 2026-02-06T10:53:57.669Z
+**Tools in this file:** 20  
+**Generated:** 2026-02-08T04:04:42.008Z
 
 ---
 
@@ -131,6 +131,20 @@
 
 ---
 
+#### `proxmox_get_node_directory`
+
+**Description:** List directory-based storage on a Proxmox node
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
 #### `proxmox_get_node_disks`
 
 **Description:** List physical disks on a Proxmox node (SSD, HDD, NVMe) with health status
@@ -151,6 +165,20 @@
 #### `proxmox_get_node_lvm`
 
 **Description:** List LVM volume groups and physical volumes on a Proxmox node
+
+**Permission:** basic
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_get_node_lvmthin`
+
+**Description:** List LVM thin pools on a Proxmox node with capacity info
 
 **Permission:** basic
 
@@ -187,6 +215,22 @@
 | Name | Type | Required | Description |
 |------|------|----------|-------------|
 | `storage` | string | Yes | Storage identifier |
+
+---
+
+#### `proxmox_init_disk_gpt`
+
+**Description:** Initialize GPT partition table on a disk (requires elevated permissions, destructive)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `disk` | string | Yes | Block device path (e.g., /dev/sdb) |
+| `uuid` | unknown | No | - |
 
 ---
 
@@ -314,6 +358,21 @@
 | `filename` | string | Yes | Filename to upload |
 | `checksum` | unknown | No | - |
 | `checksum-algorithm` | unknown | No | - |
+
+---
+
+#### `proxmox_wipe_disk`
+
+**Description:** Wipe all data from a disk (requires elevated permissions, destructive)
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `disk` | string | Yes | Block device path (e.g., /dev/sdb) |
 
 ---
 
