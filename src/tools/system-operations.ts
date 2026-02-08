@@ -19,6 +19,9 @@ import {
   startAllSchema,
   stopAllSchema,
   migrateAllSchema,
+  nodeShutdownSchema,
+  nodeRebootSchema,
+  nodeWakeonlanSchema,
 } from '../schemas/system-operations.js';
 import type {
   GetNodeTimeInput,
@@ -35,6 +38,9 @@ import type {
   StartAllInput,
   StopAllInput,
   MigrateAllInput,
+  NodeShutdownInput,
+  NodeRebootInput,
+  NodeWakeonlanInput,
 } from '../schemas/system-operations.js';
 
 interface ProxmoxNodeTime {
@@ -540,5 +546,90 @@ export async function migrateAll(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Migrate All');
+  }
+}
+
+/**
+ * Shutdown a node.
+ * Requires elevated permissions.
+ */
+export async function nodeShutdown(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeShutdownInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'shutdown node');
+
+    const validated = nodeShutdownSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const result = await client.request(`/nodes/${safeNode}/status`, 'POST', {
+      command: 'shutdown',
+    });
+
+    let output = '🛑 **Node Shutdown Issued**\n\n';
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Node Shutdown');
+  }
+}
+
+/**
+ * Reboot a node.
+ * Requires elevated permissions.
+ */
+export async function nodeReboot(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeRebootInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'reboot node');
+
+    const validated = nodeRebootSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const result = await client.request(`/nodes/${safeNode}/status`, 'POST', {
+      command: 'reboot',
+    });
+
+    let output = '🔄 **Node Reboot Issued**\n\n';
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Node Reboot');
+  }
+}
+
+/**
+ * Wake a node via Wake-on-LAN.
+ * Requires elevated permissions.
+ */
+export async function nodeWakeonlan(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeWakeonlanInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'wake node via WOL');
+
+    const validated = nodeWakeonlanSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const result = await client.request(`/nodes/${safeNode}/wakeonlan`, 'POST');
+
+    let output = '🌙 **Wake-on-LAN Issued**\n\n';
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Node Wake-on-LAN');
   }
 }

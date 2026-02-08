@@ -44,6 +44,9 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_start_all: 'Start all VMs/containers on a node (requires elevated permissions)',
   proxmox_stop_all: 'Stop all VMs/containers on a node (requires elevated permissions)',
   proxmox_migrate_all: 'Migrate all VMs/containers to another node (requires elevated permissions)',
+  proxmox_node_shutdown: 'Shutdown a node (requires elevated permissions)',
+  proxmox_node_reboot: 'Reboot a node (requires elevated permissions)',
+  proxmox_node_wakeonlan: 'Wake a node via Wake-on-LAN (requires elevated permissions)',
 
   // Cluster Management
   proxmox_get_ha_resources: 'List High Availability resources in the cluster',

@@ -15,6 +15,9 @@ import {
   sampleStartAll,
   sampleStopAll,
   sampleMigrateAll,
+  sampleNodeShutdown,
+  sampleNodeReboot,
+  sampleNodeWakeonlan,
 } from '../__fixtures__/system-operations.js';
 import {
   getNodeTime,
@@ -31,6 +34,9 @@ import {
   startAll,
   stopAll,
   migrateAll,
+  nodeShutdown,
+  nodeReboot,
+  nodeWakeonlan,
 } from './system-operations.js';
 
 describe('System Operations Tools', () => {
@@ -65,6 +71,9 @@ describe('System Operations Tools', () => {
     { name: 'startAll', handler: startAll, input: sampleStartAll },
     { name: 'stopAll', handler: stopAll, input: sampleStopAll },
     { name: 'migrateAll', handler: migrateAll, input: sampleMigrateAll },
+    { name: 'nodeShutdown', handler: nodeShutdown, input: sampleNodeShutdown },
+    { name: 'nodeReboot', handler: nodeReboot, input: sampleNodeReboot },
+    { name: 'nodeWakeonlan', handler: nodeWakeonlan, input: sampleNodeWakeonlan },
   ];
 
   it.each(elevatedOperations)('requires elevated permissions for $name', async ({
@@ -303,6 +312,49 @@ describe('System Operations Tools', () => {
         maxworkers: 2,
         'with-local-disks': true,
       });
+    });
+  });
+
+  describe('nodeShutdown', () => {
+    it('shuts down a node with expected payload', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('OK');
+
+      const result = await nodeShutdown(client, config, sampleNodeShutdown);
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('Node Shutdown Issued');
+      expect(client.request).toHaveBeenCalledWith('/nodes/pve1/status', 'POST', {
+        command: 'shutdown',
+      });
+    });
+  });
+
+  describe('nodeReboot', () => {
+    it('reboots a node with expected payload', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('OK');
+
+      const result = await nodeReboot(client, config, sampleNodeReboot);
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('Node Reboot Issued');
+      expect(client.request).toHaveBeenCalledWith('/nodes/pve1/status', 'POST', {
+        command: 'reboot',
+      });
+    });
+  });
+
+  describe('nodeWakeonlan', () => {
+    it('wakes a node via WOL', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('OK');
+
+      const result = await nodeWakeonlan(client, config, sampleNodeWakeonlan);
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('Wake-on-LAN Issued');
+      expect(client.request).toHaveBeenCalledWith('/nodes/pve1/wakeonlan', 'POST');
     });
   });
 });

@@ -40,6 +40,9 @@ export {
   startAll,
   stopAll,
   migrateAll,
+  nodeShutdown,
+  nodeReboot,
+  nodeWakeonlan,
 } from './system-operations.js';
 
 // Cluster Management tools

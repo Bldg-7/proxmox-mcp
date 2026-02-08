@@ -253,3 +253,60 @@
 - POST /access/users/{userid}/token/{tokenid} (create token)
 - PUT /access/users/{userid}/token/{tokenid} (update token)
 - DELETE /access/users/{userid}/token/{tokenid} (delete token)
+
+## Task 5: Node Power Management (COMPLETED)
+
+### Implementation Pattern
+- **Schemas**: 3 new schemas in system-operations.ts
+  - `nodeShutdownSchema`: node parameter (string, min 1)
+  - `nodeRebootSchema`: node parameter (string, min 1)
+  - `nodeWakeonlanSchema`: node parameter (string, min 1)
+
+- **Handlers**: 3 functions in system-operations.ts
+  - Shutdown: POST /nodes/{node}/status with command=shutdown
+  - Reboot: POST /nodes/{node}/status with command=reboot
+  - Wake-on-LAN: POST /nodes/{node}/wakeonlan (no payload)
+
+- **Tests**: 6 tests total
+  - 3 success cases (one per tool)
+  - 3 elevated permission denial tests
+  - Pattern: Mock client, verify API calls, check output formatting
+
+### Key Learnings
+1. **Shared endpoint pattern**: Shutdown and reboot both use `/nodes/{node}/status` endpoint
+   - Differentiated by `command` parameter (shutdown vs reboot)
+   - Similar to how startAll/stopAll use different endpoints but same pattern
+   
+2. **Elevated operations**: All 3 tools require elevated permissions
+   - Use `requireElevated(config, 'action description')`
+   - Tests verify both permission denial and successful execution
+   
+3. **Tool count tracking**: Updated 3 places
+   - registry.ts: Tool count assertion (265→268)
+   - integration tests: Two assertions for tool count (265→268)
+   
+4. **Destructive operations**: Power management is inherently destructive
+   - Shutdown/reboot affect node availability
+   - Wake-on-LAN requires network configuration
+   - All require elevated permissions as safety measure
+
+### Files Modified
+- src/schemas/system-operations.ts: +3 schemas
+- src/tools/system-operations.ts: +3 handlers
+- src/tools/index.ts: +3 exports
+- src/types/tools.ts: +3 tool names
+- src/server.ts: +3 tool descriptions
+- src/tools/registry.ts: +3 registrations, updated tool count (265→268)
+- src/__fixtures__/system-operations.ts: +3 sample data
+- src/tools/system-operations.test.ts: +6 tests
+- src/__tests__/integration/server.test.ts: Updated 2 assertions (265→268)
+
+### Verification
+- ✅ pnpm build: No errors
+- ✅ pnpm test: 699 tests pass (including 6 new tests)
+- ✅ Tool count: 265 → 268 (3 new tools)
+
+### API Endpoints Implemented
+- POST /nodes/{node}/status (shutdown command)
+- POST /nodes/{node}/status (reboot command)
+- POST /nodes/{node}/wakeonlan

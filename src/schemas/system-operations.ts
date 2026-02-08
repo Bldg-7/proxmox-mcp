@@ -120,3 +120,24 @@ export const migrateAllSchema = z.object({
 });
 
 export type MigrateAllInput = z.infer<typeof migrateAllSchema>;
+
+// proxmox_node_shutdown - Shutdown a node
+export const nodeShutdownSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type NodeShutdownInput = z.infer<typeof nodeShutdownSchema>;
+
+// proxmox_node_reboot - Reboot a node
+export const nodeRebootSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type NodeRebootInput = z.infer<typeof nodeRebootSchema>;
+
+// proxmox_node_wakeonlan - Wake a node via WOL
+export const nodeWakeonlanSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type NodeWakeonlanInput = z.infer<typeof nodeWakeonlanSchema>;

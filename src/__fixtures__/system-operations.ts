@@ -66,3 +66,15 @@ export const sampleMigrateAll = {
   maxworkers: 2,
   'with-local-disks': true,
 };
+
+export const sampleNodeShutdown = {
+  node: 'pve1',
+};
+
+export const sampleNodeReboot = {
+  node: 'pve1',
+};
+
+export const sampleNodeWakeonlan = {
+  node: 'pve1',
+};

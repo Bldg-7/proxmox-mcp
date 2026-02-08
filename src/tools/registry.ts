@@ -36,6 +36,9 @@ import {
   startAll,
   stopAll,
   migrateAll,
+  nodeShutdown,
+  nodeReboot,
+  nodeWakeonlan,
   getClusterStatus,
   getNextVMID,
   getHaResources,
@@ -311,6 +314,9 @@ import {
   startAllSchema,
   stopAllSchema,
   migrateAllSchema,
+  nodeShutdownSchema,
+  nodeRebootSchema,
+  nodeWakeonlanSchema,
 } from '../schemas/system-operations.js';
 import {
   getHaResourcesSchema,
@@ -642,6 +648,9 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_start_all: { handler: startAll, schema: startAllSchema },
   proxmox_stop_all: { handler: stopAll, schema: stopAllSchema },
   proxmox_migrate_all: { handler: migrateAll, schema: migrateAllSchema },
+  proxmox_node_shutdown: { handler: nodeShutdown, schema: nodeShutdownSchema },
+  proxmox_node_reboot: { handler: nodeReboot, schema: nodeRebootSchema },
+  proxmox_node_wakeonlan: { handler: nodeWakeonlan, schema: nodeWakeonlanSchema },
 
   // Cluster Management
   proxmox_get_ha_resources: { handler: getHaResources, schema: getHaResourcesSchema },
@@ -1109,10 +1118,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 265 tools are registered
+// Validate all 268 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 265) {
+if (registeredCount !== 268) {
   throw new Error(
-    `Tool registry incomplete: expected 265 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 268 tools, got ${registeredCount}`
   );
 }
