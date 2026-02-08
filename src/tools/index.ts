@@ -340,6 +340,18 @@ export {
   getNodeAcmeConfig,
 } from './certificate.js';
 
+// ACME Management tools
+export {
+  listAcmeAccounts,
+  getAcmeAccount,
+  createAcmeAccount,
+  updateAcmeAccount,
+  deleteAcmeAccount,
+  listAcmePlugins,
+  getAcmePlugin,
+  getAcmeDirectories,
+} from './acme.js';
+
 // QEMU Agent tools (file operations, user management, power control)
 export {
   agentFileRead,

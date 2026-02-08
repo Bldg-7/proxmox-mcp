@@ -299,6 +299,14 @@ import {
   renewAcmeCertificate,
   revokeAcmeCertificate,
   getNodeAcmeConfig,
+  listAcmeAccounts,
+  getAcmeAccount,
+  createAcmeAccount,
+  updateAcmeAccount,
+  deleteAcmeAccount,
+  listAcmePlugins,
+  getAcmePlugin,
+  getAcmeDirectories,
 } from './index.js';
 
 // Import all schemas
@@ -632,6 +640,16 @@ import {
   revokeAcmeCertificateSchema,
   getNodeAcmeConfigSchema,
 } from '../schemas/certificate.js';
+import {
+  listAcmeAccountsSchema,
+  getAcmeAccountSchema,
+  createAcmeAccountSchema,
+  updateAcmeAccountSchema,
+  deleteAcmeAccountSchema,
+  listAcmePluginsSchema,
+  getAcmePluginSchema,
+  getAcmeDirectoriesSchema,
+} from '../schemas/acme.js';
 
 // Tool handler type - accepts any input type for flexibility
 export type ToolHandler = (
@@ -1210,6 +1228,16 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
    proxmox_renew_acme_certificate: { handler: renewAcmeCertificate, schema: renewAcmeCertificateSchema },
    proxmox_revoke_acme_certificate: { handler: revokeAcmeCertificate, schema: revokeAcmeCertificateSchema },
    proxmox_get_node_acme_config: { handler: getNodeAcmeConfig, schema: getNodeAcmeConfigSchema },
+
+   // ACME Management
+   proxmox_list_acme_accounts: { handler: listAcmeAccounts, schema: listAcmeAccountsSchema },
+   proxmox_get_acme_account: { handler: getAcmeAccount, schema: getAcmeAccountSchema },
+   proxmox_create_acme_account: { handler: createAcmeAccount, schema: createAcmeAccountSchema },
+   proxmox_update_acme_account: { handler: updateAcmeAccount, schema: updateAcmeAccountSchema },
+   proxmox_delete_acme_account: { handler: deleteAcmeAccount, schema: deleteAcmeAccountSchema },
+   proxmox_list_acme_plugins: { handler: listAcmePlugins, schema: listAcmePluginsSchema },
+   proxmox_get_acme_plugin: { handler: getAcmePlugin, schema: getAcmePluginSchema },
+   proxmox_get_acme_directories: { handler: getAcmeDirectories, schema: getAcmeDirectoriesSchema },
 };
 
 // Helper to get tool handler
@@ -1217,10 +1245,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 294 tools are registered
+// Validate all 302 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 294) {
+if (registeredCount !== 302) {
    throw new Error(
-     `Tool registry incomplete: expected 294 tools, got ${registeredCount}`
+     `Tool registry incomplete: expected 302 tools, got ${registeredCount}`
    );
 }

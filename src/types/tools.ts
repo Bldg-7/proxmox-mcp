@@ -295,6 +295,15 @@ export const TOOL_NAMES = [
   'proxmox_renew_acme_certificate',
   'proxmox_revoke_acme_certificate',
   'proxmox_get_node_acme_config',
+  // ACME Management
+  'proxmox_list_acme_accounts',
+  'proxmox_get_acme_account',
+  'proxmox_create_acme_account',
+  'proxmox_update_acme_account',
+  'proxmox_delete_acme_account',
+  'proxmox_list_acme_plugins',
+  'proxmox_get_acme_plugin',
+  'proxmox_get_acme_directories',
 ] as const;
 
 export type ToolName = (typeof TOOL_NAMES)[number];

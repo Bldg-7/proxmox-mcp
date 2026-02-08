@@ -778,3 +778,105 @@ When creating a completely new domain:
 - ACME operations return task UPIDs for async operations
 - Certificate info includes subject, issuer, fingerprint, public key details, and SANs
 - ACME config shows account, domains, and plugin information
+
+## Task 13: ACME Plugins & Accounts (COMPLETED - $(date '+%Y-%m-%d %H:%M:%S'))
+
+### Implementation Summary
+Successfully implemented 8 ACME management tools for account and plugin management.
+
+### New Files Created
+1. **src/schemas/acme.ts** (57 lines)
+   - 8 Zod schemas for ACME operations
+   - Pattern: Empty schemas for list operations, name/id for get/delete, full params for create/update
+
+2. **src/tools/acme.ts** (277 lines)
+   - 8 handler functions for ACME account and plugin management
+   - Contact info redaction in create/update account operations
+   - URL encoding for name and id parameters
+
+3. **src/tools/acme.test.ts** (24 tests)
+   - 8 success tests (one per tool)
+   - 3 elevated permission denial tests (create, update, delete account)
+   - 13 additional edge case tests (empty lists, URL encoding, API errors)
+
+### Files Modified
+1. **src/tools/index.ts** - Added ACME Management export section
+2. **src/types/tools.ts** - Added 8 tool names with ACME Management section
+3. **src/server.ts** - Added 8 tool descriptions with ACME Management section
+4. **src/tools/registry.ts** - Added 8 registrations, updated count 294→302
+5. **src/__tests__/integration/server.test.ts** - Updated tool count assertions 294→302
+
+### Key Implementation Patterns
+
+#### 1. Contact Redaction Pattern
+```typescript
+const safePayload = { ...payload, contact: '[REDACTED]' };
+// Display safePayload instead of actual payload
+```
+
+#### 2. URL Encoding Pattern
+```typescript
+const encodedName = encodeURIComponent(params.name);
+const path = `/cluster/acme/account/${encodedName}`;
+```
+
+#### 3. Client Request Signature
+```typescript
+// GET request
+const result = await client.request('/path');
+
+// POST/PUT request
+const result = await client.request('/path', 'POST', payload);
+
+// DELETE request
+const result = await client.request('/path', 'DELETE');
+```
+
+#### 4. Type Casting for Unknown Results
+```typescript
+// For simple property access
+const result = await client.request('/path') as any;
+
+// For array iteration
+if (Array.isArray(result)) {
+  for (const item of result) {
+    const name = (item as any).name || 'N/A';
+  }
+}
+```
+
+### Tools Implemented
+
+| Tool Name | Handler | Endpoint | Method | Elevated |
+|-----------|---------|----------|--------|----------|
+| `proxmox_list_acme_accounts` | `listAcmeAccounts` | `/cluster/acme/account` | GET | NO |
+| `proxmox_get_acme_account` | `getAcmeAccount` | `/cluster/acme/account/{name}` | GET | NO |
+| `proxmox_create_acme_account` | `createAcmeAccount` | `/cluster/acme/account` | POST | YES |
+| `proxmox_update_acme_account` | `updateAcmeAccount` | `/cluster/acme/account/{name}` | PUT | YES |
+| `proxmox_delete_acme_account` | `deleteAcmeAccount` | `/cluster/acme/account/{name}` | DELETE | YES |
+| `proxmox_list_acme_plugins` | `listAcmePlugins` | `/cluster/acme/plugins` | GET | NO |
+| `proxmox_get_acme_plugin` | `getAcmePlugin` | `/cluster/acme/plugins/{id}` | GET | NO |
+| `proxmox_get_acme_directories` | `getAcmeDirectories` | `/cluster/acme/directories` | GET | NO |
+
+### Verification Results
+- **Build**: ✅ PASSED (exit 0)
+- **Tests**: ✅ PASSED (791 tests, +24 new tests)
+- **Tool Count**: ✅ 302 (294 + 8)
+- **Test Count**: ✅ 791 (767 + 24)
+
+### Gotchas & Lessons Learned
+
+1. **Client Request Signature**: The ProxmoxApiClient.request() signature is `(endpoint, method?, body?)`, NOT an options object. Tests must match this signature.
+
+2. **Type Casting**: Since client.request returns `unknown`, use `as any` for complex objects or type guards for arrays.
+
+3. **Contact Redaction**: Always redact sensitive data (contact emails) in output, even though it's sent to the API.
+
+4. **URL Encoding**: Always use `encodeURIComponent()` for path parameters that might contain special characters.
+
+5. **Test Expectations**: When updating client.request signature, remember to update test expectations to match the new call pattern.
+
+### Next Steps
+- Task 14: Firewall Management (remaining tools)
+- Continue with remaining API endpoints from plan
+

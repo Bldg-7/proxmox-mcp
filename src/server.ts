@@ -373,6 +373,16 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_renew_acme_certificate: 'Renew the ACME certificate for a Proxmox node (requires elevated permissions)',
   proxmox_revoke_acme_certificate: 'Revoke the ACME certificate for a Proxmox node (requires elevated permissions)',
   proxmox_get_node_acme_config: 'Get ACME configuration for a Proxmox node',
+
+  // ACME Management
+  proxmox_list_acme_accounts: 'List all ACME accounts configured in the cluster',
+  proxmox_get_acme_account: 'Get detailed information about a specific ACME account',
+  proxmox_create_acme_account: 'Create a new ACME account (requires elevated permissions)',
+  proxmox_update_acme_account: 'Update an existing ACME account (requires elevated permissions)',
+  proxmox_delete_acme_account: 'Delete an ACME account (requires elevated permissions)',
+  proxmox_list_acme_plugins: 'List all ACME challenge plugins configured in the cluster',
+  proxmox_get_acme_plugin: 'Get detailed configuration for a specific ACME plugin',
+  proxmox_get_acme_directories: 'Get available ACME directory endpoints (Let\'s Encrypt, etc.)',
 };
 
 export function createServer(client: ProxmoxApiClient, config: Config): Server {
