@@ -2,9 +2,9 @@
 
 > Complete reference for all available tools and planned Proxmox API integrations
 
-**Current Version**: 0.1.5  
-**Total Tools**: 227  
-**Last Updated**: 2026-02-06
+**Current Version**: 0.6.0  
+**Total Tools**: 307  
+**Last Updated**: 2026-02-08
 
 ---
 
@@ -14,26 +14,30 @@
 - [Permission Model](#permission-model)
 - [Implemented Tools](#implemented-tools)
   - [Node & Cluster (7 tools)](#node--cluster-7-tools)
-  - [Node Management (8 tools)](#node-management-8-tools)
+  - [Node Management (11 tools)](#node-management-11-tools)
   - [Node Network Configuration (4 tools)](#node-network-configuration-4-tools)
-  - [System Operations (14 tools)](#system-operations-14-tools)
-  - [Cluster Management (33 tools)](#cluster-management-33-tools)
+  - [System Operations (20 tools)](#system-operations-20-tools)
+  - [Cluster Management (54 tools)](#cluster-management-54-tools)
   - [Storage Management (12 tools)](#storage-management-12-tools)
-  - [VM Query (5 tools)](#vm-query-5-tools)
+  - [VM Query (9 tools)](#vm-query-9-tools)
   - [VM Lifecycle (12 tools)](#vm-lifecycle-12-tools)
   - [VM Modify (4 tools)](#vm-modify-4-tools)
-  - [VM/LXC Advanced (26 tools)](#vmlxc-advanced-26-tools)
+  - [VM/LXC Advanced (40 tools)](#vmlxc-advanced-40-tools)
   - [Snapshots (8 tools)](#snapshots-8-tools)
   - [Backups (6 tools)](#backups-6-tools)
-  - [Disks (12 tools)](#disks-12-tools)
+  - [Disks (16 tools)](#disks-16-tools)
   - [Network (6 tools)](#network-6-tools)
   - [Command (1 tool)](#command-1-tool)
   - [Creation (3 tools)](#creation-3-tools)
+  - [Cloud-Init (3 tools)](#cloud-init-3-tools)
   - [Console Access (5 tools)](#console-access-5-tools)
   - [Pool Management (5 tools)](#pool-management-5-tools)
-  - [Access Control (20 tools)](#access-control-20-tools)
+  - [Access Control (25 tools)](#access-control-25-tools)
   - [SDN (20 tools)](#sdn-20-tools)
   - [Ceph Integration (16 tools)](#ceph-integration-16-tools)
+  - [Certificate Management (7 tools)](#certificate-management-7-tools)
+  - [ACME Management (8 tools)](#acme-management-8-tools)
+  - [Notification Management (5 tools)](#notification-management-5-tools)
 - [Unimplemented Proxmox APIs](#unimplemented-proxmox-apis)
   - [High Priority](#high-priority)
   - [Medium Priority](#medium-priority)
@@ -50,27 +54,31 @@ This document provides a complete reference for all tools available in the Proxm
 | Category | Count | Permission |
 |----------|-------|------------|
 | Node & Cluster | 7 | Mixed |
-| Node Management | 8 | Mixed |
+| Node Management | 11 | Mixed |
 | Node Network Configuration | 4 | Mixed |
-| System Operations | 14 | Mixed |
-| Cluster Management | 33 | Mixed |
+| System Operations | 20 | Mixed |
+| Cluster Management | 54 | Mixed |
 | Storage Management | 12 | Mixed |
-| VM Query | 5 | Basic |
+| VM Query | 9 | Basic |
 | VM Lifecycle | 12 | Elevated |
 | VM Modify | 4 | Elevated |
-| VM/LXC Advanced | 26 | Mixed |
+| VM/LXC Advanced | 40 | Mixed |
 | Snapshots | 8 | Mixed |
 | Backups | 6 | Elevated |
-| Disks | 12 | Elevated |
+| Disks | 16 | Mixed |
 | Network | 6 | Elevated |
 | Command | 1 | Elevated |
 | Creation | 3 | Mixed |
+| Cloud-Init | 3 | Mixed |
 | Console Access | 5 | Mixed |
 | Pool Management | 5 | Mixed |
-| Access Control | 20 | Mixed |
+| Access Control | 25 | Mixed |
 | SDN | 20 | Mixed |
 | Ceph Integration | 16 | Mixed |
-| **Total** | **227** | |
+| Certificate Management | 7 | Mixed |
+| ACME Management | 8 | Mixed |
+| Notification Management | 5 | Mixed |
+| **Total** | **307** | |
 
 ---
 
@@ -235,7 +243,7 @@ Get the next available VM/Container ID number.
 
 ---
 
-### Node Management (8 tools)
+### Node Management (11 tools)
 
 #### `proxmox_get_node_services`
 List system services on a Proxmox node.
@@ -421,7 +429,474 @@ Get network connection statistics for a Proxmox node.
 
 ---
 
-### Cluster Management (33 tools)
+#### `proxmox_get_node_rrddata`
+Get node RRD performance metrics (CPU, memory, disk I/O).
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/rrddata` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `timeframe` | string | No | Timeframe: `hour`, `day`, `week`, `month`, `year` |
+| `cf` | string | No | Consolidation function: `AVERAGE`, `MAX` |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "timeframe": "hour"
+}
+```
+
+---
+
+#### `proxmox_get_storage_rrddata`
+Get storage RRD performance metrics (read/write throughput, usage).
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/storage/{storage}/rrddata` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `storage` | string | Yes | Storage name |
+| `timeframe` | string | No | Timeframe: `hour`, `day`, `week`, `month`, `year` |
+| `cf` | string | No | Consolidation function: `AVERAGE`, `MAX` |
+
+**Example**:
+```json
+{
+  "node": "pve1",
+  "storage": "local-lvm",
+  "timeframe": "day"
+}
+```
+
+---
+
+#### `proxmox_get_node_report`
+Get node diagnostic report with system information.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/report` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+**Example**:
+```json
+{
+  "node": "pve1"
+}
+```
+
+---
+
+### Node Network Configuration (4 tools)
+
+#### `proxmox_create_network_iface` 🔒
+Create a network interface on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/network` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `iface` | string | Yes | Interface name |
+| `type` | string | Yes | Interface type (`bridge`, `bond`, `eth`, `alias`, `vlan`, `OVSBridge`, `OVSBond`, `OVSPort`, `OVSIntPort`) |
+| `address` | string | No | IPv4 address |
+| `netmask` | string | No | Network mask |
+| `gateway` | string | No | Default gateway |
+| `bridge_ports` | string | No | Bridge ports |
+| `autostart` | boolean | No | Start at boot |
+
+---
+
+#### `proxmox_update_network_iface` 🔒
+Update a network interface on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/nodes/{node}/network/{iface}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `iface` | string | Yes | Interface name |
+| `type` | string | Yes | Interface type |
+| `address` | string | No | IPv4 address |
+| `netmask` | string | No | Network mask |
+| `gateway` | string | No | Default gateway |
+| `delete` | string | No | Settings to delete |
+
+---
+
+#### `proxmox_delete_network_iface` 🔒
+Delete a network interface on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/network/{iface}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `iface` | string | Yes | Interface name |
+
+---
+
+#### `proxmox_apply_network_config` 🔒
+Apply or revert pending network changes on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/nodes/{node}/network` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+### System Operations (20 tools)
+
+#### `proxmox_get_node_time`
+Get node time and timezone information.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/time` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_update_node_time` 🔒
+Update node time or timezone.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/nodes/{node}/time` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `timezone` | string | Yes | Timezone (e.g., `UTC`, `America/New_York`) |
+
+---
+
+#### `proxmox_update_node_dns` 🔒
+Update DNS configuration on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/nodes/{node}/dns` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `search` | string | Yes | Search domain |
+| `dns1` | string | No | Primary DNS server |
+| `dns2` | string | No | Secondary DNS server |
+| `dns3` | string | No | Tertiary DNS server |
+
+---
+
+#### `proxmox_get_node_hosts`
+Get hosts file entries for a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/hosts` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_update_node_hosts` 🔒
+Add/update a hosts entry on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/hosts` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `data` | string | Yes | Hosts file content |
+| `digest` | string | No | Config digest |
+
+---
+
+#### `proxmox_get_node_subscription`
+Get subscription information for a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/subscription` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_set_node_subscription` 🔒
+Set subscription information for a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/subscription` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `key` | string | Yes | Subscription key |
+
+---
+
+#### `proxmox_delete_node_subscription` 🔒
+Delete subscription information for a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/subscription` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_apt_update` 🔒
+Update APT package lists.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/apt/update` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_apt_upgrade` 🔒
+Upgrade packages via APT.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/apt/upgrade` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_apt_versions`
+List installed/upgradable APT package versions.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/apt/versions` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `package` | string | No | Filter by package name |
+
+---
+
+#### `proxmox_start_all` 🔒
+Start all VMs/containers on a node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/startall` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_stop_all` 🔒
+Stop all VMs/containers on a node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/stopall` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_migrate_all` 🔒
+Migrate all VMs/containers to another node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/migrateall` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `target` | string | Yes | Target node name |
+| `maxworkers` | number | No | Maximum parallel migrations |
+| `with-local-disks` | boolean | No | Include local disks in migration |
+
+---
+
+#### `proxmox_node_shutdown` 🔒
+Shutdown a node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/status` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_node_reboot` 🔒
+Reboot a node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/status` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_node_wakeonlan` 🔒
+Wake a node via Wake-on-LAN.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/wakeonlan` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_get_node_replication_status`
+Get node replication job status.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/replication/{id}/status` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `id` | string | Yes | Replication job ID |
+
+---
+
+#### `proxmox_get_node_replication_log`
+Get node replication job log.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/replication/{id}/log` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `id` | string | Yes | Replication job ID |
+
+---
+
+#### `proxmox_schedule_node_replication` 🔒
+Schedule immediate node replication.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/replication/{id}/schedule_now` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `id` | string | Yes | Replication job ID |
+
+---
+
+### Cluster Management (54 tools)
 
 #### `proxmox_get_ha_resources`
 List High Availability resources in the cluster.
@@ -1183,6 +1658,312 @@ Update cluster-wide options.
 
 ---
 
+#### `proxmox_get_cluster_firewall_options`
+Get cluster firewall options.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/options` |
+| Parameters | None |
+
+---
+
+#### `proxmox_update_cluster_firewall_options` 🔒
+Update cluster firewall options.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/firewall/options` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `enable` | number | No | Enable firewall (0/1) |
+| `policy_in` | string | No | Inbound policy (`ACCEPT`, `REJECT`, `DROP`) |
+| `policy_out` | string | No | Outbound policy (`ACCEPT`, `REJECT`, `DROP`) |
+| `log_ratelimit` | string | No | Log rate limit |
+
+---
+
+#### `proxmox_list_cluster_firewall_macros`
+List available firewall macros.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/macros` |
+| Parameters | None |
+
+---
+
+#### `proxmox_list_cluster_firewall_refs`
+List firewall references (aliases/ipsets).
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/refs` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | string | No | Filter: `alias`, `ipset` |
+
+---
+
+#### `proxmox_list_cluster_firewall_aliases`
+List cluster firewall aliases.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/aliases` |
+| Parameters | None |
+
+---
+
+#### `proxmox_get_cluster_firewall_alias`
+Get a cluster firewall alias by name.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/aliases/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+
+---
+
+#### `proxmox_create_cluster_firewall_alias` 🔒
+Create a cluster firewall alias.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/firewall/aliases` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+| `cidr` | string | Yes | IP address or CIDR network |
+| `comment` | string | No | Description |
+
+---
+
+#### `proxmox_update_cluster_firewall_alias` 🔒
+Update a cluster firewall alias.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/firewall/aliases/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+| `cidr` | string | Yes | IP address or CIDR network |
+| `comment` | string | No | Description |
+| `rename` | string | No | New alias name |
+
+---
+
+#### `proxmox_delete_cluster_firewall_alias` 🔒
+Delete a cluster firewall alias.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/firewall/aliases/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Firewall alias name |
+
+---
+
+#### `proxmox_list_cluster_firewall_ipsets`
+List cluster firewall IP sets.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/ipset` |
+| Parameters | None |
+
+---
+
+#### `proxmox_create_cluster_firewall_ipset` 🔒
+Create a cluster firewall IP set.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/firewall/ipset` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `comment` | string | No | Description |
+
+---
+
+#### `proxmox_delete_cluster_firewall_ipset` 🔒
+Delete a cluster firewall IP set.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/firewall/ipset/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+
+---
+
+#### `proxmox_list_cluster_firewall_ipset_entries`
+List entries in a cluster firewall IP set.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/firewall/ipset/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+
+---
+
+#### `proxmox_add_cluster_firewall_ipset_entry` 🔒
+Add an entry to a cluster firewall IP set.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/firewall/ipset/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `cidr` | string | Yes | CIDR network address |
+| `comment` | string | No | Description |
+| `nomatch` | boolean | No | Invert match (exclude this entry) |
+
+---
+
+#### `proxmox_update_cluster_firewall_ipset_entry` 🔒
+Update an entry in a cluster firewall IP set.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/firewall/ipset/{name}/{cidr}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `cidr` | string | Yes | CIDR network address |
+| `comment` | string | No | Description |
+| `nomatch` | boolean | No | Invert match (exclude this entry) |
+
+---
+
+#### `proxmox_delete_cluster_firewall_ipset_entry` 🔒
+Delete an entry from a cluster firewall IP set.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/firewall/ipset/{name}/{cidr}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | IP set name |
+| `cidr` | string | Yes | CIDR network address |
+
+---
+
+#### `proxmox_get_cluster_config`
+Get cluster configuration.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/config` |
+| Parameters | None |
+
+---
+
+#### `proxmox_list_cluster_config_nodes`
+List cluster configuration nodes.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/config/nodes` |
+| Parameters | None |
+
+---
+
+#### `proxmox_get_cluster_config_node`
+Get cluster configuration for a specific node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/config/nodes/{node}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_join_cluster` 🔒
+Join a cluster.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/config/join` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `hostname` | string | Yes | Hostname of cluster node to join |
+| `password` | string | Yes | Cluster password |
+| `fingerprint` | string | No | SSL certificate fingerprint |
+| `force` | boolean | No | Force join even if node exists |
+
+---
+
+#### `proxmox_get_cluster_totem`
+Get cluster totem configuration.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/config/totem` |
+| Parameters | None |
+
+---
+
 ### Storage Management (12 tools)
 
 #### `proxmox_list_storage_config`
@@ -1500,7 +2281,7 @@ Prune old backups on a storage.
 
 ---
 
-### VM Query (5 tools)
+### VM Query (9 tools)
 
 #### `proxmox_get_vms`
 List all virtual machines across the cluster with their status.
@@ -1601,6 +2382,72 @@ Get hardware configuration for an LXC container.
 ```
 
 **Returns**: CPU, memory, mount points, network interfaces, and other container settings.
+
+---
+
+#### `proxmox_get_vm_pending`
+Get pending configuration changes for a QEMU VM.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/pending` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+
+---
+
+#### `proxmox_get_lxc_pending`
+Get pending configuration changes for an LXC container.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/lxc/{vmid}/pending` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | Container ID |
+
+---
+
+#### `proxmox_check_vm_feature`
+Check if a feature (snapshot, clone, copy) is available for a QEMU VM.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/feature` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `feature` | string | Yes | Feature to check: `snapshot`, `clone`, `copy` |
+
+---
+
+#### `proxmox_check_lxc_feature`
+Check if a feature (snapshot, clone, copy) is available for an LXC container.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/lxc/{vmid}/feature` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | Container ID |
+| `feature` | string | Yes | Feature to check: `snapshot`, `clone`, `copy` |
 
 ---
 
@@ -1842,7 +2689,7 @@ Resize a QEMU VM CPU/memory.
 
 ---
 
-### VM/LXC Advanced (26 tools)
+### VM/LXC Advanced (40 tools)
 
 Advanced VM/LXC operations including migrations, templates, guest agent commands, firewall rules, and performance metrics.
 
@@ -2069,6 +2916,193 @@ Get command status via QEMU guest agent.
 | `node` | string | Yes | Node name |
 | `vmid` | number | Yes | VM ID |
 | `pid` | number | Yes | PID from exec |
+
+---
+
+#### `proxmox_agent_file_read` 🔒
+Read file content from guest via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/file-read` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `file` | string | Yes | Path to file in guest filesystem |
+
+---
+
+#### `proxmox_agent_file_write` 🔒
+Write content to file in guest via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/file-write` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `file` | string | Yes | Path to file in guest filesystem |
+| `content` | string | Yes | Content to write to file |
+| `encode` | boolean | No | Base64 encode content (default: true) |
+
+---
+
+#### `proxmox_agent_get_hostname`
+Get hostname from guest via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-host-name` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_get_users`
+Get list of logged-in users from guest via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-users` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_set_user_password` 🔒
+Set user password in guest via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/set-user-password` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `username` | string | Yes | Username to set password for |
+| `password` | string | Yes | New password (5-1024 characters) |
+| `crypted` | boolean | No | Whether password is already crypted |
+
+---
+
+#### `proxmox_agent_shutdown` 🔒
+Shutdown guest via QEMU agent (graceful shutdown from inside guest).
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/shutdown` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_fsfreeze_status`
+Get guest filesystem freeze status via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/fsfreeze-status` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_fsfreeze_freeze` 🔒
+Freeze guest filesystems for consistent backup via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/fsfreeze-freeze` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_fsfreeze_thaw` 🔒
+Thaw (unfreeze) guest filesystems via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/fsfreeze-thaw` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_fstrim` 🔒
+Discard unused blocks on guest filesystems via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/fstrim` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_get_memory_block_info`
+Get guest memory block size information via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/agent/get-memory-block-info` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_suspend_disk` 🔒
+Suspend guest to disk (hibernate) via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/suspend-disk` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_suspend_ram` 🔒
+Suspend guest to RAM (sleep) via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/suspend-ram` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
+
+---
+
+#### `proxmox_agent_suspend_hybrid` 🔒
+Hybrid suspend guest (RAM + disk) via QEMU agent.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/agent/suspend-hybrid` |
+
+**Parameters**: Same as `proxmox_create_template_vm`.
 
 ---
 
@@ -2424,9 +3458,9 @@ Delete a backup file from storage.
 
 ---
 
-### Disks (8 tools)
+### Disks (16 tools)
 
-All disk tools require **elevated permissions**.
+Disk management and query tools.
 
 #### `proxmox_add_disk_vm` 🔒
 Add a new disk to a QEMU virtual machine.
@@ -2788,6 +3822,1590 @@ List ZFS pools on a Proxmox node.
 
 ---
 
+#### `proxmox_init_disk_gpt` 🔒
+Initialize GPT partition table on a disk.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/disks/initgpt` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `disk` | string | Yes | Block device path (e.g., `/dev/sdb`) |
+| `uuid` | string | No | Optional UUID for the disk |
+
+---
+
+#### `proxmox_wipe_disk` 🔒
+Wipe all data from a disk.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/nodes/{node}/disks/wipedisk` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `disk` | string | Yes | Block device path (e.g., `/dev/sdb`) |
+
+---
+
+#### `proxmox_get_node_lvmthin`
+List LVM thin pools on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/disks/lvmthin` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+**Returns**: LVM thin pools with capacity, usage, and metadata information.
+
+---
+
+#### `proxmox_get_node_directory`
+List directory-based storage on a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/disks/directory` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+**Returns**: Directory storage entries with path, device, and filesystem type.
+
+---
+
+### Cloud-Init (3 tools)
+
+Cloud-init configuration management for QEMU VMs.
+
+#### `proxmox_get_cloudinit_config`
+Get cloud-init configuration items for a QEMU VM.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/cloudinit` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+
+---
+
+#### `proxmox_dump_cloudinit`
+Dump rendered cloud-init config (user-data, network-config, or meta-data) for a QEMU VM.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/qemu/{vmid}/cloudinit/dump` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+| `type` | string | Yes | Config type: `user`, `network`, or `meta` |
+
+---
+
+#### `proxmox_regenerate_cloudinit` 🔒
+Regenerate the cloud-init drive for a QEMU VM.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/nodes/{node}/qemu/{vmid}/cloudinit` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+
+---
+
+### Console Access (5 tools)
+
+Console proxy ticket generation for VMs and containers. All require **elevated permissions**.
+
+#### `proxmox_get_vnc_proxy` 🔒
+Get a VNC proxy ticket for a QEMU VM.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/vncproxy` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+
+---
+
+#### `proxmox_get_spice_proxy` 🔒
+Get a SPICE proxy ticket for a QEMU VM.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/spiceproxy` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+
+---
+
+#### `proxmox_get_term_proxy` 🔒
+Get a terminal proxy ticket for a QEMU VM.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/qemu/{vmid}/termproxy` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | VM ID |
+
+---
+
+#### `proxmox_get_lxc_vnc_proxy` 🔒
+Get a VNC proxy ticket for an LXC container.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/lxc/{vmid}/vncproxy` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | Container ID |
+
+---
+
+#### `proxmox_get_lxc_term_proxy` 🔒
+Get a terminal proxy ticket for an LXC container.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/lxc/{vmid}/termproxy` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `vmid` | number | Yes | Container ID |
+
+---
+
+### Pool Management (5 tools)
+
+Resource pool management for organizing VMs, containers, and storage.
+
+#### `proxmox_list_pools`
+List resource pools.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/pools` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_get_pool`
+Get a resource pool by ID.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/pools/{poolid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `poolid` | string | Yes | Pool identifier |
+
+---
+
+#### `proxmox_create_pool` 🔒
+Create a resource pool.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/pools` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `poolid` | string | Yes | Pool identifier |
+| `comment` | string | No | Pool description |
+
+---
+
+#### `proxmox_update_pool` 🔒
+Update a resource pool.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/pools/{poolid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `poolid` | string | Yes | Pool identifier |
+| `comment` | string | No | Updated pool description |
+| `delete` | string | No | List of settings to delete |
+| `digest` | string | No | Config digest |
+
+---
+
+#### `proxmox_delete_pool` 🔒
+Delete a resource pool.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/pools/{poolid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `poolid` | string | Yes | Pool identifier |
+
+---
+
+### Access Control (25 tools)
+
+User, group, role, ACL, authentication domain, and API token management.
+
+#### `proxmox_list_users`
+List Proxmox users.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/access/users` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_get_user`
+Get details for a Proxmox user.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/access/users/{userid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., `root@pam`) |
+
+---
+
+#### `proxmox_create_user` 🔒
+Create a Proxmox user.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/access/users` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., `user@pve`) |
+| `password` | string | No | User password |
+| `comment` | string | No | User comment |
+| `email` | string | No | Email address |
+| `firstname` | string | No | First name |
+| `lastname` | string | No | Last name |
+| `groups` | string | No | Comma-separated group IDs |
+| `expire` | number | No | Account expiration (epoch seconds) |
+| `enable` | boolean | No | Enable user account |
+
+---
+
+#### `proxmox_update_user` 🔒
+Update a Proxmox user.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/access/users/{userid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm |
+| `password` | string | No | New password |
+| `comment` | string | No | User comment |
+| `email` | string | No | Email address |
+| `firstname` | string | No | First name |
+| `lastname` | string | No | Last name |
+| `groups` | string | No | Comma-separated group IDs |
+| `append` | boolean | No | Append groups instead of replacing |
+| `expire` | number | No | Account expiration (epoch seconds) |
+| `enable` | boolean | No | Enable user account |
+
+---
+
+#### `proxmox_delete_user` 🔒
+Delete a Proxmox user.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/access/users/{userid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm |
+
+---
+
+#### `proxmox_list_groups`
+List Proxmox groups.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/access/groups` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_create_group` 🔒
+Create a Proxmox group.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/access/groups` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `groupid` | string | Yes | Group identifier |
+| `comment` | string | No | Group comment |
+| `users` | string | No | Comma-separated user IDs |
+
+---
+
+#### `proxmox_update_group` 🔒
+Update a Proxmox group.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/access/groups/{groupid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `groupid` | string | Yes | Group identifier |
+| `comment` | string | No | Group comment |
+| `users` | string | No | Comma-separated user IDs |
+| `append` | boolean | No | Append users instead of replacing |
+
+---
+
+#### `proxmox_delete_group` 🔒
+Delete a Proxmox group.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/access/groups/{groupid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `groupid` | string | Yes | Group identifier |
+
+---
+
+#### `proxmox_list_roles`
+List Proxmox roles.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/access/roles` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_create_role` 🔒
+Create a Proxmox role.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/access/roles` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `roleid` | string | Yes | Role identifier |
+| `privs` | string | Yes | Comma-separated privileges |
+| `comment` | string | No | Role comment |
+
+---
+
+#### `proxmox_update_role` 🔒
+Update a Proxmox role.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/access/roles/{roleid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `roleid` | string | Yes | Role identifier |
+| `privs` | string | No | Comma-separated privileges |
+| `comment` | string | No | Role comment |
+| `append` | boolean | No | Append privileges instead of replacing |
+
+---
+
+#### `proxmox_delete_role` 🔒
+Delete a Proxmox role.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/access/roles/{roleid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `roleid` | string | Yes | Role identifier |
+
+---
+
+#### `proxmox_get_acl`
+Get ACL entries.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/access/acl` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `path` | string | No | Filter by path (e.g., `/vms`) |
+| `userid` | string | No | Filter by user ID |
+| `groupid` | string | No | Filter by group ID |
+| `roleid` | string | No | Filter by role ID |
+
+---
+
+#### `proxmox_update_acl` 🔒
+Update ACL entries.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/access/acl` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `path` | string | Yes | ACL path (e.g., `/vms`) |
+| `roles` | string | Yes | Comma-separated roles |
+| `users` | string | No | Comma-separated user IDs |
+| `groups` | string | No | Comma-separated group IDs |
+| `propagate` | boolean | No | Propagate to sub-paths |
+| `delete` | boolean | No | Delete ACL entry |
+
+---
+
+#### `proxmox_list_domains`
+List authentication domains.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/access/domains` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_get_domain`
+Get authentication domain details.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/access/domains/{realm}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `realm` | string | Yes | Auth domain (realm) name |
+
+---
+
+#### `proxmox_create_domain` 🔒
+Create an authentication domain.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/access/domains` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `realm` | string | Yes | Auth domain (realm) name |
+| `type` | string | Yes | Domain type: `pam`, `pve`, `ldap`, `ad`, `openid` |
+| `comment` | string | No | Domain comment |
+| `default` | boolean | No | Set as default realm |
+| `server1` | string | No | Primary server |
+| `server2` | string | No | Secondary server |
+| `port` | number | No | Port (1-65535) |
+| `secure` | boolean | No | Enable TLS |
+| `base_dn` | string | No | Base DN |
+| `user_attr` | string | No | User attribute |
+
+---
+
+#### `proxmox_update_domain` 🔒
+Update an authentication domain.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/access/domains/{realm}` |
+
+**Parameters**: Same as `proxmox_create_domain` (all fields optional except `realm`).
+
+---
+
+#### `proxmox_delete_domain` 🔒
+Delete an authentication domain.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/access/domains/{realm}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `realm` | string | Yes | Auth domain (realm) name |
+
+---
+
+#### `proxmox_list_user_tokens`
+List API tokens for a user.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/access/users/{userid}/token` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm (e.g., `root@pam`) |
+
+---
+
+#### `proxmox_get_user_token`
+Get details of a specific user API token.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/access/users/{userid}/token/{tokenid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm |
+| `tokenid` | string | Yes | Token ID |
+
+---
+
+#### `proxmox_create_user_token` 🔒
+Create a new API token for a user.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/access/users/{userid}/token/{tokenid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm |
+| `tokenid` | string | Yes | Token ID |
+| `comment` | string | No | Token comment |
+| `expire` | number | No | Token expiration (epoch seconds) |
+| `privsep` | boolean | No | Privilege separation |
+
+---
+
+#### `proxmox_update_user_token` 🔒
+Update a user API token.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/access/users/{userid}/token/{tokenid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm |
+| `tokenid` | string | Yes | Token ID |
+| `comment` | string | No | Token comment |
+| `expire` | number | No | Token expiration (epoch seconds) |
+
+---
+
+#### `proxmox_delete_user_token` 🔒
+Delete a user API token.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/access/users/{userid}/token/{tokenid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `userid` | string | Yes | User ID with realm |
+| `tokenid` | string | Yes | Token ID |
+
+---
+
+### SDN (20 tools)
+
+Software Defined Networking management for virtual networks, zones, controllers, and subnets.
+
+#### `proxmox_list_sdn_vnets`
+List SDN virtual networks.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/sdn/vnets` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_get_sdn_vnet`
+Get an SDN virtual network by name.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/sdn/vnets/{vnet}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `vnet` | string | Yes | SDN VNet identifier |
+
+---
+
+#### `proxmox_create_sdn_vnet` 🔒
+Create an SDN virtual network.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/sdn/vnets` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `vnet` | string | Yes | SDN VNet identifier |
+| `zone` | string | No | SDN zone identifier |
+| `alias` | string | No | Alias/description |
+| `tag` | number | No | VLAN tag |
+| `mtu` | number | No | MTU value |
+
+---
+
+#### `proxmox_update_sdn_vnet` 🔒
+Update an SDN virtual network.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/sdn/vnets/{vnet}` |
+
+**Parameters**: Same as `proxmox_create_sdn_vnet` (with `delete` and `digest` options).
+
+---
+
+#### `proxmox_delete_sdn_vnet` 🔒
+Delete an SDN virtual network.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/sdn/vnets/{vnet}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `vnet` | string | Yes | SDN VNet identifier |
+
+---
+
+#### `proxmox_list_sdn_zones`
+List SDN zones.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/sdn/zones` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_get_sdn_zone`
+Get an SDN zone by name.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/sdn/zones/{zone}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `zone` | string | Yes | SDN zone identifier |
+
+---
+
+#### `proxmox_create_sdn_zone` 🔒
+Create an SDN zone.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/sdn/zones` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `zone` | string | Yes | SDN zone identifier |
+| `type` | string | No | Zone type (simple, evpn, vxlan, etc.) |
+| `bridge` | string | No | Bridge name |
+| `nodes` | string | No | Nodes list (comma-separated) |
+| `mtu` | number | No | MTU value |
+
+---
+
+#### `proxmox_update_sdn_zone` 🔒
+Update an SDN zone.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/sdn/zones/{zone}` |
+
+**Parameters**: Same as `proxmox_create_sdn_zone` (with `delete` and `digest` options).
+
+---
+
+#### `proxmox_delete_sdn_zone` 🔒
+Delete an SDN zone.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/sdn/zones/{zone}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `zone` | string | Yes | SDN zone identifier |
+
+---
+
+#### `proxmox_list_sdn_controllers`
+List SDN controllers.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/sdn/controllers` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_get_sdn_controller`
+Get an SDN controller by name.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/sdn/controllers/{controller}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `controller` | string | Yes | SDN controller identifier |
+
+---
+
+#### `proxmox_create_sdn_controller` 🔒
+Create an SDN controller.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/sdn/controllers` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `controller` | string | Yes | SDN controller identifier |
+| `type` | string | No | Controller type |
+| `ip` | string | No | Controller IP address |
+| `port` | number | No | Controller port |
+| `zone` | string | No | Associated SDN zone |
+
+---
+
+#### `proxmox_update_sdn_controller` 🔒
+Update an SDN controller.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/sdn/controllers/{controller}` |
+
+**Parameters**: Same as `proxmox_create_sdn_controller` (with `delete` and `digest` options).
+
+---
+
+#### `proxmox_delete_sdn_controller` 🔒
+Delete an SDN controller.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/sdn/controllers/{controller}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `controller` | string | Yes | SDN controller identifier |
+
+---
+
+#### `proxmox_list_sdn_subnets`
+List SDN subnets.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/sdn/subnets` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_get_sdn_subnet`
+Get an SDN subnet by name.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/sdn/subnets/{subnet}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `subnet` | string | Yes | SDN subnet identifier |
+
+---
+
+#### `proxmox_create_sdn_subnet` 🔒
+Create an SDN subnet.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/sdn/subnets` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `subnet` | string | Yes | SDN subnet identifier |
+| `vnet` | string | No | Associated SDN VNet |
+| `cidr` | string | No | CIDR range (e.g., `10.0.0.0/24`) |
+| `gateway` | string | No | Gateway IP address |
+| `dhcp` | boolean | No | Enable DHCP |
+| `snat` | boolean | No | Enable source NAT |
+| `dns` | string | No | DNS servers list |
+
+---
+
+#### `proxmox_update_sdn_subnet` 🔒
+Update an SDN subnet.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/sdn/subnets/{subnet}` |
+
+**Parameters**: Same as `proxmox_create_sdn_subnet` (with `delete` and `digest` options).
+
+---
+
+#### `proxmox_delete_sdn_subnet` 🔒
+Delete an SDN subnet.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/sdn/subnets/{subnet}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `subnet` | string | Yes | SDN subnet identifier |
+
+---
+
+### Ceph Integration (16 tools)
+
+Ceph distributed storage management including OSDs, monitors, MDS daemons, pools, and filesystems.
+
+#### `proxmox_get_ceph_status`
+Get Ceph cluster status.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/ceph/status` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_list_ceph_osds`
+List Ceph OSDs.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/ceph/osd` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_create_ceph_osd` 🔒
+Create a Ceph OSD.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/ceph/osd` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `dev` | string | Yes | OSD device path (e.g., `/dev/sdb`) |
+| `osdid` | number | No | Optional OSD ID |
+| `dbdev` | string | No | Optional DB device path |
+| `waldev` | string | No | Optional WAL device path |
+| `crush-device-class` | string | No | CRUSH device class (e.g., `hdd`, `ssd`) |
+| `encrypted` | boolean | No | Enable dm-crypt encryption |
+
+---
+
+#### `proxmox_delete_ceph_osd` 🔒
+Delete a Ceph OSD.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/ceph/osd/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `id` | number | Yes | OSD ID |
+
+---
+
+#### `proxmox_list_ceph_mons`
+List Ceph monitors.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/ceph/mon` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_create_ceph_mon` 🔒
+Create a Ceph monitor.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/ceph/mon/{monid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `monid` | string | Yes | Monitor ID |
+
+---
+
+#### `proxmox_delete_ceph_mon` 🔒
+Delete a Ceph monitor.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/ceph/mon/{monid}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `monid` | string | Yes | Monitor ID |
+
+---
+
+#### `proxmox_list_ceph_mds`
+List Ceph MDS daemons.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/ceph/mds` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_create_ceph_mds` 🔒
+Create a Ceph MDS daemon.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/ceph/mds/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `name` | string | Yes | MDS daemon name |
+
+---
+
+#### `proxmox_delete_ceph_mds` 🔒
+Delete a Ceph MDS daemon.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/ceph/mds/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `name` | string | Yes | MDS daemon name |
+
+---
+
+#### `proxmox_list_ceph_pools`
+List Ceph pools.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/ceph/pool` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_create_ceph_pool` 🔒
+Create a Ceph pool.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/ceph/pool` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `name` | string | Yes | Pool name |
+| `pg_num` | number | No | Placement group count |
+| `size` | number | No | Replication size |
+| `min_size` | number | No | Minimum replication size |
+| `crush_rule` | string | No | CRUSH rule name |
+| `pg_autoscale_mode` | string | No | PG autoscale mode (`on`, `off`, `warn`) |
+
+---
+
+#### `proxmox_update_ceph_pool` 🔒
+Update a Ceph pool.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/nodes/{node}/ceph/pool/{name}` |
+
+**Parameters**: Same as `proxmox_create_ceph_pool`.
+
+---
+
+#### `proxmox_delete_ceph_pool` 🔒
+Delete a Ceph pool.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/ceph/pool/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `name` | string | Yes | Pool name |
+
+---
+
+#### `proxmox_list_ceph_fs`
+List Ceph filesystems.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/ceph/fs` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_create_ceph_fs` 🔒
+Create a Ceph filesystem.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/ceph/fs/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `name` | string | Yes | CephFS name |
+| `pool` | string | No | Primary data pool name |
+| `data_pool` | string | No | Data pool name |
+| `metadata_pool` | string | No | Metadata pool name |
+
+---
+
+### Certificate Management (7 tools)
+
+SSL certificate management for Proxmox nodes including custom certificates and ACME/Let's Encrypt.
+
+#### `proxmox_get_node_certificates`
+Get SSL certificate information for a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/certificates/info` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_upload_custom_certificate` 🔒
+Upload a custom SSL certificate to a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/certificates/custom` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `certificates` | string | Yes | PEM encoded certificate(s) |
+| `key` | string | No | PEM encoded private key |
+| `force` | boolean | No | Overwrite existing custom certificate |
+| `restart` | boolean | No | Restart pveproxy service |
+
+---
+
+#### `proxmox_delete_custom_certificate` 🔒
+Delete the custom SSL certificate from a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/certificates/custom` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_order_acme_certificate` 🔒
+Order a new ACME (Let's Encrypt) certificate for a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/nodes/{node}/certificates/acme/certificate` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `force` | boolean | No | Force renewal even if certificate is still valid |
+
+---
+
+#### `proxmox_renew_acme_certificate` 🔒
+Renew the ACME certificate for a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/nodes/{node}/certificates/acme/certificate` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+| `force` | boolean | No | Force renewal even if certificate is still valid |
+
+---
+
+#### `proxmox_revoke_acme_certificate` 🔒
+Revoke the ACME certificate for a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/nodes/{node}/certificates/acme/certificate` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+#### `proxmox_get_node_acme_config`
+Get ACME configuration for a Proxmox node.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/nodes/{node}/config` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name |
+
+---
+
+### ACME Management (8 tools)
+
+Cluster-wide ACME account and plugin management for automated certificate provisioning.
+
+#### `proxmox_list_acme_accounts`
+List all ACME accounts configured in the cluster.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/acme/account` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_get_acme_account`
+Get detailed information about a specific ACME account.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/acme/account/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | ACME account name |
+
+---
+
+#### `proxmox_create_acme_account` 🔒
+Create a new ACME account.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/acme/account` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `contact` | string | Yes | Contact email address |
+| `name` | string | No | ACME account name |
+| `tos_url` | string | No | URL of CA Terms of Service (setting indicates agreement) |
+| `directory` | string | No | URL of ACME CA directory endpoint |
+
+---
+
+#### `proxmox_update_acme_account` 🔒
+Update an existing ACME account.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `PUT /api2/json/cluster/acme/account/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | ACME account name |
+| `contact` | string | No | Contact email address |
+
+---
+
+#### `proxmox_delete_acme_account` 🔒
+Delete an ACME account.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/acme/account/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | ACME account name |
+
+---
+
+#### `proxmox_list_acme_plugins`
+List all ACME challenge plugins configured in the cluster.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/acme/plugins` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_get_acme_plugin`
+Get detailed configuration for a specific ACME plugin.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/acme/plugins/{id}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `id` | string | Yes | ACME plugin ID |
+
+---
+
+#### `proxmox_get_acme_directories`
+Get available ACME directory endpoints (Let's Encrypt, etc.).
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/acme/directories` |
+
+**Parameters**: None.
+
+---
+
+### Notification Management (5 tools)
+
+Notification target management for SMTP, Gotify, and Sendmail integrations.
+
+#### `proxmox_list_notification_targets`
+List all notification targets (SMTP, Gotify, Sendmail).
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/notifications/targets` |
+
+**Parameters**: None.
+
+---
+
+#### `proxmox_get_notification_target`
+Get detailed configuration for a specific notification target.
+
+| Property | Value |
+|----------|-------|
+| Permission | Basic |
+| API Endpoint | `GET /api2/json/cluster/notifications/endpoints/{type}/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | string | Yes | Target type: `smtp`, `gotify`, `sendmail` |
+| `name` | string | Yes | Notification target name |
+
+---
+
+#### `proxmox_create_notification_target` 🔒
+Create a new notification target.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/notifications/endpoints/{type}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | string | Yes | Target type: `smtp`, `gotify`, `sendmail` |
+| `name` | string | Yes | Notification target name |
+| `comment` | string | No | Comment |
+| `disable` | boolean | No | Disable this target |
+| `server` | string | No | SMTP server address (for smtp type) |
+| `port` | number | No | SMTP server port (for smtp type) |
+| `username` | string | No | SMTP username (for smtp type) |
+| `mode` | string | No | SMTP encryption: `insecure`, `starttls`, `tls` |
+| `token` | string | No | Gotify API token (for gotify type) |
+| `mailto` | string | No | Recipient email address |
+| `from` | string | No | Sender email address |
+
+---
+
+#### `proxmox_delete_notification_target` 🔒
+Delete a notification target.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `DELETE /api2/json/cluster/notifications/endpoints/{type}/{name}` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `type` | string | Yes | Target type: `smtp`, `gotify`, `sendmail` |
+| `name` | string | Yes | Notification target name |
+
+---
+
+#### `proxmox_test_notification_target` 🔒
+Send a test notification to a target.
+
+| Property | Value |
+|----------|-------|
+| Permission | Elevated |
+| API Endpoint | `POST /api2/json/cluster/notifications/targets/{name}/test` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `name` | string | Yes | Notification target name |
+
+---
+
 ## Unimplemented Proxmox APIs
 
 This section lists Proxmox VE API endpoints that are not yet implemented in this MCP server, organized by priority.
@@ -2796,39 +5414,18 @@ This section lists Proxmox VE API endpoints that are not yet implemented in this
 
 APIs that would significantly enhance functionality:
 
+_(No high-priority APIs remaining — all have been implemented.)_
+
 ### Medium Priority
 
 APIs for specialized use cases:
 
-#### Access Control
+#### Two-Factor Authentication
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/access/users` | GET/POST/PUT/DELETE | User management |
-| `/access/groups` | GET/POST/PUT/DELETE | Group management |
-| `/access/roles` | GET/POST/PUT/DELETE | Role management |
-| `/access/acl` | GET/PUT | ACL management |
-| `/access/domains` | GET/POST/PUT/DELETE | Authentication domains |
-| `/access/tfa` | GET/POST/PUT/DELETE | Two-factor authentication |
-| `/access/password` | PUT | Change password |
-
-#### Pool Management
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/pools` | GET/POST | List/create resource pools |
-| `/pools/{poolid}` | GET/PUT/DELETE | Pool management |
-
-#### Ceph Integration
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/nodes/{node}/ceph/status` | GET | Ceph cluster status |
-| `/nodes/{node}/ceph/osd` | GET/POST/DELETE | OSD management |
-| `/nodes/{node}/ceph/mon` | GET/POST/DELETE | Monitor management |
-| `/nodes/{node}/ceph/mds` | GET/POST/DELETE | MDS management |
-| `/nodes/{node}/ceph/pools` | GET/POST/PUT/DELETE | Ceph pool management |
-| `/nodes/{node}/ceph/fs` | GET/POST | CephFS management |
+| `/access/tfa` | GET/POST/PUT/DELETE | Two-factor authentication management |
+| `/access/password` | PUT | Change user password |
 
 ---
 
@@ -2844,63 +5441,6 @@ APIs for edge cases or advanced administration:
 | `/nodes/{node}/hardware/usb` | GET | List USB devices |
 | `/nodes/{node}/capabilities/qemu/cpu` | GET | List available CPU types |
 | `/nodes/{node}/capabilities/qemu/machines` | GET | List machine types |
-
-#### Certificates & SSL
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/nodes/{node}/certificates/info` | GET | Certificate info |
-| `/nodes/{node}/certificates/custom` | POST/DELETE | Custom certificates |
-| `/nodes/{node}/certificates/acme/*` | Various | ACME/Let's Encrypt |
-
-#### Disk Operations
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/nodes/{node}/disks/initgpt` | POST | Initialize disk with GPT |
-| `/nodes/{node}/disks/wipedisk` | PUT | Wipe disk |
-| `/nodes/{node}/disks/lvmthin` | GET/POST/DELETE | LVM thin pools |
-| `/nodes/{node}/disks/directory` | GET/POST/DELETE | Directory storage |
-
-#### Node Network Configuration
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/nodes/{node}/network` | POST | Create network interface |
-| `/nodes/{node}/network/{iface}` | PUT/DELETE | Update/delete interface |
-| `/nodes/{node}/network` | PUT | Apply network changes (revert pending) |
-
-#### System Operations
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/nodes/{node}/time` | GET/PUT | Node time/timezone |
-| `/nodes/{node}/dns` | PUT | Update DNS configuration |
-| `/nodes/{node}/hosts` | GET/POST | Hosts file management |
-| `/nodes/{node}/subscription` | GET/POST/DELETE | Subscription management |
-| `/nodes/{node}/apt/*` | Various | Package management |
-| `/nodes/{node}/startall` | POST | Start all VMs/containers |
-| `/nodes/{node}/stopall` | POST | Stop all VMs/containers |
-| `/nodes/{node}/migrateall` | POST | Migrate all to another node |
-
-#### Console Access
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/nodes/{node}/qemu/{vmid}/vncproxy` | POST | Get VNC ticket |
-| `/nodes/{node}/qemu/{vmid}/spiceproxy` | POST | Get SPICE ticket |
-| `/nodes/{node}/qemu/{vmid}/termproxy` | POST | Get terminal proxy ticket |
-| `/nodes/{node}/lxc/{vmid}/vncproxy` | POST | Container VNC access |
-| `/nodes/{node}/lxc/{vmid}/termproxy` | POST | Container terminal access |
-
-#### SDN (Software Defined Networking)
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/cluster/sdn/vnets` | GET/POST/PUT/DELETE | Virtual networks |
-| `/cluster/sdn/zones` | GET/POST/PUT/DELETE | SDN zones |
-| `/cluster/sdn/controllers` | GET/POST/PUT/DELETE | SDN controllers |
-| `/cluster/sdn/subnets` | GET/POST/PUT/DELETE | Subnets |
 
 ---
 
