@@ -270,6 +270,10 @@ import {
   getDiskSmart,
   getNodeLvm,
   getNodeZfs,
+  initDiskGpt,
+  wipeDisk,
+  getNodeLvmThin,
+  getNodeDirectory,
   addNetworkVm,
   addNetworkLxc,
   updateNetworkVm,
@@ -577,6 +581,10 @@ import {
   getDiskSmartSchema,
   getNodeLvmSchema,
   getNodeZfsSchema,
+  initDiskGptSchema,
+  wipeDiskSchema,
+  getNodeLvmThinSchema,
+  getNodeDirectorySchema,
 } from '../schemas/disk.js';
 import {
   addNetworkVmSchema,
@@ -1120,6 +1128,10 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
    proxmox_get_disk_smart: { handler: getDiskSmart, schema: getDiskSmartSchema },
    proxmox_get_node_lvm: { handler: getNodeLvm, schema: getNodeLvmSchema },
    proxmox_get_node_zfs: { handler: getNodeZfs, schema: getNodeZfsSchema },
+   proxmox_init_disk_gpt: { handler: initDiskGpt, schema: initDiskGptSchema },
+   proxmox_wipe_disk: { handler: wipeDisk, schema: wipeDiskSchema },
+   proxmox_get_node_lvmthin: { handler: getNodeLvmThin, schema: getNodeLvmThinSchema },
+   proxmox_get_node_directory: { handler: getNodeDirectory, schema: getNodeDirectorySchema },
 
   // Network
   proxmox_add_network_vm: { handler: addNetworkVm, schema: addNetworkVmSchema },
@@ -1148,10 +1160,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 278 tools are registered
+// Validate all 282 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 278) {
+if (registeredCount !== 282) {
    throw new Error(
-     `Tool registry incomplete: expected 278 tools, got ${registeredCount}`
+     `Tool registry incomplete: expected 282 tools, got ${registeredCount}`
    );
 }

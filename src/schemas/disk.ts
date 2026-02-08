@@ -114,3 +114,34 @@ export const getNodeZfsSchema = z.object({
 });
 
 export type GetNodeZfsInput = z.infer<typeof getNodeZfsSchema>;
+
+// proxmox_init_disk_gpt - Initialize GPT partition table on disk
+export const initDiskGptSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+  disk: z.string().min(1).describe('Block device path (e.g., /dev/sdb)'),
+  uuid: z.string().optional().describe('Optional UUID for the disk'),
+});
+
+export type InitDiskGptInput = z.infer<typeof initDiskGptSchema>;
+
+// proxmox_wipe_disk - Wipe disk data
+export const wipeDiskSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+  disk: z.string().min(1).describe('Block device path (e.g., /dev/sdb)'),
+});
+
+export type WipeDiskInput = z.infer<typeof wipeDiskSchema>;
+
+// proxmox_get_node_lvmthin - Get LVM thin pools on a node
+export const getNodeLvmThinSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetNodeLvmThinInput = z.infer<typeof getNodeLvmThinSchema>;
+
+// proxmox_get_node_directory - Get directory-based storage on a node
+export const getNodeDirectorySchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetNodeDirectoryInput = z.infer<typeof getNodeDirectorySchema>;

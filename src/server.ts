@@ -348,6 +348,10 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
     proxmox_get_disk_smart: 'Get SMART health data for a specific disk on a Proxmox node',
     proxmox_get_node_lvm: 'List LVM volume groups and physical volumes on a Proxmox node',
     proxmox_get_node_zfs: 'List ZFS pools on a Proxmox node with health and capacity info',
+    proxmox_init_disk_gpt: 'Initialize GPT partition table on a disk (requires elevated permissions, destructive)',
+    proxmox_wipe_disk: 'Wipe all data from a disk (requires elevated permissions, destructive)',
+    proxmox_get_node_lvmthin: 'List LVM thin pools on a Proxmox node with capacity info',
+    proxmox_get_node_directory: 'List directory-based storage on a Proxmox node',
 
     // Cloud-Init
     proxmox_get_cloudinit_config: 'Get cloud-init configuration items for a QEMU VM',

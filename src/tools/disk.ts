@@ -21,6 +21,10 @@ import {
   getNodeDisksSchema,
   getDiskSmartSchema,
   getNodeZfsSchema,
+  initDiskGptSchema,
+  wipeDiskSchema,
+  getNodeLvmThinSchema,
+  getNodeDirectorySchema,
 } from '../schemas/disk.js';
 import type {
   AddDiskVmInput,
@@ -35,6 +39,10 @@ import type {
   GetNodeDisksInput,
   GetDiskSmartInput,
   GetNodeZfsInput,
+  InitDiskGptInput,
+  WipeDiskInput,
+  GetNodeLvmThinInput,
+  GetNodeDirectoryInput,
 } from '../schemas/disk.js';
 
 /**
@@ -595,5 +603,196 @@ export async function getNodeDisks(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Get Node Disks');
+  }
+}
+
+/**
+ * Initialize GPT partition table on disk
+ * Requires elevated permissions (destructive operation)
+ */
+export async function initDiskGpt(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: InitDiskGptInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'initialize disk GPT');
+
+    const validated = initDiskGptSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const payload: Record<string, unknown> = {
+      disk: validated.disk,
+    };
+    if (validated.uuid) {
+      payload.uuid = validated.uuid;
+    }
+
+    const result = await client.request(
+      `/nodes/${safeNode}/disks/initgpt`,
+      'POST',
+      payload
+    );
+
+    let output = `🔧 **Disk GPT Initialization Started**\n\n`;
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Disk**: ${validated.disk}\n`;
+    if (validated.uuid) {
+      output += `• **UUID**: ${validated.uuid}\n`;
+    }
+    output += `• **Task ID**: ${result || 'N/A'}\n\n`;
+    output += `**Warning**: This will erase all data on the disk and initialize a new GPT partition table.\n`;
+    output += `**Note**: The disk must not be in use by any storage or VM.`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Initialize Disk GPT');
+  }
+}
+
+/**
+ * Wipe disk data
+ * Requires elevated permissions (destructive operation)
+ */
+export async function wipeDisk(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: WipeDiskInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'wipe disk');
+
+    const validated = wipeDiskSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const result = await client.request(
+      `/nodes/${safeNode}/disks/wipedisk`,
+      'PUT',
+      {
+        disk: validated.disk,
+      }
+    );
+
+    let output = `🗑️ **Disk Wipe Started**\n\n`;
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Disk**: ${validated.disk}\n`;
+    output += `• **Task ID**: ${result || 'N/A'}\n\n`;
+    output += `**Warning**: This will permanently erase all data on the disk.\n`;
+    output += `**Note**: The disk must not be in use by any storage or VM.`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Wipe Disk');
+  }
+}
+
+/**
+ * Get LVM thin pools on a node
+ * Read-only operation (no elevated permissions required)
+ */
+export async function getNodeLvmThin(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeLvmThinInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeLvmThinSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const result = await client.request(`/nodes/${safeNode}/disks/lvmthin`);
+
+    const lvmThinData = result as {
+      leaf: boolean;
+      children?: Array<{
+        leaf: boolean;
+        name: string;
+        size: number;
+        free: number;
+        children?: Array<{
+          leaf: boolean;
+          name: string;
+          size: number;
+          free: number;
+        }>;
+      }>;
+    };
+
+    if (!lvmThinData.children || lvmThinData.children.length === 0) {
+      let output = `📦 **LVM Thin Pools**\n\n`;
+      output += `• **Node**: ${safeNode}\n`;
+      output += `• **Status**: No LVM thin pools configured\n`;
+      return formatToolResponse(output);
+    }
+
+    let output = `📦 **LVM Thin Pools**\n\n`;
+    output += `• **Node**: ${safeNode}\n\n`;
+
+    for (const pool of lvmThinData.children) {
+      output += `**Thin Pool: ${pool.name}**\n`;
+      output += `  • Size: ${(pool.size / (1024 ** 3)).toFixed(2)} GB\n`;
+      output += `  • Free: ${(pool.free / (1024 ** 3)).toFixed(2)} GB\n`;
+      output += `  • Used: ${(((pool.size - pool.free) / pool.size) * 100).toFixed(1)}%\n`;
+
+      if (pool.children && pool.children.length > 0) {
+        output += `  • Volumes:\n`;
+        for (const vol of pool.children) {
+          output += `    - ${vol.name}\n`;
+          output += `      Size: ${(vol.size / (1024 ** 3)).toFixed(2)} GB\n`;
+        }
+      }
+      output += `\n`;
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node LVM Thin');
+  }
+}
+
+/**
+ * Get directory-based storage on a node
+ * Read-only operation (no elevated permissions required)
+ */
+export async function getNodeDirectory(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeDirectoryInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeDirectorySchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const result = await client.request(`/nodes/${safeNode}/disks/directory`);
+
+    const dirData = result as Array<{
+      leaf: boolean;
+      name: string;
+      size: number;
+      free: number;
+    }>;
+
+    if (!Array.isArray(dirData) || dirData.length === 0) {
+      let output = `📁 **Directory Storage**\n\n`;
+      output += `• **Node**: ${safeNode}\n`;
+      output += `• **Status**: No directory-based storage configured\n`;
+      return formatToolResponse(output);
+    }
+
+    let output = `📁 **Directory Storage**\n\n`;
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Count**: ${dirData.length} directory(ies)\n\n`;
+
+    for (const dir of dirData) {
+      output += `---\n`;
+      output += `• **Name**: ${dir.name}\n`;
+      output += `• **Size**: ${(dir.size / (1024 ** 3)).toFixed(2)} GB\n`;
+      output += `• **Free**: ${(dir.free / (1024 ** 3)).toFixed(2)} GB\n`;
+      output += `• **Used**: ${(((dir.size - dir.free) / dir.size) * 100).toFixed(1)}%\n`;
+      output += `\n`;
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Directory');
   }
 }

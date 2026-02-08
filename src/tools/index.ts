@@ -295,6 +295,10 @@ export {
   getDiskSmart,
   getNodeLvm,
   getNodeZfs,
+  initDiskGpt,
+  wipeDisk,
+  getNodeLvmThin,
+  getNodeDirectory,
 } from './disk.js';
 
 // Network tools

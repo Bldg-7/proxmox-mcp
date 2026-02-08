@@ -564,3 +564,74 @@
 ### API Endpoints Implemented
 - GET /nodes/{node}/qemu/{vmid}/feature (check VM feature)
 - GET /nodes/{node}/lxc/{vmid}/feature (check LXC feature)
+
+## Task 10: Advanced Disk Operations (COMPLETED)
+
+### Implementation Pattern
+- **Schemas**: 4 new schemas in disk.ts
+  - `initDiskGptSchema`: node, disk (required), uuid (optional)
+  - `wipeDiskSchema`: node, disk (required)
+  - `getNodeLvmThinSchema`: node parameter only
+  - `getNodeDirectorySchema`: node parameter only
+
+- **Handlers**: 4 functions in disk.ts
+  - Init GPT: POST /nodes/{node}/disks/initgpt (ELEVATED - destructive)
+  - Wipe disk: PUT /nodes/{node}/disks/wipedisk (ELEVATED - destructive)
+  - Get LVM thin: GET /nodes/{node}/disks/lvmthin (read-only)
+  - Get directory: GET /nodes/{node}/disks/directory (read-only)
+
+- **Tests**: 6 tests total
+  - 4 success cases (one per tool)
+  - 2 elevated permission denial tests (initGpt, wipeDisk only)
+  - Pattern: Mock client, verify API calls, check output formatting
+
+### Key Learnings
+1. **Destructive operations pattern**: Init GPT and wipe disk are ELEVATED
+   - Both require `requireElevated(config, 'action description')`
+   - Both include warning messages about data loss
+   - Tests verify both permission denial and successful execution
+
+2. **Read-only operations**: LVM thin and directory are NOT elevated
+   - No permission checks needed
+   - Return formatted lists with capacity information
+   - Handle empty results gracefully
+
+3. **Optional parameters**: Init GPT supports optional UUID
+   - Only include in payload if provided
+   - Pattern: `if (validated.uuid) { payload.uuid = validated.uuid; }`
+
+4. **Tree structure formatting**: LVM thin and directory use nested structures
+   - LVM thin: Volume groups with physical volumes/volumes
+   - Directory: Simple array of directory entries
+   - Both format sizes in GB with percentage calculations
+
+5. **Tool count tracking**: Updated 3 places
+   - registry.ts: Tool count assertion (278→282)
+   - integration tests: Two assertions for tool count (278→282)
+
+6. **API endpoint patterns**:
+   - Init GPT: POST with optional uuid parameter
+   - Wipe disk: PUT with disk parameter
+   - LVM thin: GET returns tree structure
+   - Directory: GET returns array of entries
+
+### Files Modified
+- src/schemas/disk.ts: +4 schemas
+- src/tools/disk.ts: +4 handlers
+- src/tools/index.ts: +4 exports
+- src/types/tools.ts: +4 tool names
+- src/server.ts: +4 tool descriptions
+- src/tools/registry.ts: +4 registrations, updated tool count (278→282)
+- src/tools/disk.test.ts: +6 tests
+- src/__tests__/integration/server.test.ts: Updated 2 assertions (278→282)
+
+### Verification
+- ✅ pnpm build: No errors
+- ✅ pnpm test: 740 tests pass (including 6 new tests)
+- ✅ Tool count: 278 → 282 (4 new tools)
+
+### API Endpoints Implemented
+- POST /nodes/{node}/disks/initgpt (initialize GPT partition table)
+- PUT /nodes/{node}/disks/wipedisk (wipe disk data)
+- GET /nodes/{node}/disks/lvmthin (list LVM thin pools)
+- GET /nodes/{node}/disks/directory (list directory-based storage)

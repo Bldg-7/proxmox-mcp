@@ -274,6 +274,10 @@ export const TOOL_NAMES = [
   'proxmox_get_disk_smart',
   'proxmox_get_node_lvm',
   'proxmox_get_node_zfs',
+  'proxmox_init_disk_gpt',
+  'proxmox_wipe_disk',
+  'proxmox_get_node_lvmthin',
+  'proxmox_get_node_directory',
   // Cloud-Init
   'proxmox_get_cloudinit_config',
   'proxmox_dump_cloudinit',

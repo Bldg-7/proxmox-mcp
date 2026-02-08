@@ -13,6 +13,10 @@ import {
   getDiskSmart,
   getNodeLvm,
   getNodeDisks,
+  initDiskGpt,
+  wipeDisk,
+  getNodeLvmThin,
+  getNodeDirectory,
 } from './disk.js';
 import { sampleZfsData, noZfsPools, sampleLvmData, noLvmConfigured, sampleDiskList, emptyDiskList } from '../__fixtures__/disks.js';
 
@@ -828,5 +832,214 @@ describe('getNodeZfs', () => {
 
     expect(result.isError).toBe(false);
     expect(result.content[0].text).toContain('No ZFS pools found');
+  });
+});
+
+describe('initDiskGpt', () => {
+  it('requires elevated permissions', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig({ allowElevated: false });
+
+    const result = await initDiskGpt(client, config, {
+      node: 'pve1',
+      disk: '/dev/sdb',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Permission denied');
+  });
+
+  it('initializes GPT with elevated permissions', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig({ allowElevated: true });
+    client.request.mockResolvedValue('UPID:pve1:00001242');
+
+    const result = await initDiskGpt(client, config, {
+      node: 'pve1',
+      disk: '/dev/sdb',
+    });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('🔧');
+    expect(result.content[0].text).toContain('Disk GPT Initialization Started');
+    expect(result.content[0].text).toContain('/dev/sdb');
+    expect(result.content[0].text).toContain('Warning');
+  });
+
+  it('calls correct API endpoint with disk parameter', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig({ allowElevated: true });
+    client.request.mockResolvedValue('UPID:pve1:00001242');
+
+    await initDiskGpt(client, config, {
+      node: 'pve1',
+      disk: '/dev/sdc',
+    });
+
+    expect(client.request).toHaveBeenCalledWith(
+      '/nodes/pve1/disks/initgpt',
+      'POST',
+      { disk: '/dev/sdc' }
+    );
+  });
+
+  it('includes optional UUID in payload when provided', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig({ allowElevated: true });
+    client.request.mockResolvedValue('UPID:pve1:00001242');
+
+    await initDiskGpt(client, config, {
+      node: 'pve1',
+      disk: '/dev/sdb',
+      uuid: '550e8400-e29b-41d4-a716-446655440000',
+    });
+
+    expect(client.request).toHaveBeenCalledWith(
+      '/nodes/pve1/disks/initgpt',
+      'POST',
+      {
+        disk: '/dev/sdb',
+        uuid: '550e8400-e29b-41d4-a716-446655440000',
+      }
+    );
+  });
+});
+
+describe('wipeDisk', () => {
+  it('requires elevated permissions', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig({ allowElevated: false });
+
+    const result = await wipeDisk(client, config, {
+      node: 'pve1',
+      disk: '/dev/sdb',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Permission denied');
+  });
+
+  it('wipes disk with elevated permissions', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig({ allowElevated: true });
+    client.request.mockResolvedValue('UPID:pve1:00001243');
+
+    const result = await wipeDisk(client, config, {
+      node: 'pve1',
+      disk: '/dev/sdb',
+    });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('🗑️');
+    expect(result.content[0].text).toContain('Disk Wipe Started');
+    expect(result.content[0].text).toContain('/dev/sdb');
+    expect(result.content[0].text).toContain('Warning');
+  });
+
+  it('calls correct API endpoint with disk parameter', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig({ allowElevated: true });
+    client.request.mockResolvedValue('UPID:pve1:00001243');
+
+    await wipeDisk(client, config, {
+      node: 'pve1',
+      disk: '/dev/sdc',
+    });
+
+    expect(client.request).toHaveBeenCalledWith(
+      '/nodes/pve1/disks/wipedisk',
+      'PUT',
+      { disk: '/dev/sdc' }
+    );
+  });
+});
+
+describe('getNodeLvmThin', () => {
+  it('returns LVM thin pools successfully', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+    const lvmThinData = {
+      leaf: false,
+      children: [
+        {
+          leaf: false,
+          name: 'pve-thin',
+          size: 1099511627776,
+          free: 549755813888,
+          children: [
+            {
+              leaf: true,
+              name: 'vm-100-disk-0',
+              size: 274877906944,
+              free: 0,
+            },
+          ],
+        },
+      ],
+    };
+    client.request.mockResolvedValue(lvmThinData);
+
+    const result = await getNodeLvmThin(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('📦');
+    expect(result.content[0].text).toContain('LVM Thin Pools');
+    expect(result.content[0].text).toContain('pve-thin');
+    expect(result.content[0].text).toContain('vm-100-disk-0');
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/disks/lvmthin');
+  });
+
+  it('handles no LVM thin pools configured', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+    client.request.mockResolvedValue({ leaf: false, children: [] });
+
+    const result = await getNodeLvmThin(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('No LVM thin pools');
+  });
+});
+
+describe('getNodeDirectory', () => {
+  it('returns directory storage successfully', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+    const dirData = [
+      {
+        leaf: true,
+        name: '/mnt/storage1',
+        size: 1099511627776,
+        free: 549755813888,
+      },
+      {
+        leaf: true,
+        name: '/mnt/storage2',
+        size: 2199023255552,
+        free: 1099511627776,
+      },
+    ];
+    client.request.mockResolvedValue(dirData);
+
+    const result = await getNodeDirectory(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('📁');
+    expect(result.content[0].text).toContain('Directory Storage');
+    expect(result.content[0].text).toContain('/mnt/storage1');
+    expect(result.content[0].text).toContain('/mnt/storage2');
+    expect(result.content[0].text).toContain('**Count**: 2 directory(ies)');
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/disks/directory');
+  });
+
+  it('handles no directory storage configured', async () => {
+    const client = createMockProxmoxClient();
+    const config = createTestConfig();
+    client.request.mockResolvedValue([]);
+
+    const result = await getNodeDirectory(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('No directory-based storage');
   });
 });
