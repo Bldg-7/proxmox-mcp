@@ -10,8 +10,8 @@ import {
   formatCpuPercent,
 } from '../formatters/index.js';
 import { validateNodeName, validateVMID } from '../validators/index.js';
-import { getVmsSchema, getVmStatusSchema, getStorageSchema, getVmConfigSchema, getLxcConfigSchema, getVmPendingSchema, getLxcPendingSchema } from '../schemas/vm.js';
-import type { GetVmsInput, GetVmStatusInput, GetStorageInput, GetVmConfigInput, GetLxcConfigInput, GetVmPendingInput, GetLxcPendingInput } from '../schemas/vm.js';
+import { getVmsSchema, getVmStatusSchema, getStorageSchema, getVmConfigSchema, getLxcConfigSchema, getVmPendingSchema, getLxcPendingSchema, checkVmFeatureSchema, checkLxcFeatureSchema } from '../schemas/vm.js';
+import type { GetVmsInput, GetVmStatusInput, GetStorageInput, GetVmConfigInput, GetLxcConfigInput, GetVmPendingInput, GetLxcPendingInput, CheckVmFeatureInput, CheckLxcFeatureInput } from '../schemas/vm.js';
 
 interface VMWithType extends ProxmoxVM {
   type: VMType;
@@ -405,39 +405,107 @@ export async function getVmPending(
  * No elevated permissions required.
  */
 export async function getLxcPending(
-   client: ProxmoxApiClient,
-   _config: Config,
-   input: GetLxcPendingInput
+    client: ProxmoxApiClient,
+    _config: Config,
+    input: GetLxcPendingInput
 ): Promise<ToolResponse> {
-   try {
-     const validated = getLxcPendingSchema.parse(input);
-     const safeNode = validateNodeName(validated.node);
-     const safeVMID = validateVMID(validated.vmid);
+    try {
+      const validated = getLxcPendingSchema.parse(input);
+      const safeNode = validateNodeName(validated.node);
+      const safeVMID = validateVMID(validated.vmid);
 
-     const pending = (await client.request(
-       `/nodes/${safeNode}/lxc/${safeVMID}/pending`
-     )) as Array<Record<string, unknown>>;
+      const pending = (await client.request(
+        `/nodes/${safeNode}/lxc/${safeVMID}/pending`
+      )) as Array<Record<string, unknown>>;
 
-     let output = `📦 **LXC Container Pending Changes** (ID: ${safeVMID})\n\n`;
-     output += `• **Node**: ${safeNode}\n\n`;
+      let output = `📦 **LXC Container Pending Changes** (ID: ${safeVMID})\n\n`;
+      output += `• **Node**: ${safeNode}\n\n`;
 
-     if (pending.length === 0) {
-       output += 'No pending changes.\n';
-     } else {
-       output += `**Pending Changes** (${pending.length}):\n`;
-       for (const change of pending) {
-         output += `\n• **${change.key || 'unknown'}**\n`;
-         if (change.value !== undefined) {
-           output += `  • Value: ${change.value}\n`;
-         }
-         if (change.delete !== undefined) {
-           output += `  • Delete: ${change.delete}\n`;
-         }
-       }
-     }
+      if (pending.length === 0) {
+        output += 'No pending changes.\n';
+      } else {
+        output += `**Pending Changes** (${pending.length}):\n`;
+        for (const change of pending) {
+          output += `\n• **${change.key || 'unknown'}**\n`;
+          if (change.value !== undefined) {
+            output += `  • Value: ${change.value}\n`;
+          }
+          if (change.delete !== undefined) {
+            output += `  • Delete: ${change.delete}\n`;
+          }
+        }
+      }
 
-     return formatToolResponse(output);
-   } catch (error) {
-     return formatErrorResponse(error as Error, 'Get LXC Pending');
-   }
+      return formatToolResponse(output);
+    } catch (error) {
+      return formatErrorResponse(error as Error, 'Get LXC Pending');
+    }
+}
+
+/**
+ * Check if a feature is available for a QEMU VM.
+ * No elevated permissions required.
+ */
+export async function checkVmFeature(
+    client: ProxmoxApiClient,
+    _config: Config,
+    input: CheckVmFeatureInput
+): Promise<ToolResponse> {
+    try {
+      const validated = checkVmFeatureSchema.parse(input);
+      const safeNode = validateNodeName(validated.node);
+      const safeVMID = validateVMID(validated.vmid);
+      const feature = validated.feature;
+
+      const result = (await client.request(
+        `/nodes/${safeNode}/qemu/${safeVMID}/feature?feature=${feature}`
+      )) as Record<string, unknown>;
+
+      let output = `🖥️ **QEMU VM Feature Check** (ID: ${safeVMID})\n\n`;
+      output += `• **Node**: ${safeNode}\n`;
+      output += `• **Feature**: ${feature}\n`;
+      output += `• **Available**: ${result.enabled ? '✅ Yes' : '❌ No'}\n`;
+
+      if (result.reason) {
+        output += `• **Reason**: ${result.reason}\n`;
+      }
+
+      return formatToolResponse(output);
+    } catch (error) {
+      return formatErrorResponse(error as Error, 'Check VM Feature');
+    }
+}
+
+/**
+ * Check if a feature is available for an LXC container.
+ * No elevated permissions required.
+ */
+export async function checkLxcFeature(
+    client: ProxmoxApiClient,
+    _config: Config,
+    input: CheckLxcFeatureInput
+): Promise<ToolResponse> {
+    try {
+      const validated = checkLxcFeatureSchema.parse(input);
+      const safeNode = validateNodeName(validated.node);
+      const safeVMID = validateVMID(validated.vmid);
+      const feature = validated.feature;
+
+      const result = (await client.request(
+        `/nodes/${safeNode}/lxc/${safeVMID}/feature?feature=${feature}`
+      )) as Record<string, unknown>;
+
+      let output = `📦 **LXC Container Feature Check** (ID: ${safeVMID})\n\n`;
+      output += `• **Node**: ${safeNode}\n`;
+      output += `• **Feature**: ${feature}\n`;
+      output += `• **Available**: ${result.enabled ? '✅ Yes' : '❌ No'}\n`;
+
+      if (result.reason) {
+        output += `• **Reason**: ${result.reason}\n`;
+      }
+
+      return formatToolResponse(output);
+    } catch (error) {
+      return formatErrorResponse(error as Error, 'Check LXC Feature');
+    }
 }

@@ -45,6 +45,8 @@ export const TOOL_NAMES = [
   'proxmox_get_lxc_config',
   'proxmox_get_vm_pending',
   'proxmox_get_lxc_pending',
+  'proxmox_check_vm_feature',
+  'proxmox_check_lxc_feature',
   'proxmox_execute_vm_command',
   'proxmox_get_storage',
   'proxmox_get_cluster_status',

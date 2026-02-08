@@ -502,3 +502,65 @@
 ### API Endpoints Implemented
 - GET /nodes/{node}/qemu/{vmid}/pending (get VM pending changes)
 - GET /nodes/{node}/lxc/{vmid}/pending (get LXC pending changes)
+
+## Task 9: Feature Checks (COMPLETED)
+
+### Implementation Pattern
+- **Schemas**: 2 new schemas in vm.ts
+  - `checkVmFeatureSchema`: node, vmid, feature (enum: 'snapshot', 'clone', 'copy')
+  - `checkLxcFeatureSchema`: node, vmid, feature (enum: 'snapshot', 'clone', 'copy')
+
+- **Handlers**: 2 functions in vm-query.ts
+  - Check VM feature: GET /nodes/{node}/qemu/{vmid}/feature?feature={feature}
+  - Check LXC feature: GET /nodes/{node}/lxc/{vmid}/feature?feature={feature}
+  - Both are read-only operations (no elevated permissions)
+  - Returns object with `enabled` (0 or 1) and optional `reason` field
+
+- **Tests**: 10 tests total (5 per tool)
+  - Success case: Feature available (enabled: 1)
+  - Success case: Feature unavailable (enabled: 0 with reason)
+  - Validation tests: node name, vmid
+  - API error handling
+  - Pattern: Mock client, verify API calls, check output formatting
+  - No elevated permission tests (both are read-only)
+
+### Key Learnings
+1. **Feature check pattern**: Simple read-only query with feature parameter
+   - Path: `/nodes/{node}/{type}/{vmid}/feature?feature={feature}`
+   - Feature enum: 'snapshot', 'clone', 'copy'
+   - Response: `{ enabled: 0|1, reason?: string }`
+   - Similar to other VM/LXC query operations
+
+2. **Output formatting**: Shows feature availability with emoji indicators
+   - Available: `✅ Yes`
+   - Unavailable: `❌ No`
+   - Includes reason if provided by API
+   - Uses type-specific icons (🖥️ for VM, 📦 for LXC)
+
+3. **Tool count tracking**: Updated 3 places
+   - registry.ts: Tool count assertion (276→278)
+   - integration tests: Two assertions for tool count (276→278)
+
+4. **Test coverage**: Success cases only (no elevated tests)
+   - Both available and unavailable feature states
+   - Validation for node and vmid
+   - API error handling
+
+### Files Modified
+- src/schemas/vm.ts: +2 schemas
+- src/tools/vm-query.ts: +2 handlers
+- src/tools/index.ts: +2 exports
+- src/types/tools.ts: +2 tool names
+- src/server.ts: +2 tool descriptions
+- src/tools/registry.ts: +2 registrations, updated tool count (276→278)
+- src/tools/vm-query.test.ts: +10 tests
+- src/__tests__/integration/server.test.ts: Updated 2 assertions (276→278)
+
+### Verification
+- ✅ pnpm build: No errors
+- ✅ pnpm test: 729 tests pass (including 10 new tests)
+- ✅ Tool count: 276 → 278 (2 new tools)
+
+### API Endpoints Implemented
+- GET /nodes/{node}/qemu/{vmid}/feature (check VM feature)
+- GET /nodes/{node}/lxc/{vmid}/feature (check LXC feature)

@@ -214,3 +214,21 @@ export const resizeVmSchema = z.object({
 });
 
 export type ResizeVmInput = z.infer<typeof resizeVmSchema>;
+
+// proxmox_check_vm_feature - Check if a feature is available for a QEMU VM
+export const checkVmFeatureSchema = z.object({
+  node: z.string().min(1).describe('Node name where VM is located'),
+  vmid: z.coerce.number().describe('VM ID number'),
+  feature: z.enum(['snapshot', 'clone', 'copy']).describe('Feature to check (snapshot, clone, copy)'),
+});
+
+export type CheckVmFeatureInput = z.infer<typeof checkVmFeatureSchema>;
+
+// proxmox_check_lxc_feature - Check if a feature is available for an LXC container
+export const checkLxcFeatureSchema = z.object({
+  node: z.string().min(1).describe('Node name where container is located'),
+  vmid: z.coerce.number().describe('Container ID number'),
+  feature: z.enum(['snapshot', 'clone', 'copy']).describe('Feature to check (snapshot, clone, copy)'),
+});
+
+export type CheckLxcFeatureInput = z.infer<typeof checkLxcFeatureSchema>;
