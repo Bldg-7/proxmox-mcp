@@ -10,9 +10,9 @@ compatibility:
   - gemini-cli
   - vscode
 metadata:
-  version: 0.4.2
+  version: 0.6.0
   focus: operations
-  generated: 2026-02-07
+  generated: 2026-02-08
 ---
 
 # Proxmox VE Operations Expertise
