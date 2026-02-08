@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 143개 도구를 제공하는 MCP 서버입니다.
+Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 307개 도구를 제공하는 MCP 서버입니다.
 
 ## 참고 프로젝트 & 개선사항
 
@@ -17,26 +17,26 @@ Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 143개 도�
 ### 달라진 점
 
 **아키텍처**:
-- 3,147줄 단일 파일 → 30개 이상의 모듈로 분리된 TypeScript 구조
+- 3,147줄 단일 파일 → 110개 이상의 모듈로 분리된 TypeScript 구조
 - 타입 안전성 없음 → `noUncheckedIndexedAccess` 포함 strict TypeScript
 - 수작업 JSON Schema → Zod 스키마 기반 자동 JSON Schema 생성
 - 55개 case의 거대한 switch문 → handler/schema 쌍의 도구 레지스트리
 
 **품질**:
-- 테스트 0건 → 405건 (단위 351 + 통합 22)
+- 테스트 0건 → 808건
 - 입력 검증 없음 → 모든 도구 호출에 Zod 런타임 검증
 - 암묵적 에러 처리 → 컨텍스트를 포함한 구조화된 MCP 에러 응답
 - 권한 체크 없음 → 2단계 권한 모델 (기본 / 관리자)
 
 **개발자 경험**:
 - `npx @bldg-7/proxmox-mcp`로 바로 실행
-- MCP `ListTools`를 통해 143개 도구 설명 자동 노출
+- MCP `ListTools`를 통해 307개 도구 설명 자동 노출
 - Rate Limiter 미들웨어 내장
 - `console.log` 대신 Pino 구조화 로깅
 
 ## 주요 기능
 
-- **143개 관리 도구** - Proxmox 전 영역 커버
+- **307개 관리 도구** - Proxmox 전 영역 커버
 - **완전한 TypeScript 구현** - 엄격한 타입 안전성
 - **QEMU VM + LXC 컨테이너** 동시 지원
 - **보안 인증** - API 토큰
@@ -122,26 +122,35 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 ## 도구 목록
 
-이 서버는 Proxmox 관리를 위한 **143개의 종합 도구**를 제공합니다:
+이 서버는 Proxmox 관리를 위한 **307개의 종합 도구**를 제공합니다:
 
 | 카테고리 | 도구 수 | 권한 |
 |----------|---------|------|
 | 노드 & 클러스터 | 7 | 혼합 |
 | 노드 관리 | 8 | 혼합 |
-| 클러스터 관리 | 33 | 혼합 |
+| 시스템 운영 | 20 | 혼합 |
+| 노드 네트워크 구성 | 4 | 🔒 관리자 |
+| 클러스터 관리 | 54 | 혼합 |
 | 스토리지 관리 | 12 | 혼합 |
-| VM 조회 | 5 | 기본 |
+| 접근 제어 | 25 | 혼합 |
+| 풀 관리 | 5 | 혼합 |
+| SDN 네트워킹 | 20 | 혼합 |
+| Ceph | 16 | 혼합 |
+| VM 조회 | 9 | 기본 |
 | VM 라이프사이클 | 12 | 🔒 관리자 |
 | VM 수정 | 4 | 🔒 관리자 |
-| VM/LXC 고급 | 26 | 혼합 |
+| VM/LXC 고급 | 30 | 혼합 |
 | 스냅샷 | 8 | 혼합 |
 | 백업 | 6 | 🔒 관리자 |
-| 디스크 | 8 | 🔒 관리자 |
+| 디스크 | 16 | 혼합 |
 | VM/LXC 네트워크 | 6 | 🔒 관리자 |
+| 콘솔 접근 | 5 | 🔒 관리자 |
 | 명령어 실행 | 1 | 🔒 관리자 |
-| VM 생성 | 3 | 혼합 |
-| 노드 디스크 조회 | 4 | 기본 |
-| **합계** | **143** | |
+| VM 생성 | 6 | 혼합 |
+| 인증서 | 7 | 혼합 |
+| ACME | 8 | 혼합 |
+| 알림 | 5 | 혼합 |
+| **합계** | **307** | |
 
 📖 **[전체 도구 레퍼런스 →](docs/TOOLS_ko.md)**
 

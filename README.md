@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-A comprehensive MCP server providing 143 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
+A comprehensive MCP server providing 307 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
 
 ## Credits & Background
 
@@ -17,26 +17,26 @@ This project is a TypeScript rewrite of [mcp-proxmox-server](https://github.com/
 ### What Changed
 
 **Architecture**:
-- 3,147-line single-file monolith → modular TypeScript across 30+ source files
+- 3,147-line single-file monolith → modular TypeScript across 110+ source files
 - No type safety → strict TypeScript with `noUncheckedIndexedAccess`
 - Hand-written JSON Schema → Zod schemas with automatic JSON Schema generation
 - Giant switch statement (55 cases) → tool registry with handler/schema pairs
 
 **Quality**:
-- 0 tests → 405 tests (351 unit + 22 integration)
+- 0 tests → 808 tests
 - No input validation → Zod runtime validation on every tool call
 - Implicit error handling → structured MCP error responses with context
 - No permission checks → two-tier permission model (basic / elevated)
 
 **Developer Experience**:
 - `npx @bldg-7/proxmox-mcp` just works
-- All 143 tool descriptions exposed via MCP `ListTools`
+- All 307 tool descriptions exposed via MCP `ListTools`
 - Rate limiter middleware included
 - Pino structured logging instead of `console.log`
 
 ## Features
 
-- **143 comprehensive tools** for Proxmox management
+- **307 comprehensive tools** for Proxmox management
 - **Full TypeScript implementation** with strict type safety
 - **Support for both QEMU VMs and LXC containers**
 - **Secure authentication** (API token)
@@ -125,26 +125,35 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
 
 ## Available Tools
 
-This server provides **143 comprehensive tools** for Proxmox management:
+This server provides **307 comprehensive tools** for Proxmox management:
 
 | Category | Tools | Permission |
 |----------|-------|------------|
 | Node & Cluster | 7 | Mixed |
 | Node Management | 8 | Mixed |
-| Cluster Management | 33 | Mixed |
+| System Operations | 20 | Mixed |
+| Node Network Config | 4 | Elevated 🔒 |
+| Cluster Management | 54 | Mixed |
 | Storage Management | 12 | Mixed |
-| VM Query | 5 | Basic |
+| Access Control | 25 | Mixed |
+| Pool Management | 5 | Mixed |
+| SDN Networking | 20 | Mixed |
+| Ceph | 16 | Mixed |
+| VM Query | 9 | Basic |
 | VM Lifecycle | 12 | Elevated 🔒 |
 | VM Modify | 4 | Elevated 🔒 |
-| VM/LXC Advanced | 26 | Mixed |
+| VM/LXC Advanced | 30 | Mixed |
 | Snapshots | 8 | Mixed |
 | Backups | 6 | Elevated 🔒 |
-| Disks | 8 | Elevated 🔒 |
+| Disks | 16 | Mixed |
 | VM/LXC Network | 6 | Elevated 🔒 |
+| Console Access | 5 | Elevated 🔒 |
 | Command Execution | 1 | Elevated 🔒 |
-| VM Creation | 3 | Mixed |
-| Node Disk Query | 4 | Basic |
-| **Total** | **143** | |
+| VM Creation | 6 | Mixed |
+| Certificates | 7 | Mixed |
+| ACME | 8 | Mixed |
+| Notifications | 5 | Mixed |
+| **Total** | **307** | |
 
 📖 **[Full Tools Reference →](docs/TOOLS.md)**
 
@@ -156,7 +165,7 @@ This package includes **Agent Skills** - AI-optimized documentation that teaches
 
 | Skill | Description | Tools/Topics |
 |-------|-------------|--------------|
-| **proxmox-mcp-tools** | Complete MCP tool reference for Proxmox VE | 227 tools across 11 domains (VMs, LXC, cluster, storage, networking, Ceph) |
+| **proxmox-mcp-tools** | Complete MCP tool reference for Proxmox VE | 307 tools across 14 domains (VMs, LXC, cluster, storage, networking, Ceph, certificates, ACME, notifications) |
 | **proxmox-admin** | Operational expertise for Proxmox infrastructure | VM lifecycle, storage management, HA configuration, troubleshooting |
 
 ### Installation
@@ -224,7 +233,7 @@ Agent combines tool knowledge + operational expertise:
 ### Skill Contents
 
 **proxmox-mcp-tools** — Tool Reference:
-- 227 tools organized into 11 domains (VMs, LXC, cluster, storage, networking, Ceph, access control, pools)
+- 307 tools organized into 14 domains (VMs, LXC, cluster, storage, networking, Ceph, access control, pools, certificates, ACME, notifications)
 - Parameters, types, and descriptions for every tool
 - Permission levels (basic vs elevated 🔒)
 - Common workflow patterns (create VM, backup/restore, clone, migrate)
@@ -309,11 +318,11 @@ Each SubAgent has clear responsibilities to avoid overlap:
 
 - **vm-manager**: Only QEMU VMs (not LXC). Delegates cluster ops to cluster-admin.
 - **lxc-manager**: Only LXC containers (not VMs). Delegates cluster ops to cluster-admin.
-- **cluster-admin**: Cluster-wide operations only. Delegates per-VM/LXC ops to respective managers.
-- **storage-admin**: Storage infrastructure only. Delegates VM disk operations to vm-manager.
+- **cluster-admin**: Cluster-wide operations (HA, firewall aliases/ipsets, cluster config, notifications). Delegates per-VM/LXC ops to respective managers.
+- **storage-admin**: Storage infrastructure, certificate management, ACME configuration, advanced disk operations. Delegates VM disk operations to vm-manager.
 - **network-admin**: Network infrastructure only. Delegates per-VM/LXC NICs to respective managers.
-- **access-admin**: Access control only. No delegation to other agents.
-- **monitor**: Read-only monitoring. Delegates ALL actions to appropriate agents.
+- **access-admin**: Access control including API token management. No delegation to other agents.
+- **monitor**: Read-only monitoring including node metrics/RRD data. Delegates ALL actions to appropriate agents.
 
 ## Error Handling
 
