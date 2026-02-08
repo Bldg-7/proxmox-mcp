@@ -178,6 +178,8 @@ import {
   getVMStatus,
   getVMConfig,
   getLxcConfig,
+  getVmPending,
+  getLxcPending,
   getStorage,
   startLxc,
   startVM,
@@ -470,11 +472,13 @@ import {
   createCephFsSchema,
 } from '../schemas/ceph.js';
 import {
-  getVmsSchema,
-  getVmStatusSchema,
-  getVmConfigSchema,
-  getLxcConfigSchema,
-  getStorageSchema,
+   getVmsSchema,
+   getVmStatusSchema,
+   getVmConfigSchema,
+   getLxcConfigSchema,
+   getVmPendingSchema,
+   getLxcPendingSchema,
+   getStorageSchema,
   startLxcSchema,
   startVmSchema,
   stopLxcSchema,
@@ -980,6 +984,8 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_get_vm_status: { handler: getVMStatus, schema: getVmStatusSchema },
   proxmox_get_vm_config: { handler: getVMConfig, schema: getVmConfigSchema },
   proxmox_get_lxc_config: { handler: getLxcConfig, schema: getLxcConfigSchema },
+  proxmox_get_vm_pending: { handler: getVmPending, schema: getVmPendingSchema },
+  proxmox_get_lxc_pending: { handler: getLxcPending, schema: getLxcPendingSchema },
   proxmox_get_storage: { handler: getStorage, schema: getStorageSchema },
 
   // VM Lifecycle
@@ -1136,10 +1142,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 274 tools are registered
+// Validate all 276 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 274) {
-  throw new Error(
-    `Tool registry incomplete: expected 274 tools, got ${registeredCount}`
-  );
+if (registeredCount !== 276) {
+   throw new Error(
+     `Tool registry incomplete: expected 276 tools, got ${registeredCount}`
+   );
 }

@@ -212,7 +212,7 @@ export {
 } from './console-access.js';
 
 // VM Query & Lifecycle tools
-export { getVMs, getVMStatus, getVMConfig, getLxcConfig, getStorage } from './vm-query.js';
+export { getVMs, getVMStatus, getVMConfig, getLxcConfig, getStorage, getVmPending, getLxcPending } from './vm-query.js';
 export {
   startLxc,
   startVM,

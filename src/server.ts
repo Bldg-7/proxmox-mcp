@@ -231,6 +231,8 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_get_vm_status: 'Get detailed status information for a specific VM',
   proxmox_get_vm_config: 'Get hardware configuration for a QEMU VM (disks, network, CPU, memory)',
   proxmox_get_lxc_config: 'Get hardware configuration for an LXC container (mount points, network, CPU, memory)',
+  proxmox_get_vm_pending: 'Get pending configuration changes for a QEMU VM',
+  proxmox_get_lxc_pending: 'Get pending configuration changes for an LXC container',
   proxmox_get_storage: 'List all storage pools and their usage across the cluster',
 
   // VM Lifecycle

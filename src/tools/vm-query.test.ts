@@ -4,7 +4,7 @@ import { createTestConfig } from '../__test-utils__/index.js';
 import { sampleQemuVMs, sampleLxcContainers } from '../__fixtures__/vms.js';
 import { sampleNodes } from '../__fixtures__/nodes.js';
 import { sampleStorage } from '../__fixtures__/storage.js';
-import { getVMs, getVMStatus, getStorage } from './vm-query.js';
+import { getVMs, getVMStatus, getStorage, getVmPending, getLxcPending } from './vm-query.js';
 
 function createMockClient(): ProxmoxApiClient {
   return {
@@ -445,8 +445,136 @@ describe('getStorage', () => {
 
     const result = await getStorage(client, config, {});
 
+   expect(result.isError).toBe(true);
+   expect(result.content[0].text).toContain('❌');
+   expect(result.content[0].text).toContain('API error');
+ });
+});
+
+describe('getVmPending', () => {
+  let client: ProxmoxApiClient;
+  let config = createTestConfig();
+
+  beforeEach(() => {
+    client = createMockClient();
+    config = createTestConfig();
+  });
+
+  it('returns pending changes for a QEMU VM', async () => {
+    const mockPending = [
+      { key: 'memory', value: '8192' },
+      { key: 'cores', value: '4' },
+    ];
+
+    const mockRequest = vi.mocked(client.request);
+    mockRequest.mockResolvedValue(mockPending);
+
+    const result = await getVmPending(client, config, { node: 'pve1', vmid: 100 });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('🖥️ **QEMU VM Pending Changes**');
+    expect(result.content[0].text).toContain('ID: 100');
+    expect(result.content[0].text).toContain('memory');
+    expect(result.content[0].text).toContain('cores');
+    expect(mockRequest).toHaveBeenCalledWith('/nodes/pve1/qemu/100/pending');
+  });
+
+  it('handles empty pending changes', async () => {
+    const mockRequest = vi.mocked(client.request);
+    mockRequest.mockResolvedValue([]);
+
+    const result = await getVmPending(client, config, { node: 'pve1', vmid: 100 });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('No pending changes');
+  });
+
+  it('validates node name', async () => {
+    const result = await getVmPending(client, config, { node: 'invalid@node', vmid: 100 });
+
     expect(result.isError).toBe(true);
     expect(result.content[0].text).toContain('❌');
-    expect(result.content[0].text).toContain('API error');
+  });
+
+  it('validates VMID', async () => {
+    const result = await getVmPending(client, config, { node: 'pve1', vmid: -1 });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+  });
+
+  it('handles API errors', async () => {
+    const mockRequest = vi.mocked(client.request);
+    mockRequest.mockRejectedValue(new Error('VM not found'));
+
+    const result = await getVmPending(client, config, { node: 'pve1', vmid: 999 });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+    expect(result.content[0].text).toContain('VM not found');
+  });
+});
+
+describe('getLxcPending', () => {
+  let client: ProxmoxApiClient;
+  let config = createTestConfig();
+
+  beforeEach(() => {
+    client = createMockClient();
+    config = createTestConfig();
+  });
+
+  it('returns pending changes for an LXC container', async () => {
+    const mockPending = [
+      { key: 'memory', value: '2048' },
+      { key: 'cores', value: '2' },
+    ];
+
+    const mockRequest = vi.mocked(client.request);
+    mockRequest.mockResolvedValue(mockPending);
+
+    const result = await getLxcPending(client, config, { node: 'pve1', vmid: 200 });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('📦 **LXC Container Pending Changes**');
+    expect(result.content[0].text).toContain('ID: 200');
+    expect(result.content[0].text).toContain('memory');
+    expect(result.content[0].text).toContain('cores');
+    expect(mockRequest).toHaveBeenCalledWith('/nodes/pve1/lxc/200/pending');
+  });
+
+  it('handles empty pending changes', async () => {
+    const mockRequest = vi.mocked(client.request);
+    mockRequest.mockResolvedValue([]);
+
+    const result = await getLxcPending(client, config, { node: 'pve1', vmid: 200 });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('No pending changes');
+  });
+
+  it('validates node name', async () => {
+    const result = await getLxcPending(client, config, { node: 'invalid@node', vmid: 200 });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+  });
+
+  it('validates VMID', async () => {
+    const result = await getLxcPending(client, config, { node: 'pve1', vmid: -1 });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+  });
+
+  it('handles API errors', async () => {
+    const mockRequest = vi.mocked(client.request);
+    mockRequest.mockRejectedValue(new Error('Container not found'));
+
+    const result = await getLxcPending(client, config, { node: 'pve1', vmid: 999 });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('❌');
+    expect(result.content[0].text).toContain('Container not found');
   });
 });

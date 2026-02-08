@@ -10,8 +10,8 @@ import {
   formatCpuPercent,
 } from '../formatters/index.js';
 import { validateNodeName, validateVMID } from '../validators/index.js';
-import { getVmsSchema, getVmStatusSchema, getStorageSchema, getVmConfigSchema, getLxcConfigSchema } from '../schemas/vm.js';
-import type { GetVmsInput, GetVmStatusInput, GetStorageInput, GetVmConfigInput, GetLxcConfigInput } from '../schemas/vm.js';
+import { getVmsSchema, getVmStatusSchema, getStorageSchema, getVmConfigSchema, getLxcConfigSchema, getVmPendingSchema, getLxcPendingSchema } from '../schemas/vm.js';
+import type { GetVmsInput, GetVmStatusInput, GetStorageInput, GetVmConfigInput, GetLxcConfigInput, GetVmPendingInput, GetLxcPendingInput } from '../schemas/vm.js';
 
 interface VMWithType extends ProxmoxVM {
   type: VMType;
@@ -290,70 +290,154 @@ interface StorageWithNode extends ProxmoxStorage {
  * No elevated permissions required.
  */
 export async function getStorage(
-  client: ProxmoxApiClient,
-  _config: Config,
-  input: GetStorageInput
+   client: ProxmoxApiClient,
+   _config: Config,
+   input: GetStorageInput
 ): Promise<ToolResponse> {
-  try {
-    const validated = getStorageSchema.parse(input);
-    const nodeFilter = validated.node;
+   try {
+     const validated = getStorageSchema.parse(input);
+     const nodeFilter = validated.node;
 
-    const storages: StorageWithNode[] = [];
+     const storages: StorageWithNode[] = [];
 
-    if (nodeFilter) {
-      // Single node logic
-      const safeNode = validateNodeName(nodeFilter);
-      const nodeStorages = (await client.request(`/nodes/${safeNode}/storage`)) as ProxmoxStorage[];
-      storages.push(...nodeStorages.map((storage) => ({ ...storage, node: safeNode })));
-    } else {
-      // All nodes logic
-      const nodes = (await client.request('/nodes')) as ProxmoxNode[];
+     if (nodeFilter) {
+       // Single node logic
+       const safeNode = validateNodeName(nodeFilter);
+       const nodeStorages = (await client.request(`/nodes/${safeNode}/storage`)) as ProxmoxStorage[];
+       storages.push(...nodeStorages.map((storage) => ({ ...storage, node: safeNode })));
+     } else {
+       // All nodes logic
+       const nodes = (await client.request('/nodes')) as ProxmoxNode[];
 
-      for (const node of nodes) {
-        const nodeStorages = (await client.request(`/nodes/${node.node}/storage`)) as ProxmoxStorage[];
-        storages.push(...nodeStorages.map((storage) => ({ ...storage, node: node.node })));
-      }
-    }
+       for (const node of nodes) {
+         const nodeStorages = (await client.request(`/nodes/${node.node}/storage`)) as ProxmoxStorage[];
+         storages.push(...nodeStorages.map((storage) => ({ ...storage, node: node.node })));
+       }
+     }
 
-    // Deduplicate by storage ID (keep first occurrence)
-    const uniqueStorages: StorageWithNode[] = [];
-    const seen = new Set<string>();
+     // Deduplicate by storage ID (keep first occurrence)
+     const uniqueStorages: StorageWithNode[] = [];
+     const seen = new Set<string>();
 
-    for (const storage of storages) {
-      const key = storage.storage;
-      if (!seen.has(key)) {
-        seen.add(key);
-        uniqueStorages.push(storage);
-      }
-    }
+     for (const storage of storages) {
+       const key = storage.storage;
+       if (!seen.has(key)) {
+         seen.add(key);
+         uniqueStorages.push(storage);
+       }
+     }
 
-    // Sort by storage name
-    uniqueStorages.sort((a, b) => a.storage.localeCompare(b.storage));
+     // Sort by storage name
+     uniqueStorages.sort((a, b) => a.storage.localeCompare(b.storage));
 
-    // Format output
-    let output = '💾 **Storage Pools**\n\n';
+     // Format output
+     let output = '💾 **Storage Pools**\n\n';
 
-    if (uniqueStorages.length === 0) {
-      output += 'No storage found.\n';
-    } else {
-      for (const storage of uniqueStorages) {
-        const status = storage.enabled ? '🟢' : '🔴';
-        const usagePercent =
-          storage.total && storage.used ? ((storage.used / storage.total) * 100).toFixed(1) : 'N/A';
+     if (uniqueStorages.length === 0) {
+       output += 'No storage found.\n';
+     } else {
+       for (const storage of uniqueStorages) {
+         const status = storage.enabled ? '🟢' : '🔴';
+         const usagePercent =
+           storage.total && storage.used ? ((storage.used / storage.total) * 100).toFixed(1) : 'N/A';
 
-        output += `${status} **${storage.storage}**\n`;
-        output += `   • Type: ${storage.type || 'N/A'}\n`;
-        output += `   • Node: ${storage.node}\n`;
-        output += `   • Content: ${storage.content || 'N/A'}\n`;
-        if (storage.total && storage.used) {
-          output += `   • Usage: ${formatBytes(storage.used)} / ${formatBytes(storage.total)} (${usagePercent}%)\n`;
-        }
-        output += `   • Status: ${storage.enabled ? 'Enabled' : 'Disabled'}\n\n`;
-      }
-    }
+         output += `${status} **${storage.storage}**\n`;
+         output += `   • Type: ${storage.type || 'N/A'}\n`;
+         output += `   • Node: ${storage.node}\n`;
+         output += `   • Content: ${storage.content || 'N/A'}\n`;
+         if (storage.total && storage.used) {
+           output += `   • Usage: ${formatBytes(storage.used)} / ${formatBytes(storage.total)} (${usagePercent}%)\n`;
+         }
+         output += `   • Status: ${storage.enabled ? 'Enabled' : 'Disabled'}\n\n`;
+       }
+     }
 
-    return formatToolResponse(output);
-  } catch (error) {
-    return formatErrorResponse(error as Error, 'Get Storage');
-  }
+     return formatToolResponse(output);
+   } catch (error) {
+     return formatErrorResponse(error as Error, 'Get Storage');
+   }
+}
+
+/**
+ * Get pending configuration changes for a QEMU VM.
+ * No elevated permissions required.
+ */
+export async function getVmPending(
+   client: ProxmoxApiClient,
+   _config: Config,
+   input: GetVmPendingInput
+): Promise<ToolResponse> {
+   try {
+     const validated = getVmPendingSchema.parse(input);
+     const safeNode = validateNodeName(validated.node);
+     const safeVMID = validateVMID(validated.vmid);
+
+     const pending = (await client.request(
+       `/nodes/${safeNode}/qemu/${safeVMID}/pending`
+     )) as Array<Record<string, unknown>>;
+
+     let output = `🖥️ **QEMU VM Pending Changes** (ID: ${safeVMID})\n\n`;
+     output += `• **Node**: ${safeNode}\n\n`;
+
+     if (pending.length === 0) {
+       output += 'No pending changes.\n';
+     } else {
+       output += `**Pending Changes** (${pending.length}):\n`;
+       for (const change of pending) {
+         output += `\n• **${change.key || 'unknown'}**\n`;
+         if (change.value !== undefined) {
+           output += `  • Value: ${change.value}\n`;
+         }
+         if (change.delete !== undefined) {
+           output += `  • Delete: ${change.delete}\n`;
+         }
+       }
+     }
+
+     return formatToolResponse(output);
+   } catch (error) {
+     return formatErrorResponse(error as Error, 'Get VM Pending');
+   }
+}
+
+/**
+ * Get pending configuration changes for an LXC container.
+ * No elevated permissions required.
+ */
+export async function getLxcPending(
+   client: ProxmoxApiClient,
+   _config: Config,
+   input: GetLxcPendingInput
+): Promise<ToolResponse> {
+   try {
+     const validated = getLxcPendingSchema.parse(input);
+     const safeNode = validateNodeName(validated.node);
+     const safeVMID = validateVMID(validated.vmid);
+
+     const pending = (await client.request(
+       `/nodes/${safeNode}/lxc/${safeVMID}/pending`
+     )) as Array<Record<string, unknown>>;
+
+     let output = `📦 **LXC Container Pending Changes** (ID: ${safeVMID})\n\n`;
+     output += `• **Node**: ${safeNode}\n\n`;
+
+     if (pending.length === 0) {
+       output += 'No pending changes.\n';
+     } else {
+       output += `**Pending Changes** (${pending.length}):\n`;
+       for (const change of pending) {
+         output += `\n• **${change.key || 'unknown'}**\n`;
+         if (change.value !== undefined) {
+           output += `  • Value: ${change.value}\n`;
+         }
+         if (change.delete !== undefined) {
+           output += `  • Delete: ${change.delete}\n`;
+         }
+       }
+     }
+
+     return formatToolResponse(output);
+   } catch (error) {
+     return formatErrorResponse(error as Error, 'Get LXC Pending');
+   }
 }

@@ -46,6 +46,22 @@ export const getStorageSchema = z.object({
 
 export type GetStorageInput = z.infer<typeof getStorageSchema>;
 
+// proxmox_get_vm_pending - Get pending configuration changes for a QEMU VM
+export const getVmPendingSchema = z.object({
+  node: z.string().min(1).describe('Node name where VM is located'),
+  vmid: z.coerce.number().describe('VM ID number'),
+});
+
+export type GetVmPendingInput = z.infer<typeof getVmPendingSchema>;
+
+// proxmox_get_lxc_pending - Get pending configuration changes for an LXC container
+export const getLxcPendingSchema = z.object({
+  node: z.string().min(1).describe('Node name where container is located'),
+  vmid: z.coerce.number().describe('Container ID number'),
+});
+
+export type GetLxcPendingInput = z.infer<typeof getLxcPendingSchema>;
+
 // proxmox_execute_vm_command - Execute a shell command on a VM
 export const executeVmCommandSchema = z.object({
   node: z.string().min(1).describe('Node name where VM is located'),

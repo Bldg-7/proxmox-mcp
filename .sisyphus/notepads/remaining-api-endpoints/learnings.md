@@ -443,3 +443,62 @@
 - GET /nodes/{node}/replication/{id}/status (get replication status)
 - GET /nodes/{node}/replication/{id}/log (get replication log)
 - POST /nodes/{node}/replication/{id}/schedule_now (schedule immediate replication)
+
+## Task 8: Pending Changes (COMPLETED)
+
+### Implementation Pattern
+- **Schemas**: 2 new schemas in vm.ts
+  - `getVmPendingSchema`: node, vmid parameters (same as getVmConfigSchema)
+  - `getLxcPendingSchema`: node, vmid parameters (same as getLxcConfigSchema)
+
+- **Handlers**: 2 functions in vm-query.ts
+  - Get VM pending: Returns array of pending configuration changes for QEMU VM
+  - Get LXC pending: Returns array of pending configuration changes for LXC container
+  - Both are read-only operations (no elevated permissions)
+  - API endpoints: `/nodes/{node}/qemu/{vmid}/pending` and `/nodes/{node}/lxc/{vmid}/pending`
+
+- **Tests**: 2 test suites (10 tests total)
+  - getVmPending: 5 tests (success, empty, node validation, vmid validation, API error)
+  - getLxcPending: 5 tests (success, empty, node validation, vmid validation, API error)
+  - Pattern: Mock client, verify API calls, check output formatting
+  - No elevated permission tests (both are read-only)
+
+### Key Learnings
+1. **Pending changes pattern**: Similar to getVMConfig pattern
+   - Same parameters: node + vmid
+   - Same validation: validateNodeName + validateVMID
+   - Read-only operations (no elevated permissions)
+   - Returns array of change objects with key/value/delete fields
+
+2. **Output formatting**: Displays pending changes as list
+   - Shows change key and value/delete fields
+   - Handles empty pending changes gracefully
+   - Uses emoji icons (🖥️ for VM, 📦 for LXC)
+
+3. **Tool count tracking**: Updated 3 places
+   - registry.ts: Tool count assertion (274→276)
+   - integration tests: Two assertions for tool count (274→276)
+
+4. **Test coverage**: Success cases only (no elevated tests)
+   - Validation tests for node and vmid
+   - API error handling
+   - Empty pending changes handling
+
+### Files Modified
+- src/schemas/vm.ts: +2 schemas
+- src/tools/vm-query.ts: +2 handlers
+- src/tools/index.ts: +2 exports
+- src/types/tools.ts: +2 tool names
+- src/server.ts: +2 tool descriptions
+- src/tools/registry.ts: +2 registrations, updated tool count (274→276)
+- src/tools/vm-query.test.ts: +10 tests
+- src/__tests__/integration/server.test.ts: Updated 2 assertions (274→276)
+
+### Verification
+- ✅ pnpm build: No errors
+- ✅ pnpm test: 719 tests pass (including 10 new tests)
+- ✅ Tool count: 274 → 276 (2 new tools)
+
+### API Endpoints Implemented
+- GET /nodes/{node}/qemu/{vmid}/pending (get VM pending changes)
+- GET /nodes/{node}/lxc/{vmid}/pending (get LXC pending changes)
