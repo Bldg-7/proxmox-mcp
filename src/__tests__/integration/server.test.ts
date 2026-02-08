@@ -49,7 +49,7 @@ describe('MCP Server Integration', () => {
         expect(response).toBeDefined();
         expect(response.tools).toBeDefined();
         expect(Array.isArray(response.tools)).toBe(true);
-        expect(response.tools).toHaveLength(268);
+        expect(response.tools).toHaveLength(271);
     });
 
     it('includes correct tool properties', async () => {
@@ -419,8 +419,8 @@ describe('MCP Server Integration', () => {
       const server = createServer(client, config);
 
         const listHandler = getRequestHandlers(server).get('tools/list');
-        const listResponse = await listHandler!({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
-        expect(listResponse.tools).toHaveLength(268);
+         const listResponse = await listHandler!({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
+         expect(listResponse.tools).toHaveLength(271);
 
       const getNodesToolDef = listResponse.tools.find(
         (t: { name: string }) => t.name === 'proxmox_get_nodes'

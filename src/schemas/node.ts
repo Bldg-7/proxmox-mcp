@@ -103,3 +103,29 @@ export const getNodeNetstatSchema = z.object({
 });
 
 export type GetNodeNetstatInput = z.infer<typeof getNodeNetstatSchema>;
+
+// proxmox_get_node_rrddata - Get node RRD metrics
+export const getNodeRrddataSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+  timeframe: z.enum(['hour', 'day', 'week', 'month', 'year']).optional().describe('Timeframe for metrics'),
+  cf: z.enum(['AVERAGE', 'MAX']).optional().describe('Consolidation function'),
+});
+
+export type GetNodeRrddataInput = z.infer<typeof getNodeRrddataSchema>;
+
+// proxmox_get_storage_rrddata - Get storage RRD metrics
+export const getStorageRrddataSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+  storage: z.string().min(1).describe('Storage name'),
+  timeframe: z.enum(['hour', 'day', 'week', 'month', 'year']).optional().describe('Timeframe for metrics'),
+  cf: z.enum(['AVERAGE', 'MAX']).optional().describe('Consolidation function'),
+});
+
+export type GetStorageRrddataInput = z.infer<typeof getStorageRrddataSchema>;
+
+// proxmox_get_node_report - Get node diagnostic report
+export const getNodeReportSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+});
+
+export type GetNodeReportInput = z.infer<typeof getNodeReportSchema>;

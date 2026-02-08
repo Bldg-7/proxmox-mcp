@@ -310,3 +310,72 @@
 - POST /nodes/{node}/status (shutdown command)
 - POST /nodes/{node}/status (reboot command)
 - POST /nodes/{node}/wakeonlan
+
+## Task 6: Node and Storage RRD Metrics + Node Report (COMPLETED)
+
+### Implementation Pattern
+- **Schemas**: 3 new schemas in node.ts
+  - `getNodeRrddataSchema`: node (required), timeframe (optional enum), cf (optional enum)
+  - `getStorageRrddataSchema`: node, storage (required), timeframe (optional enum), cf (optional enum)
+  - `getNodeReportSchema`: node parameter only
+
+- **Handlers**: 3 functions in node.ts
+  - Get node RRD: Returns node performance metrics with optional timeframe/cf query params
+  - Get storage RRD: Returns storage performance metrics with optional timeframe/cf query params
+  - Get node report: Returns diagnostic report as plain text wrapped in code block
+
+- **Tests**: 6 tests total
+  - 3 success cases (one per tool)
+  - 3 API endpoint verification tests
+  - Pattern: Mock client, verify API calls, check output formatting
+
+### Key Learnings
+1. **RRD pattern**: Follows exact pattern from vm-advanced.ts (getVmRrddata)
+   - Use URLSearchParams for optional query parameters
+   - Build path with conditional query string: `/path${query ? `?${query}` : ''}`
+   - Return array of RRD data points with JSON formatting
+   - Show first 5 points in output using formatJsonBlock helper
+
+2. **Query parameter handling**: Optional timeframe and cf parameters
+   - Only add to URLSearchParams if provided
+   - Timeframe enum: 'hour', 'day', 'week', 'month', 'year'
+   - CF enum: 'AVERAGE', 'MAX'
+   - Pattern: `if (validated.param) params.set('key', validated.param)`
+
+3. **Storage RRD specifics**: Two-level path structure
+   - Path: `/nodes/{node}/storage/{storage}/rrddata`
+   - Storage name doesn't need validation (unlike node names)
+   - Same RRD data format as node metrics
+
+4. **Node report specifics**: Plain text response
+   - Returns string (not JSON array)
+   - Wrap in code block for readability
+   - Pattern: `'```\n' + report + '\n```'`
+
+5. **Tool count tracking**: Updated 3 places
+   - registry.ts: Tool count assertion (268→271)
+   - integration tests: Two assertions for tool count (268→271)
+
+6. **Test output formatting**: Bullet points in output
+   - Output uses `• **Points**: 2` format (with bullet and bold)
+   - Tests must match exact formatting: `toContain('**Points**: 2')`
+
+### Files Modified
+- src/schemas/node.ts: +3 schemas
+- src/tools/node.ts: +3 handlers (+ ProxmoxRrdDataPoint interface + formatJsonBlock helper)
+- src/tools/index.ts: +3 exports
+- src/types/tools.ts: +3 tool names
+- src/server.ts: +3 tool descriptions
+- src/tools/registry.ts: +3 registrations, updated tool count (268→271)
+- src/tools/node.test.ts: +6 tests
+- src/__tests__/integration/server.test.ts: Updated 2 assertions (268→271)
+
+### Verification
+- ✅ pnpm build: No errors
+- ✅ pnpm test: 705 tests pass (including 6 new tests)
+- ✅ Tool count: 268 → 271 (3 new tools)
+
+### API Endpoints Implemented
+- GET /nodes/{node}/rrddata (with optional timeframe/cf params)
+- GET /nodes/{node}/storage/{storage}/rrddata (with optional timeframe/cf params)
+- GET /nodes/{node}/report

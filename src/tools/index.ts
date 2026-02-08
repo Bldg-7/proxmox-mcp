@@ -13,6 +13,9 @@ export {
   getNodeTask,
   getNodeAplinfo,
   getNodeNetstat,
+  getNodeRrddata,
+  getStorageRrddata,
+  getNodeReport,
 } from './node.js';
 export { getClusterStatus, getNextVMID } from './cluster.js';
 

@@ -18,6 +18,9 @@ import {
   getNodeTask,
   getNodeAplinfo,
   getNodeNetstat,
+  getNodeRrddata,
+  getStorageRrddata,
+  getNodeReport,
   createNetworkIface,
   updateNetworkIface,
   deleteNetworkIface,
@@ -290,6 +293,9 @@ import {
   getNodeTaskSchema,
   getNodeAplinfoSchema,
   getNodeNetstatSchema,
+  getNodeRrddataSchema,
+  getStorageRrddataSchema,
+  getNodeReportSchema,
   getClusterStatusSchema,
   getNextVmidSchema,
 } from '../schemas/node.js';
@@ -956,6 +962,9 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_get_node_task: { handler: getNodeTask, schema: getNodeTaskSchema },
   proxmox_get_node_aplinfo: { handler: getNodeAplinfo, schema: getNodeAplinfoSchema },
   proxmox_get_node_netstat: { handler: getNodeNetstat, schema: getNodeNetstatSchema },
+  proxmox_get_node_rrddata: { handler: getNodeRrddata, schema: getNodeRrddataSchema },
+  proxmox_get_storage_rrddata: { handler: getStorageRrddata, schema: getStorageRrddataSchema },
+  proxmox_get_node_report: { handler: getNodeReport, schema: getNodeReportSchema },
 
   // VM Query
   proxmox_get_vms: { handler: getVMs, schema: getVmsSchema },
@@ -1120,8 +1129,8 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
 
 // Validate all 268 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 268) {
+if (registeredCount !== 271) {
   throw new Error(
-    `Tool registry incomplete: expected 268 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 271 tools, got ${registeredCount}`
   );
 }

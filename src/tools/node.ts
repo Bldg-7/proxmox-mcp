@@ -39,6 +39,9 @@ import {
   getNodeTaskSchema,
   getNodeAplinfoSchema,
   getNodeNetstatSchema,
+  getNodeRrddataSchema,
+  getStorageRrddataSchema,
+  getNodeReportSchema,
 } from '../schemas/node.js';
 import type {
   GetNodesInput,
@@ -54,6 +57,9 @@ import type {
   GetNodeTaskInput,
   GetNodeAplinfoInput,
   GetNodeNetstatInput,
+  GetNodeRrddataInput,
+  GetStorageRrddataInput,
+  GetNodeReportInput,
 } from '../schemas/node.js';
 import type { ProxmoxNetwork, ProxmoxDNS } from '../types/proxmox.js';
 
@@ -567,5 +573,123 @@ export async function getNodeNetstat(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Get Node Netstat');
+  }
+}
+
+interface ProxmoxRrdDataPoint {
+  [key: string]: number | string | null | undefined;
+  time?: number;
+}
+
+function formatJsonBlock(data: unknown): string {
+  return `\n\n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``;
+}
+
+/**
+ * Get node RRD performance metrics.
+ * No elevated permissions required.
+ */
+export async function getNodeRrddata(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeRrddataInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeRrddataSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const params = new URLSearchParams();
+    if (validated.timeframe) params.set('timeframe', validated.timeframe);
+    if (validated.cf) params.set('cf', validated.cf);
+
+    const query = params.toString();
+    const path = `/nodes/${safeNode}/rrddata${query ? `?${query}` : ''}`;
+    const data = (await client.request(path)) as ProxmoxRrdDataPoint[];
+
+    let output = '📈 **Node Performance Metrics**\n\n';
+    output += `• **Node**: ${safeNode}\n`;
+
+    if (!data || data.length === 0) {
+      output += '\nNo performance metrics available.';
+      return formatToolResponse(output);
+    }
+
+    output += `• **Points**: ${data.length}`;
+    output += formatJsonBlock(data.slice(0, 5));
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node RRD Data');
+  }
+}
+
+/**
+ * Get storage RRD performance metrics.
+ * No elevated permissions required.
+ */
+export async function getStorageRrddata(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetStorageRrddataInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getStorageRrddataSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeStorage = validated.storage;
+
+    const params = new URLSearchParams();
+    if (validated.timeframe) params.set('timeframe', validated.timeframe);
+    if (validated.cf) params.set('cf', validated.cf);
+
+    const query = params.toString();
+    const path = `/nodes/${safeNode}/storage/${safeStorage}/rrddata${query ? `?${query}` : ''}`;
+    const data = (await client.request(path)) as ProxmoxRrdDataPoint[];
+
+    let output = '📈 **Storage Performance Metrics**\n\n';
+    output += `• **Storage**: ${safeStorage}\n`;
+    output += `• **Node**: ${safeNode}\n`;
+
+    if (!data || data.length === 0) {
+      output += '\nNo performance metrics available.';
+      return formatToolResponse(output);
+    }
+
+    output += `• **Points**: ${data.length}`;
+    output += formatJsonBlock(data.slice(0, 5));
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Storage RRD Data');
+  }
+}
+
+/**
+ * Get node diagnostic report.
+ * No elevated permissions required.
+ */
+export async function getNodeReport(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeReportInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeReportSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+
+    const report = (await client.request(`/nodes/${safeNode}/report`)) as string;
+
+    let output = '📋 **Node Diagnostic Report**\n\n';
+    output += `• **Node**: ${safeNode}\n\n`;
+
+    if (!report || report.length === 0) {
+      output += 'No diagnostic report available.';
+      return formatToolResponse(output);
+    }
+
+    output += '```\n' + report + '\n```';
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Report');
   }
 }

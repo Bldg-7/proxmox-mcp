@@ -15,6 +15,9 @@ import {
   getNodeTask,
   getNodeAplinfo,
   getNodeNetstat,
+  getNodeRrddata,
+  getStorageRrddata,
+  getNodeReport,
 } from './node.js';
 
 describe('getNodes', () => {
@@ -739,5 +742,102 @@ describe('getNodeNetstat', () => {
     await getNodeNetstat(client, config, { node: 'pve1' });
 
     expect(client.request).toHaveBeenCalledWith('/nodes/pve1/netstat');
+  });
+});
+
+describe('getNodeRrddata', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted RRD metrics', async () => {
+    const config = createTestConfig();
+    const sampleRrdData = [
+      { time: 1609459200, cpu: 0.25, memory: 0.5, disk: 0.1 },
+      { time: 1609459260, cpu: 0.3, memory: 0.52, disk: 0.12 },
+    ];
+    client.request.mockResolvedValue(sampleRrdData);
+
+    const result = await getNodeRrddata(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Node Performance Metrics');
+    expect(result.content[0].text).toContain('pve1');
+    expect(result.content[0].text).toContain('**Points**: 2');
+  });
+
+  it('calls correct API endpoint with optional params', async () => {
+    const config = createTestConfig();
+    client.request.mockResolvedValue([]);
+
+    await getNodeRrddata(client, config, { node: 'pve1', timeframe: 'day', cf: 'AVERAGE' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/rrddata?timeframe=day&cf=AVERAGE');
+  });
+});
+
+describe('getStorageRrddata', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted storage RRD metrics', async () => {
+    const config = createTestConfig();
+    const sampleRrdData = [
+      { time: 1609459200, read: 1000, write: 500 },
+      { time: 1609459260, read: 1200, write: 600 },
+    ];
+    client.request.mockResolvedValue(sampleRrdData);
+
+    const result = await getStorageRrddata(client, config, { node: 'pve1', storage: 'local' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Storage Performance Metrics');
+    expect(result.content[0].text).toContain('local');
+    expect(result.content[0].text).toContain('pve1');
+    expect(result.content[0].text).toContain('**Points**: 2');
+  });
+
+  it('calls correct API endpoint with optional params', async () => {
+    const config = createTestConfig();
+    client.request.mockResolvedValue([]);
+
+    await getStorageRrddata(client, config, { node: 'pve1', storage: 'local', timeframe: 'week', cf: 'MAX' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/storage/local/rrddata?timeframe=week&cf=MAX');
+  });
+});
+
+describe('getNodeReport', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted diagnostic report', async () => {
+    const config = createTestConfig();
+    const sampleReport = 'PROXMOX REPORT\nNode: pve1\nStatus: OK\nUptime: 30 days';
+    client.request.mockResolvedValue(sampleReport);
+
+    const result = await getNodeReport(client, config, { node: 'pve1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Node Diagnostic Report');
+    expect(result.content[0].text).toContain('pve1');
+    expect(result.content[0].text).toContain('PROXMOX REPORT');
+  });
+
+  it('calls correct API endpoint', async () => {
+    const config = createTestConfig();
+    client.request.mockResolvedValue('report data');
+
+    await getNodeReport(client, config, { node: 'pve1' });
+
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/report');
   });
 });

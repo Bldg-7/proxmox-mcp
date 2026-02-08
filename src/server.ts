@@ -219,6 +219,9 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_get_node_task: 'Get status details for a specific Proxmox node task',
   proxmox_get_node_aplinfo: 'List available appliance templates on a Proxmox node',
   proxmox_get_node_netstat: 'Get network connection statistics for a Proxmox node',
+  proxmox_get_node_rrddata: 'Get node RRD performance metrics (CPU, memory, disk I/O)',
+  proxmox_get_storage_rrddata: 'Get storage RRD performance metrics (read/write throughput, usage)',
+  proxmox_get_node_report: 'Get node diagnostic report with system information',
 
   // VM Query
   proxmox_get_vms: 'List all virtual machines across the cluster with their status',
