@@ -141,6 +141,11 @@ export {
   createDomain,
   updateDomain,
   deleteDomain,
+  listUserTokens,
+  getUserToken,
+  createUserToken,
+  updateUserToken,
+  deleteUserToken,
 } from './access-control.js';
 
 // Pool Management tools

@@ -127,6 +127,11 @@ import {
   createDomain,
   updateDomain,
   deleteDomain,
+  listUserTokens,
+  getUserToken,
+  createUserToken,
+  updateUserToken,
+  deleteUserToken,
   listPools,
   getPool,
   createPool,
@@ -401,6 +406,11 @@ import {
   createDomainSchema,
   updateDomainSchema,
   deleteDomainSchema,
+  listUserTokensSchema,
+  getUserTokenSchema,
+  createUserTokenSchema,
+  updateUserTokenSchema,
+  deleteUserTokenSchema,
 } from '../schemas/access-control.js';
 import {
   listPoolsSchema,
@@ -851,6 +861,13 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_update_domain: { handler: updateDomain, schema: updateDomainSchema },
   proxmox_delete_domain: { handler: deleteDomain, schema: deleteDomainSchema },
 
+  // User API Tokens
+  proxmox_list_user_tokens: { handler: listUserTokens, schema: listUserTokensSchema },
+  proxmox_get_user_token: { handler: getUserToken, schema: getUserTokenSchema },
+  proxmox_create_user_token: { handler: createUserToken, schema: createUserTokenSchema },
+  proxmox_update_user_token: { handler: updateUserToken, schema: updateUserTokenSchema },
+  proxmox_delete_user_token: { handler: deleteUserToken, schema: deleteUserTokenSchema },
+
   // Pool Management
   proxmox_list_pools: { handler: listPools, schema: listPoolsSchema },
   proxmox_get_pool: { handler: getPool, schema: getPoolSchema },
@@ -1092,10 +1109,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 260 tools are registered
+// Validate all 265 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 260) {
+if (registeredCount !== 265) {
   throw new Error(
-    `Tool registry incomplete: expected 260 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 265 tools, got ${registeredCount}`
   );
 }

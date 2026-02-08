@@ -30,6 +30,11 @@ import {
   createDomain,
   updateDomain,
   deleteDomain,
+  listUserTokens,
+  getUserToken,
+  createUserToken,
+  updateUserToken,
+  deleteUserToken,
 } from './access-control.js';
 
 describe('listUsers', () => {
@@ -471,5 +476,172 @@ describe('deleteDomain', () => {
 
     expect(result.isError).toBe(false);
     expect(client.request).toHaveBeenCalledWith('/access/domains/ldap', 'DELETE');
+  });
+});
+
+describe('listUserTokens', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('lists user API tokens', async () => {
+    const config = createTestConfig();
+    const sampleTokens = [
+      { tokenid: 'token1', userid: 'root@pam', comment: 'Test token', expire: 1234567890 },
+      { tokenid: 'token2', userid: 'root@pam', comment: 'Another token' },
+    ];
+    client.request.mockResolvedValue(sampleTokens);
+
+    const result = await listUserTokens(client, config, { userid: 'root@pam' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('User API Tokens');
+    expect(result.content[0].text).toContain('token1');
+    expect(client.request).toHaveBeenCalledWith('/access/users/root%40pam/token');
+  });
+});
+
+describe('getUserToken', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns user token details', async () => {
+    const config = createTestConfig();
+    const sampleToken = { tokenid: 'token1', userid: 'root@pam', comment: 'Test token', expire: 1234567890 };
+    client.request.mockResolvedValue(sampleToken);
+
+    const result = await getUserToken(client, config, { userid: 'root@pam', tokenid: 'token1' });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('token1');
+    expect(result.content[0].text).toContain('root@pam');
+    expect(client.request).toHaveBeenCalledWith('/access/users/root%40pam/token/token1');
+  });
+});
+
+describe('createUserToken', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('requires elevated permissions', async () => {
+    const config = createTestConfig({ allowElevated: false });
+
+    const result = await createUserToken(client, config, {
+      userid: 'root@pam',
+      tokenid: 'token1',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Permission');
+  });
+
+  it('creates user token with one-time value', async () => {
+    const config = createTestConfig({ allowElevated: true });
+    const tokenResponse = {
+      value: 'abc123def456ghi789',
+      expire: 1234567890,
+      privsep: false,
+    };
+    client.request.mockResolvedValue(tokenResponse);
+
+    const result = await createUserToken(client, config, {
+      userid: 'root@pam',
+      tokenid: 'token1',
+      comment: 'Test token',
+    });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('User API Token Created');
+    expect(result.content[0].text).toContain('One-Time Token Value');
+    expect(result.content[0].text).toContain('abc123def456ghi789');
+    expect(client.request).toHaveBeenCalledWith(
+      '/access/users/root%40pam/token/token1',
+      'POST',
+      { comment: 'Test token' }
+    );
+  });
+});
+
+describe('updateUserToken', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('requires elevated permissions', async () => {
+    const config = createTestConfig({ allowElevated: false });
+
+    const result = await updateUserToken(client, config, {
+      userid: 'root@pam',
+      tokenid: 'token1',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Permission');
+  });
+
+  it('updates user token', async () => {
+    const config = createTestConfig({ allowElevated: true });
+    client.request.mockResolvedValue('OK');
+
+    const result = await updateUserToken(client, config, {
+      userid: 'root@pam',
+      tokenid: 'token1',
+      comment: 'Updated comment',
+    });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('User API Token Updated');
+    expect(client.request).toHaveBeenCalledWith(
+      '/access/users/root%40pam/token/token1',
+      'PUT',
+      { comment: 'Updated comment' }
+    );
+  });
+});
+
+describe('deleteUserToken', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('requires elevated permissions', async () => {
+    const config = createTestConfig({ allowElevated: false });
+
+    const result = await deleteUserToken(client, config, {
+      userid: 'root@pam',
+      tokenid: 'token1',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Permission');
+  });
+
+  it('deletes user token', async () => {
+    const config = createTestConfig({ allowElevated: true });
+    client.request.mockResolvedValue('OK');
+
+    const result = await deleteUserToken(client, config, {
+      userid: 'root@pam',
+      tokenid: 'token1',
+    });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('User API Token Deleted');
+    expect(client.request).toHaveBeenCalledWith(
+      '/access/users/root%40pam/token/token1',
+      'DELETE'
+    );
   });
 });

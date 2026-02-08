@@ -152,6 +152,13 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_update_domain: 'Update an authentication domain (requires elevated permissions)',
   proxmox_delete_domain: 'Delete an authentication domain (requires elevated permissions)',
 
+  // User API Tokens
+  proxmox_list_user_tokens: 'List API tokens for a user',
+  proxmox_get_user_token: 'Get details of a specific user API token',
+  proxmox_create_user_token: 'Create a new API token for a user (requires elevated permissions)',
+  proxmox_update_user_token: 'Update a user API token (requires elevated permissions)',
+  proxmox_delete_user_token: 'Delete a user API token (requires elevated permissions)',
+
   // Pool Management
   proxmox_list_pools: 'List resource pools',
   proxmox_get_pool: 'Get a resource pool by ID',

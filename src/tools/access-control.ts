@@ -24,6 +24,11 @@ import {
   createDomainSchema,
   updateDomainSchema,
   deleteDomainSchema,
+  listUserTokensSchema,
+  getUserTokenSchema,
+  createUserTokenSchema,
+  updateUserTokenSchema,
+  deleteUserTokenSchema,
 } from '../schemas/access-control.js';
 import type {
   ListUsersInput,
@@ -46,6 +51,11 @@ import type {
   CreateDomainInput,
   UpdateDomainInput,
   DeleteDomainInput,
+  ListUserTokensInput,
+  GetUserTokenInput,
+  CreateUserTokenInput,
+  UpdateUserTokenInput,
+  DeleteUserTokenInput,
 } from '../schemas/access-control.js';
 
 interface AccessUserEntry {
@@ -794,5 +804,197 @@ export async function deleteDomain(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Delete Domain');
+  }
+}
+
+interface UserTokenEntry {
+  tokenid?: string;
+  userid?: string;
+  comment?: string;
+  expire?: number;
+  privsep?: number | boolean;
+  [key: string]: unknown;
+}
+
+/**
+ * List user API tokens.
+ */
+export async function listUserTokens(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: ListUserTokensInput
+): Promise<ToolResponse> {
+  try {
+    listUserTokensSchema.parse(input);
+    const validated = input as ListUserTokensInput;
+    const encodedUser = encodeURIComponent(validated.userid);
+    const tokens = (await client.request(`/access/users/${encodedUser}/token`)) as UserTokenEntry[];
+
+    let output = '🔑 **User API Tokens**\n\n';
+
+    if (!tokens || tokens.length === 0) {
+      output += 'No tokens found.';
+      return formatToolResponse(output);
+    }
+
+    for (const token of tokens) {
+      const tokenid = token.tokenid ?? 'unknown';
+      output += `• **${tokenid}**`;
+      if (token.expire !== undefined) output += ` (expires: ${token.expire})`;
+      if (token.comment) output += `\n  ${token.comment}`;
+      output += '\n';
+    }
+
+    output += `\n**Total**: ${tokens.length} token(s)`;
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'List User Tokens');
+  }
+}
+
+/**
+ * Get user API token details.
+ */
+export async function getUserToken(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetUserTokenInput
+): Promise<ToolResponse> {
+  try {
+    getUserTokenSchema.parse(input);
+    const validated = input as GetUserTokenInput;
+    const encodedUser = encodeURIComponent(validated.userid);
+    const encodedToken = encodeURIComponent(validated.tokenid);
+    const token = (await client.request(
+      `/access/users/${encodedUser}/token/${encodedToken}`
+    )) as UserTokenEntry;
+
+    let output = '🔑 **User API Token Details**\n\n';
+    output += `• **Token ID**: ${validated.tokenid}\n`;
+    output += `• **User**: ${validated.userid}\n`;
+    if (token.expire !== undefined) output += `• **Expire**: ${token.expire}\n`;
+    if (token.privsep !== undefined) {
+      output += `• **Privilege Separation**: ${Boolean(token.privsep) ? 'yes' : 'no'}\n`;
+    }
+    if (token.comment) output += `• **Comment**: ${token.comment}\n`;
+
+    return formatToolResponse(output.trimEnd());
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get User Token');
+  }
+}
+
+/**
+ * Create user API token.
+ */
+export async function createUserToken(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CreateUserTokenInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'create user token');
+
+    createUserTokenSchema.parse(input);
+    const validated = input as CreateUserTokenInput;
+    const encodedUser = encodeURIComponent(validated.userid);
+    const encodedToken = encodeURIComponent(validated.tokenid);
+    const payload: Record<string, unknown> = {};
+
+    if (validated.comment) payload.comment = validated.comment;
+    if (validated.expire !== undefined) payload.expire = validated.expire;
+    if (validated.privsep !== undefined) payload.privsep = validated.privsep;
+
+    const result = (await client.request(
+      `/access/users/${encodedUser}/token/${encodedToken}`,
+      'POST',
+      payload
+    )) as Record<string, unknown>;
+
+    let output = '✅ **User API Token Created**\n\n';
+    output += `• **Token ID**: ${validated.tokenid}\n`;
+    output += `• **User**: ${validated.userid}\n`;
+
+    if (result.value) {
+      output += `\n⚠️  **One-Time Token Value** (save this now, it won\'t be shown again):\n`;
+      output += `\`\`\`\n${result.value}\n\`\`\`\n`;
+    }
+
+    if (result.expire) output += `• **Expire**: ${result.expire}\n`;
+    if (result.privsep !== undefined) {
+      output += `• **Privilege Separation**: ${Boolean(result.privsep) ? 'yes' : 'no'}\n`;
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Create User Token');
+  }
+}
+
+/**
+ * Update user API token.
+ */
+export async function updateUserToken(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: UpdateUserTokenInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'update user token');
+
+    updateUserTokenSchema.parse(input);
+    const validated = input as UpdateUserTokenInput;
+    const encodedUser = encodeURIComponent(validated.userid);
+    const encodedToken = encodeURIComponent(validated.tokenid);
+    const payload: Record<string, unknown> = {};
+
+    if (validated.comment) payload.comment = validated.comment;
+    if (validated.expire !== undefined) payload.expire = validated.expire;
+
+    const result = await client.request(
+      `/access/users/${encodedUser}/token/${encodedToken}`,
+      'PUT',
+      payload
+    );
+
+    let output = '✅ **User API Token Updated**\n\n';
+    output += `• **Token ID**: ${validated.tokenid}\n`;
+    output += `• **User**: ${validated.userid}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Update User Token');
+  }
+}
+
+/**
+ * Delete user API token.
+ */
+export async function deleteUserToken(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: DeleteUserTokenInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'delete user token');
+
+    deleteUserTokenSchema.parse(input);
+    const validated = input as DeleteUserTokenInput;
+    const encodedUser = encodeURIComponent(validated.userid);
+    const encodedToken = encodeURIComponent(validated.tokenid);
+    const result = await client.request(
+      `/access/users/${encodedUser}/token/${encodedToken}`,
+      'DELETE'
+    );
+
+    let output = '🗑️  **User API Token Deleted**\n\n';
+    output += `• **Token ID**: ${validated.tokenid}\n`;
+    output += `• **User**: ${validated.userid}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Delete User Token');
   }
 }

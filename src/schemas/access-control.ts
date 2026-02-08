@@ -205,3 +205,47 @@ export const deleteDomainSchema = z.object({
 });
 
 export type DeleteDomainInput = z.input<typeof deleteDomainSchema>;
+
+// proxmox_list_user_tokens - List user API tokens
+export const listUserTokensSchema = z.object({
+  userid: z.string().min(1).describe('User ID with realm (e.g., root@pam)'),
+});
+
+export type ListUserTokensInput = z.input<typeof listUserTokensSchema>;
+
+// proxmox_get_user_token - Get user API token details
+export const getUserTokenSchema = z.object({
+  userid: z.string().min(1).describe('User ID with realm (e.g., root@pam)'),
+  tokenid: z.string().min(1).describe('Token ID'),
+});
+
+export type GetUserTokenInput = z.input<typeof getUserTokenSchema>;
+
+// proxmox_create_user_token - Create user API token
+export const createUserTokenSchema = z.object({
+  userid: z.string().min(1).describe('User ID with realm (e.g., root@pam)'),
+  tokenid: z.string().min(1).describe('Token ID'),
+  comment: z.string().optional().describe('Token comment'),
+  expire: z.number().int().min(0).optional().describe('Token expiration (epoch seconds)'),
+  privsep: z.boolean().optional().describe('Privilege separation'),
+});
+
+export type CreateUserTokenInput = z.input<typeof createUserTokenSchema>;
+
+// proxmox_update_user_token - Update user API token
+export const updateUserTokenSchema = z.object({
+  userid: z.string().min(1).describe('User ID with realm (e.g., root@pam)'),
+  tokenid: z.string().min(1).describe('Token ID'),
+  comment: z.string().optional().describe('Token comment'),
+  expire: z.number().int().min(0).optional().describe('Token expiration (epoch seconds)'),
+});
+
+export type UpdateUserTokenInput = z.input<typeof updateUserTokenSchema>;
+
+// proxmox_delete_user_token - Delete user API token
+export const deleteUserTokenSchema = z.object({
+  userid: z.string().min(1).describe('User ID with realm (e.g., root@pam)'),
+  tokenid: z.string().min(1).describe('Token ID'),
+});
+
+export type DeleteUserTokenInput = z.input<typeof deleteUserTokenSchema>;

@@ -185,3 +185,71 @@
 - POST /cluster/firewall/ipset/{name} (add entry)
 - PUT /cluster/firewall/ipset/{name}/{cidr} (update entry)
 - DELETE /cluster/firewall/ipset/{name}/{cidr} (delete entry)
+
+## Task 4: User API Token CRUD (COMPLETED)
+
+### Implementation Pattern
+- **Schemas**: 5 new schemas in access-control.ts
+  - `listUserTokensSchema`: userid parameter (string, min 1)
+  - `getUserTokenSchema`: userid, tokenid parameters (both string, min 1)
+  - `createUserTokenSchema`: userid, tokenid (required), comment, expire, privsep (optional)
+  - `updateUserTokenSchema`: userid, tokenid (required), comment, expire (optional)
+  - `deleteUserTokenSchema`: userid, tokenid parameters (both string, min 1)
+
+- **Handlers**: 5 functions in access-control.ts
+  - List tokens: Returns array with tokenid/userid/comment/expire fields
+  - Get token: Returns specific token by userid and tokenid using `encodeURIComponent()` for both
+  - Create token: Requires elevated, displays one-time `value` field prominently in output
+  - Update token: Requires elevated, updates comment/expire fields
+  - Delete token: Requires elevated, removes token
+
+- **Tests**: 8 tests total
+  - 5 success cases (one per tool)
+  - 3 elevated permission denial tests (for create/update/delete)
+  - Pattern: Mock client, verify API calls, check output formatting
+
+### Key Learnings
+1. **Double URL encoding**: Both userid AND tokenid must be encoded with `encodeURIComponent()`
+   - Pattern: `/access/users/${encodeURIComponent(userid)}/token/${encodeURIComponent(tokenid)}`
+   - Critical for special characters in userid (e.g., `root@pam` → `root%40pam`)
+   - Applied in all 5 handlers
+
+2. **One-time token value**: Create response displays token value prominently
+   - Response includes `value` field with full token (only shown once)
+   - Wrapped in code block with warning about saving it
+   - Pattern: Check for `result.value` and display with special formatting
+
+3. **Nested resource pattern**: Tokens are nested under users
+   - Level 1: User (userid)
+   - Level 2: Token (tokenid)
+   - Similar to firewall groups but with different nesting structure
+
+4. **Tool count tracking**: Updated 3 places
+   - registry.ts: Tool count assertion (260→265)
+   - integration tests: Two assertions for tool count (260→265)
+
+5. **Elevated operations**: 3 tools require elevated permissions
+   - Create token, update token, delete token
+   - Tests verify both permission denial and successful execution
+
+### Files Modified
+- src/schemas/access-control.ts: +5 schemas
+- src/tools/access-control.ts: +5 handlers
+- src/tools/index.ts: +5 exports
+- src/types/tools.ts: +5 tool names
+- src/server.ts: +5 tool descriptions
+- src/tools/registry.ts: +5 registrations, updated tool count (260→265)
+- src/tools/access-control.test.ts: +8 tests
+- src/__tests__/integration/server.test.ts: Updated 2 assertions (260→265)
+
+### Verification
+- ✅ pnpm build: No errors
+- ✅ pnpm test: 693 tests pass (including 8 new tests)
+- ✅ Tool count: 260 → 265 (5 new tools)
+
+### API Endpoints Implemented
+- GET /access/users/{userid}/token (list tokens)
+- GET /access/users/{userid}/token/{tokenid} (get token)
+- POST /access/users/{userid}/token/{tokenid} (create token)
+- PUT /access/users/{userid}/token/{tokenid} (update token)
+- DELETE /access/users/{userid}/token/{tokenid} (delete token)
