@@ -103,7 +103,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 1. Firewall Options, Macros & Refs (4 tools)
+- [x] 1. Firewall Options, Macros & Refs (4 tools)
 
   **What to do**:
   Add 4 tools for cluster-level firewall options, macros, and references.
@@ -146,7 +146,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 2. Firewall Aliases (5 tools)
+- [x] 2. Firewall Aliases (5 tools)
 
   **What to do**:
   Add 5 tools for cluster firewall alias CRUD.
@@ -189,7 +189,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 3. Firewall IP Sets (7 tools)
+- [x] 3. Firewall IP Sets (7 tools)
 
   **What to do**:
   Add 7 tools for cluster firewall IP set management including nested entry CRUD.
@@ -237,7 +237,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 4. API Tokens (5 tools)
+- [x] 4. API Tokens (5 tools)
 
   **What to do**:
   Add 5 tools for user API token management.
@@ -285,7 +285,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 5. Node Power Management (3 tools)
+- [x] 5. Node Power Management (3 tools)
 
   **What to do**:
   Add 3 tools for node power operations.
@@ -326,7 +326,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 6. Node Metrics / RRD (3 tools)
+- [x] 6. Node Metrics / RRD (3 tools)
 
   **What to do**:
   Add 3 tools for node and storage RRD metrics + diagnostic report.
@@ -367,7 +367,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 7. Node Replication (3 tools)
+- [x] 7. Node Replication (3 tools)
 
   **What to do**:
   Add 3 tools for node-level replication monitoring and control.
@@ -401,7 +401,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 8. Pending Changes (2 tools)
+- [x] 8. Pending Changes (2 tools)
 
   **What to do**:
   Add 2 tools to view pending VM/LXC configuration changes.
@@ -435,7 +435,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 9. Feature Checks (2 tools)
+- [x] 9. Feature Checks (2 tools)
 
   **What to do**:
   Add 2 tools for VM/LXC feature availability checks.
@@ -466,7 +466,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 10. Advanced Disk Operations (4 tools)
+- [x] 10. Advanced Disk Operations (4 tools)
 
   **What to do**:
   Add 4 tools for additional disk management operations.
@@ -505,7 +505,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 11. Cluster Config (5 tools)
+- [x] 11. Cluster Config (5 tools)
 
   **What to do**:
   Add 5 tools for cluster configuration management.
@@ -544,7 +544,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 12. Certificate Management (7 tools)
+- [x] 12. Certificate Management (7 tools)
 
   **What to do**:
   Add 7 tools for node certificate and ACME certificate management.
@@ -588,7 +588,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 13. ACME Plugins & Accounts (8 tools)
+- [x] 13. ACME Plugins & Accounts (8 tools)
 
   **What to do**:
   Add 8 tools for ACME account and plugin management.
@@ -635,7 +635,7 @@ Every category follows the SAME 7-file pattern. The executor MUST:
 
 ---
 
-- [ ] 14. Notifications (5 tools)
+- [x] 14. Notifications (5 tools)
 
   **What to do**:
   Add 5 tools for notification target management.
@@ -708,9 +708,9 @@ pnpm test      # Expected: exit 0, all tests pass
 ```
 
 ### Final Checklist
-- [ ] All ~63 new tools implemented (244 → ~307)
-- [ ] 14 commits, each with changeset
-- [ ] All builds pass
-- [ ] All tests pass
-- [ ] Elevated permissions on all write/delete operations
-- [ ] encodeURIComponent used for all URL path parameters with special chars
+- [x] All ~63 new tools implemented (244 → 307) ✅
+- [x] 14 commits, each with changeset ✅
+- [x] All builds pass ✅
+- [x] All tests pass (808 tests) ✅
+- [x] Elevated permissions on all write/delete operations ✅
+- [x] encodeURIComponent used for all URL path parameters with special chars ✅

@@ -987,3 +987,100 @@ Total tests written across all tasks:
 
 **The entire remaining-api-endpoints plan is now COMPLETE!** 🎉
 
+
+## 🎉 PLAN COMPLETION SUMMARY
+
+**Date**: 2026-02-08
+**Status**: ✅ ALL TASKS COMPLETE
+
+### Final Metrics
+
+- **Tool Count**: 307 (started at 244, added 63 tools)
+- **Test Count**: 808 (started at 659, added 149 tests)
+- **Commits**: 14 atomic commits
+- **Changesets**: 14 changesets created
+- **Build Status**: ✅ All passing
+- **Test Status**: ✅ All 808 tests passing
+
+### Tasks Completed (14/14)
+
+| # | Category | Tools | Range | Commit | Tests | Status |
+|---|----------|-------|-------|--------|-------|--------|
+| 1 | Firewall Options/Refs | 4 | 244→248 | `eb6dc8f` | +6 | ✅ |
+| 2 | Firewall Aliases | 5 | 248→253 | `61ea8eb` | +8 | ✅ |
+| 3 | Firewall IP Sets | 7 | 253→260 | `bec651a` | +12 | ✅ |
+| 4 | API Tokens | 5 | 260→265 | `d754430` | +8 | ✅ |
+| 5 | Node Power | 3 | 265→268 | `85ccf97` | +6 | ✅ |
+| 6 | Node Metrics/RRD | 3 | 268→271 | `a9e7d6b` | +6 | ✅ |
+| 7 | Node Replication | 3 | 271→274 | `5da79b8` | +4 | ✅ |
+| 8 | Pending Changes | 2 | 274→276 | `bc156b1` | +10 | ✅ |
+| 9 | Feature Checks | 2 | 276→278 | `120c9a7` | +10 | ✅ |
+| 10 | Advanced Disk Ops | 4 | 278→282 | `2bcc06e` | +6 | ✅ |
+| 11 | Cluster Config | 5 | 282→287 | `42be7a3` | +6 | ✅ |
+| 12 | Certificate Management | 7 | 287→294 | `ab46a2f` | +21 | ✅ |
+| 13 | ACME Plugins | 8 | 294→302 | `7f326b3` | +24 | ✅ |
+| 14 | Notifications | 5 | 302→307 | `c4a2889` | +17 | ✅ |
+
+### New Domain Files Created
+
+- `src/tools/certificate.ts` + `src/schemas/certificate.ts` + `src/tools/certificate.test.ts`
+- `src/tools/acme.ts` + `src/schemas/acme.ts` + `src/tools/acme.test.ts`
+- `src/tools/notifications.ts` + `src/schemas/notifications.ts` + `src/tools/notifications.test.ts`
+
+### Key Implementation Patterns Established
+
+1. **7-File Pattern**: Consistently applied across all 14 tasks
+   - schemas/{domain}.ts: Zod schemas
+   - tools/{domain}.ts: Handler functions
+   - tools/index.ts: Export handlers
+   - types/tools.ts: Tool name array
+   - server.ts: Tool descriptions
+   - tools/registry.ts: Registry + count
+   - tools/{domain}.test.ts: Tests
+
+2. **URL Encoding**: `encodeURIComponent()` used for all special chars in URL paths
+   - Applied to: name, id, userid, tokenid, alias names, ipset names, CIDR notation
+
+3. **Credential Redaction**: Sensitive data redacted in output
+   - Passwords: `[REDACTED]`
+   - Contact info: `[REDACTED]`
+   - API tokens: Displayed once with warning
+
+4. **Elevated Permissions**: `requireElevated()` for all destructive operations
+   - All POST/PUT/DELETE operations properly gated
+   - Tests verify both success and permission denial
+
+5. **Type Discriminators**: Used for multi-type endpoints
+   - Notifications: smtp/gotify/sendmail
+   - Single tool with type enum parameter
+
+### Success Criteria Met
+
+- ✅ All 63 new tools implemented (244 → 307)
+- ✅ 14 commits, each with changeset
+- ✅ All builds pass
+- ✅ All tests pass (808 tests)
+- ✅ Elevated permissions on all write/delete operations
+- ✅ encodeURIComponent used for all URL path parameters with special chars
+
+### Verification
+
+```bash
+$ pnpm build
+✅ TypeScript compilation successful
+
+$ pnpm test
+✅ Test Files  28 passed (28)
+✅ Tests  808 passed (808)
+
+$ grep "Validate all" src/tools/registry.ts
+// Validate all 307 tools are registered
+```
+
+### Plan File Status
+
+All 14 task checkboxes marked complete in `.sisyphus/plans/remaining-api-endpoints.md`
+
+---
+
+**THE ENTIRE REMAINING-API-ENDPOINTS PLAN HAS BEEN SUCCESSFULLY COMPLETED!** 🏆
