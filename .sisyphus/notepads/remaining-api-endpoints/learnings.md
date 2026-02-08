@@ -379,3 +379,67 @@
 - GET /nodes/{node}/rrddata (with optional timeframe/cf params)
 - GET /nodes/{node}/storage/{storage}/rrddata (with optional timeframe/cf params)
 - GET /nodes/{node}/report
+
+## Task 7: Node Replication Status, Log, and Schedule (COMPLETED)
+
+### Implementation Pattern
+- **Schemas**: 3 new schemas in system-operations.ts
+  - `getNodeReplicationStatusSchema`: node, id parameters (both string, min 1)
+  - `getNodeReplicationLogSchema`: node, id parameters (both string, min 1)
+  - `scheduleNodeReplicationSchema`: node, id parameters (both string, min 1)
+
+- **Handlers**: 3 functions in system-operations.ts
+  - Get status: Returns replication job status as key-value pairs
+  - Get log: Returns array of log entries with timestamp/message fields
+  - Schedule: Requires elevated, triggers immediate replication via POST
+
+- **Tests**: 4 tests total
+  - 3 success cases (one per tool)
+  - 1 elevated permission denial test (schedule only)
+  - Pattern: Mock client, verify API calls, check output formatting
+
+### Key Learnings
+1. **Replication job pattern**: Two-level path structure
+   - Path: `/nodes/{node}/replication/{id}/status|log|schedule_now`
+   - Both node and id are required parameters
+   - No special encoding needed (unlike firewall entries)
+
+2. **Status vs Log distinction**:
+   - Status: Returns single object with status fields (ok, last_sync, next_sync, etc.)
+   - Log: Returns array of log entries with timestamp and message
+   - Both are read-only operations (no elevated permissions)
+
+3. **Schedule operation**: Triggers immediate replication
+   - POST to `/nodes/{node}/replication/{id}/schedule_now`
+   - Requires elevated permissions (destructive action)
+   - Returns simple OK response
+
+4. **Tool count tracking**: Updated 3 places
+   - registry.ts: Tool count assertion (271→274)
+   - integration tests: Two assertions for tool count (271→274)
+
+5. **Elevated operations**: Only schedule requires elevated permissions
+   - Status and log are read-only (no elevated check)
+   - Schedule uses `requireElevated(config, 'schedule node replication')`
+   - Tests verify both permission denial and successful execution
+
+### Files Modified
+- src/schemas/system-operations.ts: +3 schemas
+- src/tools/system-operations.ts: +3 handlers
+- src/tools/index.ts: +3 exports
+- src/types/tools.ts: +3 tool names
+- src/server.ts: +3 tool descriptions
+- src/tools/registry.ts: +3 registrations, updated tool count (271→274)
+- src/__fixtures__/system-operations.ts: +3 sample data
+- src/tools/system-operations.test.ts: +4 tests
+- src/__tests__/integration/server.test.ts: Updated 2 assertions (271→274)
+
+### Verification
+- ✅ pnpm build: No errors
+- ✅ pnpm test: 709 tests pass (including 4 new tests)
+- ✅ Tool count: 271 → 274 (3 new tools)
+
+### API Endpoints Implemented
+- GET /nodes/{node}/replication/{id}/status (get replication status)
+- GET /nodes/{node}/replication/{id}/log (get replication log)
+- POST /nodes/{node}/replication/{id}/schedule_now (schedule immediate replication)

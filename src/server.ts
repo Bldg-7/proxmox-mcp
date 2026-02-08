@@ -47,6 +47,9 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_node_shutdown: 'Shutdown a node (requires elevated permissions)',
   proxmox_node_reboot: 'Reboot a node (requires elevated permissions)',
   proxmox_node_wakeonlan: 'Wake a node via Wake-on-LAN (requires elevated permissions)',
+  proxmox_get_node_replication_status: 'Get node replication job status',
+  proxmox_get_node_replication_log: 'Get node replication job log',
+  proxmox_schedule_node_replication: 'Schedule immediate node replication (requires elevated permissions)',
 
   // Cluster Management
   proxmox_get_ha_resources: 'List High Availability resources in the cluster',

@@ -22,6 +22,9 @@ import {
   nodeShutdownSchema,
   nodeRebootSchema,
   nodeWakeonlanSchema,
+  getNodeReplicationStatusSchema,
+  getNodeReplicationLogSchema,
+  scheduleNodeReplicationSchema,
 } from '../schemas/system-operations.js';
 import type {
   GetNodeTimeInput,
@@ -41,6 +44,9 @@ import type {
   NodeShutdownInput,
   NodeRebootInput,
   NodeWakeonlanInput,
+  GetNodeReplicationStatusInput,
+  GetNodeReplicationLogInput,
+  ScheduleNodeReplicationInput,
 } from '../schemas/system-operations.js';
 
 interface ProxmoxNodeTime {
@@ -631,5 +637,104 @@ export async function nodeWakeonlan(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Node Wake-on-LAN');
+  }
+}
+
+/**
+ * Get node replication job status.
+ * No elevated permissions required.
+ */
+export async function getNodeReplicationStatus(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeReplicationStatusInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeReplicationStatusSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeId = validated.id;
+
+    const status = (await client.request(
+      `/nodes/${safeNode}/replication/${safeId}/status`
+    )) as Record<string, unknown>;
+
+    let output = '📊 **Replication Status**\n\n';
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Job ID**: ${safeId}\n`;
+    for (const [key, value] of Object.entries(status)) {
+      output += `• **${key}**: ${value}\n`;
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Replication Status');
+  }
+}
+
+/**
+ * Get node replication job log.
+ * No elevated permissions required.
+ */
+export async function getNodeReplicationLog(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetNodeReplicationLogInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getNodeReplicationLogSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeId = validated.id;
+
+    const logEntries = (await client.request(
+      `/nodes/${safeNode}/replication/${safeId}/log`
+    )) as Array<Record<string, unknown>>;
+
+    if (logEntries.length === 0) {
+      return formatToolResponse('No replication log entries found.');
+    }
+
+    let output = '📋 **Replication Log**\n\n';
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Job ID**: ${safeId}\n`;
+    output += `• **Entries**: ${logEntries.length}\n\n`;
+    for (const entry of logEntries) {
+      output += `• ${JSON.stringify(entry)}\n`;
+    }
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Node Replication Log');
+  }
+}
+
+/**
+ * Schedule immediate node replication.
+ * Requires elevated permissions.
+ */
+export async function scheduleNodeReplication(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ScheduleNodeReplicationInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'schedule node replication');
+
+    const validated = scheduleNodeReplicationSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeId = validated.id;
+
+    const result = await client.request(
+      `/nodes/${safeNode}/replication/${safeId}/schedule_now`,
+      'POST'
+    );
+
+    let output = '⏱️ **Replication Scheduled**\n\n';
+    output += `• **Node**: ${safeNode}\n`;
+    output += `• **Job ID**: ${safeId}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Schedule Node Replication');
   }
 }

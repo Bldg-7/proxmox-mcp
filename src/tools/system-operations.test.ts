@@ -18,6 +18,9 @@ import {
   sampleNodeShutdown,
   sampleNodeReboot,
   sampleNodeWakeonlan,
+  sampleGetNodeReplicationStatus,
+  sampleGetNodeReplicationLog,
+  sampleScheduleNodeReplication,
 } from '../__fixtures__/system-operations.js';
 import {
   getNodeTime,
@@ -37,6 +40,9 @@ import {
   nodeShutdown,
   nodeReboot,
   nodeWakeonlan,
+  getNodeReplicationStatus,
+  getNodeReplicationLog,
+  scheduleNodeReplication,
 } from './system-operations.js';
 
 describe('System Operations Tools', () => {
@@ -355,6 +361,66 @@ describe('System Operations Tools', () => {
       expect(result.isError).toBe(false);
       expect(result.content[0].text).toContain('Wake-on-LAN Issued');
       expect(client.request).toHaveBeenCalledWith('/nodes/pve1/wakeonlan', 'POST');
+    });
+  });
+
+  describe('getNodeReplicationStatus', () => {
+    it('returns replication job status', async () => {
+      const config = createTestConfig();
+      client.request.mockResolvedValue({
+        status: 'ok',
+        last_sync: 1710000000,
+        next_sync: 1710003600,
+      });
+
+      const result = await getNodeReplicationStatus(client, config, sampleGetNodeReplicationStatus);
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('Replication Status');
+      expect(result.content[0].text).toContain('repl-1');
+      expect(client.request).toHaveBeenCalledWith('/nodes/pve1/replication/repl-1/status');
+    });
+  });
+
+  describe('getNodeReplicationLog', () => {
+    it('returns replication job log entries', async () => {
+      const config = createTestConfig();
+      client.request.mockResolvedValue([
+        { timestamp: 1710000000, message: 'Replication started' },
+        { timestamp: 1710003600, message: 'Replication completed' },
+      ]);
+
+      const result = await getNodeReplicationLog(client, config, sampleGetNodeReplicationLog);
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('Replication Log');
+      expect(result.content[0].text).toContain('Entries');
+      expect(client.request).toHaveBeenCalledWith('/nodes/pve1/replication/repl-1/log');
+    });
+  });
+
+  describe('scheduleNodeReplication', () => {
+    it('requires elevated permissions', async () => {
+      const config = createTestConfig({ allowElevated: false });
+
+      const result = await scheduleNodeReplication(client, config, sampleScheduleNodeReplication);
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Permission denied');
+    });
+
+    it('schedules immediate replication with expected payload', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue('OK');
+
+      const result = await scheduleNodeReplication(client, config, sampleScheduleNodeReplication);
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('Replication Scheduled');
+      expect(client.request).toHaveBeenCalledWith(
+        '/nodes/pve1/replication/repl-1/schedule_now',
+        'POST'
+      );
     });
   });
 });

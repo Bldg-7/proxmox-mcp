@@ -141,3 +141,27 @@ export const nodeWakeonlanSchema = z.object({
 });
 
 export type NodeWakeonlanInput = z.infer<typeof nodeWakeonlanSchema>;
+
+// proxmox_get_node_replication_status - Get node replication job status
+export const getNodeReplicationStatusSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+  id: z.string().min(1).describe('Replication job ID'),
+});
+
+export type GetNodeReplicationStatusInput = z.infer<typeof getNodeReplicationStatusSchema>;
+
+// proxmox_get_node_replication_log - Get node replication job log
+export const getNodeReplicationLogSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+  id: z.string().min(1).describe('Replication job ID'),
+});
+
+export type GetNodeReplicationLogInput = z.infer<typeof getNodeReplicationLogSchema>;
+
+// proxmox_schedule_node_replication - Schedule immediate node replication
+export const scheduleNodeReplicationSchema = z.object({
+  node: z.string().min(1).describe('Node name'),
+  id: z.string().min(1).describe('Replication job ID'),
+});
+
+export type ScheduleNodeReplicationInput = z.infer<typeof scheduleNodeReplicationSchema>;

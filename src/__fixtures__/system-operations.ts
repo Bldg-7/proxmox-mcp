@@ -78,3 +78,18 @@ export const sampleNodeReboot = {
 export const sampleNodeWakeonlan = {
   node: 'pve1',
 };
+
+export const sampleGetNodeReplicationStatus = {
+  node: 'pve1',
+  id: 'repl-1',
+};
+
+export const sampleGetNodeReplicationLog = {
+  node: 'pve1',
+  id: 'repl-1',
+};
+
+export const sampleScheduleNodeReplication = {
+  node: 'pve1',
+  id: 'repl-1',
+};

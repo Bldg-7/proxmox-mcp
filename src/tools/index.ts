@@ -46,6 +46,9 @@ export {
   nodeShutdown,
   nodeReboot,
   nodeWakeonlan,
+  getNodeReplicationStatus,
+  getNodeReplicationLog,
+  scheduleNodeReplication,
 } from './system-operations.js';
 
 // Cluster Management tools
