@@ -304,6 +304,12 @@ export const TOOL_NAMES = [
   'proxmox_list_acme_plugins',
   'proxmox_get_acme_plugin',
   'proxmox_get_acme_directories',
+  // Notification Management
+  'proxmox_list_notification_targets',
+  'proxmox_get_notification_target',
+  'proxmox_create_notification_target',
+  'proxmox_delete_notification_target',
+  'proxmox_test_notification_target',
 ] as const;
 
 export type ToolName = (typeof TOOL_NAMES)[number];

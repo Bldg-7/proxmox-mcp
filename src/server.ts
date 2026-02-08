@@ -383,6 +383,11 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_list_acme_plugins: 'List all ACME challenge plugins configured in the cluster',
   proxmox_get_acme_plugin: 'Get detailed configuration for a specific ACME plugin',
   proxmox_get_acme_directories: 'Get available ACME directory endpoints (Let\'s Encrypt, etc.)',
+  proxmox_list_notification_targets: 'List all notification targets (SMTP, Gotify, Sendmail)',
+  proxmox_get_notification_target: 'Get detailed configuration for a specific notification target',
+  proxmox_create_notification_target: 'Create a new notification target (requires elevated permissions)',
+  proxmox_delete_notification_target: 'Delete a notification target (requires elevated permissions)',
+  proxmox_test_notification_target: 'Send a test notification to a target (requires elevated permissions)',
 };
 
 export function createServer(client: ProxmoxApiClient, config: Config): Server {

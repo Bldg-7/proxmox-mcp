@@ -369,3 +369,12 @@ export {
   agentSuspendRam,
   agentSuspendHybrid,
 } from './vm-advanced.js';
+
+// Notification Management tools
+export {
+  listNotificationTargets,
+  getNotificationTarget,
+  createNotificationTarget,
+  deleteNotificationTarget,
+  testNotificationTarget,
+} from './notifications.js';

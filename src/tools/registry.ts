@@ -307,6 +307,11 @@ import {
   listAcmePlugins,
   getAcmePlugin,
   getAcmeDirectories,
+  listNotificationTargets,
+  getNotificationTarget,
+  createNotificationTarget,
+  deleteNotificationTarget,
+  testNotificationTarget,
 } from './index.js';
 
 // Import all schemas
@@ -650,6 +655,13 @@ import {
   getAcmePluginSchema,
   getAcmeDirectoriesSchema,
 } from '../schemas/acme.js';
+import {
+  listNotificationTargetsSchema,
+  getNotificationTargetSchema,
+  createNotificationTargetSchema,
+  deleteNotificationTargetSchema,
+  testNotificationTargetSchema,
+} from '../schemas/notifications.js';
 
 // Tool handler type - accepts any input type for flexibility
 export type ToolHandler = (
@@ -1238,6 +1250,13 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
    proxmox_list_acme_plugins: { handler: listAcmePlugins, schema: listAcmePluginsSchema },
    proxmox_get_acme_plugin: { handler: getAcmePlugin, schema: getAcmePluginSchema },
    proxmox_get_acme_directories: { handler: getAcmeDirectories, schema: getAcmeDirectoriesSchema },
+
+   // Notification Management
+   proxmox_list_notification_targets: { handler: listNotificationTargets, schema: listNotificationTargetsSchema },
+   proxmox_get_notification_target: { handler: getNotificationTarget, schema: getNotificationTargetSchema },
+   proxmox_create_notification_target: { handler: createNotificationTarget, schema: createNotificationTargetSchema },
+   proxmox_delete_notification_target: { handler: deleteNotificationTarget, schema: deleteNotificationTargetSchema },
+   proxmox_test_notification_target: { handler: testNotificationTarget, schema: testNotificationTargetSchema },
 };
 
 // Helper to get tool handler
@@ -1245,10 +1264,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 302 tools are registered
+// Validate all 307 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 302) {
+if (registeredCount !== 307) {
    throw new Error(
-     `Tool registry incomplete: expected 302 tools, got ${registeredCount}`
+     `Tool registry incomplete: expected 307 tools, got ${registeredCount}`
    );
 }

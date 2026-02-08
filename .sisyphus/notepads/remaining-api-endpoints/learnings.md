@@ -880,3 +880,110 @@ if (Array.isArray(result)) {
 - Task 14: Firewall Management (remaining tools)
 - Continue with remaining API endpoints from plan
 
+
+---
+
+## Task 14: Notifications (COMPLETED - FINAL TASK) - $(date '+%Y-%m-%d %H:%M:%S')
+
+### 🎉 FINAL TASK COMPLETION - ALL 14 TASKS DONE!
+
+**Tool Count: 302 → 307 (TARGET REACHED!)**
+**Test Count: 791 → 808 (+17 tests)**
+
+### Implementation Summary
+
+**NEW FILES CREATED:**
+1. `src/schemas/notifications.ts` - 5 Zod schemas for notification target management
+2. `src/tools/notifications.ts` - 5 handler functions for notification operations
+3. `src/tools/notifications.test.ts` - 17 tests (14 success + 3 elevated denial)
+
+**EXISTING FILES MODIFIED:**
+1. `src/tools/index.ts` - Added notifications exports
+2. `src/types/tools.ts` - Added 5 tool names to TOOL_NAMES array
+3. `src/server.ts` - Added 5 tool descriptions to TOOL_DESCRIPTIONS
+4. `src/tools/registry.ts` - Added 5 tool registrations, updated count assertion (302→307)
+5. `src/__tests__/integration/server.test.ts` - Updated 2 tool count assertions (302→307)
+
+### Tools Implemented
+
+| Tool Name | Handler | Endpoint | Method | Elevated |
+|-----------|---------|----------|--------|----------|
+| `proxmox_list_notification_targets` | `listNotificationTargets` | `/cluster/notifications/targets` | GET | NO |
+| `proxmox_get_notification_target` | `getNotificationTarget` | `/cluster/notifications/endpoints/{type}/{name}` | GET | NO |
+| `proxmox_create_notification_target` | `createNotificationTarget` | `/cluster/notifications/endpoints/{type}` | POST | YES |
+| `proxmox_delete_notification_target` | `deleteNotificationTarget` | `/cluster/notifications/endpoints/{type}/{name}` | DELETE | YES |
+| `proxmox_test_notification_target` | `testNotificationTarget` | `/cluster/notifications/targets/{name}/test` | POST | YES |
+
+### Key Implementation Details
+
+1. **Type Discriminator Pattern**
+   - Single tool with `type` parameter: `smtp`, `gotify`, `sendmail`
+   - NOT separate tools per notification type
+   - Type determines endpoint path: `/cluster/notifications/endpoints/{type}/{name}`
+
+2. **URL Encoding**
+   - Used `encodeURIComponent()` for name parameters in URL paths
+   - Applied to both get/delete endpoints and test endpoint
+   - Pattern: `const encodedName = encodeURIComponent(input.name);`
+
+3. **Schema Design Challenge**
+   - Initial duplicate property error: `mailto`, `from`, `author`, `mailto-user` appeared in both SMTP and Sendmail sections
+   - Solution: Moved shared email parameters to "Common email parameters" section
+   - All parameters remain optional to support different notification types
+
+4. **Permission Model**
+   - 2 read-only tools: list, get
+   - 3 elevated tools: create, delete, test
+   - Test assertions use "Permission denied" (lowercase), not "🚫 Permission Denied"
+
+5. **Test Coverage**
+   - 17 total tests (not 8 as initially planned)
+   - Breakdown:
+     - listNotificationTargets: 3 tests (success, empty, error)
+     - getNotificationTarget: 3 tests (success, URL encoding, error)
+     - createNotificationTarget: 3 tests (success, permission denial, error)
+     - deleteNotificationTarget: 4 tests (success, permission denial, URL encoding, error)
+     - testNotificationTarget: 4 tests (success, permission denial, URL encoding, error)
+
+### Build & Test Results
+
+```bash
+pnpm build
+✅ TypeScript compilation successful (exit 0)
+
+pnpm test
+✅ All 808 tests passed
+   - 28 test files
+   - Duration: 1.70s
+```
+
+### Verification Checklist
+
+- [x] 3 new files created (schemas, tools, tests)
+- [x] 5 existing files modified (index, tools, server, registry, integration tests)
+- [x] All 5 tools registered and callable
+- [x] 3 tools require elevated permissions (create, delete, test)
+- [x] 2 tools are read-only (list, get)
+- [x] Type discriminator for smtp/gotify/sendmail
+- [x] URL encoding for name parameters
+- [x] Tool count: 302 → 307 ✅
+- [x] Test count: 791 → 808 ✅
+- [x] Build passes (exit 0) ✅
+- [x] All tests pass (808/808) ✅
+
+### 🏆 FINAL ACHIEVEMENT
+
+**ALL 14 TASKS COMPLETED SUCCESSFULLY!**
+
+Total tools implemented across all tasks:
+- Task 1-13: 302 tools
+- Task 14 (Notifications): +5 tools
+- **FINAL TOTAL: 307 tools**
+
+Total tests written across all tasks:
+- Previous: 791 tests
+- Task 14: +17 tests
+- **FINAL TOTAL: 808 tests**
+
+**The entire remaining-api-endpoints plan is now COMPLETE!** 🎉
+
