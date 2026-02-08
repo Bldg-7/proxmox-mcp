@@ -23,10 +23,15 @@ import {
   listClusterReplicationJobs,
   getClusterOptions,
   getClusterFirewallOptions,
-  updateClusterFirewallOptions,
-  listClusterFirewallMacros,
-  listClusterFirewallRefs,
-} from './cluster-management.js';
+   updateClusterFirewallOptions,
+   listClusterFirewallMacros,
+   listClusterFirewallRefs,
+   listClusterFirewallAliases,
+   getClusterFirewallAlias,
+   createClusterFirewallAlias,
+   updateClusterFirewallAlias,
+   deleteClusterFirewallAlias,
+ } from './cluster-management.js';
 
 describe('getHaResources', () => {
   let client: ReturnType<typeof createMockProxmoxClient>;
@@ -346,12 +351,161 @@ describe('listClusterFirewallRefs', () => {
     expect(result.content[0].text).toContain('office');
   });
 
-  it('applies type filter to API endpoint', async () => {
-    const config = createTestConfig();
-    client.request.mockResolvedValue([]);
+   it('applies type filter to API endpoint', async () => {
+     const config = createTestConfig();
+     client.request.mockResolvedValue([]);
 
-    await listClusterFirewallRefs(client, config, { type: 'alias' });
+     await listClusterFirewallRefs(client, config, { type: 'alias' });
 
-    expect(client.request).toHaveBeenCalledWith('/cluster/firewall/refs?type=alias');
-  });
-});
+     expect(client.request).toHaveBeenCalledWith('/cluster/firewall/refs?type=alias');
+   });
+ });
+
+ describe('listClusterFirewallAliases', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('returns formatted firewall aliases', async () => {
+     const config = createTestConfig();
+     client.request.mockResolvedValue([
+       { name: 'office', cidr: '192.168.1.0/24', comment: 'Office network' },
+       { name: 'home', cidr: '10.0.0.0/8' },
+     ]);
+
+     const result = await listClusterFirewallAliases(client, config, {});
+
+     expect(result.isError).toBe(false);
+     expect(result.content[0].text).toContain('Firewall Aliases');
+     expect(result.content[0].text).toContain('office');
+     expect(result.content[0].text).toContain('home');
+   });
+ });
+
+ describe('getClusterFirewallAlias', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('returns firewall alias details', async () => {
+     const config = createTestConfig();
+     client.request.mockResolvedValue({
+       name: 'office',
+       cidr: '192.168.1.0/24',
+       comment: 'Office network',
+     });
+
+     const result = await getClusterFirewallAlias(client, config, { name: 'office' });
+
+     expect(result.isError).toBe(false);
+     expect(result.content[0].text).toContain('office');
+     expect(result.content[0].text).toContain('192.168.1.0/24');
+   });
+ });
+
+ describe('createClusterFirewallAlias', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('requires elevated permissions', async () => {
+     const config = createTestConfig({ allowElevated: false });
+
+     const result = await createClusterFirewallAlias(client, config, {
+       name: 'office',
+       cidr: '192.168.1.0/24',
+     });
+
+     expect(result.isError).toBe(true);
+     expect(result.content[0].text).toContain('Permission');
+   });
+
+   it('calls correct API endpoint', async () => {
+     const config = createTestConfig({ allowElevated: true });
+     client.request.mockResolvedValue('OK');
+
+     await createClusterFirewallAlias(client, config, {
+       name: 'office',
+       cidr: '192.168.1.0/24',
+       comment: 'Office network',
+     });
+
+     expect(client.request).toHaveBeenCalledWith('/cluster/firewall/aliases', 'POST', {
+       name: 'office',
+       cidr: '192.168.1.0/24',
+       comment: 'Office network',
+     });
+   });
+ });
+
+ describe('updateClusterFirewallAlias', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('requires elevated permissions', async () => {
+     const config = createTestConfig({ allowElevated: false });
+
+     const result = await updateClusterFirewallAlias(client, config, {
+       name: 'office',
+       cidr: '192.168.1.0/24',
+     });
+
+     expect(result.isError).toBe(true);
+     expect(result.content[0].text).toContain('Permission');
+   });
+
+   it('calls correct API endpoint', async () => {
+     const config = createTestConfig({ allowElevated: true });
+     client.request.mockResolvedValue('OK');
+
+     await updateClusterFirewallAlias(client, config, {
+       name: 'office',
+       cidr: '192.168.2.0/24',
+       comment: 'Updated office',
+     });
+
+     expect(client.request).toHaveBeenCalledWith(
+       '/cluster/firewall/aliases/office',
+       'PUT',
+       {
+         cidr: '192.168.2.0/24',
+         comment: 'Updated office',
+       }
+     );
+   });
+ });
+
+ describe('deleteClusterFirewallAlias', () => {
+   let client: ReturnType<typeof createMockProxmoxClient>;
+
+   beforeEach(() => {
+     client = createMockProxmoxClient();
+   });
+
+   it('requires elevated permissions', async () => {
+     const config = createTestConfig({ allowElevated: false });
+
+     const result = await deleteClusterFirewallAlias(client, config, { name: 'office' });
+
+     expect(result.isError).toBe(true);
+     expect(result.content[0].text).toContain('Permission');
+   });
+
+   it('calls correct API endpoint', async () => {
+     const config = createTestConfig({ allowElevated: true });
+     client.request.mockResolvedValue('OK');
+
+     await deleteClusterFirewallAlias(client, config, { name: 'office' });
+
+     expect(client.request).toHaveBeenCalledWith('/cluster/firewall/aliases/office', 'DELETE');
+   });
+ });

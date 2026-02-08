@@ -55,9 +55,14 @@ import {
   updateClusterOptionsSchema,
   getClusterFirewallOptionsSchema,
   updateClusterFirewallOptionsSchema,
-  listClusterFirewallMacrosSchema,
-  listClusterFirewallRefsSchema,
-} from '../schemas/cluster-management.js';
+   listClusterFirewallMacrosSchema,
+   listClusterFirewallRefsSchema,
+   listClusterFirewallAliasesSchema,
+   getClusterFirewallAliasSchema,
+   createClusterFirewallAliasSchema,
+   updateClusterFirewallAliasSchema,
+   deleteClusterFirewallAliasSchema,
+ } from '../schemas/cluster-management.js';
 import type {
   GetHaResourcesInput,
   GetHaResourceInput,
@@ -94,9 +99,14 @@ import type {
   UpdateClusterOptionsInput,
   GetClusterFirewallOptionsInput,
   UpdateClusterFirewallOptionsInput,
-  ListClusterFirewallMacrosInput,
-  ListClusterFirewallRefsInput,
-} from '../schemas/cluster-management.js';
+   ListClusterFirewallMacrosInput,
+   ListClusterFirewallRefsInput,
+   ListClusterFirewallAliasesInput,
+   GetClusterFirewallAliasInput,
+   CreateClusterFirewallAliasInput,
+   UpdateClusterFirewallAliasInput,
+   DeleteClusterFirewallAliasInput,
+ } from '../schemas/cluster-management.js';
 
 /**
  * List HA resources.
@@ -1402,9 +1412,174 @@ export async function listClusterFirewallRefs(
       output += '\n';
     }
 
-    output += `\n**Total**: ${refs.length} reference(s)`;
+     output += `\n**Total**: ${refs.length} reference(s)`;
+     return formatToolResponse(output);
+   } catch (error) {
+     return formatErrorResponse(error as Error, 'List Cluster Firewall Refs');
+   }
+}
+
+/**
+ * List cluster firewall aliases.
+ */
+export async function listClusterFirewallAliases(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: ListClusterFirewallAliasesInput
+): Promise<ToolResponse> {
+  try {
+    listClusterFirewallAliasesSchema.parse(input);
+    const aliases = (await client.request('/cluster/firewall/aliases')) as Array<{
+      name?: string;
+      cidr?: string;
+      comment?: string;
+    }>;
+
+    let output = '🔖 **Cluster Firewall Aliases**\n\n';
+
+    if (!aliases || aliases.length === 0) {
+      output += 'No firewall aliases found.';
+      return formatToolResponse(output);
+    }
+
+    for (const alias of aliases) {
+      const name = alias.name ?? 'unknown';
+      output += `• **${name}**`;
+      if (alias.cidr) output += ` - ${alias.cidr}`;
+      if (alias.comment) output += ` (${alias.comment})`;
+      output += '\n';
+    }
+
+    output += `\n**Total**: ${aliases.length} alias(es)`;
     return formatToolResponse(output);
   } catch (error) {
-    return formatErrorResponse(error as Error, 'List Cluster Firewall Refs');
+    return formatErrorResponse(error as Error, 'List Cluster Firewall Aliases');
+  }
+}
+
+/**
+ * Get cluster firewall alias.
+ */
+export async function getClusterFirewallAlias(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetClusterFirewallAliasInput
+): Promise<ToolResponse> {
+  try {
+    const validated = getClusterFirewallAliasSchema.parse(input);
+    const safeName = validated.name;
+    const alias = (await client.request(
+      `/cluster/firewall/aliases/${encodeURIComponent(safeName)}`
+    )) as { name?: string; cidr?: string; comment?: string };
+
+    let output = '🔖 **Cluster Firewall Alias**\n\n';
+    output += `• **Name**: ${safeName}\n`;
+    if (alias.cidr) output += `• **CIDR**: ${alias.cidr}\n`;
+    if (alias.comment) output += `• **Comment**: ${alias.comment}\n`;
+
+    return formatToolResponse(output.trimEnd());
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Cluster Firewall Alias');
+  }
+}
+
+/**
+ * Create cluster firewall alias.
+ */
+export async function createClusterFirewallAlias(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CreateClusterFirewallAliasInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'create cluster firewall alias');
+
+    const validated = createClusterFirewallAliasSchema.parse(input);
+    const safeName = validated.name;
+    const payload: Record<string, unknown> = {
+      name: safeName,
+      cidr: validated.cidr,
+    };
+
+    if (validated.comment) payload.comment = validated.comment;
+
+    const result = await client.request('/cluster/firewall/aliases', 'POST', payload);
+
+    let output = '✅ **Cluster Firewall Alias Created**\n\n';
+    output += `• **Name**: ${safeName}\n`;
+    output += `• **CIDR**: ${validated.cidr}\n`;
+    if (validated.comment) output += `• **Comment**: ${validated.comment}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Create Cluster Firewall Alias');
+  }
+}
+
+/**
+ * Update cluster firewall alias.
+ */
+export async function updateClusterFirewallAlias(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: UpdateClusterFirewallAliasInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'update cluster firewall alias');
+
+    const validated = updateClusterFirewallAliasSchema.parse(input);
+    const safeName = validated.name;
+    const payload: Record<string, unknown> = {
+      cidr: validated.cidr,
+    };
+
+    if (validated.comment) payload.comment = validated.comment;
+    if (validated.rename) payload.rename = validated.rename;
+
+    const result = await client.request(
+      `/cluster/firewall/aliases/${encodeURIComponent(safeName)}`,
+      'PUT',
+      payload
+    );
+
+    let output = '✅ **Cluster Firewall Alias Updated**\n\n';
+    output += `• **Name**: ${safeName}\n`;
+    output += `• **CIDR**: ${validated.cidr}\n`;
+    if (validated.rename) output += `• **Renamed to**: ${validated.rename}\n`;
+    if (validated.comment) output += `• **Comment**: ${validated.comment}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Update Cluster Firewall Alias');
+  }
+}
+
+/**
+ * Delete cluster firewall alias.
+ */
+export async function deleteClusterFirewallAlias(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: DeleteClusterFirewallAliasInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'delete cluster firewall alias');
+
+    const validated = deleteClusterFirewallAliasSchema.parse(input);
+    const safeName = validated.name;
+    const result = await client.request(
+      `/cluster/firewall/aliases/${encodeURIComponent(safeName)}`,
+      'DELETE'
+    );
+
+    let output = '🗑️  **Cluster Firewall Alias Deleted**\n\n';
+    output += `• **Name**: ${safeName}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Delete Cluster Firewall Alias');
   }
 }

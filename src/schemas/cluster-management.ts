@@ -401,3 +401,41 @@ export const listClusterFirewallRefsSchema = z.object({
 });
 
 export type ListClusterFirewallRefsInput = z.infer<typeof listClusterFirewallRefsSchema>;
+
+// proxmox_list_cluster_firewall_aliases - List cluster firewall aliases
+export const listClusterFirewallAliasesSchema = z.object({});
+
+export type ListClusterFirewallAliasesInput = z.infer<typeof listClusterFirewallAliasesSchema>;
+
+// proxmox_get_cluster_firewall_alias - Get cluster firewall alias
+export const getClusterFirewallAliasSchema = z.object({
+  name: z.string().min(1).describe('Firewall alias name'),
+});
+
+export type GetClusterFirewallAliasInput = z.infer<typeof getClusterFirewallAliasSchema>;
+
+// proxmox_create_cluster_firewall_alias - Create cluster firewall alias
+export const createClusterFirewallAliasSchema = z.object({
+  name: z.string().min(1).describe('Firewall alias name'),
+  cidr: z.string().min(1).describe('IP address or CIDR network'),
+  comment: z.string().optional().describe('Description'),
+});
+
+export type CreateClusterFirewallAliasInput = z.infer<typeof createClusterFirewallAliasSchema>;
+
+// proxmox_update_cluster_firewall_alias - Update cluster firewall alias
+export const updateClusterFirewallAliasSchema = z.object({
+  name: z.string().min(1).describe('Firewall alias name'),
+  cidr: z.string().min(1).describe('IP address or CIDR network'),
+  comment: z.string().optional().describe('Description'),
+  rename: z.string().optional().describe('New alias name'),
+});
+
+export type UpdateClusterFirewallAliasInput = z.infer<typeof updateClusterFirewallAliasSchema>;
+
+// proxmox_delete_cluster_firewall_alias - Delete cluster firewall alias
+export const deleteClusterFirewallAliasSchema = z.object({
+  name: z.string().min(1).describe('Firewall alias name'),
+});
+
+export type DeleteClusterFirewallAliasInput = z.infer<typeof deleteClusterFirewallAliasSchema>;

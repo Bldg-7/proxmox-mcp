@@ -93,10 +93,15 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_update_cluster_options: 'Update cluster-wide options (requires elevated permissions)',
   proxmox_get_cluster_firewall_options: 'Get cluster firewall options',
   proxmox_update_cluster_firewall_options: 'Update cluster firewall options (requires elevated permissions)',
-  proxmox_list_cluster_firewall_macros: 'List available firewall macros',
-  proxmox_list_cluster_firewall_refs: 'List firewall references (aliases/ipsets)',
+   proxmox_list_cluster_firewall_macros: 'List available firewall macros',
+   proxmox_list_cluster_firewall_refs: 'List firewall references (aliases/ipsets)',
+   proxmox_list_cluster_firewall_aliases: 'List cluster firewall aliases',
+   proxmox_get_cluster_firewall_alias: 'Get a cluster firewall alias by name',
+   proxmox_create_cluster_firewall_alias: 'Create a cluster firewall alias (requires elevated permissions)',
+   proxmox_update_cluster_firewall_alias: 'Update a cluster firewall alias (requires elevated permissions)',
+   proxmox_delete_cluster_firewall_alias: 'Delete a cluster firewall alias (requires elevated permissions)',
 
-  // SDN
+   // SDN
   proxmox_list_sdn_vnets: 'List SDN virtual networks',
   proxmox_get_sdn_vnet: 'Get an SDN virtual network by name',
   proxmox_create_sdn_vnet: 'Create an SDN virtual network (requires elevated permissions)',

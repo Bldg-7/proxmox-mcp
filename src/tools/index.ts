@@ -78,10 +78,15 @@ export {
   getClusterOptions,
   updateClusterOptions,
   getClusterFirewallOptions,
-  updateClusterFirewallOptions,
-  listClusterFirewallMacros,
-  listClusterFirewallRefs,
-} from './cluster-management.js';
+   updateClusterFirewallOptions,
+   listClusterFirewallMacros,
+   listClusterFirewallRefs,
+   listClusterFirewallAliases,
+   getClusterFirewallAlias,
+   createClusterFirewallAlias,
+   updateClusterFirewallAlias,
+   deleteClusterFirewallAlias,
+ } from './cluster-management.js';
 
 // SDN tools
 export {
