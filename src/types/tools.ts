@@ -287,6 +287,14 @@ export const TOOL_NAMES = [
   'proxmox_get_cloudinit_config',
   'proxmox_dump_cloudinit',
   'proxmox_regenerate_cloudinit',
+  // Certificate Management
+  'proxmox_get_node_certificates',
+  'proxmox_upload_custom_certificate',
+  'proxmox_delete_custom_certificate',
+  'proxmox_order_acme_certificate',
+  'proxmox_renew_acme_certificate',
+  'proxmox_revoke_acme_certificate',
+  'proxmox_get_node_acme_config',
 ] as const;
 
 export type ToolName = (typeof TOOL_NAMES)[number];

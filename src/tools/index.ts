@@ -329,6 +329,17 @@ export {
   regenerateCloudInit,
 } from './cloud-init.js';
 
+// Certificate Management tools
+export {
+  getNodeCertificates,
+  uploadCustomCertificate,
+  deleteCustomCertificate,
+  orderAcmeCertificate,
+  renewAcmeCertificate,
+  revokeAcmeCertificate,
+  getNodeAcmeConfig,
+} from './certificate.js';
+
 // QEMU Agent tools (file operations, user management, power control)
 export {
   agentFileRead,

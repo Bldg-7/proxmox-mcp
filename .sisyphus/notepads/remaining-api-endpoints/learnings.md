@@ -704,3 +704,77 @@
 - GET /cluster/config/nodes/{node} (get cluster config node)
 - POST /cluster/config/join (join cluster - ELEVATED)
 - GET /cluster/config/totem (get cluster totem config)
+
+## Task 12: Certificate Management (COMPLETED - $(date '+%Y-%m-%d %H:%M:%S'))
+
+### Implementation Summary
+Successfully implemented 7 certificate management tools across 3 new domain files.
+
+### Files Created
+1. **src/schemas/certificate.ts**: 7 Zod schemas for certificate operations
+2. **src/tools/certificate.ts**: 7 handler functions for certificate management
+3. **src/tools/certificate.test.ts**: 21 tests (12 required + 9 additional coverage)
+
+### Files Modified
+1. **src/tools/index.ts**: Added 7 exports from certificate.ts
+2. **src/types/tools.ts**: Added 7 tool names to TOOL_NAMES array
+3. **src/server.ts**: Added 7 tool descriptions to TOOL_DESCRIPTIONS
+4. **src/tools/registry.ts**: 
+   - Added 7 imports (handlers + schemas)
+   - Added 7 tool registrations
+   - Updated tool count assertion: 287 → 294
+5. **src/__tests__/integration/server.test.ts**: Updated 2 count assertions (287 → 294)
+
+### Tools Implemented
+1. `proxmox_get_node_certificates` - GET /nodes/{node}/certificates/info (basic)
+2. `proxmox_upload_custom_certificate` - POST /nodes/{node}/certificates/custom (elevated)
+3. `proxmox_delete_custom_certificate` - DELETE /nodes/{node}/certificates/custom (elevated)
+4. `proxmox_order_acme_certificate` - POST /nodes/{node}/certificates/acme/certificate (elevated)
+5. `proxmox_renew_acme_certificate` - PUT /nodes/{node}/certificates/acme/certificate (elevated)
+6. `proxmox_revoke_acme_certificate` - DELETE /nodes/{node}/certificates/acme/certificate (elevated)
+7. `proxmox_get_node_acme_config` - GET /nodes/{node}/certificates/acme (basic)
+
+### Key Learnings
+
+#### API Patterns
+- **client.request signature**: `client.request(path, method?, body?)` - NOT object-based
+  - GET: `client.request('/path')`
+  - POST: `client.request('/path', 'POST', body)`
+  - PUT: `client.request('/path', 'PUT', body)`
+  - DELETE: `client.request('/path', 'DELETE')`
+- **requireElevated**: Returns `void`, throws on permission denial (not a ToolResponse)
+- **formatErrorResponse**: Requires 2 args: `formatErrorResponse(error as Error, 'Context')`
+
+#### Schema Design
+- PEM certificate fields use `z.string()` without max length (certificates can be long)
+- Optional fields for force/restart flags on certificate operations
+- ACME operations share similar schema patterns (node + optional force flag)
+
+#### Test Patterns
+- Permission denial tests check for lowercase "Permission denied" (not "Permission Denied")
+- Output formatting uses bold markdown: `Force:** true` (not `Force: true`)
+- DELETE method calls: `client.request(path, 'DELETE')` (not object with method property)
+- Test count: 21 tests total (7 success + 5 elevated denial + 9 additional coverage)
+
+#### NEW Domain File Pattern (3-file creation)
+When creating a completely new domain:
+1. Create `src/schemas/{domain}.ts` with all Zod schemas
+2. Create `src/tools/{domain}.ts` with all handler functions
+3. Create `src/tools/{domain}.test.ts` with comprehensive tests
+4. Import/export in `src/tools/index.ts`
+5. Add tool names to `src/types/tools.ts`
+6. Add descriptions to `src/server.ts`
+7. Import and register in `src/tools/registry.ts`
+8. Update tool count assertions in registry.ts and integration tests
+
+### Verification Results
+- **Build**: ✅ PASSED (pnpm build - exit 0)
+- **Tests**: ✅ PASSED (767 tests, all passing)
+- **Tool Count**: ✅ 287 → 294 (+7 tools)
+- **Test Count**: ✅ 746 → 767 (+21 tests)
+
+### Certificate-Specific Notes
+- Custom certificates accept PEM format strings (certificates + optional key)
+- ACME operations return task UPIDs for async operations
+- Certificate info includes subject, issuer, fingerprint, public key details, and SANs
+- ACME config shows account, domains, and plugin information

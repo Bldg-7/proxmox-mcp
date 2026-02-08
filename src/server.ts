@@ -364,6 +364,15 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
     proxmox_get_cloudinit_config: 'Get cloud-init configuration items for a QEMU VM',
     proxmox_dump_cloudinit: 'Dump rendered cloud-init config (user-data, network-config, or meta-data) for a QEMU VM',
     proxmox_regenerate_cloudinit: 'Regenerate the cloud-init drive for a QEMU VM (requires elevated permissions)',
+
+  // Certificate Management
+  proxmox_get_node_certificates: 'Get SSL certificate information for a Proxmox node',
+  proxmox_upload_custom_certificate: 'Upload a custom SSL certificate to a Proxmox node (requires elevated permissions)',
+  proxmox_delete_custom_certificate: 'Delete the custom SSL certificate from a Proxmox node (requires elevated permissions)',
+  proxmox_order_acme_certificate: 'Order a new ACME (Let\'s Encrypt) certificate for a Proxmox node (requires elevated permissions)',
+  proxmox_renew_acme_certificate: 'Renew the ACME certificate for a Proxmox node (requires elevated permissions)',
+  proxmox_revoke_acme_certificate: 'Revoke the ACME certificate for a Proxmox node (requires elevated permissions)',
+  proxmox_get_node_acme_config: 'Get ACME configuration for a Proxmox node',
 };
 
 export function createServer(client: ProxmoxApiClient, config: Config): Server {
