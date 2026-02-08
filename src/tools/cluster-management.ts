@@ -53,6 +53,10 @@ import {
   deleteClusterReplicationJobSchema,
   getClusterOptionsSchema,
   updateClusterOptionsSchema,
+  getClusterFirewallOptionsSchema,
+  updateClusterFirewallOptionsSchema,
+  listClusterFirewallMacrosSchema,
+  listClusterFirewallRefsSchema,
 } from '../schemas/cluster-management.js';
 import type {
   GetHaResourcesInput,
@@ -88,6 +92,10 @@ import type {
   DeleteClusterReplicationJobInput,
   GetClusterOptionsInput,
   UpdateClusterOptionsInput,
+  GetClusterFirewallOptionsInput,
+  UpdateClusterFirewallOptionsInput,
+  ListClusterFirewallMacrosInput,
+  ListClusterFirewallRefsInput,
 } from '../schemas/cluster-management.js';
 
 /**
@@ -1267,5 +1275,136 @@ export async function updateClusterOptions(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Update Cluster Options');
+  }
+}
+
+/**
+ * Get cluster firewall options.
+ */
+export async function getClusterFirewallOptions(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: GetClusterFirewallOptionsInput
+): Promise<ToolResponse> {
+  try {
+    getClusterFirewallOptionsSchema.parse(input);
+    const options = (await client.request('/cluster/firewall/options')) as Record<string, unknown>;
+
+    let output = '🛡️  **Cluster Firewall Options**\n\n';
+    const entries = Object.entries(options ?? {});
+
+    if (entries.length === 0) {
+      output += 'No firewall options found.';
+      return formatToolResponse(output);
+    }
+
+    for (const [key, value] of entries) {
+      output += `• **${key}**: ${typeof value === 'string' ? value : JSON.stringify(value)}\n`;
+    }
+
+    return formatToolResponse(output.trimEnd());
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Cluster Firewall Options');
+  }
+}
+
+/**
+ * Update cluster firewall options.
+ */
+export async function updateClusterFirewallOptions(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: UpdateClusterFirewallOptionsInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'update cluster firewall options');
+
+    const validated = updateClusterFirewallOptionsSchema.parse(input);
+    const payload: Record<string, unknown> = {};
+
+    if (validated.enable !== undefined) payload.enable = validated.enable;
+    if (validated.policy_in) payload.policy_in = validated.policy_in;
+    if (validated.policy_out) payload.policy_out = validated.policy_out;
+    if (validated.log_ratelimit) payload.log_ratelimit = validated.log_ratelimit;
+
+    const result = await client.request('/cluster/firewall/options', 'PUT', payload);
+
+    let output = '✅ **Cluster Firewall Options Updated**\n\n';
+    output += `• **Updated Keys**: ${Object.keys(payload).join(', ') || 'none'}\n`;
+    output += `• **Result**: ${result ?? 'OK'}`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Update Cluster Firewall Options');
+  }
+}
+
+/**
+ * List cluster firewall macros.
+ */
+export async function listClusterFirewallMacros(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: ListClusterFirewallMacrosInput
+): Promise<ToolResponse> {
+  try {
+    listClusterFirewallMacrosSchema.parse(input);
+    const macros = (await client.request('/cluster/firewall/macros')) as Array<Record<string, unknown>>;
+
+    let output = '🛡️  **Cluster Firewall Macros**\n\n';
+
+    if (!macros || macros.length === 0) {
+      output += 'No firewall macros found.';
+      return formatToolResponse(output);
+    }
+
+    for (const macro of macros) {
+      const name = macro.name ?? 'unknown';
+      output += `• **${name}**`;
+      if (macro.descr) output += ` - ${macro.descr}`;
+      output += '\n';
+    }
+
+    output += `\n**Total**: ${macros.length} macro(s)`;
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'List Cluster Firewall Macros');
+  }
+}
+
+/**
+ * List cluster firewall refs.
+ */
+export async function listClusterFirewallRefs(
+  client: ProxmoxApiClient,
+  _config: Config,
+  input: ListClusterFirewallRefsInput
+): Promise<ToolResponse> {
+  try {
+    const validated = listClusterFirewallRefsSchema.parse(input);
+    const typeFilter = validated.type ? `?type=${encodeURIComponent(validated.type)}` : '';
+    const refs = (await client.request(
+      `/cluster/firewall/refs${typeFilter}`
+    )) as Array<Record<string, unknown>>;
+
+    let output = '🛡️  **Cluster Firewall References**\n\n';
+
+    if (!refs || refs.length === 0) {
+      output += 'No firewall references found.';
+      return formatToolResponse(output);
+    }
+
+    for (const ref of refs) {
+      const name = ref.name ?? 'unknown';
+      const type = ref.type ?? 'unknown';
+      output += `• **${name}** (${type})`;
+      if (ref.comment) output += ` - ${ref.comment}`;
+      output += '\n';
+    }
+
+    output += `\n**Total**: ${refs.length} reference(s)`;
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'List Cluster Firewall Refs');
   }
 }

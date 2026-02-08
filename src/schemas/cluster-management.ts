@@ -374,3 +374,30 @@ export const updateClusterOptionsSchema = z.record(
 );
 
 export type UpdateClusterOptionsInput = z.infer<typeof updateClusterOptionsSchema>;
+
+// proxmox_get_cluster_firewall_options - Get cluster firewall options
+export const getClusterFirewallOptionsSchema = z.object({});
+
+export type GetClusterFirewallOptionsInput = z.infer<typeof getClusterFirewallOptionsSchema>;
+
+// proxmox_update_cluster_firewall_options - Update cluster firewall options
+export const updateClusterFirewallOptionsSchema = z.object({
+  enable: z.number().optional().describe('Enable firewall'),
+  policy_in: z.string().optional().describe('Inbound policy (ACCEPT, REJECT, DROP)'),
+  policy_out: z.string().optional().describe('Outbound policy (ACCEPT, REJECT, DROP)'),
+  log_ratelimit: z.string().optional().describe('Log rate limit'),
+});
+
+export type UpdateClusterFirewallOptionsInput = z.infer<typeof updateClusterFirewallOptionsSchema>;
+
+// proxmox_list_cluster_firewall_macros - List cluster firewall macros
+export const listClusterFirewallMacrosSchema = z.object({});
+
+export type ListClusterFirewallMacrosInput = z.infer<typeof listClusterFirewallMacrosSchema>;
+
+// proxmox_list_cluster_firewall_refs - List cluster firewall refs
+export const listClusterFirewallRefsSchema = z.object({
+  type: z.enum(['alias', 'ipset']).optional().describe('Filter by reference type'),
+});
+
+export type ListClusterFirewallRefsInput = z.infer<typeof listClusterFirewallRefsSchema>;

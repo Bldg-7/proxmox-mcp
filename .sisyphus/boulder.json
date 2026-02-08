@@ -1,10 +1,9 @@
 {
-  "active_plan": "/Users/snark/Documents/dev/proxmox-mcp/.sisyphus/plans/update-readme-tool-counts.md",
-  "started_at": "2026-02-05T10:17:41.747Z",
-  "completed_at": "2026-02-05T10:27:00.000Z",
+  "active_plan": "/Users/snark/Documents/dev/proxmox-mcp/.sisyphus/plans/remaining-api-endpoints.md",
+  "started_at": "2026-02-08T10:45:00.000Z",
   "session_ids": [
+    "current_session",
     "ses_3d400eb1dffeKd4WDY8OIavIPs"
   ],
-  "plan_name": "update-readme-tool-counts",
-  "status": "complete"
+  "plan_name": "remaining-api-endpoints"
 }

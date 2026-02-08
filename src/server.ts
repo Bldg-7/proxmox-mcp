@@ -91,6 +91,10 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
     'Delete a cluster replication job (requires elevated permissions)',
   proxmox_get_cluster_options: 'Get cluster-wide options',
   proxmox_update_cluster_options: 'Update cluster-wide options (requires elevated permissions)',
+  proxmox_get_cluster_firewall_options: 'Get cluster firewall options',
+  proxmox_update_cluster_firewall_options: 'Update cluster firewall options (requires elevated permissions)',
+  proxmox_list_cluster_firewall_macros: 'List available firewall macros',
+  proxmox_list_cluster_firewall_refs: 'List firewall references (aliases/ipsets)',
 
   // SDN
   proxmox_list_sdn_vnets: 'List SDN virtual networks',

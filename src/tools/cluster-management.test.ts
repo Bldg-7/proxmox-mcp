@@ -22,6 +22,10 @@ import {
   listClusterBackupJobs,
   listClusterReplicationJobs,
   getClusterOptions,
+  getClusterFirewallOptions,
+  updateClusterFirewallOptions,
+  listClusterFirewallMacros,
+  listClusterFirewallRefs,
 } from './cluster-management.js';
 
 describe('getHaResources', () => {
@@ -248,5 +252,106 @@ describe('getClusterOptions', () => {
     expect(result.isError).toBe(false);
     expect(result.content[0].text).toContain('Cluster Options');
     expect(result.content[0].text).toContain('console');
+  });
+});
+
+describe('getClusterFirewallOptions', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns cluster firewall options', async () => {
+    const config = createTestConfig();
+    client.request.mockResolvedValue({ enable: 1, policy_in: 'ACCEPT', policy_out: 'ACCEPT' });
+
+    const result = await getClusterFirewallOptions(client, config, {});
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Firewall Options');
+    expect(result.content[0].text).toContain('enable');
+  });
+});
+
+describe('updateClusterFirewallOptions', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('requires elevated permissions', async () => {
+    const config = createTestConfig({ allowElevated: false });
+
+    const result = await updateClusterFirewallOptions(client, config, { enable: 1 });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('Permission');
+  });
+
+  it('calls correct API endpoint', async () => {
+    const config = createTestConfig({ allowElevated: true });
+    client.request.mockResolvedValue('OK');
+
+    await updateClusterFirewallOptions(client, config, { enable: 1, policy_in: 'REJECT' });
+
+    expect(client.request).toHaveBeenCalledWith('/cluster/firewall/options', 'PUT', {
+      enable: 1,
+      policy_in: 'REJECT',
+    });
+  });
+});
+
+describe('listClusterFirewallMacros', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted firewall macros', async () => {
+    const config = createTestConfig();
+    client.request.mockResolvedValue([
+      { name: 'HTTP', descr: 'HTTP traffic' },
+      { name: 'HTTPS', descr: 'HTTPS traffic' },
+    ]);
+
+    const result = await listClusterFirewallMacros(client, config, {});
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Firewall Macros');
+    expect(result.content[0].text).toContain('HTTP');
+  });
+});
+
+describe('listClusterFirewallRefs', () => {
+  let client: ReturnType<typeof createMockProxmoxClient>;
+
+  beforeEach(() => {
+    client = createMockProxmoxClient();
+  });
+
+  it('returns formatted firewall refs', async () => {
+    const config = createTestConfig();
+    client.request.mockResolvedValue([
+      { name: 'office', type: 'alias', comment: 'Office network' },
+      { name: 'trusted', type: 'ipset', comment: 'Trusted hosts' },
+    ]);
+
+    const result = await listClusterFirewallRefs(client, config, {});
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('Firewall References');
+    expect(result.content[0].text).toContain('office');
+  });
+
+  it('applies type filter to API endpoint', async () => {
+    const config = createTestConfig();
+    client.request.mockResolvedValue([]);
+
+    await listClusterFirewallRefs(client, config, { type: 'alias' });
+
+    expect(client.request).toHaveBeenCalledWith('/cluster/firewall/refs?type=alias');
   });
 });

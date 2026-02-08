@@ -77,6 +77,10 @@ export {
   deleteClusterReplicationJob,
   getClusterOptions,
   updateClusterOptions,
+  getClusterFirewallOptions,
+  updateClusterFirewallOptions,
+  listClusterFirewallMacros,
+  listClusterFirewallRefs,
 } from './cluster-management.js';
 
 // SDN tools

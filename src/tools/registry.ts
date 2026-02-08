@@ -71,6 +71,10 @@ import {
   deleteClusterReplicationJob,
   getClusterOptions,
   updateClusterOptions,
+  getClusterFirewallOptions,
+  updateClusterFirewallOptions,
+  listClusterFirewallMacros,
+  listClusterFirewallRefs,
   listSdnVnets,
   getSdnVnet,
   createSdnVnet,
@@ -325,6 +329,10 @@ import {
   deleteClusterReplicationJobSchema,
   getClusterOptionsSchema,
   updateClusterOptionsSchema,
+  getClusterFirewallOptionsSchema,
+  updateClusterFirewallOptionsSchema,
+  listClusterFirewallMacrosSchema,
+  listClusterFirewallRefsSchema,
 } from '../schemas/cluster-management.js';
 import {
   listSdnVnetsSchema,
@@ -698,6 +706,22 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
     handler: updateClusterOptions,
     schema: updateClusterOptionsSchema,
   },
+  proxmox_get_cluster_firewall_options: {
+    handler: getClusterFirewallOptions,
+    schema: getClusterFirewallOptionsSchema,
+  },
+  proxmox_update_cluster_firewall_options: {
+    handler: updateClusterFirewallOptions,
+    schema: updateClusterFirewallOptionsSchema,
+  },
+  proxmox_list_cluster_firewall_macros: {
+    handler: listClusterFirewallMacros,
+    schema: listClusterFirewallMacrosSchema,
+  },
+  proxmox_list_cluster_firewall_refs: {
+    handler: listClusterFirewallRefs,
+    schema: listClusterFirewallRefsSchema,
+  },
 
   // SDN
   proxmox_list_sdn_vnets: { handler: listSdnVnets, schema: listSdnVnetsSchema },
@@ -996,10 +1020,10 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 244 tools are registered
+// Validate all 248 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 244) {
+if (registeredCount !== 248) {
   throw new Error(
-    `Tool registry incomplete: expected 244 tools, got ${registeredCount}`
+    `Tool registry incomplete: expected 248 tools, got ${registeredCount}`
   );
 }
