@@ -249,3 +249,114 @@ export const deleteUserTokenSchema = z.object({
 });
 
 export type DeleteUserTokenInput = z.input<typeof deleteUserTokenSchema>;
+
+// ── Consolidated: proxmox_user ────────────────────────────────────────────
+export const userToolSchema = z.discriminatedUnion('action', [
+  listUsersSchema.extend({
+    action: z.literal('list'),
+  }),
+  getUserSchema.extend({
+    action: z.literal('get'),
+  }),
+  createUserSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateUserSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteUserSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type UserToolInput = z.infer<typeof userToolSchema>;
+
+// ── Consolidated: proxmox_group ───────────────────────────────────────────
+export const groupToolSchema = z.discriminatedUnion('action', [
+  listGroupsSchema.extend({
+    action: z.literal('list'),
+  }),
+  createGroupSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateGroupSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteGroupSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type GroupToolInput = z.infer<typeof groupToolSchema>;
+
+// ── Consolidated: proxmox_role ────────────────────────────────────────────
+export const roleToolSchema = z.discriminatedUnion('action', [
+  listRolesSchema.extend({
+    action: z.literal('list'),
+  }),
+  createRoleSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateRoleSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteRoleSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type RoleToolInput = z.infer<typeof roleToolSchema>;
+
+// ── Consolidated: proxmox_acl ─────────────────────────────────────────────
+export const aclToolSchema = z.discriminatedUnion('action', [
+  getAclSchema.extend({
+    action: z.literal('get'),
+  }),
+  updateAclSchema.extend({
+    action: z.literal('update'),
+  }),
+]);
+
+export type AclToolInput = z.infer<typeof aclToolSchema>;
+
+// ── Consolidated: proxmox_domain ──────────────────────────────────────────
+export const domainToolSchema = z.discriminatedUnion('action', [
+  listDomainsSchema.extend({
+    action: z.literal('list'),
+  }),
+  getDomainSchema.extend({
+    action: z.literal('get'),
+  }),
+  createDomainSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateDomainSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteDomainSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type DomainToolInput = z.infer<typeof domainToolSchema>;
+
+// ── Consolidated: proxmox_user_token ──────────────────────────────────────
+export const userTokenToolSchema = z.discriminatedUnion('action', [
+  listUserTokensSchema.extend({
+    action: z.literal('list'),
+  }),
+  getUserTokenSchema.extend({
+    action: z.literal('get'),
+  }),
+  createUserTokenSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateUserTokenSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteUserTokenSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type UserTokenToolInput = z.infer<typeof userTokenToolSchema>;

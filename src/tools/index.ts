@@ -130,31 +130,12 @@ export {
 
 // Access Control tools
 export {
-  listUsers,
-  getUser,
-  createUser,
-  updateUser,
-  deleteUser,
-  listGroups,
-  createGroup,
-  updateGroup,
-  deleteGroup,
-  listRoles,
-  createRole,
-  updateRole,
-  deleteRole,
-  getAcl,
-  updateAcl,
-  listDomains,
-  getDomain,
-  createDomain,
-  updateDomain,
-  deleteDomain,
-  listUserTokens,
-  getUserToken,
-  createUserToken,
-  updateUserToken,
-  deleteUserToken,
+  handleUserTool,
+  handleGroupTool,
+  handleRoleTool,
+  handleAclTool,
+  handleDomainTool,
+  handleUserTokenTool,
 } from './access-control.js';
 
 // Pool Management tools

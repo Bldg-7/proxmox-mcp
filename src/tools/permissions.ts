@@ -117,4 +117,41 @@ export const toolPermissions: ToolPermissions = {
     update: 'elevated',
     delete: 'elevated',
   },
+  proxmox_user: {
+    list: 'basic',
+    get: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_group: {
+    list: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_role: {
+    list: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_acl: {
+    get: 'basic',
+    update: 'elevated',
+  },
+  proxmox_domain: {
+    list: 'basic',
+    get: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_user_token: {
+    list: 'basic',
+    get: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
 };

@@ -47,3 +47,19 @@
 - TDD approach: Created comprehensive test suite with 18 tests covering all actions and permission checks before implementation.
 - Net result: 258 → 242 tools (removed 20 old SDN tools, added 4 new consolidated tools = net -16).
 - All 903 tests pass, build succeeds with zero TypeScript errors.
+
+## Task 6 (Wave 2) - Access Control CRUD Consolidation
+
+- Consolidated 25 Access Control tools into 6 consolidated tools using the exact Task 4/5 pattern.
+- Access Control resources follow variable action counts:
+  - Users (5 actions): list/get/create/update/delete
+  - Groups (4 actions): list/create/update/delete (no 'get')
+  - Roles (4 actions): list/create/update/delete (no 'get')
+  - Domains (5 actions): list/get/create/update/delete
+  - User Tokens (5 actions): list/get/create/update/delete
+  - ACL (2 actions): get/update (only 2 actions)
+- Permission model: list/get=basic, create/update/delete=elevated (consistent across all 6 tools).
+- TDD approach: Created comprehensive test suite with 32 tests covering all actions and permission checks before implementation.
+- Net result: 242 → 223 tools (removed 25 old access control tools, added 6 new consolidated tools = net -19).
+- All 935 tests pass, build succeeds with zero TypeScript errors.
+- No old tool names remain in src/ (only in schema comments documenting original names).
