@@ -10,7 +10,7 @@ compatibility:
   - gemini-cli
   - vscode
 metadata:
-  version: 0.6.0
+  version: 0.6.1
   tool_count: 309
   domains: 14
   generated: 2026-02-08
