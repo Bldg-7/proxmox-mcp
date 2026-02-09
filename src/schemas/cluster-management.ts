@@ -526,3 +526,258 @@ export type JoinClusterInput = z.infer<typeof joinClusterSchema>;
 export const getClusterTotemSchema = z.object({});
 
 export type GetClusterTotemInput = z.infer<typeof getClusterTotemSchema>;
+
+// ── Consolidated: proxmox_ha_resource ─────────────────────────────────────
+export const haResourceToolSchema = z.discriminatedUnion('action', [
+  getHaResourcesSchema.extend({
+    action: z.literal('list'),
+  }),
+  getHaResourceSchema.extend({
+    action: z.literal('get'),
+  }),
+  getHaStatusSchema.extend({
+    action: z.literal('status'),
+  }),
+  createHaResourceSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateHaResourceSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteHaResourceSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type HaResourceToolInput = z.infer<typeof haResourceToolSchema>;
+
+// ── Consolidated: proxmox_ha_group ────────────────────────────────────────
+export const haGroupToolSchema = z.discriminatedUnion('action', [
+  getHaGroupsSchema.extend({
+    action: z.literal('list'),
+  }),
+  getHaGroupSchema.extend({
+    action: z.literal('get'),
+  }),
+  createHaGroupSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateHaGroupSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteHaGroupSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type HaGroupToolInput = z.infer<typeof haGroupToolSchema>;
+
+// ── Consolidated: proxmox_cluster_firewall_rule ───────────────────────────
+export const clusterFirewallRuleToolSchema = z.discriminatedUnion('action', [
+  listClusterFirewallRulesSchema.extend({
+    action: z.literal('list'),
+  }),
+  getClusterFirewallRuleSchema.extend({
+    action: z.literal('get'),
+  }),
+  z.object({
+    action: z.literal('create'),
+    rule_action: z.string().min(1).describe('Rule action (ACCEPT, REJECT, DROP)'),
+    type: z.enum(['in', 'out', 'group']).describe('Rule type'),
+    comment: z.string().optional(),
+    dest: z.string().optional(),
+    dport: z.string().optional(),
+    enable: z.number().int().optional(),
+    iface: z.string().optional(),
+    log: z
+      .enum(['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug', 'nolog'])
+      .optional(),
+    macro: z.string().optional(),
+    pos: z.number().int().optional(),
+    proto: z.string().optional(),
+    source: z.string().optional(),
+    sport: z.string().optional(),
+  }),
+  z.object({
+    action: z.literal('update'),
+    pos: z.number().int().min(0).describe('Rule position'),
+    rule_action: z.string().optional(),
+    comment: z.string().optional(),
+    delete: z.string().optional(),
+    dest: z.string().optional(),
+    digest: z.string().max(64).optional(),
+    dport: z.string().optional(),
+    enable: z.number().int().optional(),
+    iface: z.string().optional(),
+    log: z
+      .enum(['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug', 'nolog'])
+      .optional(),
+    macro: z.string().optional(),
+    moveto: z.number().int().optional(),
+    proto: z.string().optional(),
+    source: z.string().optional(),
+    sport: z.string().optional(),
+    type: z.enum(['in', 'out', 'group']).optional(),
+  }),
+  deleteClusterFirewallRuleSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type ClusterFirewallRuleToolInput = z.infer<typeof clusterFirewallRuleToolSchema>;
+
+// ── Consolidated: proxmox_cluster_firewall_group ──────────────────────────
+export const clusterFirewallGroupToolSchema = z.discriminatedUnion('action', [
+  listClusterFirewallGroupsSchema.extend({
+    action: z.literal('list'),
+  }),
+  getClusterFirewallGroupSchema.extend({
+    action: z.literal('get'),
+  }),
+  createClusterFirewallGroupSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateClusterFirewallGroupSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteClusterFirewallGroupSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type ClusterFirewallGroupToolInput = z.infer<typeof clusterFirewallGroupToolSchema>;
+
+// ── Consolidated: proxmox_cluster_firewall ────────────────────────────────
+export const clusterFirewallToolSchema = z.discriminatedUnion('action', [
+  getClusterFirewallOptionsSchema.extend({
+    action: z.literal('get_options'),
+  }),
+  updateClusterFirewallOptionsSchema.extend({
+    action: z.literal('update_options'),
+  }),
+  listClusterFirewallMacrosSchema.extend({
+    action: z.literal('list_macros'),
+  }),
+  listClusterFirewallRefsSchema.extend({
+    action: z.literal('list_refs'),
+  }),
+]);
+
+export type ClusterFirewallToolInput = z.infer<typeof clusterFirewallToolSchema>;
+
+// ── Consolidated: proxmox_cluster_firewall_alias ──────────────────────────
+export const clusterFirewallAliasToolSchema = z.discriminatedUnion('action', [
+  listClusterFirewallAliasesSchema.extend({
+    action: z.literal('list'),
+  }),
+  getClusterFirewallAliasSchema.extend({
+    action: z.literal('get'),
+  }),
+  createClusterFirewallAliasSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateClusterFirewallAliasSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteClusterFirewallAliasSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type ClusterFirewallAliasToolInput = z.infer<typeof clusterFirewallAliasToolSchema>;
+
+// ── Consolidated: proxmox_cluster_firewall_ipset ──────────────────────────
+export const clusterFirewallIpsetToolSchema = z.discriminatedUnion('action', [
+  listClusterFirewallIpsetsSchema.extend({
+    action: z.literal('list'),
+  }),
+  createClusterFirewallIpsetSchema.extend({
+    action: z.literal('create'),
+  }),
+  deleteClusterFirewallIpsetSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type ClusterFirewallIpsetToolInput = z.infer<typeof clusterFirewallIpsetToolSchema>;
+
+// ── Consolidated: proxmox_cluster_firewall_ipset_entry ────────────────────
+export const clusterFirewallIpsetEntryToolSchema = z.discriminatedUnion('action', [
+  listClusterFirewallIpsetEntriesSchema.extend({
+    action: z.literal('list'),
+  }),
+  addClusterFirewallIpsetEntrySchema.extend({
+    action: z.literal('create'),
+  }),
+  updateClusterFirewallIpsetEntrySchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteClusterFirewallIpsetEntrySchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type ClusterFirewallIpsetEntryToolInput = z.infer<typeof clusterFirewallIpsetEntryToolSchema>;
+
+// ── Consolidated: proxmox_cluster_backup_job ──────────────────────────────
+export const clusterBackupJobToolSchema = z.discriminatedUnion('action', [
+  listClusterBackupJobsSchema.extend({
+    action: z.literal('list'),
+  }),
+  getClusterBackupJobSchema.extend({
+    action: z.literal('get'),
+  }),
+  createClusterBackupJobSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateClusterBackupJobSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteClusterBackupJobSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type ClusterBackupJobToolInput = z.infer<typeof clusterBackupJobToolSchema>;
+
+// ── Consolidated: proxmox_cluster_replication_job ─────────────────────────
+export const clusterReplicationJobToolSchema = z.discriminatedUnion('action', [
+  listClusterReplicationJobsSchema.extend({
+    action: z.literal('list'),
+  }),
+  getClusterReplicationJobSchema.extend({
+    action: z.literal('get'),
+  }),
+  createClusterReplicationJobSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateClusterReplicationJobSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteClusterReplicationJobSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type ClusterReplicationJobToolInput = z.infer<typeof clusterReplicationJobToolSchema>;
+
+// ── Consolidated: proxmox_cluster_config ──────────────────────────────────
+export const clusterConfigToolSchema = z.discriminatedUnion('action', [
+  getClusterConfigSchema.extend({
+    action: z.literal('get'),
+  }),
+  listClusterConfigNodesSchema.extend({
+    action: z.literal('list_nodes'),
+  }),
+  getClusterConfigNodeSchema.extend({
+    action: z.literal('get_node'),
+  }),
+  joinClusterSchema.extend({
+    action: z.literal('join'),
+  }),
+  getClusterTotemSchema.extend({
+    action: z.literal('totem'),
+  }),
+]);
+
+export type ClusterConfigToolInput = z.infer<typeof clusterConfigToolSchema>;

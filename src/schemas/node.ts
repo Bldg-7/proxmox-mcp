@@ -77,6 +77,15 @@ export const clusterToolSchema = z.discriminatedUnion('action', [
   z.object({
     action: z.literal('status'),
   }),
+  z.object({
+    action: z.literal('options'),
+  }),
+  z.object({
+    action: z.literal('update_options'),
+    options: z
+      .record(z.union([z.string(), z.number(), z.boolean()]))
+      .describe('Cluster options to update'),
+  }),
 ]);
 
 export type ClusterToolInput = z.infer<typeof clusterToolSchema>;

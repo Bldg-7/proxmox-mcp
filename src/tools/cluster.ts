@@ -9,6 +9,7 @@ import {
 } from '../formatters/index.js';
 import { getClusterStatusSchema, getNextVmidSchema } from '../schemas/node.js';
 import type { GetClusterStatusInput, GetNextVmidInput, ClusterToolInput } from '../schemas/node.js';
+import { getClusterOptions, updateClusterOptions } from './cluster-management.js';
 
 /**
  * Get overall cluster status with resource usage and node information.
@@ -117,6 +118,10 @@ export async function handleClusterTool(
   switch (input.action) {
     case 'status':
       return getClusterStatus(client, config, {});
+    case 'options':
+      return getClusterOptions(client, config, {});
+    case 'update_options':
+      return updateClusterOptions(client, config, input.options);
     default:
       return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Cluster Tool');
   }

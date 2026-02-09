@@ -68,13 +68,24 @@ import {
     listClusterFirewallIpsetEntriesSchema,
     addClusterFirewallIpsetEntrySchema,
     updateClusterFirewallIpsetEntrySchema,
-    deleteClusterFirewallIpsetEntrySchema,
-    getClusterConfigSchema,
-    listClusterConfigNodesSchema,
-    getClusterConfigNodeSchema,
-    joinClusterSchema,
-    getClusterTotemSchema,
-  } from '../schemas/cluster-management.js';
+     deleteClusterFirewallIpsetEntrySchema,
+     getClusterConfigSchema,
+     listClusterConfigNodesSchema,
+     getClusterConfigNodeSchema,
+     joinClusterSchema,
+     getClusterTotemSchema,
+     haResourceToolSchema,
+     haGroupToolSchema,
+     clusterFirewallRuleToolSchema,
+     clusterFirewallGroupToolSchema,
+     clusterFirewallToolSchema,
+     clusterFirewallAliasToolSchema,
+     clusterFirewallIpsetToolSchema,
+     clusterFirewallIpsetEntryToolSchema,
+     clusterBackupJobToolSchema,
+     clusterReplicationJobToolSchema,
+     clusterConfigToolSchema,
+   } from '../schemas/cluster-management.js';
 import type {
    GetHaResourcesInput,
    GetHaResourceInput,
@@ -124,13 +135,24 @@ import type {
     ListClusterFirewallIpsetEntriesInput,
     AddClusterFirewallIpsetEntryInput,
     UpdateClusterFirewallIpsetEntryInput,
-    DeleteClusterFirewallIpsetEntryInput,
-    GetClusterConfigInput,
-    ListClusterConfigNodesInput,
-    GetClusterConfigNodeInput,
-    JoinClusterInput,
-    GetClusterTotemInput,
-  } from '../schemas/cluster-management.js';
+     DeleteClusterFirewallIpsetEntryInput,
+     GetClusterConfigInput,
+     ListClusterConfigNodesInput,
+     GetClusterConfigNodeInput,
+     JoinClusterInput,
+     GetClusterTotemInput,
+     HaResourceToolInput,
+     HaGroupToolInput,
+     ClusterFirewallRuleToolInput,
+     ClusterFirewallGroupToolInput,
+     ClusterFirewallToolInput,
+     ClusterFirewallAliasToolInput,
+     ClusterFirewallIpsetToolInput,
+     ClusterFirewallIpsetEntryToolInput,
+     ClusterBackupJobToolInput,
+     ClusterReplicationJobToolInput,
+     ClusterConfigToolInput,
+   } from '../schemas/cluster-management.js';
 
 /**
  * List HA resources.
@@ -2005,5 +2027,371 @@ export async function getClusterTotem(
     return formatToolResponse(output.trimEnd());
   } catch (error) {
     return formatErrorResponse(error as Error, 'Get Cluster Totem');
+  }
+}
+
+export async function handleHaResourceTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: HaResourceToolInput
+): Promise<ToolResponse> {
+  const validated = haResourceToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      const { action: _action, ...payload } = validated;
+      return getHaResources(client, config, payload);
+    }
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getHaResource(client, config, payload);
+    }
+    case 'status': {
+      return getHaStatus(client, config, {});
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createHaResource(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateHaResource(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteHaResource(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'HA Resource Tool'
+      );
+  }
+}
+
+export async function handleHaGroupTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: HaGroupToolInput
+): Promise<ToolResponse> {
+  const validated = haGroupToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      return getHaGroups(client, config, {});
+    }
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getHaGroup(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createHaGroup(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateHaGroup(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteHaGroup(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'HA Group Tool'
+      );
+  }
+}
+
+export async function handleClusterFirewallRuleTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ClusterFirewallRuleToolInput
+): Promise<ToolResponse> {
+  const validated = clusterFirewallRuleToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list':
+      return listClusterFirewallRules(client, config, {});
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getClusterFirewallRule(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, rule_action, ...payload } = validated;
+      return createClusterFirewallRule(client, config, {
+        ...payload,
+        action: rule_action,
+      });
+    }
+    case 'update': {
+      const { action: _action, rule_action, ...payload } = validated;
+      return updateClusterFirewallRule(client, config, {
+        ...payload,
+        ...(rule_action ? { action: rule_action } : {}),
+      });
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteClusterFirewallRule(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Cluster Firewall Rule Tool'
+      );
+  }
+}
+
+export async function handleClusterFirewallGroupTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ClusterFirewallGroupToolInput
+): Promise<ToolResponse> {
+  const validated = clusterFirewallGroupToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list':
+      return listClusterFirewallGroups(client, config, {});
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getClusterFirewallGroup(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createClusterFirewallGroup(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateClusterFirewallGroup(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteClusterFirewallGroup(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Cluster Firewall Group Tool'
+      );
+  }
+}
+
+export async function handleClusterFirewallTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ClusterFirewallToolInput
+): Promise<ToolResponse> {
+  const validated = clusterFirewallToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'get_options':
+      return getClusterFirewallOptions(client, config, {});
+    case 'update_options': {
+      const { action: _action, ...payload } = validated;
+      return updateClusterFirewallOptions(client, config, payload);
+    }
+    case 'list_macros':
+      return listClusterFirewallMacros(client, config, {});
+    case 'list_refs': {
+      const { action: _action, ...payload } = validated;
+      return listClusterFirewallRefs(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Cluster Firewall Tool'
+      );
+  }
+}
+
+export async function handleClusterFirewallAliasTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ClusterFirewallAliasToolInput
+): Promise<ToolResponse> {
+  const validated = clusterFirewallAliasToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list':
+      return listClusterFirewallAliases(client, config, {});
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getClusterFirewallAlias(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createClusterFirewallAlias(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateClusterFirewallAlias(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteClusterFirewallAlias(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Cluster Firewall Alias Tool'
+      );
+  }
+}
+
+export async function handleClusterFirewallIpsetTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ClusterFirewallIpsetToolInput
+): Promise<ToolResponse> {
+  const validated = clusterFirewallIpsetToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list':
+      return listClusterFirewallIpsets(client, config, {});
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createClusterFirewallIpset(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteClusterFirewallIpset(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Cluster Firewall IPSet Tool'
+      );
+  }
+}
+
+export async function handleClusterFirewallIpsetEntryTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ClusterFirewallIpsetEntryToolInput
+): Promise<ToolResponse> {
+  const validated = clusterFirewallIpsetEntryToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      const { action: _action, ...payload } = validated;
+      return listClusterFirewallIpsetEntries(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return addClusterFirewallIpsetEntry(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateClusterFirewallIpsetEntry(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteClusterFirewallIpsetEntry(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Cluster Firewall IPSet Entry Tool'
+      );
+  }
+}
+
+export async function handleClusterBackupJobTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ClusterBackupJobToolInput
+): Promise<ToolResponse> {
+  const validated = clusterBackupJobToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list':
+      return listClusterBackupJobs(client, config, {});
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getClusterBackupJob(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createClusterBackupJob(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateClusterBackupJob(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteClusterBackupJob(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Cluster Backup Job Tool'
+      );
+  }
+}
+
+export async function handleClusterReplicationJobTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ClusterReplicationJobToolInput
+): Promise<ToolResponse> {
+  const validated = clusterReplicationJobToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list':
+      return listClusterReplicationJobs(client, config, {});
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getClusterReplicationJob(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createClusterReplicationJob(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateClusterReplicationJob(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteClusterReplicationJob(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Cluster Replication Job Tool'
+      );
+  }
+}
+
+export async function handleClusterConfigTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ClusterConfigToolInput
+): Promise<ToolResponse> {
+  const validated = clusterConfigToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'get':
+      return getClusterConfig(client, config, {});
+    case 'list_nodes':
+      return listClusterConfigNodes(client, config, {});
+    case 'get_node': {
+      const { action: _action, ...payload } = validated;
+      return getClusterConfigNode(client, config, payload);
+    }
+    case 'join': {
+      const { action: _action, ...payload } = validated;
+      return joinCluster(client, config, payload);
+    }
+    case 'totem':
+      return getClusterTotem(client, config, {});
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Cluster Config Tool'
+      );
   }
 }

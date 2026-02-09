@@ -16,7 +16,7 @@ const SERVER_VERSION = '0.1.0';
 const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   // Node & Cluster (consolidated)
   proxmox_node: 'Query Proxmox node info. action=list: list all nodes | action=status: node status (elevated) | action=network: network interfaces | action=dns: DNS config | action=iface: specific interface details',
-  proxmox_cluster: 'Query Proxmox cluster info. action=status: overall cluster status with nodes and resource usage',
+  proxmox_cluster: 'Query Proxmox cluster info. action=status: overall cluster status with nodes and resource usage | action=options: get cluster-wide options | action=update_options: update cluster-wide options (requires elevated permissions)',
   proxmox_get_next_vmid: 'Get the next available VM/Container ID number',
 
   // Node Network Configuration
@@ -48,76 +48,19 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_schedule_node_replication: 'Schedule immediate node replication (requires elevated permissions)',
 
   // Cluster Management
-  proxmox_get_ha_resources: 'List High Availability resources in the cluster',
-  proxmox_get_ha_resource: 'Get details for a specific HA resource',
-  proxmox_create_ha_resource: 'Create a new HA resource (requires elevated permissions)',
-  proxmox_update_ha_resource: 'Update an HA resource (requires elevated permissions)',
-  proxmox_delete_ha_resource: 'Delete an HA resource (requires elevated permissions)',
-  proxmox_get_ha_groups: 'List High Availability groups in the cluster',
-  proxmox_get_ha_group: 'Get details for a specific HA group',
-  proxmox_create_ha_group: 'Create a new HA group (requires elevated permissions)',
-  proxmox_update_ha_group: 'Update an HA group (requires elevated permissions)',
-  proxmox_delete_ha_group: 'Delete an HA group (requires elevated permissions)',
-  proxmox_get_ha_status: 'Get HA manager status information for the cluster',
-  proxmox_list_cluster_firewall_rules: 'List cluster-wide firewall rules',
-  proxmox_get_cluster_firewall_rule: 'Get a cluster firewall rule by position',
-  proxmox_create_cluster_firewall_rule:
-    'Create a cluster-wide firewall rule (requires elevated permissions)',
-  proxmox_update_cluster_firewall_rule:
-    'Update a cluster firewall rule (requires elevated permissions)',
-  proxmox_delete_cluster_firewall_rule:
-    'Delete a cluster firewall rule (requires elevated permissions)',
-  proxmox_list_cluster_firewall_groups: 'List cluster firewall security groups',
-  proxmox_get_cluster_firewall_group: 'Get a cluster firewall group by name',
-  proxmox_create_cluster_firewall_group:
-    'Create a cluster firewall group (requires elevated permissions)',
-  proxmox_update_cluster_firewall_group:
-    'Update a cluster firewall group (requires elevated permissions)',
-  proxmox_delete_cluster_firewall_group:
-    'Delete a cluster firewall group (requires elevated permissions)',
-  proxmox_list_cluster_backup_jobs: 'List scheduled cluster backup jobs',
-  proxmox_get_cluster_backup_job: 'Get a scheduled cluster backup job',
-  proxmox_create_cluster_backup_job:
-    'Create a scheduled cluster backup job (requires elevated permissions)',
-  proxmox_update_cluster_backup_job:
-    'Update a scheduled cluster backup job (requires elevated permissions)',
-  proxmox_delete_cluster_backup_job:
-    'Delete a scheduled cluster backup job (requires elevated permissions)',
-  proxmox_list_cluster_replication_jobs: 'List cluster replication jobs',
-  proxmox_get_cluster_replication_job: 'Get a cluster replication job by ID',
-  proxmox_create_cluster_replication_job:
-    'Create a cluster replication job (requires elevated permissions)',
-  proxmox_update_cluster_replication_job:
-    'Update a cluster replication job (requires elevated permissions)',
-  proxmox_delete_cluster_replication_job:
-    'Delete a cluster replication job (requires elevated permissions)',
-  proxmox_get_cluster_options: 'Get cluster-wide options',
-  proxmox_update_cluster_options: 'Update cluster-wide options (requires elevated permissions)',
-  proxmox_get_cluster_firewall_options: 'Get cluster firewall options',
-  proxmox_update_cluster_firewall_options: 'Update cluster firewall options (requires elevated permissions)',
-   proxmox_list_cluster_firewall_macros: 'List available firewall macros',
-   proxmox_list_cluster_firewall_refs: 'List firewall references (aliases/ipsets)',
-   proxmox_list_cluster_firewall_aliases: 'List cluster firewall aliases',
-   proxmox_get_cluster_firewall_alias: 'Get a cluster firewall alias by name',
-   proxmox_create_cluster_firewall_alias: 'Create a cluster firewall alias (requires elevated permissions)',
-   proxmox_update_cluster_firewall_alias: 'Update a cluster firewall alias (requires elevated permissions)',
-   proxmox_delete_cluster_firewall_alias: 'Delete a cluster firewall alias (requires elevated permissions)',
-   proxmox_list_cluster_firewall_ipsets: 'List cluster firewall IP sets',
-   proxmox_create_cluster_firewall_ipset: 'Create a cluster firewall IP set (requires elevated permissions)',
-   proxmox_delete_cluster_firewall_ipset: 'Delete a cluster firewall IP set (requires elevated permissions)',
-   proxmox_list_cluster_firewall_ipset_entries: 'List entries in a cluster firewall IP set',
-   proxmox_add_cluster_firewall_ipset_entry: 'Add an entry to a cluster firewall IP set (requires elevated permissions)',
-   proxmox_update_cluster_firewall_ipset_entry: 'Update an entry in a cluster firewall IP set (requires elevated permissions)',
-    proxmox_delete_cluster_firewall_ipset_entry: 'Delete an entry from a cluster firewall IP set (requires elevated permissions)',
+  proxmox_ha_resource: 'Manage HA resources. action=list: list resources | action=get: get resource details | action=status: get HA manager status | action=create: create resource (elevated) | action=update: update resource (elevated) | action=delete: delete resource (elevated)',
+  proxmox_ha_group: 'Manage HA groups. action=list: list groups | action=get: get group details | action=create: create group (elevated) | action=update: update group (elevated) | action=delete: delete group (elevated)',
+  proxmox_cluster_firewall_rule: 'Manage cluster firewall rules. action=list: list rules | action=get: get rule by position | action=create: create rule (elevated) | action=update: update rule (elevated) | action=delete: delete rule (elevated)',
+  proxmox_cluster_firewall_group: 'Manage cluster firewall groups. action=list: list groups | action=get: get group by name | action=create: create group (elevated) | action=update: update group (elevated) | action=delete: delete group (elevated)',
+  proxmox_cluster_firewall: 'Query/manage cluster firewall metadata. action=get_options: get firewall options | action=update_options: update firewall options (elevated) | action=list_macros: list firewall macros | action=list_refs: list firewall refs',
+  proxmox_cluster_firewall_alias: 'Manage cluster firewall aliases. action=list: list aliases | action=get: get alias by name | action=create: create alias (elevated) | action=update: update alias (elevated) | action=delete: delete alias (elevated)',
+  proxmox_cluster_firewall_ipset: 'Manage cluster firewall IP sets. action=list: list IP sets | action=create: create IP set (elevated) | action=delete: delete IP set (elevated)',
+  proxmox_cluster_firewall_ipset_entry: 'Manage cluster firewall IP set entries. action=list: list entries | action=create: add entry (elevated) | action=update: update entry (elevated) | action=delete: delete entry (elevated)',
+  proxmox_cluster_backup_job: 'Manage cluster backup jobs. action=list: list jobs | action=get: get job by ID | action=create: create job (elevated) | action=update: update job (elevated) | action=delete: delete job (elevated)',
+  proxmox_cluster_replication_job: 'Manage cluster replication jobs. action=list: list jobs | action=get: get job by ID | action=create: create job (elevated) | action=update: update job (elevated) | action=delete: delete job (elevated)',
+  proxmox_cluster_config: 'Manage cluster config. action=get: get config | action=list_nodes: list config nodes | action=get_node: get node config | action=join: join cluster (elevated) | action=totem: get totem config',
 
-    // Cluster Config
-    proxmox_get_cluster_config: 'Get cluster configuration',
-    proxmox_list_cluster_config_nodes: 'List cluster configuration nodes',
-    proxmox_get_cluster_config_node: 'Get cluster configuration for a specific node',
-    proxmox_join_cluster: 'Join a cluster (requires elevated permissions)',
-    proxmox_get_cluster_totem: 'Get cluster totem configuration',
-
-    // SDN
+  // SDN
   proxmox_list_sdn_vnets: 'List SDN virtual networks',
   proxmox_get_sdn_vnet: 'Get an SDN virtual network by name',
   proxmox_create_sdn_vnet: 'Create an SDN virtual network (requires elevated permissions)',
@@ -190,8 +133,8 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_download_file_restore: 'Download a file from backup',
   proxmox_prune_backups: 'Prune old backups from storage (requires elevated permissions)',
 
-  // Ceph Integration
-  proxmox_get_ceph_status: 'Get Ceph cluster status',
+  // Ceph Integration (consolidated)
+  proxmox_ceph: 'Query Ceph cluster. action=status: get Ceph cluster health, FSID, monitors, OSDs, and placement groups',
   proxmox_list_ceph_osds: 'List Ceph OSDs',
   proxmox_create_ceph_osd: 'Create a Ceph OSD (requires elevated permissions)',
   proxmox_delete_ceph_osd: 'Delete a Ceph OSD (requires elevated permissions)',

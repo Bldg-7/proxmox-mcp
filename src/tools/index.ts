@@ -53,6 +53,17 @@ export {
 
 // Cluster Management tools
 export {
+  handleHaResourceTool,
+  handleHaGroupTool,
+  handleClusterFirewallRuleTool,
+  handleClusterFirewallGroupTool,
+  handleClusterFirewallTool,
+  handleClusterFirewallAliasTool,
+  handleClusterFirewallIpsetTool,
+  handleClusterFirewallIpsetEntryTool,
+  handleClusterBackupJobTool,
+  handleClusterReplicationJobTool,
+  handleClusterConfigTool,
   getHaResources,
   getHaResource,
   createHaResource,
@@ -189,6 +200,7 @@ export {
 
 // Ceph Integration tools
 export {
+  handleCephTool,
   getCephStatus,
   listCephOsds,
   createCephOsd,
