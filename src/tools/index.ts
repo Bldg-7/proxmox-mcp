@@ -1,5 +1,5 @@
-// Node & Cluster tools
 export {
+  handleNodeTool,
   getNodes,
   getNodeStatus,
   getNodeNetwork,
@@ -17,7 +17,7 @@ export {
   getStorageRrddata,
   getNodeReport,
 } from './node.js';
-export { getClusterStatus, getNextVMID } from './cluster.js';
+export { handleClusterTool, getClusterStatus, getNextVMID } from './cluster.js';
 
 // Node Network Configuration tools
 export {

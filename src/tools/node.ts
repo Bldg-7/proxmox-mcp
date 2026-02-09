@@ -62,6 +62,7 @@ import type {
   GetNodeReportInput,
 } from '../schemas/node.js';
 import type { ProxmoxNetwork, ProxmoxDNS } from '../types/proxmox.js';
+import type { NodeToolInput } from '../schemas/node.js';
 
 /**
  * List all Proxmox cluster nodes with their status and resource usage.
@@ -691,5 +692,26 @@ export async function getNodeReport(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Get Node Report');
+  }
+}
+
+export async function handleNodeTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return getNodes(client, config, {});
+    case 'status':
+      return getNodeStatus(client, config, { node: input.node });
+    case 'network':
+      return getNodeNetwork(client, config, { node: input.node, type: input.type });
+    case 'dns':
+      return getNodeDns(client, config, { node: input.node });
+    case 'iface':
+      return getNetworkIface(client, config, { node: input.node, iface: input.iface });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Tool');
   }
 }

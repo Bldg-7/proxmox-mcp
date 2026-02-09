@@ -45,6 +45,42 @@ export const getNetworkIfaceSchema = z.object({
 
 export type GetNetworkIfaceInput = z.infer<typeof getNetworkIfaceSchema>;
 
+// ── Consolidated: proxmox_node ──────────────────────────────────────────
+export const nodeToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('list'),
+  }),
+  z.object({
+    action: z.literal('status'),
+    node: z.string().min(1).describe('Node name (e.g., pve1, proxmox-node2)'),
+  }),
+  z.object({
+    action: z.literal('network'),
+    node: z.string().min(1).describe('Node name'),
+    type: z.string().optional().describe('Filter by interface type (bridge, bond, eth, vlan, etc.)'),
+  }),
+  z.object({
+    action: z.literal('dns'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('iface'),
+    node: z.string().min(1).describe('Node name'),
+    iface: z.string().min(1).describe('Interface name (e.g., eth0, vmbr0, bond0)'),
+  }),
+]);
+
+export type NodeToolInput = z.infer<typeof nodeToolSchema>;
+
+// ── Consolidated: proxmox_cluster ───────────────────────────────────────
+export const clusterToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('status'),
+  }),
+]);
+
+export type ClusterToolInput = z.infer<typeof clusterToolSchema>;
+
 // proxmox_get_node_services - List services on a node
 export const getNodeServicesSchema = z.object({
   node: z.string().min(1).describe('Node name'),

@@ -14,13 +14,9 @@ import { TOOL_NAMES } from './types/tools.js';
 const SERVER_VERSION = '0.1.0';
 
 const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
-  // Node & Cluster
-  proxmox_get_nodes: 'List all Proxmox cluster nodes with their status and resources',
-  proxmox_get_node_status: 'Get detailed status information for a specific Proxmox node',
-  proxmox_get_node_network: 'Get network interfaces for a specific Proxmox node',
-  proxmox_get_node_dns: 'Get DNS configuration for a specific Proxmox node',
-  proxmox_get_network_iface: 'Get details for a specific network interface on a Proxmox node',
-  proxmox_get_cluster_status: 'Get overall cluster status including nodes and resource usage',
+  // Node & Cluster (consolidated)
+  proxmox_node: 'Query Proxmox node info. action=list: list all nodes | action=status: node status (elevated) | action=network: network interfaces | action=dns: DNS config | action=iface: specific interface details',
+  proxmox_cluster: 'Query Proxmox cluster info. action=status: overall cluster status with nodes and resource usage',
   proxmox_get_next_vmid: 'Get the next available VM/Container ID number',
 
   // Node Network Configuration

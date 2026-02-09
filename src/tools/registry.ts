@@ -1,15 +1,12 @@
 import type { ProxmoxApiClient } from '../client/proxmox.js';
 import type { Config } from '../config/index.js';
 import type { ToolResponse, ToolName } from '../types/index.js';
+import { TOOL_NAMES } from '../types/index.js';
 import type { z } from 'zod';
 
 // Import all tool handlers
 import {
-  getNodes,
-  getNodeStatus,
-  getNodeNetwork,
-  getNodeDns,
-  getNetworkIface,
+  handleNodeTool,
   getNodeServices,
   controlNodeService,
   getNodeSyslog,
@@ -45,7 +42,7 @@ import {
   getNodeReplicationStatus,
   getNodeReplicationLog,
   scheduleNodeReplication,
-  getClusterStatus,
+  handleClusterTool,
   getNextVMID,
   getHaResources,
   getHaResource,
@@ -318,11 +315,8 @@ import {
 
 // Import all schemas
 import {
-  getNodesSchema,
-  getNodeStatusSchema,
-  getNodeNetworkSchema,
-  getNodeDnsSchema,
-  getNetworkIfaceSchema,
+  nodeToolSchema,
+  clusterToolSchema,
   getNodeServicesSchema,
   controlNodeServiceSchema,
   getNodeSyslogSchema,
@@ -334,7 +328,6 @@ import {
   getNodeRrddataSchema,
   getStorageRrddataSchema,
   getNodeReportSchema,
-  getClusterStatusSchema,
   getNextVmidSchema,
 } from '../schemas/node.js';
 import {
@@ -682,13 +675,9 @@ export interface ToolRegistryEntry {
 
 // Tool registry mapping tool names to handlers and schemas
 export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
-  // Node & Cluster
-  proxmox_get_nodes: { handler: getNodes, schema: getNodesSchema },
-  proxmox_get_node_status: { handler: getNodeStatus, schema: getNodeStatusSchema },
-  proxmox_get_node_network: { handler: getNodeNetwork, schema: getNodeNetworkSchema },
-  proxmox_get_node_dns: { handler: getNodeDns, schema: getNodeDnsSchema },
-  proxmox_get_network_iface: { handler: getNetworkIface, schema: getNetworkIfaceSchema },
-  proxmox_get_cluster_status: { handler: getClusterStatus, schema: getClusterStatusSchema },
+  // Node & Cluster (consolidated)
+  proxmox_node: { handler: handleNodeTool, schema: nodeToolSchema },
+  proxmox_cluster: { handler: handleClusterTool, schema: clusterToolSchema },
   proxmox_get_next_vmid: { handler: getNextVMID, schema: getNextVmidSchema },
 
   // Node Network Configuration
@@ -1270,10 +1259,11 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
   return toolRegistry[toolName];
 }
 
-// Validate all 307 tools are registered
+// Validate all tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 309) {
+const expectedCount = TOOL_NAMES.length;
+if (registeredCount !== expectedCount) {
    throw new Error(
-     `Tool registry incomplete: expected 309 tools, got ${registeredCount}`
+     `Tool registry incomplete: expected ${expectedCount} tools, got ${registeredCount}`
    );
 }

@@ -8,7 +8,7 @@ import {
   formatBytes,
 } from '../formatters/index.js';
 import { getClusterStatusSchema, getNextVmidSchema } from '../schemas/node.js';
-import type { GetClusterStatusInput, GetNextVmidInput } from '../schemas/node.js';
+import type { GetClusterStatusInput, GetNextVmidInput, ClusterToolInput } from '../schemas/node.js';
 
 /**
  * Get overall cluster status with resource usage and node information.
@@ -106,5 +106,18 @@ export async function getNextVMID(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Get Next VMID');
+  }
+}
+
+export async function handleClusterTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ClusterToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'status':
+      return getClusterStatus(client, config, {});
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Cluster Tool');
   }
 }
