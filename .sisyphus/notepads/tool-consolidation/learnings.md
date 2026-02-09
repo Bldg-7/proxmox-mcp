@@ -96,3 +96,11 @@
 - Old tool schemas in schemas/vm.ts remain as internal implementation used by handlers — only public-facing names changed.
 - Net result: 201 → 196 tools (removed 12 old lifecycle tools, added 7 consolidated = net -5).
 - All 1007 tests pass, build succeeds with zero TypeScript errors.
+
+## Task 9 (Wave 3) - VM/LXC Modify Consolidation
+
+- Followed Task 8 pattern exactly: `z.discriminatedUnion('type', [...])` in `src/schemas/guest.ts` and thin switch dispatchers in `src/tools/guest-modify.ts`.
+- Consolidated clean mirrors into five tools: `proxmox_guest_clone`, `proxmox_guest_resize`, `proxmox_guest_config_update`, `proxmox_guest_migrate`, `proxmox_guest_template`.
+- `update_vm_config` and `update_lxc_config` were safe to merge: both schemas are generic key-value config plus optional `delete`; type-specific differences are descriptive text only.
+- `proxmox_create_vm` and `proxmox_create_lxc` remain separate due fundamental schema divergence (VM uses ISO/ostype/disk model semantics, LXC uses ostemplate/hostname/password/rootfs semantics).
+- Permission model now explicitly marks all guest modify tools and both create tools as elevated in `src/tools/permissions.ts`.

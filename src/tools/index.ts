@@ -224,6 +224,16 @@ export {
   handleGuestPause,
   handleGuestResume,
 } from './guest-lifecycle.js';
+
+// Guest Modify (consolidated VM/LXC)
+export {
+  handleGuestClone,
+  handleGuestResize,
+  handleGuestConfigUpdate,
+  handleGuestMigrate,
+  handleGuestTemplate,
+} from './guest-modify.js';
+
 export { cloneLxc, cloneVM, resizeLxc, resizeVM, updateVmConfig, updateLxcConfig } from './vm-modify.js';
 
 // VM/LXC Advanced tools

@@ -223,4 +223,25 @@ export const toolPermissions: ToolPermissions = {
   proxmox_guest_resume: {
     elevated: 'elevated',
   },
+  proxmox_guest_clone: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_resize: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_config_update: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_migrate: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_template: {
+    elevated: 'elevated',
+  },
+  proxmox_create_vm: {
+    elevated: 'elevated',
+  },
+  proxmox_create_lxc: {
+    elevated: 'elevated',
+  },
 };

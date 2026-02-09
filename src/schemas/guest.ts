@@ -202,3 +202,120 @@ export const guestResumeSchema = z.object({
 });
 
 export type GuestResumeInput = z.infer<typeof guestResumeSchema>;
+
+// ── Consolidated: proxmox_guest_clone ────────────────────────────────────
+// Replaces legacy VM/LXC clone tools
+export const guestCloneSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Node name where VM is located'),
+    vmid: z.coerce.number().describe('VM ID to clone from'),
+    newid: z.coerce.number().describe('New VM ID'),
+    name: z.string().optional().describe('Name for cloned VM (optional)'),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Node name where container is located'),
+    vmid: z.coerce.number().describe('Container ID to clone from'),
+    newid: z.coerce.number().describe('New container ID'),
+    hostname: z.string().optional().describe('Hostname for cloned container (optional)'),
+  }),
+]);
+
+export type GuestCloneInput = z.infer<typeof guestCloneSchema>;
+
+// ── Consolidated: proxmox_guest_resize ───────────────────────────────────
+// Replaces legacy VM/LXC resize tools
+export const guestResizeSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Node name where VM is located'),
+    vmid: z.coerce.number().describe('VM ID number'),
+    memory: z.number().optional().describe('Memory in MB (optional)'),
+    cores: z.number().optional().describe('Number of CPU cores (optional)'),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Node name where container is located'),
+    vmid: z.coerce.number().describe('Container ID number'),
+    memory: z.number().optional().describe('Memory in MB (optional)'),
+    cores: z.number().optional().describe('Number of CPU cores (optional)'),
+  }),
+]);
+
+export type GuestResizeInput = z.infer<typeof guestResizeSchema>;
+
+// ── Consolidated: proxmox_guest_config_update ────────────────────────────
+// Replaces legacy VM/LXC config update tools
+export const guestConfigUpdateSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Node name where VM is located'),
+    vmid: z.coerce.number().describe('VM ID number'),
+    config: z.record(z.string(), z.any()).optional().describe(
+      'Key-value pairs of VM configuration to set. Use proxmox_guest_config with type=vm to discover valid keys.'
+    ),
+    delete: z.string().optional().describe(
+      'Comma-separated list of config keys to REMOVE (e.g. "ciuser,cipassword"). Does NOT delete the VM.'
+    ),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Node name where container is located'),
+    vmid: z.coerce.number().describe('Container ID number'),
+    config: z.record(z.string(), z.any()).optional().describe(
+      'Key-value pairs of container configuration to set. Use proxmox_guest_config with type=lxc to discover valid keys.'
+    ),
+    delete: z.string().optional().describe(
+      'Comma-separated list of config keys to REMOVE (e.g. "mp0,nameserver"). Does NOT delete the container.'
+    ),
+  }),
+]);
+
+export type GuestConfigUpdateInput = z.infer<typeof guestConfigUpdateSchema>;
+
+// ── Consolidated: proxmox_guest_migrate ──────────────────────────────────
+// Replaces legacy VM/LXC migration tools
+export const guestMigrateSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Source node name'),
+    vmid: z.coerce.number().describe('VM ID to migrate'),
+    target: z.string().min(1).describe('Target node name'),
+    online: z.boolean().optional().describe('Live migrate running VM'),
+    force: z.boolean().optional().describe('Force migration'),
+    bwlimit: z.number().int().min(0).optional().describe('Migration bandwidth limit (MB/s)'),
+    ['with-local-disks']: z.boolean().optional().describe('Migrate local disks'),
+    ['with-local-storage']: z.boolean().optional().describe('Migrate local storage'),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Source node name'),
+    vmid: z.coerce.number().describe('Container ID to migrate'),
+    target: z.string().min(1).describe('Target node name'),
+    online: z.boolean().optional().describe('Live migrate running container'),
+    force: z.boolean().optional().describe('Force migration'),
+    bwlimit: z.number().int().min(0).optional().describe('Migration bandwidth limit (MB/s)'),
+    ['with-local-disks']: z.boolean().optional().describe('Migrate local disks'),
+    ['with-local-storage']: z.boolean().optional().describe('Migrate local storage'),
+  }),
+]);
+
+export type GuestMigrateInput = z.infer<typeof guestMigrateSchema>;
+
+// ── Consolidated: proxmox_guest_template ─────────────────────────────────
+// Replaces legacy VM/LXC template tools
+export const guestTemplateSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Node name where VM is located'),
+    vmid: z.coerce.number().describe('VM ID number'),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Node name where container is located'),
+    vmid: z.coerce.number().describe('Container ID number'),
+  }),
+]);
+
+export type GuestTemplateInput = z.infer<typeof guestTemplateSchema>;

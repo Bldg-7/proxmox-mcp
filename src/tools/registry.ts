@@ -27,6 +27,11 @@ import {
   guestDeleteSchema,
   guestPauseSchema,
   guestResumeSchema,
+  guestCloneSchema,
+  guestResizeSchema,
+  guestConfigUpdateSchema,
+  guestMigrateSchema,
+  guestTemplateSchema,
 } from '../schemas/guest.js';
 import {
   handleNodeTool,
@@ -108,16 +113,11 @@ import {
   handleGuestDelete,
   handleGuestPause,
   handleGuestResume,
-  cloneLxc,
-  cloneVM,
-  resizeLxc,
-  resizeVM,
-  updateVmConfig,
-  updateLxcConfig,
-  migrateVm,
-  migrateLxc,
-  createTemplateVm,
-  createTemplateLxc,
+  handleGuestClone,
+  handleGuestResize,
+  handleGuestConfigUpdate,
+  handleGuestMigrate,
+  handleGuestTemplate,
 
   agentPing,
   agentGetOsinfo,
@@ -311,24 +311,13 @@ import {
   cephFsToolSchema,
 } from '../schemas/ceph.js';
 import {
-    getStorageSchema,
-  cloneLxcSchema,
-  cloneVmSchema,
-  resizeLxcSchema,
-  resizeVmSchema,
-  updateVmConfigSchema,
-  updateLxcConfigSchema,
+  getStorageSchema,
   executeVmCommandSchema,
   listTemplatesSchema,
   createLxcSchema,
   createVmSchema,
 } from '../schemas/vm.js';
 import {
-  migrateVmSchema,
-  migrateLxcSchema,
-  createTemplateVmSchema,
-  createTemplateLxcSchema,
-
   agentPingSchema,
   agentGetOsinfoSchema,
   agentGetFsinfoSchema,
@@ -640,19 +629,17 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_guest_pause: { handler: handleGuestPause, schema: guestPauseSchema },
   proxmox_guest_resume: { handler: handleGuestResume, schema: guestResumeSchema },
 
-  // VM Modify
-  proxmox_clone_lxc: { handler: cloneLxc, schema: cloneLxcSchema },
-  proxmox_clone_vm: { handler: cloneVM, schema: cloneVmSchema },
-  proxmox_resize_lxc: { handler: resizeLxc, schema: resizeLxcSchema },
-  proxmox_resize_vm: { handler: resizeVM, schema: resizeVmSchema },
-  proxmox_update_vm_config: { handler: updateVmConfig, schema: updateVmConfigSchema },
-  proxmox_update_lxc_config: { handler: updateLxcConfig, schema: updateLxcConfigSchema },
+  // Guest Modify (consolidated VM/LXC)
+  proxmox_guest_clone: { handler: handleGuestClone, schema: guestCloneSchema },
+  proxmox_guest_resize: { handler: handleGuestResize, schema: guestResizeSchema },
+  proxmox_guest_config_update: {
+    handler: handleGuestConfigUpdate,
+    schema: guestConfigUpdateSchema,
+  },
+  proxmox_guest_migrate: { handler: handleGuestMigrate, schema: guestMigrateSchema },
+  proxmox_guest_template: { handler: handleGuestTemplate, schema: guestTemplateSchema },
 
   // VM/LXC Advanced
-  proxmox_migrate_vm: { handler: migrateVm, schema: migrateVmSchema },
-  proxmox_migrate_lxc: { handler: migrateLxc, schema: migrateLxcSchema },
-  proxmox_create_template_vm: { handler: createTemplateVm, schema: createTemplateVmSchema },
-  proxmox_create_template_lxc: { handler: createTemplateLxc, schema: createTemplateLxcSchema },
 
   proxmox_agent_ping: { handler: agentPing, schema: agentPingSchema },
   proxmox_agent_get_osinfo: { handler: agentGetOsinfo, schema: agentGetOsinfoSchema },

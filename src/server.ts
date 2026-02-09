@@ -130,19 +130,14 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_guest_pause: 'Pause a QEMU virtual machine — VM only (requires elevated permissions)',
   proxmox_guest_resume: 'Resume a paused QEMU virtual machine — VM only (requires elevated permissions)',
 
-  // VM Modify
-  proxmox_clone_lxc: 'Clone an LXC container (requires elevated permissions)',
-  proxmox_clone_vm: 'Clone a QEMU virtual machine (requires elevated permissions)',
-  proxmox_resize_lxc: 'Resize an LXC container CPU/memory (requires elevated permissions)',
-  proxmox_resize_vm: 'Resize a QEMU VM CPU/memory (requires elevated permissions)',
-  proxmox_update_vm_config: 'Update QEMU VM configuration with arbitrary key-value pairs (requires elevated permissions)',
-  proxmox_update_lxc_config: 'Update LXC container configuration with arbitrary key-value pairs (requires elevated permissions)',
+  // Guest Modify (consolidated VM/LXC)
+  proxmox_guest_clone: 'Clone a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
+  proxmox_guest_resize: 'Resize VM/LXC CPU or memory (type=vm|lxc) (requires elevated permissions)',
+  proxmox_guest_config_update: 'Update VM/LXC config key-value pairs (type=vm|lxc) (requires elevated permissions)',
+  proxmox_guest_migrate: 'Migrate a VM or LXC container to another node (type=vm|lxc) (requires elevated permissions)',
+  proxmox_guest_template: 'Convert a VM or LXC container to a template (type=vm|lxc) (requires elevated permissions)',
 
   // VM/LXC Advanced
-  proxmox_migrate_vm: 'Migrate a QEMU VM to another node (requires elevated permissions)',
-  proxmox_migrate_lxc: 'Migrate an LXC container to another node (requires elevated permissions)',
-  proxmox_create_template_vm: 'Convert a QEMU VM to a template (requires elevated permissions)',
-  proxmox_create_template_lxc: 'Convert an LXC container to a template (requires elevated permissions)',
 
   proxmox_agent_ping: 'Ping the QEMU guest agent to verify availability',
   proxmox_agent_get_osinfo: 'Get guest OS information via QEMU guest agent',

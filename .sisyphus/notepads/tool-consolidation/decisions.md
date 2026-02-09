@@ -33,3 +33,10 @@
 - Added dedicated consolidated tools for each cluster sub-resource (`ha_resource`, `ha_group`, `cluster_firewall_rule`, `cluster_firewall_group`, `cluster_firewall`, `cluster_firewall_alias`, `cluster_firewall_ipset`, `cluster_firewall_ipset_entry`, `cluster_backup_job`, `cluster_replication_job`, `cluster_config`) and merged cluster options into existing `proxmox_cluster` actions.
 - Mapped legacy `proxmox_get_ha_status` into `proxmox_ha_resource(action='status')` to preserve functionality while staying within the <=6 action cap.
 - For firewall rule create/update consolidated actions, used `rule_action` as payload field to avoid collision with dispatcher discriminator `action`.
+
+## Task 9 - VM/LXC Modify Consolidation Decisions
+
+- Kept `create_vm` and `create_lxc` separate per plan because schemas are fundamentally different and exceed the divergence guardrail.
+- Consolidated `update_vm_config` and `update_lxc_config` into `proxmox_guest_config_update(type=...)` because both are structurally identical (`node`, `vmid`, `config`, `delete`).
+- Migrate and template actions moved into the same guest-modify consolidated layer (`proxmox_guest_migrate`, `proxmox_guest_template`) to keep all VM/LXC modify operations behind a consistent `type` parameter API.
+- Implemented consolidated handlers as direct delegates to existing legacy handlers to preserve response formats and validation behavior.
