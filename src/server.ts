@@ -92,11 +92,9 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_ceph_fs: 'Manage Ceph filesystems (list, create)',
 
   // Console Access
-  proxmox_get_vnc_proxy: 'Get a VNC proxy ticket for a QEMU VM (requires elevated permissions)',
+  proxmox_console_vnc: 'Get a VNC proxy ticket for a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
+  proxmox_console_term: 'Get a terminal proxy ticket for a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
   proxmox_get_spice_proxy: 'Get a SPICE proxy ticket for a QEMU VM (requires elevated permissions)',
-  proxmox_get_term_proxy: 'Get a terminal proxy ticket for a QEMU VM (requires elevated permissions)',
-  proxmox_get_lxc_vnc_proxy: 'Get a VNC proxy ticket for an LXC container (requires elevated permissions)',
-  proxmox_get_lxc_term_proxy: 'Get a terminal proxy ticket for an LXC container (requires elevated permissions)',
 
   // Node Management
   proxmox_get_node_services: 'List system services on a Proxmox node',
@@ -188,33 +186,15 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
     proxmox_wipe_disk: 'Wipe all data from a disk (requires elevated permissions, destructive)',
 
     // Cloud-Init
-    proxmox_get_cloudinit_config: 'Get cloud-init configuration items for a QEMU VM',
-    proxmox_dump_cloudinit: 'Dump rendered cloud-init config (user-data, network-config, or meta-data) for a QEMU VM',
-    proxmox_regenerate_cloudinit: 'Regenerate the cloud-init drive for a QEMU VM (requires elevated permissions)',
+     proxmox_cloudinit: 'Manage cloud-init for a QEMU VM. action=get: list config | action=dump: dump rendered config (dump_type=user|network|meta) | action=regenerate: regenerate drive (requires elevated)',
 
-  // Certificate Management
-  proxmox_get_node_certificates: 'Get SSL certificate information for a Proxmox node',
-  proxmox_upload_custom_certificate: 'Upload a custom SSL certificate to a Proxmox node (requires elevated permissions)',
-  proxmox_delete_custom_certificate: 'Delete the custom SSL certificate from a Proxmox node (requires elevated permissions)',
-  proxmox_order_acme_certificate: 'Order a new ACME (Let\'s Encrypt) certificate for a Proxmox node (requires elevated permissions)',
-  proxmox_renew_acme_certificate: 'Renew the ACME certificate for a Proxmox node (requires elevated permissions)',
-  proxmox_revoke_acme_certificate: 'Revoke the ACME certificate for a Proxmox node (requires elevated permissions)',
-  proxmox_get_node_acme_config: 'Get ACME configuration for a Proxmox node',
+  proxmox_certificate: 'Manage node SSL certificates. action=list: view certs | action=upload: upload custom cert (requires elevated) | action=delete: remove custom cert (requires elevated)',
+  proxmox_acme_cert: 'Manage ACME certificates. action=order|renew|revoke: certificate ops (requires elevated) | action=config: get ACME config',
 
-  // ACME Management
-  proxmox_list_acme_accounts: 'List all ACME accounts configured in the cluster',
-  proxmox_get_acme_account: 'Get detailed information about a specific ACME account',
-  proxmox_create_acme_account: 'Create a new ACME account (requires elevated permissions)',
-  proxmox_update_acme_account: 'Update an existing ACME account (requires elevated permissions)',
-  proxmox_delete_acme_account: 'Delete an ACME account (requires elevated permissions)',
-  proxmox_list_acme_plugins: 'List all ACME challenge plugins configured in the cluster',
-  proxmox_get_acme_plugin: 'Get detailed configuration for a specific ACME plugin',
-  proxmox_get_acme_directories: 'Get available ACME directory endpoints (Let\'s Encrypt, etc.)',
-  proxmox_list_notification_targets: 'List all notification targets (SMTP, Gotify, Sendmail)',
-  proxmox_get_notification_target: 'Get detailed configuration for a specific notification target',
-  proxmox_create_notification_target: 'Create a new notification target (requires elevated permissions)',
-  proxmox_delete_notification_target: 'Delete a notification target (requires elevated permissions)',
-  proxmox_test_notification_target: 'Send a test notification to a target (requires elevated permissions)',
+  proxmox_acme_account: 'Manage ACME accounts. action=list|get: query accounts | action=create|update|delete: manage accounts (requires elevated)',
+  proxmox_acme_info: 'Query ACME information. action=list_plugins|get_plugin|directories',
+
+  proxmox_notification: 'Manage notification targets. action=list|get: query targets | action=create|delete|test: manage targets (requires elevated)',
 };
 
 export function createServer(client: ProxmoxApiClient, config: Config): Server {

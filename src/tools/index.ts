@@ -193,13 +193,11 @@ export {
   handleCephFsTool,
 } from './ceph.js';
 
-// Console Access tools
+// Console Access tools (consolidated)
 export {
-  getVncProxy,
+  handleConsoleVnc,
+  handleConsoleTerm,
   getSpiceProxy,
-  getTermProxy,
-  getLxcVncProxy,
-  getLxcTermProxy,
 } from './console-access.js';
 
 // Guest Query tools (consolidated VM/LXC)
@@ -337,35 +335,14 @@ export { executeVMCommand } from './command.js';
 // Creation tools
 export { listTemplates, createLxc, createVM } from './vm-create.js';
 
-// Cloud-Init tools
-export {
-  getCloudInitConfig,
-  dumpCloudInit,
-  regenerateCloudInit,
-} from './cloud-init.js';
+// Cloud-Init tools (consolidated)
+export { handleCloudInit } from './cloud-init.js';
 
-// Certificate Management tools
-export {
-  getNodeCertificates,
-  uploadCustomCertificate,
-  deleteCustomCertificate,
-  orderAcmeCertificate,
-  renewAcmeCertificate,
-  revokeAcmeCertificate,
-  getNodeAcmeConfig,
-} from './certificate.js';
+// Certificate Management tools (consolidated)
+export { handleCertificate, handleAcmeCert } from './certificate.js';
 
-// ACME Management tools
-export {
-  listAcmeAccounts,
-  getAcmeAccount,
-  createAcmeAccount,
-  updateAcmeAccount,
-  deleteAcmeAccount,
-  listAcmePlugins,
-  getAcmePlugin,
-  getAcmeDirectories,
-} from './acme.js';
+// ACME Management tools (consolidated)
+export { handleAcmeAccount, handleAcmeInfo } from './acme.js';
 
 // QEMU Agent tools (file operations, user management, power control)
 export {
@@ -385,11 +362,5 @@ export {
   agentSuspendHybrid,
 } from './vm-advanced.js';
 
-// Notification Management tools
-export {
-  listNotificationTargets,
-  getNotificationTarget,
-  createNotificationTarget,
-  deleteNotificationTarget,
-  testNotificationTarget,
-} from './notifications.js';
+// Notification Management tools (consolidated)
+export { handleNotification } from './notifications.js';

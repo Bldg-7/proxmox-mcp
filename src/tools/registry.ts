@@ -136,11 +136,9 @@ import {
   createLxcFirewallRule,
   updateLxcFirewallRule,
   deleteLxcFirewallRule,
-  getVncProxy,
+  handleConsoleVnc,
+  handleConsoleTerm,
   getSpiceProxy,
-  getTermProxy,
-  getLxcVncProxy,
-  getLxcTermProxy,
   handleGuestSnapshot,
   handleBackup,
   addDiskVM,
@@ -157,29 +155,12 @@ import {
   listTemplates,
   createLxc,
   createVM,
-  getCloudInitConfig,
-  dumpCloudInit,
-  regenerateCloudInit,
-  getNodeCertificates,
-  uploadCustomCertificate,
-  deleteCustomCertificate,
-  orderAcmeCertificate,
-  renewAcmeCertificate,
-  revokeAcmeCertificate,
-  getNodeAcmeConfig,
-  listAcmeAccounts,
-  getAcmeAccount,
-  createAcmeAccount,
-  updateAcmeAccount,
-  deleteAcmeAccount,
-  listAcmePlugins,
-  getAcmePlugin,
-  getAcmeDirectories,
-  listNotificationTargets,
-  getNotificationTarget,
-  createNotificationTarget,
-  deleteNotificationTarget,
-  testNotificationTarget,
+  handleCloudInit,
+  handleCertificate,
+  handleAcmeCert,
+  handleAcmeAccount,
+  handleAcmeInfo,
+  handleNotification,
 } from './index.js';
 
 // Import all schemas
@@ -316,43 +297,14 @@ import {
   guestNetworkSchema,
 } from '../schemas/network.js';
 import {
-  getVncProxySchema,
+  consoleVncSchema,
+  consoleTermSchema,
   getSpiceProxySchema,
-  getTermProxySchema,
-  getLxcVncProxySchema,
-  getLxcTermProxySchema,
 } from '../schemas/console-access.js';
-import {
-  getCloudInitConfigSchema,
-  dumpCloudInitSchema,
-  regenerateCloudInitSchema,
-} from '../schemas/cloud-init.js';
-import {
-  getNodeCertificatesSchema,
-  uploadCustomCertificateSchema,
-  deleteCustomCertificateSchema,
-  orderAcmeCertificateSchema,
-  renewAcmeCertificateSchema,
-  revokeAcmeCertificateSchema,
-  getNodeAcmeConfigSchema,
-} from '../schemas/certificate.js';
-import {
-  listAcmeAccountsSchema,
-  getAcmeAccountSchema,
-  createAcmeAccountSchema,
-  updateAcmeAccountSchema,
-  deleteAcmeAccountSchema,
-  listAcmePluginsSchema,
-  getAcmePluginSchema,
-  getAcmeDirectoriesSchema,
-} from '../schemas/acme.js';
-import {
-  listNotificationTargetsSchema,
-  getNotificationTargetSchema,
-  createNotificationTargetSchema,
-  deleteNotificationTargetSchema,
-  testNotificationTargetSchema,
-} from '../schemas/notifications.js';
+import { cloudInitSchema } from '../schemas/cloud-init.js';
+import { certificateSchema, acmeCertSchema } from '../schemas/certificate.js';
+import { acmeAccountSchema, acmeInfoSchema } from '../schemas/acme.js';
+import { notificationSchema } from '../schemas/notifications.js';
 
 // Tool handler type - accepts any input type for flexibility
 export type ToolHandler = (
@@ -500,18 +452,10 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_ceph_pool: { handler: handleCephPoolTool, schema: cephPoolToolSchema },
   proxmox_ceph_fs: { handler: handleCephFsTool, schema: cephFsToolSchema },
 
-  // Console Access
-  proxmox_get_vnc_proxy: { handler: getVncProxy, schema: getVncProxySchema },
+  // Console Access (consolidated)
+  proxmox_console_vnc: { handler: handleConsoleVnc, schema: consoleVncSchema },
+  proxmox_console_term: { handler: handleConsoleTerm, schema: consoleTermSchema },
   proxmox_get_spice_proxy: { handler: getSpiceProxy, schema: getSpiceProxySchema },
-  proxmox_get_term_proxy: { handler: getTermProxy, schema: getTermProxySchema },
-  proxmox_get_lxc_vnc_proxy: {
-    handler: getLxcVncProxy,
-    schema: getLxcVncProxySchema,
-  },
-  proxmox_get_lxc_term_proxy: {
-    handler: getLxcTermProxy,
-    schema: getLxcTermProxySchema,
-  },
 
   // Node Management
   proxmox_get_node_services: { handler: getNodeServices, schema: getNodeServicesSchema },
@@ -632,36 +576,19 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
    proxmox_create_lxc: { handler: createLxc, schema: createLxcSchema },
    proxmox_create_vm: { handler: createVM, schema: createVmSchema },
 
-   // Cloud-Init
-   proxmox_get_cloudinit_config: { handler: getCloudInitConfig, schema: getCloudInitConfigSchema },
-   proxmox_dump_cloudinit: { handler: dumpCloudInit, schema: dumpCloudInitSchema },
-   proxmox_regenerate_cloudinit: { handler: regenerateCloudInit, schema: regenerateCloudInitSchema },
+   // Cloud-Init (consolidated)
+   proxmox_cloudinit: { handler: handleCloudInit, schema: cloudInitSchema },
 
-   // Certificate Management
-   proxmox_get_node_certificates: { handler: getNodeCertificates, schema: getNodeCertificatesSchema },
-   proxmox_upload_custom_certificate: { handler: uploadCustomCertificate, schema: uploadCustomCertificateSchema },
-   proxmox_delete_custom_certificate: { handler: deleteCustomCertificate, schema: deleteCustomCertificateSchema },
-   proxmox_order_acme_certificate: { handler: orderAcmeCertificate, schema: orderAcmeCertificateSchema },
-   proxmox_renew_acme_certificate: { handler: renewAcmeCertificate, schema: renewAcmeCertificateSchema },
-   proxmox_revoke_acme_certificate: { handler: revokeAcmeCertificate, schema: revokeAcmeCertificateSchema },
-   proxmox_get_node_acme_config: { handler: getNodeAcmeConfig, schema: getNodeAcmeConfigSchema },
+   // Certificate Management (consolidated)
+   proxmox_certificate: { handler: handleCertificate, schema: certificateSchema },
+   proxmox_acme_cert: { handler: handleAcmeCert, schema: acmeCertSchema },
 
-   // ACME Management
-   proxmox_list_acme_accounts: { handler: listAcmeAccounts, schema: listAcmeAccountsSchema },
-   proxmox_get_acme_account: { handler: getAcmeAccount, schema: getAcmeAccountSchema },
-   proxmox_create_acme_account: { handler: createAcmeAccount, schema: createAcmeAccountSchema },
-   proxmox_update_acme_account: { handler: updateAcmeAccount, schema: updateAcmeAccountSchema },
-   proxmox_delete_acme_account: { handler: deleteAcmeAccount, schema: deleteAcmeAccountSchema },
-   proxmox_list_acme_plugins: { handler: listAcmePlugins, schema: listAcmePluginsSchema },
-   proxmox_get_acme_plugin: { handler: getAcmePlugin, schema: getAcmePluginSchema },
-   proxmox_get_acme_directories: { handler: getAcmeDirectories, schema: getAcmeDirectoriesSchema },
+   // ACME Management (consolidated)
+   proxmox_acme_account: { handler: handleAcmeAccount, schema: acmeAccountSchema },
+   proxmox_acme_info: { handler: handleAcmeInfo, schema: acmeInfoSchema },
 
-   // Notification Management
-   proxmox_list_notification_targets: { handler: listNotificationTargets, schema: listNotificationTargetsSchema },
-   proxmox_get_notification_target: { handler: getNotificationTarget, schema: getNotificationTargetSchema },
-   proxmox_create_notification_target: { handler: createNotificationTarget, schema: createNotificationTargetSchema },
-   proxmox_delete_notification_target: { handler: deleteNotificationTarget, schema: deleteNotificationTargetSchema },
-   proxmox_test_notification_target: { handler: testNotificationTarget, schema: testNotificationTargetSchema },
+   // Notification Management (consolidated)
+   proxmox_notification: { handler: handleNotification, schema: notificationSchema },
 };
 
 // Helper to get tool handler

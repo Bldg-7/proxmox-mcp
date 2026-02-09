@@ -5,58 +5,80 @@ import { formatToolResponse, formatErrorResponse } from '../formatters/index.js'
 import { requireElevated } from '../middleware/index.js';
 import { validateNodeName, validateVMID } from '../validators/index.js';
 import {
-  getVncProxySchema,
+  consoleVncSchema,
+  consoleTermSchema,
   getSpiceProxySchema,
-  getTermProxySchema,
-  getLxcVncProxySchema,
-  getLxcTermProxySchema,
 } from '../schemas/console-access.js';
 import type {
-  GetVncProxyInput,
+  ConsoleVncInput,
+  ConsoleTermInput,
   GetSpiceProxyInput,
-  GetTermProxyInput,
-  GetLxcVncProxyInput,
-  GetLxcTermProxyInput,
 } from '../schemas/console-access.js';
 
 function formatJsonBlock(data: unknown): string {
   return `\n\n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``;
 }
 
-/**
- * Get VNC proxy ticket for a QEMU VM.
- */
-export async function getVncProxy(
+export async function handleConsoleVnc(
   client: ProxmoxApiClient,
   config: Config,
-  input: GetVncProxyInput
+  input: ConsoleVncInput
 ): Promise<ToolResponse> {
   try {
-    requireElevated(config, 'get VM VNC proxy ticket');
+    requireElevated(config, 'get VNC proxy ticket');
 
-    const validated = getVncProxySchema.parse(input);
+    const validated = consoleVncSchema.parse(input);
     const safeNode = validateNodeName(validated.node);
     const safeVmid = validateVMID(validated.vmid);
+    const guestPath = validated.type === 'vm' ? 'qemu' : 'lxc';
+    const label = validated.type === 'vm' ? 'VM' : 'LXC';
 
     const result = await client.request(
-      `/nodes/${safeNode}/qemu/${safeVmid}/vncproxy`,
+      `/nodes/${safeNode}/${guestPath}/${safeVmid}/vncproxy`,
       'POST'
     );
 
-    let output = '🖥️ **VM VNC Proxy Ticket**\n\n';
-    output += `• **VM ID**: ${safeVmid}\n`;
+    let output = `🖥️ **${label} VNC Proxy Ticket**\n\n`;
+    output += `• **${validated.type === 'vm' ? 'VM' : 'Container'} ID**: ${safeVmid}\n`;
     output += `• **Node**: ${safeNode}`;
     output += formatJsonBlock(result ?? {});
 
     return formatToolResponse(output);
   } catch (error) {
-    return formatErrorResponse(error as Error, 'Get VM VNC Proxy');
+    return formatErrorResponse(error as Error, 'Get VNC Proxy');
   }
 }
 
-/**
- * Get SPICE proxy ticket for a QEMU VM.
- */
+export async function handleConsoleTerm(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: ConsoleTermInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'get terminal proxy ticket');
+
+    const validated = consoleTermSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+    const guestPath = validated.type === 'vm' ? 'qemu' : 'lxc';
+    const label = validated.type === 'vm' ? 'VM' : 'LXC';
+
+    const result = await client.request(
+      `/nodes/${safeNode}/${guestPath}/${safeVmid}/termproxy`,
+      'POST'
+    );
+
+    let output = `⌨️ **${label} Terminal Proxy Ticket**\n\n`;
+    output += `• **${validated.type === 'vm' ? 'VM' : 'Container'} ID**: ${safeVmid}\n`;
+    output += `• **Node**: ${safeNode}`;
+    output += formatJsonBlock(result ?? {});
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Get Terminal Proxy');
+  }
+}
+
 export async function getSpiceProxy(
   client: ProxmoxApiClient,
   config: Config,
@@ -82,98 +104,5 @@ export async function getSpiceProxy(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Get VM SPICE Proxy');
-  }
-}
-
-/**
- * Get terminal proxy ticket for a QEMU VM.
- */
-export async function getTermProxy(
-  client: ProxmoxApiClient,
-  config: Config,
-  input: GetTermProxyInput
-): Promise<ToolResponse> {
-  try {
-    requireElevated(config, 'get VM terminal proxy ticket');
-
-    const validated = getTermProxySchema.parse(input);
-    const safeNode = validateNodeName(validated.node);
-    const safeVmid = validateVMID(validated.vmid);
-
-    const result = await client.request(
-      `/nodes/${safeNode}/qemu/${safeVmid}/termproxy`,
-      'POST'
-    );
-
-    let output = '⌨️ **VM Terminal Proxy Ticket**\n\n';
-    output += `• **VM ID**: ${safeVmid}\n`;
-    output += `• **Node**: ${safeNode}`;
-    output += formatJsonBlock(result ?? {});
-
-    return formatToolResponse(output);
-  } catch (error) {
-    return formatErrorResponse(error as Error, 'Get VM Terminal Proxy');
-  }
-}
-
-/**
- * Get VNC proxy ticket for an LXC container.
- */
-export async function getLxcVncProxy(
-  client: ProxmoxApiClient,
-  config: Config,
-  input: GetLxcVncProxyInput
-): Promise<ToolResponse> {
-  try {
-    requireElevated(config, 'get LXC VNC proxy ticket');
-
-    const validated = getLxcVncProxySchema.parse(input);
-    const safeNode = validateNodeName(validated.node);
-    const safeVmid = validateVMID(validated.vmid);
-
-    const result = await client.request(
-      `/nodes/${safeNode}/lxc/${safeVmid}/vncproxy`,
-      'POST'
-    );
-
-    let output = '🖥️ **LXC VNC Proxy Ticket**\n\n';
-    output += `• **Container ID**: ${safeVmid}\n`;
-    output += `• **Node**: ${safeNode}`;
-    output += formatJsonBlock(result ?? {});
-
-    return formatToolResponse(output);
-  } catch (error) {
-    return formatErrorResponse(error as Error, 'Get LXC VNC Proxy');
-  }
-}
-
-/**
- * Get terminal proxy ticket for an LXC container.
- */
-export async function getLxcTermProxy(
-  client: ProxmoxApiClient,
-  config: Config,
-  input: GetLxcTermProxyInput
-): Promise<ToolResponse> {
-  try {
-    requireElevated(config, 'get LXC terminal proxy ticket');
-
-    const validated = getLxcTermProxySchema.parse(input);
-    const safeNode = validateNodeName(validated.node);
-    const safeVmid = validateVMID(validated.vmid);
-
-    const result = await client.request(
-      `/nodes/${safeNode}/lxc/${safeVmid}/termproxy`,
-      'POST'
-    );
-
-    let output = '⌨️ **LXC Terminal Proxy Ticket**\n\n';
-    output += `• **Container ID**: ${safeVmid}\n`;
-    output += `• **Node**: ${safeNode}`;
-    output += formatJsonBlock(result ?? {});
-
-    return formatToolResponse(output);
-  } catch (error) {
-    return formatErrorResponse(error as Error, 'Get LXC Terminal Proxy');
   }
 }

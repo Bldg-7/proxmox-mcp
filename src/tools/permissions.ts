@@ -306,4 +306,48 @@ export const toolPermissions: ToolPermissions = {
   proxmox_wipe_disk: {
     elevated: 'elevated',
   },
+  proxmox_console_vnc: {
+    elevated: 'elevated',
+  },
+  proxmox_console_term: {
+    elevated: 'elevated',
+  },
+  proxmox_get_spice_proxy: {
+    elevated: 'elevated',
+  },
+  proxmox_cloudinit: {
+    get: 'basic',
+    dump: 'basic',
+    regenerate: 'elevated',
+  },
+  proxmox_certificate: {
+    list: 'basic',
+    upload: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_acme_cert: {
+    order: 'elevated',
+    renew: 'elevated',
+    revoke: 'elevated',
+    config: 'basic',
+  },
+  proxmox_acme_account: {
+    list: 'basic',
+    get: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_acme_info: {
+    list_plugins: 'basic',
+    get_plugin: 'basic',
+    directories: 'basic',
+  },
+  proxmox_notification: {
+    list: 'basic',
+    get: 'basic',
+    create: 'elevated',
+    delete: 'elevated',
+    test: 'elevated',
+  },
 };

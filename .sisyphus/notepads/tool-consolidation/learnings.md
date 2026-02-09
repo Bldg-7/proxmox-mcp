@@ -138,3 +138,32 @@
 - All agent operations now require elevated permissions as specified
 - Updated user-facing message from `proxmox_agent_exec_status` to `proxmox_agent_exec with operation=status`
 - Old schemas/handlers kept in place (not deleted) since they're used by the consolidated dispatchers
+
+## Wave 4 - Task 13: Console, Cloud-Init, Cert, ACME, Notification Consolidation
+
+**Date**: 2026-02-10
+**Tools consolidated**: 28 → 9 (net -19)
+**Tool count**: 150 → 131
+
+### Consolidation Mapping
+- Console VNC: 2→1 (`proxmox_console_vnc` with type=vm|lxc)
+- Console Term: 2→1 (`proxmox_console_term` with type=vm|lxc)
+- SPICE: kept as singleton (VM only)
+- Cloud-Init: 3→1 (`proxmox_cloudinit` with action=get|dump|regenerate)
+- Certificate: 7→2 (`proxmox_certificate` 3 actions + `proxmox_acme_cert` 4 actions)
+- ACME: 8→2 (`proxmox_acme_account` 5 actions + `proxmox_acme_info` 3 actions)
+- Notification: 5→1 (`proxmox_notification` with 5 actions)
+
+### Patterns
+- Console tools use **type parameter** (vm/lxc) for guestPath dispatch
+- All others use **action discriminated union** pattern
+- 6-action limit respected: largest tool has 5 actions
+- Cloud-init `dump` action uses `dump_type` field (not `type`) to avoid conflict with guest type
+- Notification uses `target_type` field (not `type`) for endpoint type discrimination
+- Old test files at `src/tools/*.test.ts` must be deleted (not in `__tests__/` dir)
+
+### Verification
+- `pnpm build` → exit 0 (zero TS errors)
+- `pnpm test` → 1057 tests pass, 39 test files, 0 failures
+- Zero old tool name references in src/
+- LSP diagnostics clean on all modified files

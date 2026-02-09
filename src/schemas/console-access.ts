@@ -5,22 +5,15 @@ const baseConsoleSchema = z.object({
   vmid: z.coerce.number().describe('VM or container ID'),
 });
 
-// proxmox_get_vnc_proxy - Get VNC proxy ticket for a QEMU VM
-export const getVncProxySchema = baseConsoleSchema;
-export type GetVncProxyInput = z.input<typeof getVncProxySchema>;
+export const consoleVncSchema = baseConsoleSchema.extend({
+  type: z.enum(['vm', 'lxc']).describe('Guest type: vm or lxc'),
+});
+export type ConsoleVncInput = z.input<typeof consoleVncSchema>;
 
-// proxmox_get_spice_proxy - Get SPICE proxy ticket for a QEMU VM
+export const consoleTermSchema = baseConsoleSchema.extend({
+  type: z.enum(['vm', 'lxc']).describe('Guest type: vm or lxc'),
+});
+export type ConsoleTermInput = z.input<typeof consoleTermSchema>;
+
 export const getSpiceProxySchema = baseConsoleSchema;
 export type GetSpiceProxyInput = z.input<typeof getSpiceProxySchema>;
-
-// proxmox_get_term_proxy - Get terminal proxy ticket for a QEMU VM
-export const getTermProxySchema = baseConsoleSchema;
-export type GetTermProxyInput = z.input<typeof getTermProxySchema>;
-
-// proxmox_get_lxc_vnc_proxy - Get VNC proxy ticket for an LXC container
-export const getLxcVncProxySchema = baseConsoleSchema;
-export type GetLxcVncProxyInput = z.input<typeof getLxcVncProxySchema>;
-
-// proxmox_get_lxc_term_proxy - Get terminal proxy ticket for an LXC container
-export const getLxcTermProxySchema = baseConsoleSchema;
-export type GetLxcTermProxyInput = z.input<typeof getLxcTermProxySchema>;
