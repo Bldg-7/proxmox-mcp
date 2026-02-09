@@ -154,4 +154,52 @@ export const toolPermissions: ToolPermissions = {
     update: 'elevated',
     delete: 'elevated',
   },
+  proxmox_storage_config: {
+    list: 'basic',
+    get: 'basic',
+    cluster_usage: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_storage_content: {
+    list: 'basic',
+    list_templates: 'basic',
+    upload: 'elevated',
+    download_url: 'elevated',
+    delete: 'elevated',
+    prune: 'elevated',
+  },
+  proxmox_pool: {
+    list: 'basic',
+    get: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_ceph_osd: {
+    list: 'basic',
+    create: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_ceph_mon: {
+    list: 'basic',
+    create: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_ceph_mds: {
+    list: 'basic',
+    create: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_ceph_pool: {
+    list: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_ceph_fs: {
+    list: 'basic',
+    create: 'elevated',
+  },
 };

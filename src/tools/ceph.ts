@@ -40,6 +40,11 @@ import type {
   ListCephFsInput,
   CreateCephFsInput,
   CephToolInput,
+  CephOsdToolInput,
+  CephMonToolInput,
+  CephMdsToolInput,
+  CephPoolToolInput,
+  CephFsToolInput,
 } from '../schemas/ceph.js';
 
 function validateCephIdentifier(value: string, label: string): string {
@@ -666,5 +671,90 @@ export async function handleCephTool(
       return getCephStatus(client, config, input);
     default:
       throw new Error(`Unknown ceph action: ${(input as { action: string }).action}`);
+  }
+}
+
+export async function handleCephOsdTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CephOsdToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return listCephOsds(client, config, input);
+    case 'create':
+      return createCephOsd(client, config, input);
+    case 'delete':
+      return deleteCephOsd(client, config, input);
+    default:
+      throw new Error(`Unknown ceph_osd action: ${(input as { action: string }).action}`);
+  }
+}
+
+export async function handleCephMonTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CephMonToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return listCephMons(client, config, input);
+    case 'create':
+      return createCephMon(client, config, input);
+    case 'delete':
+      return deleteCephMon(client, config, input);
+    default:
+      throw new Error(`Unknown ceph_mon action: ${(input as { action: string }).action}`);
+  }
+}
+
+export async function handleCephMdsTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CephMdsToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return listCephMds(client, config, input);
+    case 'create':
+      return createCephMds(client, config, input);
+    case 'delete':
+      return deleteCephMds(client, config, input);
+    default:
+      throw new Error(`Unknown ceph_mds action: ${(input as { action: string }).action}`);
+  }
+}
+
+export async function handleCephPoolTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CephPoolToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return listCephPools(client, config, input);
+    case 'create':
+      return createCephPool(client, config, input);
+    case 'update':
+      return updateCephPool(client, config, input);
+    case 'delete':
+      return deleteCephPool(client, config, input);
+    default:
+      throw new Error(`Unknown ceph_pool action: ${(input as { action: string }).action}`);
+  }
+}
+
+export async function handleCephFsTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CephFsToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return listCephFs(client, config, input);
+    case 'create':
+      return createCephFs(client, config, input);
+    default:
+      throw new Error(`Unknown ceph_fs action: ${(input as { action: string }).action}`);
   }
 }

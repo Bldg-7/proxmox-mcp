@@ -36,3 +36,32 @@ export const deletePoolSchema = z.object({
 });
 
 export type DeletePoolInput = z.input<typeof deletePoolSchema>;
+
+// ── Consolidated: proxmox_pool ──────────────────────────────────────
+export const poolToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('list'),
+  }),
+  z.object({
+    action: z.literal('get'),
+    poolid: z.string().min(1).describe('Pool identifier'),
+  }),
+  z.object({
+    action: z.literal('create'),
+    poolid: z.string().min(1).describe('Pool identifier'),
+    comment: z.string().optional().describe('Pool description'),
+  }),
+  z.object({
+    action: z.literal('update'),
+    poolid: z.string().min(1).describe('Pool identifier'),
+    comment: z.string().optional().describe('Updated pool description'),
+    delete: z.string().optional().describe('List of settings to delete'),
+    digest: z.string().max(64).optional().describe('Config digest'),
+  }),
+  z.object({
+    action: z.literal('delete'),
+    poolid: z.string().min(1).describe('Pool identifier'),
+  }),
+]);
+
+export type PoolToolInput = z.input<typeof poolToolSchema>;

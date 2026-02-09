@@ -63,3 +63,23 @@
 - Net result: 242 → 223 tools (removed 25 old access control tools, added 6 new consolidated tools = net -19).
 - All 935 tests pass, build succeeds with zero TypeScript errors.
 - No old tool names remain in src/ (only in schema comments documenting original names).
+
+## Task 7 (Wave 2) - Storage/Pool/Ceph CRUD Consolidation
+
+- Consolidated 32 Storage/Pool/Ceph tools into 8 consolidated tools (+ kept 2 file_restore tools unchanged):
+  - `proxmox_storage_config` (6 actions): list/get/create/update/delete/cluster_usage
+  - `proxmox_storage_content` (6 actions): list/list_templates/upload/download_url/delete/prune
+  - `proxmox_pool` (5 actions): list/get/create/update/delete
+  - `proxmox_ceph_osd` (3 actions): list/create/delete
+  - `proxmox_ceph_mon` (3 actions): list/create/delete
+  - `proxmox_ceph_mds` (3 actions): list/create/delete
+  - `proxmox_ceph_pool` (4 actions): list/create/update/delete
+  - `proxmox_ceph_fs` (2 actions): list/create
+- Extended Task 3's `proxmox_ceph` (action=status) without modification — new tools are separate resources (`ceph_osd`, `ceph_mon`, etc.).
+- `storage_config:cluster_usage` delegates to existing `getStorage` in vm-query.ts via dynamic import to avoid circular dependency.
+- `storage_content:list_templates` delegates to existing `listTemplates` in vm-create.ts via dynamic import.
+- `proxmox_list_file_restore` and `proxmox_download_file_restore` kept as-is (not in consolidated scope per mapping table — they map to `proxmox_file_restore` in a different consolidation task).
+- Pool handlers live in pool-management.ts but the consolidated `handlePoolTool` dispatcher is in storage-management.ts (cross-imports from pool-management.ts).
+- Net result: 223 → 201 tools (removed 32 old tools, added 10 new consolidated tools = net -22).
+- All 983 tests pass, build succeeds with zero TypeScript errors.
+- Permission map populated for all 8 new tools following established patterns.

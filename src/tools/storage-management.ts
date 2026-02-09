@@ -31,7 +31,17 @@ import type {
   ListFileRestoreInput,
   DownloadFileRestoreInput,
   PruneBackupsInput,
+  StorageConfigToolInput,
+  StorageContentToolInput,
 } from '../schemas/storage-management.js';
+import type { PoolToolInput } from '../schemas/pool-management.js';
+import {
+  listPools,
+  getPool,
+  createPool,
+  updatePool,
+  deletePool,
+} from './pool-management.js';
 
 interface StorageContentEntry {
   volid?: string;
@@ -559,5 +569,76 @@ export async function pruneBackups(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Prune Backups');
+  }
+}
+
+export async function handleStorageConfigTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: StorageConfigToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return listStorageConfig(client, config, input);
+    case 'get':
+      return getStorageConfig(client, config, input);
+    case 'cluster_usage': {
+      const { getStorage } = await import('./vm-query.js');
+      return getStorage(client, config, input);
+    }
+    case 'create':
+      return createStorage(client, config, input);
+    case 'update':
+      return updateStorage(client, config, input);
+    case 'delete':
+      return deleteStorage(client, config, input);
+    default:
+      throw new Error(`Unknown storage_config action: ${(input as { action: string }).action}`);
+  }
+}
+
+export async function handleStorageContentTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: StorageContentToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return listStorageContent(client, config, input);
+    case 'list_templates': {
+      const { listTemplates } = await import('./vm-create.js');
+      return listTemplates(client, config, input);
+    }
+    case 'upload':
+      return uploadToStorage(client, config, input);
+    case 'download_url':
+      return downloadUrlToStorage(client, config, input);
+    case 'delete':
+      return deleteStorageContent(client, config, input);
+    case 'prune':
+      return pruneBackups(client, config, input);
+    default:
+      throw new Error(`Unknown storage_content action: ${(input as { action: string }).action}`);
+  }
+}
+
+export async function handlePoolTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: PoolToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return listPools(client, config, input);
+    case 'get':
+      return getPool(client, config, input);
+    case 'create':
+      return createPool(client, config, input);
+    case 'update':
+      return updatePool(client, config, input);
+    case 'delete':
+      return deletePool(client, config, input);
+    default:
+      throw new Error(`Unknown pool action: ${(input as { action: string }).action}`);
   }
 }

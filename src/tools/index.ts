@@ -161,6 +161,9 @@ export {
   listFileRestore,
   downloadFileRestore,
   pruneBackups,
+  handleStorageConfigTool,
+  handleStorageContentTool,
+  handlePoolTool,
 } from './storage-management.js';
 
 // Ceph Integration tools
@@ -182,6 +185,11 @@ export {
   deleteCephPool,
   listCephFs,
   createCephFs,
+  handleCephOsdTool,
+  handleCephMonTool,
+  handleCephMdsTool,
+  handleCephPoolTool,
+  handleCephFsTool,
 } from './ceph.js';
 
 // Console Access tools

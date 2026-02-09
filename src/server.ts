@@ -74,45 +74,22 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_domain: 'Manage authentication domains (list, get, create, update, delete)',
   proxmox_user_token: 'Manage user API tokens (list, get, create, update, delete)',
 
-  // Pool Management
-  proxmox_list_pools: 'List resource pools',
-  proxmox_get_pool: 'Get a resource pool by ID',
-  proxmox_create_pool: 'Create a resource pool (requires elevated permissions)',
-  proxmox_update_pool: 'Update a resource pool (requires elevated permissions)',
-  proxmox_delete_pool: 'Delete a resource pool (requires elevated permissions)',
+  // Pool Management (consolidated)
+  proxmox_pool: 'Manage resource pools (list, get, create, update, delete)',
 
-  // Storage Management
-  proxmox_list_storage_config: 'List storage configurations available in Proxmox',
-  proxmox_get_storage_config: 'Get a storage configuration by name',
-  proxmox_create_storage: 'Create a storage configuration (requires elevated permissions)',
-  proxmox_update_storage: 'Update a storage configuration (requires elevated permissions)',
-  proxmox_delete_storage: 'Delete a storage configuration (requires elevated permissions)',
-  proxmox_upload_to_storage: 'Upload ISO/template to storage (requires elevated permissions)',
-  proxmox_download_url_to_storage:
-    'Download a file from URL to storage (requires elevated permissions)',
-  proxmox_list_storage_content: 'List content stored on a storage',
-  proxmox_delete_storage_content: 'Delete content from storage (requires elevated permissions)',
+  // Storage Management (consolidated)
+  proxmox_storage_config: 'Manage storage configurations (list, get, create, update, delete, cluster_usage)',
+  proxmox_storage_content: 'Manage storage content (list, list_templates, upload, download_url, delete, prune)',
   proxmox_list_file_restore: 'List files in a backup for restore',
   proxmox_download_file_restore: 'Download a file from backup',
-  proxmox_prune_backups: 'Prune old backups from storage (requires elevated permissions)',
 
   // Ceph Integration (consolidated)
   proxmox_ceph: 'Query Ceph cluster. action=status: get Ceph cluster health, FSID, monitors, OSDs, and placement groups',
-  proxmox_list_ceph_osds: 'List Ceph OSDs',
-  proxmox_create_ceph_osd: 'Create a Ceph OSD (requires elevated permissions)',
-  proxmox_delete_ceph_osd: 'Delete a Ceph OSD (requires elevated permissions)',
-  proxmox_list_ceph_mons: 'List Ceph monitors',
-  proxmox_create_ceph_mon: 'Create a Ceph monitor (requires elevated permissions)',
-  proxmox_delete_ceph_mon: 'Delete a Ceph monitor (requires elevated permissions)',
-  proxmox_list_ceph_mds: 'List Ceph MDS daemons',
-  proxmox_create_ceph_mds: 'Create a Ceph MDS daemon (requires elevated permissions)',
-  proxmox_delete_ceph_mds: 'Delete a Ceph MDS daemon (requires elevated permissions)',
-  proxmox_list_ceph_pools: 'List Ceph pools',
-  proxmox_create_ceph_pool: 'Create a Ceph pool (requires elevated permissions)',
-  proxmox_update_ceph_pool: 'Update a Ceph pool (requires elevated permissions)',
-  proxmox_delete_ceph_pool: 'Delete a Ceph pool (requires elevated permissions)',
-  proxmox_list_ceph_fs: 'List Ceph filesystems',
-  proxmox_create_ceph_fs: 'Create a Ceph filesystem (requires elevated permissions)',
+  proxmox_ceph_osd: 'Manage Ceph OSDs (list, create, delete)',
+  proxmox_ceph_mon: 'Manage Ceph monitors (list, create, delete)',
+  proxmox_ceph_mds: 'Manage Ceph MDS daemons (list, create, delete)',
+  proxmox_ceph_pool: 'Manage Ceph pools (list, create, update, delete)',
+  proxmox_ceph_fs: 'Manage Ceph filesystems (list, create)',
 
   // Console Access
   proxmox_get_vnc_proxy: 'Get a VNC proxy ticket for a QEMU VM (requires elevated permissions)',

@@ -155,7 +155,124 @@ export const cephToolSchema = z.discriminatedUnion('action', [
     action: z.literal('status'),
     node: z.string().min(1).describe('Node name'),
   }),
-  // More actions will be added in Task 7 (Wave 2 - CRUD consolidation)
 ]);
 
 export type CephToolInput = z.input<typeof cephToolSchema>;
+
+// ── Consolidated: proxmox_ceph_osd ──────────────────────────────────────
+export const cephOsdToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('list'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('create'),
+    node: z.string().min(1).describe('Node name'),
+    dev: z.string().min(1).describe('OSD device path (e.g., /dev/sdb)'),
+    osdid: z.coerce.number().int().min(0).optional().describe('Optional OSD ID'),
+    dbdev: z.string().optional().describe('Optional DB device path'),
+    waldev: z.string().optional().describe('Optional WAL device path'),
+    ['crush-device-class']: z.string().optional().describe('CRUSH device class (e.g., hdd, ssd)'),
+    encrypted: z.boolean().optional().describe('Enable dm-crypt encryption'),
+  }),
+  z.object({
+    action: z.literal('delete'),
+    node: z.string().min(1).describe('Node name'),
+    id: z.coerce.number().int().min(0).describe('OSD ID'),
+  }),
+]);
+
+export type CephOsdToolInput = z.input<typeof cephOsdToolSchema>;
+
+// ── Consolidated: proxmox_ceph_mon ──────────────────────────────────────
+export const cephMonToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('list'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('create'),
+    node: z.string().min(1).describe('Node name'),
+    monid: cephNameSchema.describe('Monitor ID'),
+  }),
+  z.object({
+    action: z.literal('delete'),
+    node: z.string().min(1).describe('Node name'),
+    monid: cephNameSchema.describe('Monitor ID'),
+  }),
+]);
+
+export type CephMonToolInput = z.input<typeof cephMonToolSchema>;
+
+// ── Consolidated: proxmox_ceph_mds ──────────────────────────────────────
+export const cephMdsToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('list'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('create'),
+    node: z.string().min(1).describe('Node name'),
+    name: cephNameSchema.describe('MDS daemon name'),
+  }),
+  z.object({
+    action: z.literal('delete'),
+    node: z.string().min(1).describe('Node name'),
+    name: cephNameSchema.describe('MDS daemon name'),
+  }),
+]);
+
+export type CephMdsToolInput = z.input<typeof cephMdsToolSchema>;
+
+// ── Consolidated: proxmox_ceph_pool ──────────────────────────────────────
+export const cephPoolToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('list'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('create'),
+    node: z.string().min(1).describe('Node name'),
+    name: cephNameSchema.describe('Pool name'),
+    pg_num: z.coerce.number().int().min(1).optional().describe('Placement group count'),
+    size: z.coerce.number().int().min(1).optional().describe('Replication size'),
+    min_size: z.coerce.number().int().min(1).optional().describe('Minimum replication size'),
+    crush_rule: z.string().optional().describe('CRUSH rule name'),
+    ['pg_autoscale_mode']: z.string().optional().describe('PG autoscale mode (e.g., on, off, warn)'),
+  }),
+  z.object({
+    action: z.literal('update'),
+    node: z.string().min(1).describe('Node name'),
+    name: cephNameSchema.describe('Pool name'),
+    pg_num: z.coerce.number().int().min(1).optional().describe('Placement group count'),
+    size: z.coerce.number().int().min(1).optional().describe('Replication size'),
+    min_size: z.coerce.number().int().min(1).optional().describe('Minimum replication size'),
+    crush_rule: z.string().optional().describe('CRUSH rule name'),
+    ['pg_autoscale_mode']: z.string().optional().describe('PG autoscale mode (e.g., on, off, warn)'),
+  }),
+  z.object({
+    action: z.literal('delete'),
+    node: z.string().min(1).describe('Node name'),
+    name: cephNameSchema.describe('Pool name'),
+  }),
+]);
+
+export type CephPoolToolInput = z.input<typeof cephPoolToolSchema>;
+
+// ── Consolidated: proxmox_ceph_fs ──────────────────────────────────────
+export const cephFsToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('list'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('create'),
+    node: z.string().min(1).describe('Node name'),
+    name: cephNameSchema.describe('CephFS name'),
+    pool: z.string().optional().describe('Primary data pool name'),
+    data_pool: z.string().optional().describe('Data pool name'),
+    metadata_pool: z.string().optional().describe('Metadata pool name'),
+  }),
+]);
+
+export type CephFsToolInput = z.input<typeof cephFsToolSchema>;
