@@ -202,6 +202,8 @@ export const TOOL_NAMES = [
   'proxmox_clone_vm',
   'proxmox_resize_lxc',
   'proxmox_resize_vm',
+  'proxmox_update_vm_config',
+  'proxmox_update_lxc_config',
   'proxmox_migrate_vm',
   'proxmox_migrate_lxc',
   'proxmox_create_template_vm',

@@ -263,6 +263,8 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_clone_vm: 'Clone a QEMU virtual machine (requires elevated permissions)',
   proxmox_resize_lxc: 'Resize an LXC container CPU/memory (requires elevated permissions)',
   proxmox_resize_vm: 'Resize a QEMU VM CPU/memory (requires elevated permissions)',
+  proxmox_update_vm_config: 'Update QEMU VM configuration with arbitrary key-value pairs (requires elevated permissions)',
+  proxmox_update_lxc_config: 'Update LXC container configuration with arbitrary key-value pairs (requires elevated permissions)',
 
   // VM/LXC Advanced
   proxmox_migrate_vm: 'Migrate a QEMU VM to another node (requires elevated permissions)',

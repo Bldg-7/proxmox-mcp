@@ -204,6 +204,8 @@ import {
   cloneVM,
   resizeLxc,
   resizeVM,
+  updateVmConfig,
+  updateLxcConfig,
   migrateVm,
   migrateLxc,
   createTemplateVm,
@@ -533,6 +535,8 @@ import {
   cloneVmSchema,
   resizeLxcSchema,
   resizeVmSchema,
+  updateVmConfigSchema,
+  updateLxcConfigSchema,
   executeVmCommandSchema,
   listTemplatesSchema,
   createLxcSchema,
@@ -1099,6 +1103,8 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_clone_vm: { handler: cloneVM, schema: cloneVmSchema },
   proxmox_resize_lxc: { handler: resizeLxc, schema: resizeLxcSchema },
   proxmox_resize_vm: { handler: resizeVM, schema: resizeVmSchema },
+  proxmox_update_vm_config: { handler: updateVmConfig, schema: updateVmConfigSchema },
+  proxmox_update_lxc_config: { handler: updateLxcConfig, schema: updateLxcConfigSchema },
 
   // VM/LXC Advanced
   proxmox_migrate_vm: { handler: migrateVm, schema: migrateVmSchema },
@@ -1266,8 +1272,8 @@ export function getToolHandler(toolName: ToolName): ToolRegistryEntry | undefine
 
 // Validate all 307 tools are registered
 const registeredCount = Object.keys(toolRegistry).length;
-if (registeredCount !== 307) {
+if (registeredCount !== 309) {
    throw new Error(
-     `Tool registry incomplete: expected 307 tools, got ${registeredCount}`
+     `Tool registry incomplete: expected 309 tools, got ${registeredCount}`
    );
 }

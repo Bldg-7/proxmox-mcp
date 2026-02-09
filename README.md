@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-A comprehensive MCP server providing 307 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
+A comprehensive MCP server providing 309 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
 
 ## Credits & Background
 
@@ -30,13 +30,13 @@ This project is a TypeScript rewrite of [mcp-proxmox-server](https://github.com/
 
 **Developer Experience**:
 - `npx @bldg-7/proxmox-mcp` just works
-- All 307 tool descriptions exposed via MCP `ListTools`
+- All 309 tool descriptions exposed via MCP `ListTools`
 - Rate limiter middleware included
 - Pino structured logging instead of `console.log`
 
 ## Features
 
-- **307 comprehensive tools** for Proxmox management
+- **309 comprehensive tools** for Proxmox management
 - **Full TypeScript implementation** with strict type safety
 - **Support for both QEMU VMs and LXC containers**
 - **Secure authentication** (API token)
@@ -125,7 +125,7 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
 
 ## Available Tools
 
-This server provides **307 comprehensive tools** for Proxmox management:
+This server provides **309 comprehensive tools** for Proxmox management:
 
 | Category | Tools | Permission |
 |----------|-------|------------|
@@ -153,7 +153,7 @@ This server provides **307 comprehensive tools** for Proxmox management:
 | Certificates | 7 | Mixed |
 | ACME | 8 | Mixed |
 | Notifications | 5 | Mixed |
-| **Total** | **307** | |
+| **Total** | **309** | |
 
 📖 **[Full Tools Reference →](docs/TOOLS.md)**
 
@@ -165,7 +165,7 @@ This package includes **Agent Skills** - AI-optimized documentation that teaches
 
 | Skill | Description | Tools/Topics |
 |-------|-------------|--------------|
-| **proxmox-mcp-tools** | Complete MCP tool reference for Proxmox VE | 307 tools across 14 domains (VMs, LXC, cluster, storage, networking, Ceph, certificates, ACME, notifications) |
+| **proxmox-mcp-tools** | Complete MCP tool reference for Proxmox VE | 309 tools across 14 domains (VMs, LXC, cluster, storage, networking, Ceph, certificates, ACME, notifications) |
 | **proxmox-admin** | Operational expertise for Proxmox infrastructure | VM lifecycle, storage management, HA configuration, troubleshooting |
 
 ### Installation
@@ -233,7 +233,7 @@ Agent combines tool knowledge + operational expertise:
 ### Skill Contents
 
 **proxmox-mcp-tools** — Tool Reference:
-- 307 tools organized into 14 domains (VMs, LXC, cluster, storage, networking, Ceph, access control, pools, certificates, ACME, notifications)
+- 309 tools organized into 14 domains (VMs, LXC, cluster, storage, networking, Ceph, access control, pools, certificates, ACME, notifications)
 - Parameters, types, and descriptions for every tool
 - Permission levels (basic vs elevated 🔒)
 - Common workflow patterns (create VM, backup/restore, clone, migrate)

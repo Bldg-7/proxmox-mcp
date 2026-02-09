@@ -232,7 +232,7 @@ export {
   pauseVM,
   resumeVM,
 } from './vm-lifecycle.js';
-export { cloneLxc, cloneVM, resizeLxc, resizeVM } from './vm-modify.js';
+export { cloneLxc, cloneVM, resizeLxc, resizeVM, updateVmConfig, updateLxcConfig } from './vm-modify.js';
 
 // VM/LXC Advanced tools
 export {

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createMockProxmoxClient, createTestConfig } from '../__test-utils__/index.js';
-import { cloneLxc, cloneVM, resizeLxc, resizeVM } from './vm-modify.js';
+import { cloneLxc, cloneVM, resizeLxc, resizeVM, updateVmConfig, updateLxcConfig } from './vm-modify.js';
 
 describe('VM Modify Tools', () => {
   let client: ReturnType<typeof createMockProxmoxClient>;
@@ -456,6 +456,205 @@ describe('VM Modify Tools', () => {
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain('❌');
       expect(result.content[0].text).toContain('VM is running');
+    });
+  });
+
+  describe('updateVmConfig', () => {
+    it('requires elevated permissions', async () => {
+      const config = createTestConfig({ allowElevated: false });
+
+      const result = await updateVmConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        config: { boot: 'order=scsi0' },
+      });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Permission denied');
+    });
+
+    it('updates VM config with params', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue(null);
+
+      const result = await updateVmConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        config: { boot: 'order=scsi0', agent: '1' },
+      });
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('🔧');
+      expect(result.content[0].text).toContain('VM Configuration Updated');
+      expect(result.content[0].text).toContain('`boot`');
+      expect(result.content[0].text).toContain('order=scsi0');
+      expect(result.content[0].text).toContain('`agent`');
+      expect(client.request).toHaveBeenCalledWith(
+        '/nodes/pve1/qemu/100/config',
+        'PUT',
+        { boot: 'order=scsi0', agent: '1' }
+      );
+    });
+
+    it('supports delete parameter', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue(null);
+
+      const result = await updateVmConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        delete: 'ciuser,cipassword',
+      });
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('Parameters Removed');
+      expect(result.content[0].text).toContain('ciuser,cipassword');
+      expect(client.request).toHaveBeenCalledWith(
+        '/nodes/pve1/qemu/100/config',
+        'PUT',
+        { delete: 'ciuser,cipassword' }
+      );
+    });
+
+    it('rejects when no config or delete provided', async () => {
+      const config = createTestConfig({ allowElevated: true });
+
+      const result = await updateVmConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+      });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('At least one');
+    });
+
+    it('masks password values in output', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue(null);
+
+      const result = await updateVmConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        config: { cipassword: 'supersecret', ciuser: 'admin' },
+      });
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('***');
+      expect(result.content[0].text).not.toContain('supersecret');
+      expect(result.content[0].text).toContain('admin');
+    });
+
+    it('handles API errors', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockRejectedValue(new Error('Parameter verification failed'));
+
+      const result = await updateVmConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        config: { invalid_param: 'value' },
+      });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Parameter verification failed');
+    });
+  });
+
+  describe('updateLxcConfig', () => {
+    it('requires elevated permissions', async () => {
+      const config = createTestConfig({ allowElevated: false });
+
+      const result = await updateLxcConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        config: { hostname: 'new-name' },
+      });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Permission denied');
+    });
+
+    it('updates LXC config with params', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue(null);
+
+      const result = await updateLxcConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        config: { hostname: 'new-name', memory: 2048 },
+      });
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('🔧');
+      expect(result.content[0].text).toContain('Container Configuration Updated');
+      expect(result.content[0].text).toContain('`hostname`');
+      expect(result.content[0].text).toContain('new-name');
+      expect(client.request).toHaveBeenCalledWith(
+        '/nodes/pve1/lxc/100/config',
+        'PUT',
+        { hostname: 'new-name', memory: 2048 }
+      );
+    });
+
+    it('supports delete parameter', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue(null);
+
+      const result = await updateLxcConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        delete: 'mp0,nameserver',
+      });
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('Parameters Removed');
+      expect(result.content[0].text).toContain('mp0,nameserver');
+      expect(client.request).toHaveBeenCalledWith(
+        '/nodes/pve1/lxc/100/config',
+        'PUT',
+        { delete: 'mp0,nameserver' }
+      );
+    });
+
+    it('rejects when no config or delete provided', async () => {
+      const config = createTestConfig({ allowElevated: true });
+
+      const result = await updateLxcConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+      });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('At least one');
+    });
+
+    it('masks password values in output', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockResolvedValue(null);
+
+      const result = await updateLxcConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        config: { password: 'topsecret', hostname: 'myhost' },
+      });
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('***');
+      expect(result.content[0].text).not.toContain('topsecret');
+      expect(result.content[0].text).toContain('myhost');
+    });
+
+    it('handles API errors', async () => {
+      const config = createTestConfig({ allowElevated: true });
+      client.request.mockRejectedValue(new Error('Container is locked'));
+
+      const result = await updateLxcConfig(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        config: { hostname: 'test' },
+      });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('Container is locked');
     });
   });
 });

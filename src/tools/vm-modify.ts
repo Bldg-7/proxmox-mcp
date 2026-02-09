@@ -12,12 +12,16 @@ import {
   cloneVmSchema,
   resizeLxcSchema,
   resizeVmSchema,
+  updateVmConfigSchema,
+  updateLxcConfigSchema,
 } from '../schemas/vm.js';
 import type {
   CloneLxcInput,
   CloneVmInput,
   ResizeLxcInput,
   ResizeVmInput,
+  UpdateVmConfigInput,
+  UpdateLxcConfigInput,
 } from '../schemas/vm.js';
 
 /**
@@ -229,5 +233,125 @@ export async function resizeVM(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Resize QEMU VM');
+  }
+}
+
+/**
+ * Update QEMU VM configuration with arbitrary key-value pairs
+ * Requires elevated permissions
+ */
+export async function updateVmConfig(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: UpdateVmConfigInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'update VM configuration');
+    const validated = updateVmConfigSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const body: Record<string, unknown> = {};
+    if (validated.config) {
+      Object.assign(body, validated.config);
+    }
+    if (validated.delete) {
+      body.delete = validated.delete;
+    }
+
+    if (Object.keys(body).length === 0) {
+      return formatErrorResponse(
+        new Error('At least one config parameter or delete must be provided'),
+        'Update VM Config'
+      );
+    }
+
+    await client.request(
+      `/nodes/${safeNode}/qemu/${safeVmid}/config`,
+      'PUT',
+      body
+    );
+
+    let output = `🔧 **VM Configuration Updated**\n\n` +
+      `• **VM ID**: ${safeVmid}\n` +
+      `• **Node**: ${safeNode}\n\n`;
+
+    if (validated.config && Object.keys(validated.config).length > 0) {
+      output += `**Parameters Set**:\n`;
+      for (const [key, value] of Object.entries(validated.config)) {
+        const displayValue = key.toLowerCase().includes('password') ? '***' : String(value);
+        output += `- \`${key}\`: ${displayValue}\n`;
+      }
+    }
+
+    if (validated.delete) {
+      output += `\n**Parameters Removed**: ${validated.delete}\n`;
+    }
+
+    output += `\n**Note**: Some changes may require a VM restart. Use \`proxmox_get_vm_pending\` to check pending changes.`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Update VM Config');
+  }
+}
+
+/**
+ * Update LXC container configuration with arbitrary key-value pairs
+ * Requires elevated permissions
+ */
+export async function updateLxcConfig(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: UpdateLxcConfigInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'update LXC configuration');
+    const validated = updateLxcConfigSchema.parse(input);
+    const safeNode = validateNodeName(validated.node);
+    const safeVmid = validateVMID(validated.vmid);
+
+    const body: Record<string, unknown> = {};
+    if (validated.config) {
+      Object.assign(body, validated.config);
+    }
+    if (validated.delete) {
+      body.delete = validated.delete;
+    }
+
+    if (Object.keys(body).length === 0) {
+      return formatErrorResponse(
+        new Error('At least one config parameter or delete must be provided'),
+        'Update LXC Config'
+      );
+    }
+
+    await client.request(
+      `/nodes/${safeNode}/lxc/${safeVmid}/config`,
+      'PUT',
+      body
+    );
+
+    let output = `🔧 **Container Configuration Updated**\n\n` +
+      `• **Container ID**: ${safeVmid}\n` +
+      `• **Node**: ${safeNode}\n\n`;
+
+    if (validated.config && Object.keys(validated.config).length > 0) {
+      output += `**Parameters Set**:\n`;
+      for (const [key, value] of Object.entries(validated.config)) {
+        const displayValue = key.toLowerCase().includes('password') ? '***' : String(value);
+        output += `- \`${key}\`: ${displayValue}\n`;
+      }
+    }
+
+    if (validated.delete) {
+      output += `\n**Parameters Removed**: ${validated.delete}\n`;
+    }
+
+    output += `\n**Note**: Some changes may require a container restart. Use \`proxmox_get_lxc_pending\` to check pending changes.`;
+
+    return formatToolResponse(output);
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Update LXC Config');
   }
 }

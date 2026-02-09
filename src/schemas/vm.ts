@@ -232,3 +232,31 @@ export const checkLxcFeatureSchema = z.object({
 });
 
 export type CheckLxcFeatureInput = z.infer<typeof checkLxcFeatureSchema>;
+
+// proxmox_update_vm_config - Update QEMU VM configuration with arbitrary key-value pairs
+export const updateVmConfigSchema = z.object({
+  node: z.string().min(1).describe('Node name where VM is located'),
+  vmid: z.coerce.number().describe('VM ID number'),
+  config: z.record(z.string(), z.any()).optional().describe(
+    'Key-value pairs of VM configuration to set. Common keys: ciuser, cipassword, ipconfig0 (cloud-init), boot (boot order), agent (QEMU agent), serial0, vga, cpu, balloon, tags, description. Use proxmox_get_vm_config to discover valid keys.'
+  ),
+  delete: z.string().optional().describe(
+    'Comma-separated list of config keys to REMOVE (e.g. "ciuser,cipassword"). Does NOT delete the VM.'
+  ),
+});
+
+export type UpdateVmConfigInput = z.input<typeof updateVmConfigSchema>;
+
+// proxmox_update_lxc_config - Update LXC container configuration with arbitrary key-value pairs
+export const updateLxcConfigSchema = z.object({
+  node: z.string().min(1).describe('Node name where container is located'),
+  vmid: z.coerce.number().describe('Container ID number'),
+  config: z.record(z.string(), z.any()).optional().describe(
+    'Key-value pairs of container configuration to set. Common keys: hostname, memory, swap, cores, cpulimit, cpuunits, nameserver, searchdomain, tags, description, mp0-mpN (mount points). Use proxmox_get_lxc_config to discover valid keys.'
+  ),
+  delete: z.string().optional().describe(
+    'Comma-separated list of config keys to REMOVE (e.g. "mp0,nameserver"). Does NOT delete the container.'
+  ),
+});
+
+export type UpdateLxcConfigInput = z.input<typeof updateLxcConfigSchema>;

@@ -3,7 +3,7 @@
 > Complete reference for all available tools and planned Proxmox API integrations
 
 **Current Version**: 0.6.0  
-**Total Tools**: 307  
+**Total Tools**: 309  
 **Last Updated**: 2026-02-08
 
 ---
@@ -21,7 +21,7 @@
   - [Storage Management (12 tools)](#storage-management-12-tools)
   - [VM Query (9 tools)](#vm-query-9-tools)
   - [VM Lifecycle (12 tools)](#vm-lifecycle-12-tools)
-  - [VM Modify (4 tools)](#vm-modify-4-tools)
+  - [VM Modify (6 tools)](#vm-modify-6-tools)
   - [VM/LXC Advanced (40 tools)](#vmlxc-advanced-40-tools)
   - [Snapshots (8 tools)](#snapshots-8-tools)
   - [Backups (6 tools)](#backups-6-tools)
@@ -61,7 +61,7 @@ This document provides a complete reference for all tools available in the Proxm
 | Storage Management | 12 | Mixed |
 | VM Query | 9 | Basic |
 | VM Lifecycle | 12 | Elevated |
-| VM Modify | 4 | Elevated |
+| VM Modify | 6 | Elevated |
 | VM/LXC Advanced | 40 | Mixed |
 | Snapshots | 8 | Mixed |
 | Backups | 6 | Elevated |
@@ -78,7 +78,7 @@ This document provides a complete reference for all tools available in the Proxm
 | Certificate Management | 7 | Mixed |
 | ACME Management | 8 | Mixed |
 | Notification Management | 5 | Mixed |
-| **Total** | **307** | |
+| **Total** | **309** | |
 
 ---
 
@@ -2617,7 +2617,7 @@ Delete a QEMU virtual machine permanently.
 
 ---
 
-### VM Modify (4 tools)
+### VM Modify (6 tools)
 
 All modify tools require **elevated permissions**.
 
@@ -2686,6 +2686,70 @@ Resize a QEMU VM CPU/memory.
 | `vmid` | number | Yes | VM ID |
 | `memory` | number | No | Memory in MB |
 | `cores` | number | No | Number of CPU cores |
+
+---
+
+#### `proxmox_update_vm_config` 🔒
+Update QEMU VM configuration with arbitrary key-value pairs.
+
+| Property | Value |
+|----------|-------|
+| API Endpoint | `PUT /api2/json/nodes/{node}/qemu/{vmid}/config` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+| `config` | object | No | Key-value pairs of VM configuration to set (ciuser, cipassword, ipconfig0 for cloud-init, boot, agent, serial0, vga, cpu, balloon, tags, description) |
+| `delete` | string | No | Comma-separated list of config keys to REMOVE (e.g. "ciuser,cipassword") |
+
+**Example:**
+```json
+{
+  "node": "pve1",
+  "vmid": 100,
+  "config": {
+    "ciuser": "ubuntu",
+    "cipassword": "secret",
+    "ipconfig0": "ip=192.168.1.100/24,gw=192.168.1.1"
+  }
+}
+```
+
+**Note:** Use `proxmox_get_vm_config` to discover valid parameters.
+
+---
+
+#### `proxmox_update_lxc_config` 🔒
+Update LXC container configuration with arbitrary key-value pairs.
+
+| Property | Value |
+|----------|-------|
+| API Endpoint | `PUT /api2/json/nodes/{node}/lxc/{vmid}/config` |
+
+**Parameters**:
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where container is located |
+| `vmid` | number | Yes | Container ID number |
+| `config` | object | No | Key-value pairs of container configuration to set (hostname, memory, swap, cores, cpulimit, cpuunits, nameserver, searchdomain, tags, description, mp0-mpN for mount points) |
+| `delete` | string | No | Comma-separated list of config keys to REMOVE (e.g. "mp0,nameserver") |
+
+**Example:**
+```json
+{
+  "node": "pve1",
+  "vmid": 200,
+  "config": {
+    "hostname": "mycontainer",
+    "memory": 2048,
+    "cores": 2
+  }
+}
+```
+
+**Note:** Use `proxmox_get_lxc_config` to discover valid parameters.
 
 ---
 
