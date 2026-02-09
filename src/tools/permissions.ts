@@ -89,4 +89,32 @@ export const toolPermissions: ToolPermissions = {
     totem: 'basic',
     join: 'elevated',
   },
+  proxmox_sdn_vnet: {
+    list: 'basic',
+    get: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_sdn_zone: {
+    list: 'basic',
+    get: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_sdn_controller: {
+    list: 'basic',
+    get: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_sdn_subnet: {
+    list: 'basic',
+    get: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
 };

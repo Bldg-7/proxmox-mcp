@@ -38,3 +38,12 @@
 - For cluster firewall rules, the consolidated discriminator key `action` collides with the rule payload field `action` (ACCEPT/REJECT/DROP). Use a separate payload field (for example `rule_action`) in the consolidated schema and map it back in the dispatcher.
 - Keeping existing granular handlers intact while adding thin consolidated dispatchers avoids behavior drift and preserves existing response formatting, including emoji and markdown structure.
 - Consolidating cluster firewall options/macros/refs into a dedicated `proxmox_cluster_firewall` tool keeps action counts below 6 while still removing legacy tool names from public registry/type/description surfaces.
+
+## Task 5 (Wave 2) - SDN CRUD Consolidation
+
+- Consolidated 20 SDN tools (5 each for VNets, Zones, Controllers, Subnets) into 4 consolidated tools using the exact Task 4 pattern.
+- All SDN resources follow the same 5-action pattern: list/get/create/update/delete with no payload field collisions.
+- Permission model: list/get=basic, create/update/delete=elevated (consistent across all 4 SDN tools).
+- TDD approach: Created comprehensive test suite with 18 tests covering all actions and permission checks before implementation.
+- Net result: 258 → 242 tools (removed 20 old SDN tools, added 4 new consolidated tools = net -16).
+- All 903 tests pass, build succeeds with zero TypeScript errors.

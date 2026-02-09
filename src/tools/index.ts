@@ -122,26 +122,10 @@ export {
 
 // SDN tools
 export {
-  listSdnVnets,
-  getSdnVnet,
-  createSdnVnet,
-  updateSdnVnet,
-  deleteSdnVnet,
-  listSdnZones,
-  getSdnZone,
-  createSdnZone,
-  updateSdnZone,
-  deleteSdnZone,
-  listSdnControllers,
-  getSdnController,
-  createSdnController,
-  updateSdnController,
-  deleteSdnController,
-  listSdnSubnets,
-  getSdnSubnet,
-  createSdnSubnet,
-  updateSdnSubnet,
-  deleteSdnSubnet,
+  handleSdnVnetTool,
+  handleSdnZoneTool,
+  handleSdnControllerTool,
+  handleSdnSubnetTool,
 } from './sdn.js';
 
 // Access Control tools

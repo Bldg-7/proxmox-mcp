@@ -1,9 +1,9 @@
 {
-  "active_plan": null,
-  "started_at": null,
-  "session_ids": [],
-  "plan_name": null,
-  "completed_at": "2026-02-08T09:48:00.000Z",
-  "status": "complete",
-  "note": "All 15 plans complete. Repository fully implemented with 307 tools, 808 tests passing, complete documentation."
+  "active_plan": "/Users/snark/Documents/GitHub/proxmox-mcp/.sisyphus/plans/tool-consolidation.md",
+  "started_at": "2026-02-09T16:47:54.300Z",
+  "session_ids": [
+    "ses_3bcec396fffek37FveqfzWc0Iz"
+  ],
+  "plan_name": "tool-consolidation",
+  "agent": "atlas"
 }
