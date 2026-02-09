@@ -288,7 +288,7 @@ export async function updateVmConfig(
       output += `\n**Parameters Removed**: ${validated.delete}\n`;
     }
 
-    output += `\n**Note**: Some changes may require a VM restart. Use \`proxmox_get_vm_pending\` to check pending changes.`;
+    output += `\n**Note**: Some changes may require a VM restart. Use \`proxmox_guest_pending\` with type='vm' to check pending changes.`;
 
     return formatToolResponse(output);
   } catch (error) {
@@ -348,7 +348,7 @@ export async function updateLxcConfig(
       output += `\n**Parameters Removed**: ${validated.delete}\n`;
     }
 
-    output += `\n**Note**: Some changes may require a container restart. Use \`proxmox_get_lxc_pending\` to check pending changes.`;
+    output += `\n**Note**: Some changes may require a container restart. Use \`proxmox_guest_pending\` with type='lxc' to check pending changes.`;
 
     return formatToolResponse(output);
   } catch (error) {

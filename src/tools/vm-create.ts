@@ -115,7 +115,7 @@ export async function createLxc(
       `**Next steps**:\n` +
       `1. Wait a moment for container to be created\n` +
       `2. Start it with \`proxmox_start_lxc\`\n` +
-      `3. View status with \`proxmox_get_vm_status\`\n`;
+      `3. View status with \`proxmox_guest_status\` (type='lxc')\n`;
 
     return formatToolResponse(output);
   } catch (error) {
@@ -179,7 +179,7 @@ export async function createVM(
       `**Next steps**:\n` +
       `1. Wait a moment for VM to be created\n` +
       `2. Start it with \`proxmox_start_vm\`\n` +
-      `3. View status with \`proxmox_get_vm_status\`\n`;
+      `3. View status with \`proxmox_guest_status\` (type='vm')\n`;
 
     return formatToolResponse(output);
   } catch (error) {

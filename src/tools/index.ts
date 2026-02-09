@@ -216,6 +216,16 @@ export {
   getLxcTermProxy,
 } from './console-access.js';
 
+// Guest Query tools (consolidated VM/LXC)
+export {
+  handleGuestList,
+  handleGuestStatus,
+  handleGuestConfig,
+  handleGuestPending,
+  handleGuestFeature,
+  handleGuestRrddata,
+} from './guest-query.js';
+
 // VM Query & Lifecycle tools
 export { getVMs, getVMStatus, getVMConfig, getLxcConfig, getStorage, getVmPending, getLxcPending, checkVmFeature, checkLxcFeature } from './vm-query.js';
 export {

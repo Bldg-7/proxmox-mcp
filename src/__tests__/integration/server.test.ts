@@ -167,7 +167,7 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_vms',
+          name: 'proxmox_guest_list',
           arguments: {},
         },
       });
@@ -212,7 +212,7 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_vm_status',
+          name: 'proxmox_guest_status',
           arguments: {},
         },
       });
@@ -231,11 +231,11 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_vm_status',
+          name: 'proxmox_guest_status',
           arguments: {
             node: 'pve1',
             vmid: 'not-a-number',
-            type: 'qemu',
+            type: 'vm',
           },
         },
       });
@@ -373,7 +373,7 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_vms',
+          name: 'proxmox_guest_list',
           arguments: {},
         },
       });
@@ -405,7 +405,7 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_vms',
+          name: 'proxmox_guest_list',
           arguments: {},
         },
       });

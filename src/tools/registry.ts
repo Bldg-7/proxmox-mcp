@@ -6,6 +6,22 @@ import type { z } from 'zod';
 
 // Import all tool handlers
 import {
+  handleGuestList,
+  handleGuestStatus,
+  handleGuestConfig,
+  handleGuestPending,
+  handleGuestFeature,
+  handleGuestRrddata,
+} from './guest-query.js';
+import {
+  guestListSchema,
+  guestStatusSchema,
+  guestConfigSchema,
+  guestPendingSchema,
+  guestFeatureSchema,
+  guestRrddataSchema,
+} from '../schemas/guest.js';
+import {
   handleNodeTool,
   getNodeServices,
   controlNodeService,
@@ -176,14 +192,7 @@ import {
   deleteCephPool,
   listCephFs,
   createCephFs,
-  getVMs,
-  getVMStatus,
-  getVMConfig,
-  getLxcConfig,
-  getVmPending,
-  getLxcPending,
-  checkVmFeature,
-  checkLxcFeature,
+
   getStorage,
   startLxc,
   startVM,
@@ -207,8 +216,7 @@ import {
   migrateLxc,
   createTemplateVm,
   createTemplateLxc,
-  getVmRrddata,
-  getLxcRrddata,
+
   agentPing,
   agentGetOsinfo,
   agentGetFsinfo,
@@ -503,14 +511,6 @@ import {
   createCephFsSchema,
 } from '../schemas/ceph.js';
 import {
-    getVmsSchema,
-    getVmStatusSchema,
-    getVmConfigSchema,
-    getLxcConfigSchema,
-    getVmPendingSchema,
-    getLxcPendingSchema,
-    checkVmFeatureSchema,
-    checkLxcFeatureSchema,
     getStorageSchema,
   startLxcSchema,
   startVmSchema,
@@ -540,8 +540,7 @@ import {
   migrateLxcSchema,
   createTemplateVmSchema,
   createTemplateLxcSchema,
-  getVmRrddataSchema,
-  getLxcRrddataSchema,
+
   agentPingSchema,
   agentGetOsinfoSchema,
   agentGetFsinfoSchema,
@@ -1062,15 +1061,13 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_get_storage_rrddata: { handler: getStorageRrddata, schema: getStorageRrddataSchema },
   proxmox_get_node_report: { handler: getNodeReport, schema: getNodeReportSchema },
 
-  // VM Query
-  proxmox_get_vms: { handler: getVMs, schema: getVmsSchema },
-  proxmox_get_vm_status: { handler: getVMStatus, schema: getVmStatusSchema },
-  proxmox_get_vm_config: { handler: getVMConfig, schema: getVmConfigSchema },
-  proxmox_get_lxc_config: { handler: getLxcConfig, schema: getLxcConfigSchema },
-  proxmox_get_vm_pending: { handler: getVmPending, schema: getVmPendingSchema },
-  proxmox_get_lxc_pending: { handler: getLxcPending, schema: getLxcPendingSchema },
-  proxmox_check_vm_feature: { handler: checkVmFeature, schema: checkVmFeatureSchema },
-  proxmox_check_lxc_feature: { handler: checkLxcFeature, schema: checkLxcFeatureSchema },
+  // Guest Query (consolidated VM/LXC)
+  proxmox_guest_list: { handler: handleGuestList, schema: guestListSchema },
+  proxmox_guest_status: { handler: handleGuestStatus, schema: guestStatusSchema },
+  proxmox_guest_config: { handler: handleGuestConfig, schema: guestConfigSchema },
+  proxmox_guest_pending: { handler: handleGuestPending, schema: guestPendingSchema },
+  proxmox_guest_feature: { handler: handleGuestFeature, schema: guestFeatureSchema },
+  proxmox_guest_rrddata: { handler: handleGuestRrddata, schema: guestRrddataSchema },
   proxmox_get_storage: { handler: getStorage, schema: getStorageSchema },
 
   // VM Lifecycle
@@ -1100,8 +1097,7 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_migrate_lxc: { handler: migrateLxc, schema: migrateLxcSchema },
   proxmox_create_template_vm: { handler: createTemplateVm, schema: createTemplateVmSchema },
   proxmox_create_template_lxc: { handler: createTemplateLxc, schema: createTemplateLxcSchema },
-  proxmox_get_vm_rrddata: { handler: getVmRrddata, schema: getVmRrddataSchema },
-  proxmox_get_lxc_rrddata: { handler: getLxcRrddata, schema: getLxcRrddataSchema },
+
   proxmox_agent_ping: { handler: agentPing, schema: agentPingSchema },
   proxmox_agent_get_osinfo: { handler: agentGetOsinfo, schema: agentGetOsinfoSchema },
   proxmox_agent_get_fsinfo: { handler: agentGetFsinfo, schema: agentGetFsinfoSchema },

@@ -229,15 +229,13 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_get_storage_rrddata: 'Get storage RRD performance metrics (read/write throughput, usage)',
   proxmox_get_node_report: 'Get node diagnostic report with system information',
 
-  // VM Query
-  proxmox_get_vms: 'List all virtual machines across the cluster with their status',
-  proxmox_get_vm_status: 'Get detailed status information for a specific VM',
-  proxmox_get_vm_config: 'Get hardware configuration for a QEMU VM (disks, network, CPU, memory)',
-  proxmox_get_lxc_config: 'Get hardware configuration for an LXC container (mount points, network, CPU, memory)',
-  proxmox_get_vm_pending: 'Get pending configuration changes for a QEMU VM',
-  proxmox_get_lxc_pending: 'Get pending configuration changes for an LXC container',
-  proxmox_check_vm_feature: 'Check if a feature (snapshot, clone, copy) is available for a QEMU VM',
-  proxmox_check_lxc_feature: 'Check if a feature (snapshot, clone, copy) is available for an LXC container',
+  // Guest Query (consolidated VM/LXC)
+  proxmox_guest_list: 'List all virtual machines and containers across the cluster with their status',
+  proxmox_guest_status: 'Get detailed status for a VM (type=vm) or LXC container (type=lxc)',
+  proxmox_guest_config: 'Get hardware configuration for a VM (type=vm) or LXC container (type=lxc)',
+  proxmox_guest_pending: 'Get pending configuration changes for a VM (type=vm) or LXC container (type=lxc)',
+  proxmox_guest_feature: 'Check if a feature (snapshot, clone, copy) is available for a VM (type=vm) or LXC container (type=lxc)',
+  proxmox_guest_rrddata: 'Get performance metrics (RRD data) for a VM (type=vm) or LXC container (type=lxc)',
   proxmox_get_storage: 'List all storage pools and their usage across the cluster',
 
   // VM Lifecycle
@@ -267,8 +265,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_migrate_lxc: 'Migrate an LXC container to another node (requires elevated permissions)',
   proxmox_create_template_vm: 'Convert a QEMU VM to a template (requires elevated permissions)',
   proxmox_create_template_lxc: 'Convert an LXC container to a template (requires elevated permissions)',
-  proxmox_get_vm_rrddata: 'Get performance metrics (RRD data) for a QEMU VM',
-  proxmox_get_lxc_rrddata: 'Get performance metrics (RRD data) for an LXC container',
+
   proxmox_agent_ping: 'Ping the QEMU guest agent to verify availability',
   proxmox_agent_get_osinfo: 'Get guest OS information via QEMU guest agent',
   proxmox_agent_get_fsinfo: 'Get guest filesystem information via QEMU guest agent',
