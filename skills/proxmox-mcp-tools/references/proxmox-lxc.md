@@ -2,7 +2,7 @@
 
 > LXC container creation, lifecycle management, mount points, network configuration, and performance monitoring.
 
-**Tools in this file:** 20  
+**Tools in this file:** 21  
 **Generated:** 2026-02-08T04:04:42.008Z
 
 ---
@@ -320,6 +320,23 @@
 |------|------|----------|-------------|
 | `node` | string | Yes | Node name where VM is located |
 | `vmid` | number | Yes | VM ID number |
+
+---
+
+#### `proxmox_update_lxc_config`
+
+**Description:** Update LXC container configuration with arbitrary key-value pairs via PUT /config (requires elevated permissions). Supports hostname, memory, cores, swap, mount points, network, and all other Proxmox LXC config params. For resize (memory/cores) prefer proxmox_resize_lxc. For network prefer proxmox_update_network_lxc. Use proxmox_get_lxc_config to discover valid parameters.
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where container is located |
+| `vmid` | number | Yes | Container ID number |
+| `config` | object | No | Key-value pairs of container configuration to set. Common keys: hostname, memory, swap, cores, cpulimit, cpuunits, nameserver, searchdomain, tags, description, mp0-mpN (mount points). Use proxmox_get_lxc_config to discover valid keys. |
+| `delete` | string | No | Comma-separated list of config keys to REMOVE (e.g. "mp0,nameserver"). Does NOT delete the container. |
 
 ---
 

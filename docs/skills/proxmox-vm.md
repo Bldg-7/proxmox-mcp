@@ -2,7 +2,7 @@
 
 > QEMU VM creation, lifecycle management, disk operations, network configuration, and performance monitoring.
 
-**Tools in this file:** 30  
+**Tools in this file:** 31  
 **Generated:** 2026-02-08T04:04:42.008Z
 
 ---
@@ -497,6 +497,23 @@
 | `macaddr` | unknown | No | - |
 | `vlan` | unknown | No | - |
 | `firewall` | unknown | No | - |
+
+---
+
+#### `proxmox_update_vm_config`
+
+**Description:** Update QEMU VM configuration with arbitrary key-value pairs via PUT /config (requires elevated permissions). Supports cloud-init (ciuser, cipassword, ipconfig0), boot order, serial console, guest agent, and all other Proxmox config params. For resize (memory/cores) prefer proxmox_resize_vm. For disk/network prefer their specific tools. Use proxmox_get_vm_config to discover valid parameters.
+
+**Permission:** elevated
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Node name where VM is located |
+| `vmid` | number | Yes | VM ID number |
+| `config` | object | No | Key-value pairs of VM configuration to set. Common keys: ciuser, cipassword, ipconfig0 (cloud-init), boot (boot order), agent (QEMU agent), serial0, vga, cpu, balloon, tags, description. Use proxmox_get_vm_config to discover valid keys. |
+| `delete` | string | No | Comma-separated list of config keys to REMOVE (e.g. "ciuser,cipassword"). Does NOT delete the VM. |
 
 ---
 

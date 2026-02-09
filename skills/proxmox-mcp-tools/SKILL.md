@@ -1,6 +1,6 @@
 ---
 name: proxmox-mcp-tools
-description: Comprehensive MCP tool reference for Proxmox Virtual Environment management - 307 tools across 14 domains including QEMU VMs, LXC containers, cluster operations, storage, networking, Ceph, certificates, ACME, and notifications
+description: Comprehensive MCP tool reference for Proxmox Virtual Environment management - 309 tools across 14 domains including QEMU VMs, LXC containers, cluster operations, storage, networking, Ceph, certificates, ACME, and notifications
 license: MIT
 compatibility:
   - claude-code
@@ -11,22 +11,22 @@ compatibility:
   - vscode
 metadata:
   version: 0.6.0
-  tool_count: 307
+  tool_count: 309
   domains: 14
   generated: 2026-02-08
 ---
 
 # Proxmox MCP Tools Reference
 
-> **AI Agent Skill**: Complete reference for 307 Proxmox Virtual Environment management tools via Model Context Protocol
+> **AI Agent Skill**: Complete reference for 309 Proxmox Virtual Environment management tools via Model Context Protocol
 
 ## Overview
 
-This skill teaches AI agents how to use the **@bldg-7/proxmox-mcp** server, which provides 307 comprehensive tools for managing Proxmox VE infrastructure through the Model Context Protocol (MCP).
+This skill teaches AI agents how to use the **@bldg-7/proxmox-mcp** server, which provides 309 comprehensive tools for managing Proxmox VE infrastructure through the Model Context Protocol (MCP).
 
 **What you'll learn**:
 - How to connect to Proxmox VE via MCP
-- 307 tools organized into 14 functional domains
+- 309 tools organized into 14 functional domains
 - Permission model (basic vs elevated operations)
 - Common workflows and patterns
 - Troubleshooting API quirks
@@ -61,7 +61,7 @@ PROXMOX_PORT=8006               # Default: 8006
 | **Basic** | Read-only (list, get, status) | None |
 | **Elevated** 🔒 | Create, modify, delete | `PROXMOX_ALLOW_ELEVATED=true` |
 
-**102 basic tools** + **205 elevated tools** = **307 total**
+**102 basic tools** + **207 elevated tools** = **309 total**
 
 ### SSL Modes
 
@@ -76,8 +76,8 @@ PROXMOX_PORT=8006               # Default: 8006
 | Domain | Tools | Key Operations | Reference |
 |--------|-------|----------------|-----------|
 | **Nodes** | 47 | Node status, network config, system ops, console access | [proxmox-nodes.md](references/proxmox-nodes.md) |
-| **QEMU VMs** | 25 | VM lifecycle, config, disks, network, commands | [proxmox-vm.md](references/proxmox-vm.md) |
-| **LXC Containers** | 18 | Container lifecycle, config, mount points, network | [proxmox-lxc.md](references/proxmox-lxc.md) |
+| **QEMU VMs** | 26 | VM lifecycle, config, disks, network, commands | [proxmox-vm.md](references/proxmox-vm.md) |
+| **LXC Containers** | 19 | Container lifecycle, config, mount points, network | [proxmox-lxc.md](references/proxmox-lxc.md) |
 | **VM/LXC Shared** | 22 | Agent, firewall, migration (works for both) | [proxmox-vm-lxc-shared.md](references/proxmox-vm-lxc-shared.md) |
 | **Snapshots & Backups** | 14 | Create/restore snapshots, backup jobs | [proxmox-snapshots-backups.md](references/proxmox-snapshots-backups.md) |
 | **Storage** | 16 | Storage config, content, file operations, node disks | [proxmox-storage.md](references/proxmox-storage.md) |
@@ -90,7 +90,7 @@ PROXMOX_PORT=8006               # Default: 8006
 | **ACME** | 8 | ACME accounts, plugins, directories | [proxmox-acme.md](references/proxmox-acme.md) |
 | **Notifications** | 5 | Notification targets, SMTP/Gotify testing | [proxmox-notifications.md](references/proxmox-notifications.md) |
 
-**Total**: 307 tools
+**Total**: 309 tools
 
 ---
 
@@ -228,8 +228,8 @@ All tools return structured MCP responses:
 ### Domain-Specific Documentation
 
 - **[proxmox-nodes.md](references/proxmox-nodes.md)** - Node management, network config, system operations (47 tools)
-- **[proxmox-vm.md](references/proxmox-vm.md)** - QEMU VM operations (25 tools)
-- **[proxmox-lxc.md](references/proxmox-lxc.md)** - LXC container operations (18 tools)
+- **[proxmox-vm.md](references/proxmox-vm.md)** - QEMU VM operations (26 tools)
+- **[proxmox-lxc.md](references/proxmox-lxc.md)** - LXC container operations (19 tools)
 - **[proxmox-vm-lxc-shared.md](references/proxmox-vm-lxc-shared.md)** - Shared VM/LXC operations (22 tools)
 - **[proxmox-snapshots-backups.md](references/proxmox-snapshots-backups.md)** - Snapshots and backups (14 tools)
 - **[proxmox-storage.md](references/proxmox-storage.md)** - Storage management (16 tools)
