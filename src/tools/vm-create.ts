@@ -114,7 +114,7 @@ export async function createLxc(
       `• **Task ID**: ${result}\n\n` +
       `**Next steps**:\n` +
       `1. Wait a moment for container to be created\n` +
-      `2. Start it with \`proxmox_start_lxc\`\n` +
+      `2. Start it with \`proxmox_guest_start\` (type='lxc')\n` +
       `3. View status with \`proxmox_guest_status\` (type='lxc')\n`;
 
     return formatToolResponse(output);
@@ -178,7 +178,7 @@ export async function createVM(
       `• **Task ID**: ${result}\n\n` +
       `**Next steps**:\n` +
       `1. Wait a moment for VM to be created\n` +
-      `2. Start it with \`proxmox_start_vm\`\n` +
+      `2. Start it with \`proxmox_guest_start\` (type='vm')\n` +
       `3. View status with \`proxmox_guest_status\` (type='vm')\n`;
 
     return formatToolResponse(output);

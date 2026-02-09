@@ -275,8 +275,9 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_start_vm',
+          name: 'proxmox_guest_start',
           arguments: {
+            type: 'vm',
             node: 'pve1',
             vmid: 100,
           },
@@ -302,8 +303,9 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_start_vm',
+          name: 'proxmox_guest_start',
           arguments: {
+            type: 'vm',
             node: 'pve1',
             vmid: 100,
           },
@@ -324,8 +326,9 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_start_vm',
+          name: 'proxmox_guest_start',
           arguments: {
+            type: 'vm',
             node: 'pve1',
             vmid: 100,
           },

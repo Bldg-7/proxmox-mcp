@@ -83,3 +83,16 @@
 - Net result: 223 → 201 tools (removed 32 old tools, added 10 new consolidated tools = net -22).
 - All 983 tests pass, build succeeds with zero TypeScript errors.
 - Permission map populated for all 8 new tools following established patterns.
+## Task 8 (Wave 3) - VM/LXC Lifecycle Consolidation
+
+- Consolidated 12 lifecycle tools into 7 using the Task 2 type parameter pattern:
+  - 5 VM/LXC pairs with `type='vm'|'lxc'`: guest_start, guest_stop, guest_reboot, guest_shutdown, guest_delete
+  - 2 VM-only tools (no type parameter): guest_pause, guest_resume
+- Pause/resume schemas use simple `z.object({node, vmid})` (no discriminatedUnion) since LXC doesn't support these operations.
+- All lifecycle handlers delegate to existing vm-lifecycle.ts functions which handle `requireElevated()` internally.
+- Permission map entries use `{ elevated: 'elevated' }` pattern (no action-based permissions — entire tools are elevated).
+- Integration tests in `server.test.ts` hardcoded `proxmox_start_vm` in 3 permission-check tests — updated to `proxmox_guest_start` with `type: 'vm'`.
+- User-facing text in vm-create.ts referenced `proxmox_start_lxc`/`proxmox_start_vm` — updated to new consolidated names.
+- Old tool schemas in schemas/vm.ts remain as internal implementation used by handlers — only public-facing names changed.
+- Net result: 201 → 196 tools (removed 12 old lifecycle tools, added 7 consolidated = net -5).
+- All 1007 tests pass, build succeeds with zero TypeScript errors.

@@ -99,3 +99,106 @@ export const guestRrddataSchema = z.discriminatedUnion('type', [
 ]);
 
 export type GuestRrddataInput = z.infer<typeof guestRrddataSchema>;
+
+// ── Consolidated: proxmox_guest_start ────────────────────────────────────
+// Replaces: proxmox_start_vm + proxmox_start_lxc
+export const guestStartSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Node name where VM is located'),
+    vmid: z.coerce.number().describe('VM ID number'),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Node name where container is located'),
+    vmid: z.coerce.number().describe('Container ID number'),
+  }),
+]);
+
+export type GuestStartInput = z.infer<typeof guestStartSchema>;
+
+// ── Consolidated: proxmox_guest_stop ─────────────────────────────────────
+// Replaces: proxmox_stop_vm + proxmox_stop_lxc
+export const guestStopSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Node name where VM is located'),
+    vmid: z.coerce.number().describe('VM ID number'),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Node name where container is located'),
+    vmid: z.coerce.number().describe('Container ID number'),
+  }),
+]);
+
+export type GuestStopInput = z.infer<typeof guestStopSchema>;
+
+// ── Consolidated: proxmox_guest_reboot ───────────────────────────────────
+// Replaces: proxmox_reboot_vm + proxmox_reboot_lxc
+export const guestRebootSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Node name where VM is located'),
+    vmid: z.coerce.number().describe('VM ID number'),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Node name where container is located'),
+    vmid: z.coerce.number().describe('Container ID number'),
+  }),
+]);
+
+export type GuestRebootInput = z.infer<typeof guestRebootSchema>;
+
+// ── Consolidated: proxmox_guest_shutdown ─────────────────────────────────
+// Replaces: proxmox_shutdown_vm + proxmox_shutdown_lxc
+export const guestShutdownSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Node name where VM is located'),
+    vmid: z.coerce.number().describe('VM ID number'),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Node name where container is located'),
+    vmid: z.coerce.number().describe('Container ID number'),
+  }),
+]);
+
+export type GuestShutdownInput = z.infer<typeof guestShutdownSchema>;
+
+// ── Consolidated: proxmox_guest_delete ───────────────────────────────────
+// Replaces: proxmox_delete_vm + proxmox_delete_lxc
+export const guestDeleteSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Node name where VM is located'),
+    vmid: z.coerce.number().describe('VM ID number'),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Node name where container is located'),
+    vmid: z.coerce.number().describe('Container ID number'),
+  }),
+]);
+
+export type GuestDeleteInput = z.infer<typeof guestDeleteSchema>;
+
+// ── proxmox_guest_pause (VM only) ────────────────────────────────────────
+// Replaces: proxmox_pause_vm (LXC does not support pause)
+export const guestPauseSchema = z.object({
+  node: z.string().min(1).describe('Node name where VM is located'),
+  vmid: z.coerce.number().describe('VM ID number'),
+});
+
+export type GuestPauseInput = z.infer<typeof guestPauseSchema>;
+
+// ── proxmox_guest_resume (VM only) ───────────────────────────────────────
+// Replaces: proxmox_resume_vm (LXC does not support resume)
+export const guestResumeSchema = z.object({
+  node: z.string().min(1).describe('Node name where VM is located'),
+  vmid: z.coerce.number().describe('VM ID number'),
+});
+
+export type GuestResumeInput = z.infer<typeof guestResumeSchema>;

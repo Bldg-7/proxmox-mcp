@@ -121,19 +121,14 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_guest_rrddata: 'Get performance metrics (RRD data) for a VM (type=vm) or LXC container (type=lxc)',
   proxmox_get_storage: 'List all storage pools and their usage across the cluster',
 
-  // VM Lifecycle
-  proxmox_start_lxc: 'Start an LXC container (requires elevated permissions)',
-  proxmox_start_vm: 'Start a QEMU virtual machine (requires elevated permissions)',
-  proxmox_stop_lxc: 'Stop an LXC container (requires elevated permissions)',
-  proxmox_stop_vm: 'Stop a QEMU virtual machine (requires elevated permissions)',
-  proxmox_delete_lxc: 'Delete an LXC container (requires elevated permissions)',
-  proxmox_delete_vm: 'Delete a QEMU virtual machine (requires elevated permissions)',
-  proxmox_reboot_lxc: 'Reboot an LXC container (requires elevated permissions)',
-  proxmox_reboot_vm: 'Reboot a QEMU virtual machine (requires elevated permissions)',
-  proxmox_shutdown_lxc: 'Gracefully shutdown an LXC container (requires elevated permissions)',
-  proxmox_shutdown_vm: 'Gracefully shutdown a QEMU virtual machine (requires elevated permissions)',
-  proxmox_pause_vm: 'Pause a QEMU virtual machine (requires elevated permissions)',
-  proxmox_resume_vm: 'Resume a paused QEMU virtual machine (requires elevated permissions)',
+  // Guest Lifecycle (consolidated VM/LXC)
+  proxmox_guest_start: 'Start a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
+  proxmox_guest_stop: 'Forcefully stop a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
+  proxmox_guest_reboot: 'Reboot a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
+  proxmox_guest_shutdown: 'Gracefully shutdown a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
+  proxmox_guest_delete: 'Delete a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
+  proxmox_guest_pause: 'Pause a QEMU virtual machine — VM only (requires elevated permissions)',
+  proxmox_guest_resume: 'Resume a paused QEMU virtual machine — VM only (requires elevated permissions)',
 
   // VM Modify
   proxmox_clone_lxc: 'Clone an LXC container (requires elevated permissions)',

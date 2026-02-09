@@ -202,4 +202,25 @@ export const toolPermissions: ToolPermissions = {
     list: 'basic',
     create: 'elevated',
   },
+  proxmox_guest_start: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_stop: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_reboot: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_shutdown: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_delete: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_pause: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_resume: {
+    elevated: 'elevated',
+  },
 };

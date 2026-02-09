@@ -213,20 +213,17 @@ export {
 
 // VM Query & Lifecycle tools
 export { getVMs, getVMStatus, getVMConfig, getLxcConfig, getStorage, getVmPending, getLxcPending, checkVmFeature, checkLxcFeature } from './vm-query.js';
+
+// Guest Lifecycle (consolidated VM/LXC)
 export {
-  startLxc,
-  startVM,
-  stopLxc,
-  stopVM,
-  deleteLxc,
-  deleteVM,
-  rebootLxc,
-  rebootVM,
-  shutdownLxc,
-  shutdownVM,
-  pauseVM,
-  resumeVM,
-} from './vm-lifecycle.js';
+  handleGuestStart,
+  handleGuestStop,
+  handleGuestReboot,
+  handleGuestShutdown,
+  handleGuestDelete,
+  handleGuestPause,
+  handleGuestResume,
+} from './guest-lifecycle.js';
 export { cloneLxc, cloneVM, resizeLxc, resizeVM, updateVmConfig, updateLxcConfig } from './vm-modify.js';
 
 // VM/LXC Advanced tools
