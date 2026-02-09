@@ -39,6 +39,7 @@ import type {
   DeleteCephPoolInput,
   ListCephFsInput,
   CreateCephFsInput,
+  CephToolInput,
 } from '../schemas/ceph.js';
 
 function validateCephIdentifier(value: string, label: string): string {
@@ -652,5 +653,18 @@ export async function createCephFs(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Create Ceph Filesystem');
+  }
+}
+
+export async function handleCephTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: CephToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'status':
+      return getCephStatus(client, config, input);
+    default:
+      throw new Error(`Unknown ceph action: ${(input as { action: string }).action}`);
   }
 }

@@ -10,7 +10,7 @@ const cephNameSchema = z
   .max(128)
   .describe('Ceph identifier');
 
-// proxmox_get_ceph_status - Get Ceph cluster status
+// proxmox_ceph(action='status') / legacy: proxmox_get_ceph_status
 export const getCephStatusSchema = nodeSchema;
 
 export type GetCephStatusInput = z.input<typeof getCephStatusSchema>;
@@ -148,3 +148,14 @@ export const createCephFsSchema = nodeSchema.extend({
 });
 
 export type CreateCephFsInput = z.input<typeof createCephFsSchema>;
+
+// ── Consolidated: proxmox_ceph ──────────────────────────────────────────
+export const cephToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('status'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  // More actions will be added in Task 7 (Wave 2 - CRUD consolidation)
+]);
+
+export type CephToolInput = z.input<typeof cephToolSchema>;
