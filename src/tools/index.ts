@@ -268,6 +268,7 @@ export {
 
 // Snapshot tools
 export {
+  handleGuestSnapshot,
   createSnapshotLxc,
   createSnapshotVM,
   listSnapshotsLxc,
@@ -280,6 +281,7 @@ export {
 
 // Backup tools
 export {
+  handleBackup,
   createBackupLxc,
   createBackupVM,
   listBackups,

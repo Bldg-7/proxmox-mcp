@@ -175,22 +175,10 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_delete_lxc_firewall_rule: 'Delete an LXC firewall rule (requires elevated permissions)',
 
   // Snapshots
-  proxmox_create_snapshot_lxc: 'Create a snapshot of an LXC container (requires elevated permissions)',
-  proxmox_create_snapshot_vm: 'Create a snapshot of a QEMU virtual machine (requires elevated permissions)',
-  proxmox_list_snapshots_lxc: 'List all snapshots of an LXC container (requires elevated permissions)',
-  proxmox_list_snapshots_vm: 'List all snapshots of a QEMU virtual machine (requires elevated permissions)',
-  proxmox_rollback_snapshot_lxc: 'Rollback an LXC container to a snapshot (requires elevated permissions)',
-  proxmox_rollback_snapshot_vm: 'Rollback a QEMU virtual machine to a snapshot (requires elevated permissions)',
-  proxmox_delete_snapshot_lxc: 'Delete a snapshot of an LXC container (requires elevated permissions)',
-  proxmox_delete_snapshot_vm: 'Delete a snapshot of a QEMU virtual machine (requires elevated permissions)',
+  proxmox_guest_snapshot: 'Manage guest snapshots (create, list, rollback, delete) for VMs and LXC containers (requires elevated permissions)',
 
   // Backups
-  proxmox_create_backup_lxc: 'Create a backup of an LXC container (requires elevated permissions)',
-  proxmox_create_backup_vm: 'Create a backup of a QEMU virtual machine (requires elevated permissions)',
-  proxmox_list_backups: 'List all backups on a storage (requires elevated permissions)',
-  proxmox_restore_backup_lxc: 'Restore an LXC container from backup (requires elevated permissions)',
-  proxmox_restore_backup_vm: 'Restore a QEMU virtual machine from backup (requires elevated permissions)',
-  proxmox_delete_backup: 'Delete a backup file from storage (requires elevated permissions)',
+  proxmox_backup: 'Manage guest backups (create, list, restore, delete) for VMs and LXC containers (requires elevated permissions)',
 
   // Disks
   proxmox_add_disk_vm: 'Add a new disk to a QEMU virtual machine (requires elevated permissions)',

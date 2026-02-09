@@ -104,3 +104,16 @@
 - `update_vm_config` and `update_lxc_config` were safe to merge: both schemas are generic key-value config plus optional `delete`; type-specific differences are descriptive text only.
 - `proxmox_create_vm` and `proxmox_create_lxc` remain separate due fundamental schema divergence (VM uses ISO/ostype/disk model semantics, LXC uses ostemplate/hostname/password/rootfs semantics).
 - Permission model now explicitly marks all guest modify tools and both create tools as elevated in `src/tools/permissions.ts`.
+
+## Task 10 (Wave 3) - Snapshot & Backup Crud Consolidation
+
+- Consolidated 14 snapshot/backup tools into 2 consolidated tools using combined action + type parameter pattern:
+  - `proxmox_guest_snapshot` (8 tools → 1): create/list/rollback/delete × vm/lxc with `z.discriminatedUnion('action', [...])` where each action variant has `type: 'vm' | 'lxc'`
+  - `proxmox_backup` (6 tools → 1): create/restore/list/delete with type parameter only for create/restore actions (list/delete don't need type)
+- Schema pattern: Nested discriminated unions on action, with type parameter conditionally required per action variant
+- Backup list/delete actions don't require type parameter since they work on any backup regardless of source VM/LXC type
+- All snapshot/backup operations require elevated permissions (permission model: `{ elevated: 'elevated' }`)
+- TDD approach: Created comprehensive test suite with 19 tests covering all actions, type variants, and permission checks before implementation
+- Net result: 191 → 179 tools (removed 14 old snapshot/backup tools, added 2 new consolidated tools = net -12)
+- All 1041 tests pass, build succeeds with zero TypeScript errors
+- No old tool names remain in src/ (verified with grep)

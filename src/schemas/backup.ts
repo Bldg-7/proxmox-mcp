@@ -58,3 +58,45 @@ export const deleteBackupSchema = z.object({
 });
 
 export type DeleteBackupInput = z.infer<typeof deleteBackupSchema>;
+
+// proxmox_backup - Consolidated backup tool with action + type parameters
+export const backupCreateSchema = z.object({
+  action: z.literal('create'),
+  type: z.enum(['vm', 'lxc']).describe('Guest type'),
+  node: z.string().min(1).describe('Node name where guest is located'),
+  vmid: z.coerce.number().describe('Guest ID number'),
+  storage: z.string().default('local').describe('Storage location for backup'),
+  mode: z.enum(['snapshot', 'suspend', 'stop']).default('snapshot').describe('Backup mode'),
+  compress: z.enum(['none', 'lzo', 'gzip', 'zstd']).default('zstd').describe('Compression algorithm'),
+});
+
+export const backupListSchema = z.object({
+  action: z.literal('list'),
+  node: z.string().min(1).describe('Node name'),
+  storage: z.string().default('local').describe('Storage name'),
+});
+
+export const backupRestoreSchema = z.object({
+  action: z.literal('restore'),
+  type: z.enum(['vm', 'lxc']).describe('Guest type'),
+  node: z.string().min(1).describe('Node name where guest will be restored'),
+  vmid: z.coerce.number().describe('New guest ID for restored guest'),
+  archive: z.string().min(1).describe('Backup archive path'),
+  storage: z.string().optional().describe('Storage location for restored guest (optional)'),
+});
+
+export const backupDeleteSchema = z.object({
+  action: z.literal('delete'),
+  node: z.string().min(1).describe('Node name'),
+  storage: z.string().min(1).describe('Storage name'),
+  volume: z.string().min(1).describe('Backup volume ID'),
+});
+
+export const backupSchema = z.discriminatedUnion('action', [
+  backupCreateSchema,
+  backupListSchema,
+  backupRestoreSchema,
+  backupDeleteSchema,
+]);
+
+export type BackupInput = z.infer<typeof backupSchema>;

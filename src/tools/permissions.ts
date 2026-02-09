@@ -238,6 +238,12 @@ export const toolPermissions: ToolPermissions = {
   proxmox_guest_template: {
     elevated: 'elevated',
   },
+  proxmox_guest_snapshot: {
+    elevated: 'elevated',
+  },
+  proxmox_backup: {
+    elevated: 'elevated',
+  },
   proxmox_create_vm: {
     elevated: 'elevated',
   },

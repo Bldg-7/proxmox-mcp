@@ -16,6 +16,7 @@ import {
   rollbackSnapshotVmSchema,
   deleteSnapshotLxcSchema,
   deleteSnapshotVmSchema,
+  guestSnapshotSchema,
 } from '../schemas/snapshot.js';
 import type {
   CreateSnapshotLxcInput,
@@ -26,6 +27,7 @@ import type {
   RollbackSnapshotVmInput,
   DeleteSnapshotLxcInput,
   DeleteSnapshotVmInput,
+  GuestSnapshotInput,
 } from '../schemas/snapshot.js';
 
 /**
@@ -371,5 +373,78 @@ export async function deleteSnapshotVM(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Delete VM Snapshot');
+  }
+}
+
+export async function handleGuestSnapshot(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: GuestSnapshotInput
+): Promise<ToolResponse> {
+  const validated = guestSnapshotSchema.parse(input);
+
+  switch (validated.action) {
+    case 'create':
+      if (validated.type === 'vm') {
+        return createSnapshotVM(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          snapname: validated.snapname,
+          description: validated.description,
+        });
+      } else {
+        return createSnapshotLxc(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          snapname: validated.snapname,
+          description: validated.description,
+        });
+      }
+
+    case 'list':
+      if (validated.type === 'vm') {
+        return listSnapshotsVM(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+        });
+      } else {
+        return listSnapshotsLxc(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+        });
+      }
+
+    case 'rollback':
+      if (validated.type === 'vm') {
+        return rollbackSnapshotVM(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          snapname: validated.snapname,
+        });
+      } else {
+        return rollbackSnapshotLxc(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          snapname: validated.snapname,
+        });
+      }
+
+    case 'delete':
+      if (validated.type === 'vm') {
+        return deleteSnapshotVM(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          snapname: validated.snapname,
+        });
+      } else {
+        return deleteSnapshotLxc(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          snapname: validated.snapname,
+        });
+      }
+
+    default:
+      throw new Error(`Unknown action: ${(validated as { action: string }).action}`);
   }
 }

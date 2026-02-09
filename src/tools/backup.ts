@@ -15,6 +15,7 @@ import {
   restoreBackupLxcSchema,
   restoreBackupVmSchema,
   deleteBackupSchema,
+  backupSchema,
 } from '../schemas/backup.js';
 import type {
   CreateBackupLxcInput,
@@ -23,6 +24,7 @@ import type {
   RestoreBackupLxcInput,
   RestoreBackupVmInput,
   DeleteBackupInput,
+  BackupInput,
 } from '../schemas/backup.js';
 
 /**
@@ -289,7 +291,6 @@ export async function deleteBackup(
     const safeNode = validateNodeName(validated.node);
     const safeStorage = validateStorageName(validated.storage);
 
-    // URL-encode the volume parameter
     const encodedVolume = encodeURIComponent(validated.volume);
 
     const result = await client.request(
@@ -307,5 +308,67 @@ export async function deleteBackup(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Delete Backup');
+  }
+}
+
+export async function handleBackup(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: BackupInput
+): Promise<ToolResponse> {
+  const validated = backupSchema.parse(input);
+
+  switch (validated.action) {
+    case 'create':
+      if (validated.type === 'vm') {
+        return createBackupVM(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          storage: validated.storage,
+          mode: validated.mode,
+          compress: validated.compress,
+        });
+      } else {
+        return createBackupLxc(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          storage: validated.storage,
+          mode: validated.mode,
+          compress: validated.compress,
+        });
+      }
+
+    case 'list':
+      return listBackups(client, config, {
+        node: validated.node,
+        storage: validated.storage,
+      });
+
+    case 'restore':
+      if (validated.type === 'vm') {
+        return restoreBackupVM(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          archive: validated.archive,
+          storage: validated.storage,
+        });
+      } else {
+        return restoreBackupLxc(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          archive: validated.archive,
+          storage: validated.storage,
+        });
+      }
+
+    case 'delete':
+      return deleteBackup(client, config, {
+        node: validated.node,
+        storage: validated.storage,
+        volume: validated.volume,
+      });
+
+    default:
+      throw new Error(`Unknown action: ${(validated as { action: string }).action}`);
   }
 }

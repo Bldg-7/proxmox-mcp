@@ -158,20 +158,8 @@ import {
   getTermProxy,
   getLxcVncProxy,
   getLxcTermProxy,
-  createSnapshotLxc,
-  createSnapshotVM,
-  listSnapshotsLxc,
-  listSnapshotsVM,
-  rollbackSnapshotLxc,
-  rollbackSnapshotVM,
-  deleteSnapshotLxc,
-  deleteSnapshotVM,
-  createBackupLxc,
-  createBackupVM,
-  listBackups,
-  restoreBackupLxc,
-  restoreBackupVM,
-  deleteBackup,
+  handleGuestSnapshot,
+  handleBackup,
   addDiskVM,
   addMountpointLxc,
   resizeDiskVM,
@@ -354,22 +342,10 @@ import {
   deleteLxcFirewallRuleSchema,
 } from '../schemas/vm-advanced.js';
 import {
-  createSnapshotLxcSchema,
-  createSnapshotVmSchema,
-  listSnapshotsLxcSchema,
-  listSnapshotsVmSchema,
-  rollbackSnapshotLxcSchema,
-  rollbackSnapshotVmSchema,
-  deleteSnapshotLxcSchema,
-  deleteSnapshotVmSchema,
+  guestSnapshotSchema,
 } from '../schemas/snapshot.js';
 import {
-  createBackupLxcSchema,
-  createBackupVmSchema,
-  listBackupsSchema,
-  restoreBackupLxcSchema,
-  restoreBackupVmSchema,
-  deleteBackupSchema,
+  backupSchema,
 } from '../schemas/backup.js';
 import {
   addDiskVmSchema,
@@ -710,22 +686,10 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   },
 
   // Snapshots
-  proxmox_create_snapshot_lxc: { handler: createSnapshotLxc, schema: createSnapshotLxcSchema },
-  proxmox_create_snapshot_vm: { handler: createSnapshotVM, schema: createSnapshotVmSchema },
-  proxmox_list_snapshots_lxc: { handler: listSnapshotsLxc, schema: listSnapshotsLxcSchema },
-  proxmox_list_snapshots_vm: { handler: listSnapshotsVM, schema: listSnapshotsVmSchema },
-  proxmox_rollback_snapshot_lxc: { handler: rollbackSnapshotLxc, schema: rollbackSnapshotLxcSchema },
-  proxmox_rollback_snapshot_vm: { handler: rollbackSnapshotVM, schema: rollbackSnapshotVmSchema },
-  proxmox_delete_snapshot_lxc: { handler: deleteSnapshotLxc, schema: deleteSnapshotLxcSchema },
-  proxmox_delete_snapshot_vm: { handler: deleteSnapshotVM, schema: deleteSnapshotVmSchema },
+  proxmox_guest_snapshot: { handler: handleGuestSnapshot, schema: guestSnapshotSchema },
 
   // Backups
-  proxmox_create_backup_lxc: { handler: createBackupLxc, schema: createBackupLxcSchema },
-  proxmox_create_backup_vm: { handler: createBackupVM, schema: createBackupVmSchema },
-  proxmox_list_backups: { handler: listBackups, schema: listBackupsSchema },
-  proxmox_restore_backup_lxc: { handler: restoreBackupLxc, schema: restoreBackupLxcSchema },
-  proxmox_restore_backup_vm: { handler: restoreBackupVM, schema: restoreBackupVmSchema },
-  proxmox_delete_backup: { handler: deleteBackup, schema: deleteBackupSchema },
+  proxmox_backup: { handler: handleBackup, schema: backupSchema },
 
    // Disks
    proxmox_add_disk_vm: { handler: addDiskVM, schema: addDiskVmSchema },
