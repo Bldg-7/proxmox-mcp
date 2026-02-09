@@ -189,6 +189,97 @@ export type AgentSuspendRamInput = z.input<typeof agentSuspendRamSchema>;
 export const agentSuspendHybridSchema = baseVmSchema;
 export type AgentSuspendHybridInput = z.input<typeof agentSuspendHybridSchema>;
 
+// ─── Consolidated Agent Schemas ────────────────────────────────
+
+// proxmox_agent_info - Query guest agent info (ping, osinfo, fsinfo, network_interfaces, time, timezone)
+export const agentInfoSchema = z.discriminatedUnion('operation', [
+  baseVmSchema.extend({ operation: z.literal('ping') }),
+  baseVmSchema.extend({ operation: z.literal('osinfo') }),
+  baseVmSchema.extend({ operation: z.literal('fsinfo') }),
+  baseVmSchema.extend({ operation: z.literal('network_interfaces') }),
+  baseVmSchema.extend({ operation: z.literal('time') }),
+  baseVmSchema.extend({ operation: z.literal('timezone') }),
+]);
+
+export type AgentInfoInput = z.input<typeof agentInfoSchema>;
+
+// proxmox_agent_hw - Query guest hardware info (memory_blocks, vcpus, memory_block_info, hostname, users)
+export const agentHwSchema = z.discriminatedUnion('operation', [
+  baseVmSchema.extend({ operation: z.literal('memory_blocks') }),
+  baseVmSchema.extend({ operation: z.literal('vcpus') }),
+  baseVmSchema.extend({ operation: z.literal('memory_block_info') }),
+  baseVmSchema.extend({ operation: z.literal('hostname') }),
+  baseVmSchema.extend({ operation: z.literal('users') }),
+]);
+
+export type AgentHwInput = z.input<typeof agentHwSchema>;
+
+// proxmox_agent_exec - Execute commands via guest agent (exec, status)
+export const agentExecToolSchema = z.discriminatedUnion('operation', [
+  baseVmSchema.extend({
+    operation: z.literal('exec'),
+    command: z.string().min(1).describe('Command to execute'),
+    args: z.array(z.string()).optional().describe('Command arguments'),
+    ['input-data']: z.string().optional().describe('Input data for stdin'),
+    ['capture-output']: z.boolean().optional().describe('Capture stdout/stderr'),
+    timeout: z.number().int().min(0).optional().describe('Timeout in seconds'),
+  }),
+  baseVmSchema.extend({
+    operation: z.literal('status'),
+    pid: z.coerce.number().int().min(1).describe('Process ID returned by agent exec'),
+  }),
+]);
+
+export type AgentExecToolInput = z.input<typeof agentExecToolSchema>;
+
+// proxmox_agent_file - Read/write files in guest (read, write)
+export const agentFileSchema = z.discriminatedUnion('operation', [
+  baseVmSchema.extend({
+    operation: z.literal('read'),
+    file: z.string().min(1).describe('Path to file in guest filesystem'),
+  }),
+  baseVmSchema.extend({
+    operation: z.literal('write'),
+    file: z.string().min(1).describe('Path to file in guest filesystem'),
+    content: z.string().describe('Content to write to file'),
+    encode: z.boolean().optional().describe('Base64 encode content (default: true)'),
+  }),
+]);
+
+export type AgentFileInput = z.input<typeof agentFileSchema>;
+
+// proxmox_agent_freeze - Manage filesystem freeze (status, freeze, thaw, fstrim)
+export const agentFreezeSchema = z.discriminatedUnion('operation', [
+  baseVmSchema.extend({ operation: z.literal('status') }),
+  baseVmSchema.extend({ operation: z.literal('freeze') }),
+  baseVmSchema.extend({ operation: z.literal('thaw') }),
+  baseVmSchema.extend({ operation: z.literal('fstrim') }),
+]);
+
+export type AgentFreezeInput = z.input<typeof agentFreezeSchema>;
+
+// proxmox_agent_power - Guest power operations (shutdown, suspend_disk, suspend_ram, suspend_hybrid)
+export const agentPowerSchema = z.discriminatedUnion('operation', [
+  baseVmSchema.extend({ operation: z.literal('shutdown') }),
+  baseVmSchema.extend({ operation: z.literal('suspend_disk') }),
+  baseVmSchema.extend({ operation: z.literal('suspend_ram') }),
+  baseVmSchema.extend({ operation: z.literal('suspend_hybrid') }),
+]);
+
+export type AgentPowerInput = z.input<typeof agentPowerSchema>;
+
+// proxmox_agent_user - User management (set_password)
+export const agentUserSchema = z.discriminatedUnion('operation', [
+  baseVmSchema.extend({
+    operation: z.literal('set_password'),
+    username: z.string().min(1).max(32).describe('Username to set password for'),
+    password: z.string().min(5).max(1024).describe('New password (5-1024 characters)'),
+    crypted: z.boolean().optional().describe('Whether password is already crypted (default: false)'),
+  }),
+]);
+
+export type AgentUserInput = z.input<typeof agentUserSchema>;
+
 // proxmox_list_vm_firewall_rules - List VM firewall rules
 export const listVmFirewallRulesSchema = baseVmSchema;
 

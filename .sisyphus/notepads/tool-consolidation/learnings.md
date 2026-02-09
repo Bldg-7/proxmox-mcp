@@ -126,3 +126,15 @@
 - Keeping `proxmox_add_disk_vm`/`proxmox_add_mountpoint_lxc` and `proxmox_remove_disk_vm`/`proxmox_remove_mountpoint_lxc` as separate tools avoids schema drift for disk vs mountpoint semantics.
 - Legacy-name grep checks are cleaner when tests avoid hard-coded removed tool names as contiguous string literals.
 - Net result in this wave step: removed 16 legacy tool names and added 4 consolidated names (net -12 for this task); full suite now passes at 1059 tests.
+
+### Task 12: Guest Agent Consolidation
+- 24 agent tools → 7 consolidated tools (net -17, count 167→150)
+- Task description said "30 tools" but actual agent tools count was 24 (firewall tools are separate)
+- Guest agent is VM-only — no type parameter needed
+- Used `z.discriminatedUnion('operation', [...])` for schemas (same pattern as Tasks 4-7)
+- Dispatcher pattern: `requireElevated` at consolidated handler level + `try/catch` for formatErrorResponse
+- Some existing handlers already called `requireElevated` internally (e.g., agentExec, agentFileRead) — double-checking is harmless
+- Some existing handlers did NOT call `requireElevated` (e.g., agentPing, agentGetOsinfo) — consolidated handler adds it
+- All agent operations now require elevated permissions as specified
+- Updated user-facing message from `proxmox_agent_exec_status` to `proxmox_agent_exec with operation=status`
+- Old schemas/handlers kept in place (not deleted) since they're used by the consolidated dispatchers

@@ -88,6 +88,13 @@ import type {
   CreateLxcFirewallRuleInput,
   UpdateLxcFirewallRuleInput,
   DeleteLxcFirewallRuleInput,
+  AgentInfoInput,
+  AgentHwInput,
+  AgentExecToolInput,
+  AgentFileInput,
+  AgentFreezeInput,
+  AgentPowerInput,
+  AgentUserInput,
 } from '../schemas/vm-advanced.js';
 
 interface ProxmoxRrdDataPoint {
@@ -590,7 +597,7 @@ export async function agentExec(
     output += `• **Command**: \`${validated.command}\`\n`;
     if (validated.args) output += `• **Args**: ${validated.args.join(' ')}\n`;
     if (result?.pid !== undefined) output += `• **PID**: ${result.pid}\n`;
-    output += '\nUse `proxmox_agent_exec_status` to check status.';
+    output += '\nUse `proxmox_agent_exec` with operation=status to check status.';
 
     return formatToolResponse(output);
   } catch (error) {
@@ -1566,5 +1573,134 @@ export async function deleteLxcFirewallRule(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Delete LXC Firewall Rule');
+  }
+}
+
+export async function handleAgentInfo(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentInfoInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'query guest agent info');
+    switch (input.operation) {
+      case 'ping': return agentPing(client, config, input);
+      case 'osinfo': return agentGetOsinfo(client, config, input);
+      case 'fsinfo': return agentGetFsinfo(client, config, input);
+      case 'network_interfaces': return agentGetNetworkInterfaces(client, config, input);
+      case 'time': return agentGetTime(client, config, input);
+      case 'timezone': return agentGetTimezone(client, config, input);
+      default: throw new Error(`Unknown operation: ${(input as { operation: string }).operation}`);
+    }
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Info');
+  }
+}
+
+export async function handleAgentHw(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentHwInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'query guest agent hardware info');
+    switch (input.operation) {
+      case 'memory_blocks': return agentGetMemoryBlocks(client, config, input);
+      case 'vcpus': return agentGetVcpus(client, config, input);
+      case 'memory_block_info': return agentGetMemoryBlockInfo(client, config, input);
+      case 'hostname': return agentGetHostname(client, config, input);
+      case 'users': return agentGetUsers(client, config, input);
+      default: throw new Error(`Unknown operation: ${(input as { operation: string }).operation}`);
+    }
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Hardware');
+  }
+}
+
+export async function handleAgentExec(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentExecToolInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'execute guest agent command');
+    switch (input.operation) {
+      case 'exec': return agentExec(client, config, input);
+      case 'status': return agentExecStatus(client, config, input);
+      default: throw new Error(`Unknown operation: ${(input as { operation: string }).operation}`);
+    }
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Exec');
+  }
+}
+
+export async function handleAgentFile(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentFileInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'access guest files');
+    switch (input.operation) {
+      case 'read': return agentFileRead(client, config, input);
+      case 'write': return agentFileWrite(client, config, input);
+      default: throw new Error(`Unknown operation: ${(input as { operation: string }).operation}`);
+    }
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent File');
+  }
+}
+
+export async function handleAgentFreeze(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentFreezeInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'manage guest filesystem freeze');
+    switch (input.operation) {
+      case 'status': return agentFsfreezeStatus(client, config, input);
+      case 'freeze': return agentFsfreezeFreeze(client, config, input);
+      case 'thaw': return agentFsfreezeThaw(client, config, input);
+      case 'fstrim': return agentFstrim(client, config, input);
+      default: throw new Error(`Unknown operation: ${(input as { operation: string }).operation}`);
+    }
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Freeze');
+  }
+}
+
+export async function handleAgentPower(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentPowerInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'control guest power state');
+    switch (input.operation) {
+      case 'shutdown': return agentShutdown(client, config, input);
+      case 'suspend_disk': return agentSuspendDisk(client, config, input);
+      case 'suspend_ram': return agentSuspendRam(client, config, input);
+      case 'suspend_hybrid': return agentSuspendHybrid(client, config, input);
+      default: throw new Error(`Unknown operation: ${(input as { operation: string }).operation}`);
+    }
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent Power');
+  }
+}
+
+export async function handleAgentUser(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AgentUserInput
+): Promise<ToolResponse> {
+  try {
+    requireElevated(config, 'manage guest users');
+    switch (input.operation) {
+      case 'set_password': return agentSetUserPassword(client, config, input);
+      default: throw new Error(`Unknown operation: ${(input as { operation: string }).operation}`);
+    }
+  } catch (error) {
+    return formatErrorResponse(error as Error, 'Agent User');
   }
 }

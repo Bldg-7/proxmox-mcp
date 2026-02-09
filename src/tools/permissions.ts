@@ -271,6 +271,27 @@ export const toolPermissions: ToolPermissions = {
   proxmox_guest_network: {
     elevated: 'elevated',
   },
+  proxmox_agent_info: {
+    elevated: 'elevated',
+  },
+  proxmox_agent_hw: {
+    elevated: 'elevated',
+  },
+  proxmox_agent_exec: {
+    elevated: 'elevated',
+  },
+  proxmox_agent_file: {
+    elevated: 'elevated',
+  },
+  proxmox_agent_freeze: {
+    elevated: 'elevated',
+  },
+  proxmox_agent_power: {
+    elevated: 'elevated',
+  },
+  proxmox_agent_user: {
+    elevated: 'elevated',
+  },
   proxmox_node_disk: {
     list: 'basic',
     smart: 'basic',
