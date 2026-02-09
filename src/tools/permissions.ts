@@ -292,6 +292,63 @@ export const toolPermissions: ToolPermissions = {
   proxmox_agent_user: {
     elevated: 'elevated',
   },
+  proxmox_node_service: {
+    list: 'basic',
+    control: 'elevated',
+  },
+  proxmox_node_log: {
+    syslog: 'basic',
+    journal: 'basic',
+  },
+  proxmox_node_task: {
+    list: 'basic',
+    get: 'basic',
+  },
+  proxmox_node_info: {
+    aplinfo: 'basic',
+    netstat: 'basic',
+    rrddata: 'basic',
+    storage_rrddata: 'basic',
+    report: 'basic',
+  },
+  proxmox_node_config: {
+    get_time: 'basic',
+    set_time: 'elevated',
+    set_dns: 'elevated',
+    get_hosts: 'basic',
+    set_hosts: 'elevated',
+  },
+  proxmox_node_subscription: {
+    get: 'basic',
+    set: 'elevated',
+    delete: 'elevated',
+  },
+  proxmox_apt: {
+    update: 'elevated',
+    upgrade: 'elevated',
+    versions: 'basic',
+  },
+  proxmox_node_bulk: {
+    start_all: 'elevated',
+    stop_all: 'elevated',
+    migrate_all: 'elevated',
+  },
+  proxmox_node_power: {
+    shutdown: 'elevated',
+    reboot: 'elevated',
+    wakeonlan: 'elevated',
+  },
+  proxmox_node_replication: {
+    status: 'basic',
+    log: 'basic',
+    schedule: 'elevated',
+  },
+  proxmox_node_network_iface: {
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+    apply: 'elevated',
+  },
   proxmox_node_disk: {
     list: 'basic',
     smart: 'basic',

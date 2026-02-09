@@ -165,3 +165,138 @@ export const scheduleNodeReplicationSchema = z.object({
 });
 
 export type ScheduleNodeReplicationInput = z.infer<typeof scheduleNodeReplicationSchema>;
+
+// ── Consolidated: proxmox_node_config ────────────────────────────────────
+export const nodeConfigToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('get_time'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('set_time'),
+    node: z.string().min(1).describe('Node name'),
+    time: z.number().int().optional().describe('Unix epoch time in seconds'),
+    timezone: z.string().optional().describe('Timezone (e.g., UTC, America/New_York)'),
+  }),
+  z.object({
+    action: z.literal('set_dns'),
+    node: z.string().min(1).describe('Node name'),
+    search: z.string().optional().describe('Search domain'),
+    dns1: z.string().optional().describe('Primary DNS server'),
+    dns2: z.string().optional().describe('Secondary DNS server'),
+    dns3: z.string().optional().describe('Tertiary DNS server'),
+    delete: z.string().optional().describe('Comma-separated list of settings to delete'),
+  }),
+  z.object({
+    action: z.literal('get_hosts'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('set_hosts'),
+    node: z.string().min(1).describe('Node name'),
+    ip: z.string().min(1).describe('IP address'),
+    name: z.string().min(1).describe('Hostname or alias'),
+    comment: z.string().optional().describe('Optional comment'),
+    digest: z.string().optional().describe('Configuration digest'),
+  }),
+]);
+
+export type NodeConfigToolInput = z.infer<typeof nodeConfigToolSchema>;
+
+// ── Consolidated: proxmox_node_subscription ──────────────────────────────
+export const nodeSubscriptionToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('get'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('set'),
+    node: z.string().min(1).describe('Node name'),
+    key: z.string().min(1).describe('Subscription key'),
+  }),
+  z.object({
+    action: z.literal('delete'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+]);
+
+export type NodeSubscriptionToolInput = z.infer<typeof nodeSubscriptionToolSchema>;
+
+// ── Consolidated: proxmox_apt ────────────────────────────────────────────
+export const aptToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('update'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('upgrade'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('versions'),
+    node: z.string().min(1).describe('Node name'),
+    package: z.string().optional().describe('Filter by package name'),
+  }),
+]);
+
+export type AptToolInput = z.infer<typeof aptToolSchema>;
+
+// ── Consolidated: proxmox_node_bulk ──────────────────────────────────────
+export const nodeBulkToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('start_all'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('stop_all'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('migrate_all'),
+    node: z.string().min(1).describe('Node name'),
+    target: z.string().min(1).describe('Target node name'),
+    maxworkers: z.number().int().optional().describe('Maximum parallel migrations'),
+    'with-local-disks': z.boolean().optional().describe('Include local disks in migration'),
+  }),
+]);
+
+export type NodeBulkToolInput = z.infer<typeof nodeBulkToolSchema>;
+
+// ── Consolidated: proxmox_node_power ─────────────────────────────────────
+export const nodePowerToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('shutdown'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('reboot'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('wakeonlan'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+]);
+
+export type NodePowerToolInput = z.infer<typeof nodePowerToolSchema>;
+
+// ── Consolidated: proxmox_node_replication ────────────────────────────────
+export const nodeReplicationToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('status'),
+    node: z.string().min(1).describe('Node name'),
+    id: z.string().min(1).describe('Replication job ID'),
+  }),
+  z.object({
+    action: z.literal('log'),
+    node: z.string().min(1).describe('Node name'),
+    id: z.string().min(1).describe('Replication job ID'),
+  }),
+  z.object({
+    action: z.literal('schedule'),
+    node: z.string().min(1).describe('Node name'),
+    id: z.string().min(1).describe('Replication job ID'),
+  }),
+]);
+
+export type NodeReplicationToolInput = z.infer<typeof nodeReplicationToolSchema>;

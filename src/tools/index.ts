@@ -1,5 +1,9 @@
 export {
   handleNodeTool,
+  handleNodeService,
+  handleNodeLog,
+  handleNodeTask,
+  handleNodeInfo,
   getNodes,
   getNodeStatus,
   getNodeNetwork,
@@ -26,6 +30,7 @@ export {
   updateNetworkIface,
   deleteNetworkIface,
   applyNetworkConfig,
+  handleNodeNetworkIface,
 } from './node-network.js';
 
 // System Operations tools
@@ -50,6 +55,12 @@ export {
   getNodeReplicationStatus,
   getNodeReplicationLog,
   scheduleNodeReplication,
+  handleNodeConfig,
+  handleNodeSubscription,
+  handleApt,
+  handleNodeBulk,
+  handleNodePower,
+  handleNodeReplication,
 } from './system-operations.js';
 
 // Cluster Management tools

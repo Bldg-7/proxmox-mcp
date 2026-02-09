@@ -15,6 +15,7 @@ import type {
   UpdateNetworkIfaceInput,
   DeleteNetworkIfaceInput,
   ApplyNetworkConfigInput,
+  NodeNetworkIfaceToolInput,
 } from '../schemas/node-network.js';
 
 /**
@@ -202,5 +203,24 @@ export async function applyNetworkConfig(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Apply Network Configuration');
+  }
+}
+
+export async function handleNodeNetworkIface(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeNetworkIfaceToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'create':
+      return createNetworkIface(client, config, input as CreateNetworkIfaceInput);
+    case 'update':
+      return updateNetworkIface(client, config, input as UpdateNetworkIfaceInput);
+    case 'delete':
+      return deleteNetworkIface(client, config, { node: input.node, iface: input.iface, digest: input.digest });
+    case 'apply':
+      return applyNetworkConfig(client, config, { node: input.node, revert: input.revert });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Network Interface');
   }
 }

@@ -47,6 +47,12 @@ import type {
   GetNodeReplicationStatusInput,
   GetNodeReplicationLogInput,
   ScheduleNodeReplicationInput,
+  NodeConfigToolInput,
+  NodeSubscriptionToolInput,
+  AptToolInput,
+  NodeBulkToolInput,
+  NodePowerToolInput,
+  NodeReplicationToolInput,
 } from '../schemas/system-operations.js';
 
 interface ProxmoxNodeTime {
@@ -736,5 +742,111 @@ export async function scheduleNodeReplication(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Schedule Node Replication');
+  }
+}
+
+export async function handleNodeConfig(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeConfigToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'get_time':
+      return getNodeTime(client, config, { node: input.node });
+    case 'set_time':
+      return updateNodeTime(client, config, { node: input.node, time: input.time, timezone: input.timezone });
+    case 'set_dns':
+      return updateNodeDns(client, config, { node: input.node, search: input.search, dns1: input.dns1, dns2: input.dns2, dns3: input.dns3, delete: input.delete });
+    case 'get_hosts':
+      return getNodeHosts(client, config, { node: input.node });
+    case 'set_hosts':
+      return updateNodeHosts(client, config, { node: input.node, ip: input.ip, name: input.name, comment: input.comment, digest: input.digest });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Config');
+  }
+}
+
+export async function handleNodeSubscription(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeSubscriptionToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'get':
+      return getNodeSubscription(client, config, { node: input.node });
+    case 'set':
+      return setNodeSubscription(client, config, { node: input.node, key: input.key });
+    case 'delete':
+      return deleteNodeSubscription(client, config, { node: input.node });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Subscription');
+  }
+}
+
+export async function handleApt(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AptToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'update':
+      return aptUpdate(client, config, { node: input.node });
+    case 'upgrade':
+      return aptUpgrade(client, config, { node: input.node });
+    case 'versions':
+      return aptVersions(client, config, { node: input.node, package: input.package });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'APT');
+  }
+}
+
+export async function handleNodeBulk(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeBulkToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'start_all':
+      return startAll(client, config, { node: input.node });
+    case 'stop_all':
+      return stopAll(client, config, { node: input.node });
+    case 'migrate_all':
+      return migrateAll(client, config, { node: input.node, target: input.target, maxworkers: input.maxworkers, 'with-local-disks': input['with-local-disks'] });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Bulk');
+  }
+}
+
+export async function handleNodePower(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodePowerToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'shutdown':
+      return nodeShutdown(client, config, { node: input.node });
+    case 'reboot':
+      return nodeReboot(client, config, { node: input.node });
+    case 'wakeonlan':
+      return nodeWakeonlan(client, config, { node: input.node });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Power');
+  }
+}
+
+export async function handleNodeReplication(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeReplicationToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'status':
+      return getNodeReplicationStatus(client, config, { node: input.node, id: input.id });
+    case 'log':
+      return getNodeReplicationLog(client, config, { node: input.node, id: input.id });
+    case 'schedule':
+      return scheduleNodeReplication(client, config, { node: input.node, id: input.id });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Replication');
   }
 }

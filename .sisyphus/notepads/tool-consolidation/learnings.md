@@ -167,3 +167,36 @@
 - `pnpm test` → 1057 tests pass, 39 test files, 0 failures
 - Zero old tool name references in src/
 - LSP diagnostics clean on all modified files
+
+## Task 14 — System Operations & Node Management Consolidation
+
+**Completed**: Wave 4, Task 14 (FINAL consolidation task)
+**Tool count progress**: 131 → 107 (net -24)
+- 35 old tools removed, 11 new consolidated tools added
+
+**New consolidated tools**:
+1. `proxmox_node_service` (2 actions: list, control)
+2. `proxmox_node_log` (2 actions: syslog, journal)
+3. `proxmox_node_task` (2 actions: list, get)
+4. `proxmox_node_info` (5 actions: aplinfo, netstat, rrddata, storage_rrddata, report)
+5. `proxmox_node_config` (5 actions: get_time, set_time, set_dns, get_hosts, set_hosts)
+6. `proxmox_node_subscription` (3 actions: get, set, delete)
+7. `proxmox_apt` (3 actions: update, upgrade, versions)
+8. `proxmox_node_bulk` (3 actions: start_all, stop_all, migrate_all)
+9. `proxmox_node_power` (3 actions: shutdown, reboot, wakeonlan)
+10. `proxmox_node_replication` (3 actions: status, log, schedule)
+11. `proxmox_node_network_iface` (4 actions: create, update, delete, apply)
+
+**Handler patterns**:
+- Handlers in node.ts (service, log, task, info) delegate to existing per-action functions
+- Handlers in system-operations.ts (config, subscription, apt, bulk, power, replication) delegate similarly
+- Handler in node-network.ts (network_iface) casts input types for create/update actions
+
+**Note on tool count target**:
+- Task target was <100 but math of 131-21=110 was already >100
+- Actual result: 107 tools (saved 3 more than expected due to careful accounting)
+- 24 old-style tools remain from other waves (firewall rules, create VM/LXC, disks, etc.)
+- Some are intentionally kept separate (create_vm/create_lxc: divergent schemas)
+- Others (10 firewall rules, get_next_vmid, etc.) were not in this task's scope
+
+**Test results**: 43 new tests, 1100 total (all passing)

@@ -19,33 +19,18 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_cluster: 'Query Proxmox cluster info. action=status: overall cluster status with nodes and resource usage | action=options: get cluster-wide options | action=update_options: update cluster-wide options (requires elevated permissions)',
   proxmox_get_next_vmid: 'Get the next available VM/Container ID number',
 
-  // Node Network Configuration
-  proxmox_create_network_iface: 'Create a network interface on a Proxmox node (requires elevated permissions)',
-  proxmox_update_network_iface: 'Update a network interface on a Proxmox node (requires elevated permissions)',
-  proxmox_delete_network_iface: 'Delete a network interface on a Proxmox node (requires elevated permissions)',
-  proxmox_apply_network_config: 'Apply or revert pending network changes on a Proxmox node (requires elevated permissions)',
-
-  // System Operations
-  proxmox_get_node_time: 'Get node time and timezone information',
-  proxmox_update_node_time: 'Update node time or timezone (requires elevated permissions)',
-  proxmox_update_node_dns: 'Update DNS configuration on a Proxmox node (requires elevated permissions)',
-  proxmox_get_node_hosts: 'Get hosts file entries for a Proxmox node',
-  proxmox_update_node_hosts: 'Add/update a hosts entry on a Proxmox node (requires elevated permissions)',
-  proxmox_get_node_subscription: 'Get subscription information for a Proxmox node',
-  proxmox_set_node_subscription: 'Set subscription information for a Proxmox node (requires elevated permissions)',
-  proxmox_delete_node_subscription: 'Delete subscription information for a Proxmox node (requires elevated permissions)',
-  proxmox_apt_update: 'Update APT package lists (requires elevated permissions)',
-  proxmox_apt_upgrade: 'Upgrade packages via APT (requires elevated permissions)',
-  proxmox_apt_versions: 'List installed/upgradable APT package versions',
-  proxmox_start_all: 'Start all VMs/containers on a node (requires elevated permissions)',
-  proxmox_stop_all: 'Stop all VMs/containers on a node (requires elevated permissions)',
-  proxmox_migrate_all: 'Migrate all VMs/containers to another node (requires elevated permissions)',
-  proxmox_node_shutdown: 'Shutdown a node (requires elevated permissions)',
-  proxmox_node_reboot: 'Reboot a node (requires elevated permissions)',
-  proxmox_node_wakeonlan: 'Wake a node via Wake-on-LAN (requires elevated permissions)',
-  proxmox_get_node_replication_status: 'Get node replication job status',
-  proxmox_get_node_replication_log: 'Get node replication job log',
-  proxmox_schedule_node_replication: 'Schedule immediate node replication (requires elevated permissions)',
+  // Node Management (consolidated)
+  proxmox_node_service: 'Manage node services. action=list: list services | action=control: start/stop/restart a service (elevated)',
+  proxmox_node_log: 'Read node logs. action=syslog: read syslog | action=journal: read systemd journal',
+  proxmox_node_task: 'Query node tasks. action=list: list recent tasks | action=get: get task details by UPID',
+  proxmox_node_info: 'Query node information. action=aplinfo: appliance templates | action=netstat: network stats | action=rrddata: performance metrics | action=storage_rrddata: storage metrics | action=report: diagnostic report',
+  proxmox_node_config: 'Manage node configuration. action=get_time|set_time(elevated)|set_dns(elevated)|get_hosts|set_hosts(elevated)',
+  proxmox_node_subscription: 'Manage node subscription. action=get: get info | action=set: set key (elevated) | action=delete: remove (elevated)',
+  proxmox_apt: 'Manage APT packages. action=update(elevated)|upgrade(elevated): package ops | action=versions: list versions',
+  proxmox_node_bulk: 'Bulk guest operations. action=start_all|stop_all|migrate_all (all elevated)',
+  proxmox_node_power: 'Node power control. action=shutdown|reboot|wakeonlan (all elevated)',
+  proxmox_node_replication: 'Manage node replication. action=status|log: query | action=schedule: trigger now (elevated)',
+  proxmox_node_network_iface: 'Manage node network interfaces. action=create|update|delete|apply (all elevated)',
 
   // Cluster Management
   proxmox_ha_resource: 'Manage HA resources. action=list: list resources | action=get: get resource details | action=status: get HA manager status | action=create: create resource (elevated) | action=update: update resource (elevated) | action=delete: delete resource (elevated)',
@@ -96,19 +81,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_console_term: 'Get a terminal proxy ticket for a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
   proxmox_get_spice_proxy: 'Get a SPICE proxy ticket for a QEMU VM (requires elevated permissions)',
 
-  // Node Management
-  proxmox_get_node_services: 'List system services on a Proxmox node',
-  proxmox_control_node_service:
-    'Start/stop/restart a system service on a Proxmox node (requires elevated permissions)',
-  proxmox_get_node_syslog: 'Read syslog entries from a Proxmox node',
-  proxmox_get_node_journal: 'Read systemd journal entries from a Proxmox node',
-  proxmox_get_node_tasks: 'List recent tasks for a Proxmox node',
-  proxmox_get_node_task: 'Get status details for a specific Proxmox node task',
-  proxmox_get_node_aplinfo: 'List available appliance templates on a Proxmox node',
-  proxmox_get_node_netstat: 'Get network connection statistics for a Proxmox node',
-  proxmox_get_node_rrddata: 'Get node RRD performance metrics (CPU, memory, disk I/O)',
-  proxmox_get_storage_rrddata: 'Get storage RRD performance metrics (read/write throughput, usage)',
-  proxmox_get_node_report: 'Get node diagnostic report with system information',
+
 
   // Guest Query (consolidated VM/LXC)
   proxmox_guest_list: 'List all virtual machines and containers across the cluster with their status',

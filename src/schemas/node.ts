@@ -209,3 +209,79 @@ export const getNodeReportSchema = z.object({
 });
 
 export type GetNodeReportInput = z.infer<typeof getNodeReportSchema>;
+
+// ── Consolidated: proxmox_node_service ───────────────────────────────────
+export const nodeServiceToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('list'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('control'),
+    node: z.string().min(1).describe('Node name'),
+    service: z.string().min(1).describe('Service name (e.g., pveproxy, ssh, pvedaemon)'),
+    command: z.enum(['start', 'stop', 'restart']).describe('Service command'),
+  }),
+]);
+
+export type NodeServiceToolInput = z.infer<typeof nodeServiceToolSchema>;
+
+// ── Consolidated: proxmox_node_log ───────────────────────────────────────
+export const nodeLogToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('syslog'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('journal'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+]);
+
+export type NodeLogToolInput = z.infer<typeof nodeLogToolSchema>;
+
+// ── Consolidated: proxmox_node_task ──────────────────────────────────────
+export const nodeTaskToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('list'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('get'),
+    node: z.string().min(1).describe('Node name'),
+    upid: z.string().min(1).describe('Task UPID'),
+  }),
+]);
+
+export type NodeTaskToolInput = z.infer<typeof nodeTaskToolSchema>;
+
+// ── Consolidated: proxmox_node_info ──────────────────────────────────────
+export const nodeInfoToolSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('aplinfo'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('netstat'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('rrddata'),
+    node: z.string().min(1).describe('Node name'),
+    timeframe: z.enum(['hour', 'day', 'week', 'month', 'year']).optional().describe('Timeframe for metrics'),
+    cf: z.enum(['AVERAGE', 'MAX']).optional().describe('Consolidation function'),
+  }),
+  z.object({
+    action: z.literal('storage_rrddata'),
+    node: z.string().min(1).describe('Node name'),
+    storage: z.string().min(1).describe('Storage name'),
+    timeframe: z.enum(['hour', 'day', 'week', 'month', 'year']).optional().describe('Timeframe for metrics'),
+    cf: z.enum(['AVERAGE', 'MAX']).optional().describe('Consolidation function'),
+  }),
+  z.object({
+    action: z.literal('report'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+]);
+
+export type NodeInfoToolInput = z.infer<typeof nodeInfoToolSchema>;
