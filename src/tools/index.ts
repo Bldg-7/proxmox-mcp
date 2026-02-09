@@ -17,6 +17,7 @@ export {
   getStorageRrddata,
   getNodeReport,
 } from './node.js';
+export { handleNodeDisk } from './node-disk.js';
 export { handleClusterTool, getClusterStatus, getNextVMID } from './cluster.js';
 
 // Node Network Configuration tools
@@ -294,6 +295,8 @@ export {
 export {
   addDiskVM,
   addMountpointLxc,
+  handleGuestDiskResize,
+  handleGuestDiskMove,
   resizeDiskVM,
   resizeDiskLxc,
   removeDiskVM,
@@ -312,6 +315,7 @@ export {
 
 // Network tools
 export {
+  handleGuestNetwork,
   addNetworkVm,
   addNetworkLxc,
   updateNetworkVm,

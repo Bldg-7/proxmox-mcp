@@ -72,6 +72,41 @@ export const nodeToolSchema = z.discriminatedUnion('action', [
 
 export type NodeToolInput = z.infer<typeof nodeToolSchema>;
 
+// ── Consolidated: proxmox_node_disk ──────────────────────────────────────
+export const nodeDiskSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('list'),
+    node: z.string().min(1).describe('Node name'),
+    include_partitions: z.boolean().optional().describe('Include partitions in listing'),
+    skip_smart: z.boolean().optional().describe('Skip SMART health checks (faster)'),
+    type: z.enum(['unused', 'journal_disks']).optional().describe('Filter by disk type'),
+  }),
+  z.object({
+    action: z.literal('smart'),
+    node: z.string().min(1).describe('Node name'),
+    disk: z.string().min(1).describe('Block device path (e.g., /dev/sda)'),
+    health_only: z.boolean().optional().describe('Only return health status'),
+  }),
+  z.object({
+    action: z.literal('lvm'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('zfs'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('lvmthin'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+  z.object({
+    action: z.literal('directory'),
+    node: z.string().min(1).describe('Node name'),
+  }),
+]);
+
+export type NodeDiskInput = z.infer<typeof nodeDiskSchema>;
+
 // ── Consolidated: proxmox_cluster ───────────────────────────────────────
 export const clusterToolSchema = z.discriminatedUnion('action', [
   z.object({

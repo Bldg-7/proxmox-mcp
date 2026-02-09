@@ -42,6 +42,26 @@ export const resizeDiskLxcSchema = z.object({
 
 export type ResizeDiskLxcInput = z.infer<typeof resizeDiskLxcSchema>;
 
+// proxmox_guest_disk_resize - Resize VM/LXC disk or volume
+export const guestDiskResizeSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Node name where VM is located'),
+    vmid: z.coerce.number().describe('VM ID number'),
+    disk: z.string().min(1).describe('Disk name (e.g., scsi0, virtio0, sata0, ide0)'),
+    size: z.string().min(1).describe('New size with + for relative or absolute (e.g., +10G or 50G)'),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Node name where container is located'),
+    vmid: z.coerce.number().describe('Container ID number'),
+    disk: z.string().min(1).describe('Disk name (rootfs, mp0, mp1, etc.)'),
+    size: z.string().min(1).describe('New size with + for relative or absolute (e.g., +10G or 50G)'),
+  }),
+]);
+
+export type GuestDiskResizeInput = z.infer<typeof guestDiskResizeSchema>;
+
 // proxmox_remove_disk_vm - Remove a disk from a QEMU VM
 export const removeDiskVmSchema = z.object({
   node: z.string().min(1).describe('Node name where VM is located'),
@@ -81,6 +101,28 @@ export const moveDiskLxcSchema = z.object({
 });
 
 export type MoveDiskLxcInput = z.infer<typeof moveDiskLxcSchema>;
+
+// proxmox_guest_disk_move - Consolidated disk move for VM/LXC
+export const guestDiskMoveSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('vm'),
+    node: z.string().min(1).describe('Node name where VM is located'),
+    vmid: z.coerce.number().describe('VM ID number'),
+    disk: z.string().min(1).describe('Disk name to move (e.g., scsi0, virtio0, sata0, ide0)'),
+    storage: z.string().min(1).describe('Target storage name'),
+    delete: z.boolean().default(true).describe('Delete source disk after move (default: true)'),
+  }),
+  z.object({
+    type: z.literal('lxc'),
+    node: z.string().min(1).describe('Node name where container is located'),
+    vmid: z.coerce.number().describe('Container ID number'),
+    disk: z.string().min(1).describe('Disk/volume name to move (rootfs, mp0, mp1, etc.)'),
+    storage: z.string().min(1).describe('Target storage name'),
+    delete: z.boolean().default(true).describe('Delete source disk after move (default: true)'),
+  }),
+]);
+
+export type GuestDiskMoveInput = z.infer<typeof guestDiskMoveSchema>;
 
 // proxmox_get_node_disks - Get list of disks on a node
 export const getNodeDisksSchema = z.object({

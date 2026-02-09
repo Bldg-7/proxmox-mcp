@@ -183,20 +183,13 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   // Disks
   proxmox_add_disk_vm: 'Add a new disk to a QEMU virtual machine (requires elevated permissions)',
   proxmox_add_mountpoint_lxc: 'Add a mount point to an LXC container (requires elevated permissions)',
-  proxmox_resize_disk_vm: 'Resize a QEMU VM disk (requires elevated permissions)',
-  proxmox_resize_disk_lxc: 'Resize an LXC container disk or mount point (requires elevated permissions)',
+  proxmox_guest_disk_resize: 'Resize guest storage for VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
   proxmox_remove_disk_vm: 'Remove a disk from a QEMU virtual machine (requires elevated permissions)',
   proxmox_remove_mountpoint_lxc: 'Remove a mount point from an LXC container (requires elevated permissions)',
-  proxmox_move_disk_vm: 'Move a QEMU VM disk to different storage (requires elevated permissions)',
-  proxmox_move_disk_lxc: 'Move an LXC container disk to different storage (requires elevated permissions)',
+  proxmox_guest_disk_move: 'Move guest storage for VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
 
   // Network
-  proxmox_add_network_vm: 'Add network interface to QEMU VM (requires elevated permissions)',
-  proxmox_add_network_lxc: 'Add network interface to LXC container (requires elevated permissions)',
-  proxmox_update_network_vm: 'Update/modify VM network interface configuration (requires elevated permissions)',
-  proxmox_update_network_lxc: 'Update/modify LXC network interface configuration (requires elevated permissions)',
-  proxmox_remove_network_vm: 'Remove network interface from QEMU VM (requires elevated permissions)',
-  proxmox_remove_network_lxc: 'Remove network interface from LXC container (requires elevated permissions)',
+  proxmox_guest_network: 'Manage guest network interfaces. action=add|update|remove with type=vm|lxc (requires elevated permissions)',
 
   // Command
   proxmox_execute_vm_command: 'Execute a shell command on a QEMU VM via guest agent (QEMU only)',
@@ -207,14 +200,9 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
    proxmox_create_vm: 'Create a new QEMU virtual machine (requires elevated permissions)',
 
     // Node Disk Query
-    proxmox_get_node_disks: 'List physical disks on a Proxmox node (SSD, HDD, NVMe) with health status',
-    proxmox_get_disk_smart: 'Get SMART health data for a specific disk on a Proxmox node',
-    proxmox_get_node_lvm: 'List LVM volume groups and physical volumes on a Proxmox node',
-    proxmox_get_node_zfs: 'List ZFS pools on a Proxmox node with health and capacity info',
+    proxmox_node_disk: 'Query node disk information. action=list|smart|lvm|zfs|lvmthin|directory',
     proxmox_init_disk_gpt: 'Initialize GPT partition table on a disk (requires elevated permissions, destructive)',
     proxmox_wipe_disk: 'Wipe all data from a disk (requires elevated permissions, destructive)',
-    proxmox_get_node_lvmthin: 'List LVM thin pools on a Proxmox node with capacity info',
-    proxmox_get_node_directory: 'List directory-based storage on a Proxmox node',
 
     // Cloud-Init
     proxmox_get_cloudinit_config: 'Get cloud-init configuration items for a QEMU VM',

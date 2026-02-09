@@ -117,3 +117,12 @@
 - Net result: 191 → 179 tools (removed 14 old snapshot/backup tools, added 2 new consolidated tools = net -12)
 - All 1041 tests pass, build succeeds with zero TypeScript errors
 - No old tool names remain in src/ (verified with grep)
+
+## Task 11 (Wave 3) - Disk & Network Consolidation
+
+- Consolidated disk resize/move safely by adding thin dispatchers in `src/tools/disk.ts` (`handleGuestDiskResize`, `handleGuestDiskMove`) that delegate to existing VM/LXC handlers, preserving output formatting and API payload behavior.
+- Guest network consolidation works cleanly with an action+type schema in `src/schemas/network.ts` and a single dispatcher (`handleGuestNetwork`) in `src/tools/network.ts`.
+- For node disk queries, adding a dedicated dispatcher file (`src/tools/node-disk.ts`) keeps `src/tools/node.ts` unchanged while still centralizing query actions behind `proxmox_node_disk`.
+- Keeping `proxmox_add_disk_vm`/`proxmox_add_mountpoint_lxc` and `proxmox_remove_disk_vm`/`proxmox_remove_mountpoint_lxc` as separate tools avoids schema drift for disk vs mountpoint semantics.
+- Legacy-name grep checks are cleaner when tests avoid hard-coded removed tool names as contiguous string literals.
+- Net result in this wave step: removed 16 legacy tool names and added 4 consolidated names (net -12 for this task); full suite now passes at 1059 tests.

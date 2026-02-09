@@ -71,3 +71,44 @@ export const removeNetworkLxcSchema = z.object({
 });
 
 export type RemoveNetworkLxcInput = z.infer<typeof removeNetworkLxcSchema>;
+
+// proxmox_guest_network - Consolidated VM/LXC guest network operations
+export const guestNetworkSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('add'),
+    type: z.enum(['vm', 'lxc']).describe('Guest type'),
+    node: z.string().min(1).describe('Node name where guest is located'),
+    vmid: z.coerce.number().describe('Guest ID number'),
+    net: z.string().min(1).describe('Network interface name (net0, net1, net2, etc.)'),
+    bridge: z.string().min(1).describe('Bridge name (e.g., vmbr0, vmbr1)'),
+    model: z.string().optional().describe('VM only: network model (virtio, e1000, rtl8139, vmxnet3)'),
+    macaddr: z.string().optional().describe('VM only: MAC address (XX:XX:XX:XX:XX:XX)'),
+    vlan: z.number().optional().describe('VM only: VLAN tag (1-4094)'),
+    ip: z.string().optional().describe('LXC only: IP address (dhcp, 192.168.1.100/24, auto)'),
+    gw: z.string().optional().describe('LXC only: gateway IP address'),
+    firewall: z.boolean().optional().describe('Enable firewall on this interface'),
+  }),
+  z.object({
+    action: z.literal('update'),
+    type: z.enum(['vm', 'lxc']).describe('Guest type'),
+    node: z.string().min(1).describe('Node name where guest is located'),
+    vmid: z.coerce.number().describe('Guest ID number'),
+    net: z.string().min(1).describe('Network interface name to update (net0, net1, net2, etc.)'),
+    bridge: z.string().optional().describe('Bridge name (e.g., vmbr0, vmbr1)'),
+    model: z.string().optional().describe('VM only: network model (virtio, e1000, rtl8139, vmxnet3)'),
+    macaddr: z.string().optional().describe('VM only: MAC address (XX:XX:XX:XX:XX:XX)'),
+    vlan: z.number().optional().describe('VM only: VLAN tag (1-4094)'),
+    ip: z.string().optional().describe('LXC only: IP address (dhcp, 192.168.1.100/24, auto)'),
+    gw: z.string().optional().describe('LXC only: gateway IP address'),
+    firewall: z.boolean().optional().describe('Enable firewall on this interface'),
+  }),
+  z.object({
+    action: z.literal('remove'),
+    type: z.enum(['vm', 'lxc']).describe('Guest type'),
+    node: z.string().min(1).describe('Node name where guest is located'),
+    vmid: z.coerce.number().describe('Guest ID number'),
+    net: z.string().min(1).describe('Network interface name to remove (net0, net1, net2, etc.)'),
+  }),
+]);
+
+export type GuestNetworkInput = z.infer<typeof guestNetworkSchema>;

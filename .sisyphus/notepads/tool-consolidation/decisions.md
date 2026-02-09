@@ -40,3 +40,11 @@
 - Consolidated `update_vm_config` and `update_lxc_config` into `proxmox_guest_config_update(type=...)` because both are structurally identical (`node`, `vmid`, `config`, `delete`).
 - Migrate and template actions moved into the same guest-modify consolidated layer (`proxmox_guest_migrate`, `proxmox_guest_template`) to keep all VM/LXC modify operations behind a consistent `type` parameter API.
 - Implemented consolidated handlers as direct delegates to existing legacy handlers to preserve response formats and validation behavior.
+
+## Task 11 - Disk/Network Consolidation Decisions
+
+- Kept `proxmox_add_disk_vm` and `proxmox_add_mountpoint_lxc` separate, and kept `proxmox_remove_disk_vm` and `proxmox_remove_mountpoint_lxc` separate, per schema-divergence guardrails (disk vs mountpoint semantics).
+- Consolidated resize and move into `proxmox_guest_disk_resize` and `proxmox_guest_disk_move` using `type: 'vm' | 'lxc'` discrimination.
+- Consolidated VM/LXC NIC add/update/remove into one `proxmox_guest_network` tool using `action + type` schema; type-specific fields stay optional and dispatch only to relevant underlying handlers.
+- Consolidated node disk query actions into `proxmox_node_disk` (`list|smart|lvm|zfs|lvmthin|directory`) and kept `proxmox_init_disk_gpt` / `proxmox_wipe_disk` separate elevated tools rather than adding a separate `node_disk_admin` wrapper.
+- Added explicit permission entries for all disk/network tools: all guest disk/network operations and destructive node disk operations are elevated; `proxmox_node_disk` query actions are basic.

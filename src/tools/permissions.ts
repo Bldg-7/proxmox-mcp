@@ -250,4 +250,39 @@ export const toolPermissions: ToolPermissions = {
   proxmox_create_lxc: {
     elevated: 'elevated',
   },
+  proxmox_add_disk_vm: {
+    elevated: 'elevated',
+  },
+  proxmox_add_mountpoint_lxc: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_disk_resize: {
+    elevated: 'elevated',
+  },
+  proxmox_remove_disk_vm: {
+    elevated: 'elevated',
+  },
+  proxmox_remove_mountpoint_lxc: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_disk_move: {
+    elevated: 'elevated',
+  },
+  proxmox_guest_network: {
+    elevated: 'elevated',
+  },
+  proxmox_node_disk: {
+    list: 'basic',
+    smart: 'basic',
+    lvm: 'basic',
+    zfs: 'basic',
+    lvmthin: 'basic',
+    directory: 'basic',
+  },
+  proxmox_init_disk_gpt: {
+    elevated: 'elevated',
+  },
+  proxmox_wipe_disk: {
+    elevated: 'elevated',
+  },
 };
