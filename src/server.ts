@@ -78,7 +78,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   // Console Access
   proxmox_console_vnc: 'Get a VNC proxy ticket for a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
   proxmox_console_term: 'Get a terminal proxy ticket for a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
-  proxmox_get_spice_proxy: 'Get a SPICE proxy ticket for a QEMU VM (requires elevated permissions)',
+  proxmox_console_spice: 'Get a SPICE proxy ticket for a QEMU VM (requires elevated permissions)',
 
 
 

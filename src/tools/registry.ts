@@ -332,7 +332,7 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   // Console Access (consolidated)
   proxmox_console_vnc: { handler: handleConsoleVnc, schema: consoleVncSchema },
   proxmox_console_term: { handler: handleConsoleTerm, schema: consoleTermSchema },
-  proxmox_get_spice_proxy: { handler: getSpiceProxy, schema: getSpiceProxySchema },
+  proxmox_console_spice: { handler: getSpiceProxy, schema: getSpiceProxySchema },
 
   // Guest Query (consolidated VM/LXC)
   proxmox_guest_list: { handler: handleGuestList, schema: guestListSchema },

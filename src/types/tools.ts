@@ -75,7 +75,7 @@ export const TOOL_NAMES = [
   'proxmox_guest_firewall_rule',
   'proxmox_console_vnc',
   'proxmox_console_term',
-  'proxmox_get_spice_proxy',
+  'proxmox_console_spice',
   'proxmox_guest_snapshot',
   'proxmox_backup',
   'proxmox_vm_disk',

@@ -372,7 +372,7 @@ export const toolPermissions: ToolPermissions = {
   proxmox_console_term: {
     elevated: 'elevated',
   },
-  proxmox_get_spice_proxy: {
+  proxmox_console_spice: {
     elevated: 'elevated',
   },
   proxmox_cloudinit: {
