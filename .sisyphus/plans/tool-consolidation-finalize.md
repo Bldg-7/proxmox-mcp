@@ -144,7 +144,7 @@ Wave 3 (Finalization — SEQUENTIAL after Wave 2):
 
 ## TODOs
 
-- [ ] 1. 잔여 Old-Style Tool 추가 통합 (107→~90)
+- [x] 1. 잔여 Old-Style Tool 추가 통합 (107→~90)
 
   **What to do**:
   
@@ -286,7 +286,7 @@ Wave 3 (Finalization — SEQUENTIAL after Wave 2):
 
 ---
 
-- [ ] 2. docs/TOOLS.md + docs/TOOLS_ko.md 전면 재작성
+- [x] 2. docs/TOOLS.md + docs/TOOLS_ko.md 전면 재작성
 
   **What to do**:
   - `docs/TOOLS.md` — 현재 309개 tool 기준 전면 재작성 → 새 ~91개 tool 기준
