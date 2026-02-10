@@ -41,3 +41,34 @@ All 8 criteria marked complete:
 ### Next Steps
 Branch is PR-ready. All commits pushed to origin/feat/tool-consolidation-309-to-107.
 User can create PR and merge to trigger changeset version bump (0.6.1 → 1.0.0).
+
+## [2026-02-10 16:00] Post-Completion: Workflow Update
+
+### Change
+Made `release-skills.yml` workflow manual-only by removing automatic trigger on push to main.
+
+**Before**:
+```yaml
+on:
+  push:
+    branches: [main]
+    paths: ['skills/**']
+  workflow_dispatch:
+```
+
+**After**:
+```yaml
+on:
+  workflow_dispatch:
+```
+
+### Rationale
+User requested manual control over skills release workflow. Automatic releases on every skills/** change may not be desired.
+
+### Commit
+- `325beb1` - ci: make release-skills workflow manual-only (remove auto-trigger)
+
+### How to Trigger
+Users can now manually trigger the workflow via:
+- GitHub UI: Actions → Release Skills → Run workflow
+- GitHub CLI: `gh workflow run release-skills.yml`
