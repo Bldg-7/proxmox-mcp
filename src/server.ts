@@ -65,8 +65,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   // Storage Management (consolidated)
   proxmox_storage_config: 'Manage storage configurations (list, get, create, update, delete, cluster_usage)',
   proxmox_storage_content: 'Manage storage content (list, list_templates, upload, download_url, delete, prune)',
-  proxmox_list_file_restore: 'List files in a backup for restore',
-  proxmox_download_file_restore: 'Download a file from backup',
+  proxmox_file_restore: 'Restore files from backup. action=list: list files in backup | action=download: download file from backup',
 
   // Ceph Integration (consolidated)
   proxmox_ceph: 'Query Ceph cluster. action=status: get Ceph cluster health, FSID, monitors, OSDs, and placement groups',

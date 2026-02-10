@@ -176,6 +176,7 @@ export {
   handleStorageConfigTool,
   handleStorageContentTool,
   handlePoolTool,
+  handleFileRestore,
 } from './storage-management.js';
 
 // Ceph Integration tools

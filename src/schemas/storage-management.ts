@@ -168,6 +168,13 @@ export const downloadFileRestoreSchema = z.object({
 
 export type DownloadFileRestoreInput = z.input<typeof downloadFileRestoreSchema>;
 
+export const fileRestoreSchema = z.discriminatedUnion('action', [
+  listFileRestoreSchema.extend({ action: z.literal('list') }),
+  downloadFileRestoreSchema.extend({ action: z.literal('download') }),
+]);
+
+export type FileRestoreInput = z.infer<typeof fileRestoreSchema>;
+
 // proxmox_prune_backups - Prune old backups
 export const pruneBackupsSchema = z.object({
   node: z.string().min(1).describe('Node name'),

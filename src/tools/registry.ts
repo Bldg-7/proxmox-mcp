@@ -72,8 +72,7 @@ import {
   handlePoolTool,
   handleStorageConfigTool,
   handleStorageContentTool,
-  listFileRestore,
-  downloadFileRestore,
+  handleFileRestore,
   handleCephTool,
   handleCephOsdTool,
   handleCephMonTool,
@@ -183,8 +182,7 @@ import { poolToolSchema } from '../schemas/pool-management.js';
 import {
   storageConfigToolSchema,
   storageContentToolSchema,
-  listFileRestoreSchema,
-  downloadFileRestoreSchema,
+  fileRestoreSchema,
 } from '../schemas/storage-management.js';
 import {
   cephToolSchema,
@@ -333,11 +331,7 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   // Storage Management (consolidated)
   proxmox_storage_config: { handler: handleStorageConfigTool, schema: storageConfigToolSchema },
   proxmox_storage_content: { handler: handleStorageContentTool, schema: storageContentToolSchema },
-  proxmox_list_file_restore: { handler: listFileRestore, schema: listFileRestoreSchema },
-  proxmox_download_file_restore: {
-    handler: downloadFileRestore,
-    schema: downloadFileRestoreSchema,
-  },
+  proxmox_file_restore: { handler: handleFileRestore, schema: fileRestoreSchema },
 
   // Ceph Integration (consolidated)
   proxmox_ceph: { handler: handleCephTool, schema: cephToolSchema },

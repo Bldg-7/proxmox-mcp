@@ -17,6 +17,7 @@ import {
   listFileRestoreSchema,
   downloadFileRestoreSchema,
   pruneBackupsSchema,
+  fileRestoreSchema,
 } from '../schemas/storage-management.js';
 import type {
   ListStorageConfigInput,
@@ -33,6 +34,7 @@ import type {
   PruneBackupsInput,
   StorageConfigToolInput,
   StorageContentToolInput,
+  FileRestoreInput,
 } from '../schemas/storage-management.js';
 import type { PoolToolInput } from '../schemas/pool-management.js';
 import {
@@ -640,5 +642,24 @@ export async function handlePoolTool(
       return deletePool(client, config, input);
     default:
       throw new Error(`Unknown pool action: ${(input as { action: string }).action}`);
+  }
+}
+
+export async function handleFileRestore(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: FileRestoreInput
+): Promise<ToolResponse> {
+  const validated = fileRestoreSchema.parse(input);
+  switch (validated.action) {
+    case 'list':
+      return listFileRestore(client, config, validated);
+    case 'download':
+      return downloadFileRestore(client, config, validated);
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'File Restore'
+      );
   }
 }
