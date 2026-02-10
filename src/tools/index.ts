@@ -1,5 +1,9 @@
-// Node & Cluster tools
 export {
+  handleNodeTool,
+  handleNodeService,
+  handleNodeLog,
+  handleNodeTask,
+  handleNodeInfo,
   getNodes,
   getNodeStatus,
   getNodeNetwork,
@@ -17,7 +21,8 @@ export {
   getStorageRrddata,
   getNodeReport,
 } from './node.js';
-export { getClusterStatus, getNextVMID } from './cluster.js';
+export { handleNodeDisk } from './node-disk.js';
+export { handleClusterTool, getClusterStatus, getNextVMID } from './cluster.js';
 
 // Node Network Configuration tools
 export {
@@ -25,6 +30,7 @@ export {
   updateNetworkIface,
   deleteNetworkIface,
   applyNetworkConfig,
+  handleNodeNetworkIface,
 } from './node-network.js';
 
 // System Operations tools
@@ -49,10 +55,27 @@ export {
   getNodeReplicationStatus,
   getNodeReplicationLog,
   scheduleNodeReplication,
+  handleNodeConfig,
+  handleNodeSubscription,
+  handleApt,
+  handleNodeBulk,
+  handleNodePower,
+  handleNodeReplication,
 } from './system-operations.js';
 
 // Cluster Management tools
 export {
+  handleHaResourceTool,
+  handleHaGroupTool,
+  handleClusterFirewallRuleTool,
+  handleClusterFirewallGroupTool,
+  handleClusterFirewallTool,
+  handleClusterFirewallAliasTool,
+  handleClusterFirewallIpsetTool,
+  handleClusterFirewallIpsetEntryTool,
+  handleClusterBackupJobTool,
+  handleClusterReplicationJobTool,
+  handleClusterConfigTool,
   getHaResources,
   getHaResource,
   createHaResource,
@@ -111,55 +134,20 @@ export {
 
 // SDN tools
 export {
-  listSdnVnets,
-  getSdnVnet,
-  createSdnVnet,
-  updateSdnVnet,
-  deleteSdnVnet,
-  listSdnZones,
-  getSdnZone,
-  createSdnZone,
-  updateSdnZone,
-  deleteSdnZone,
-  listSdnControllers,
-  getSdnController,
-  createSdnController,
-  updateSdnController,
-  deleteSdnController,
-  listSdnSubnets,
-  getSdnSubnet,
-  createSdnSubnet,
-  updateSdnSubnet,
-  deleteSdnSubnet,
+  handleSdnVnetTool,
+  handleSdnZoneTool,
+  handleSdnControllerTool,
+  handleSdnSubnetTool,
 } from './sdn.js';
 
 // Access Control tools
 export {
-  listUsers,
-  getUser,
-  createUser,
-  updateUser,
-  deleteUser,
-  listGroups,
-  createGroup,
-  updateGroup,
-  deleteGroup,
-  listRoles,
-  createRole,
-  updateRole,
-  deleteRole,
-  getAcl,
-  updateAcl,
-  listDomains,
-  getDomain,
-  createDomain,
-  updateDomain,
-  deleteDomain,
-  listUserTokens,
-  getUserToken,
-  createUserToken,
-  updateUserToken,
-  deleteUserToken,
+  handleUserTool,
+  handleGroupTool,
+  handleRoleTool,
+  handleAclTool,
+  handleDomainTool,
+  handleUserTokenTool,
 } from './access-control.js';
 
 // Pool Management tools
@@ -185,10 +173,15 @@ export {
   listFileRestore,
   downloadFileRestore,
   pruneBackups,
+  handleStorageConfigTool,
+  handleStorageContentTool,
+  handlePoolTool,
+  handleFileRestore,
 } from './storage-management.js';
 
 // Ceph Integration tools
 export {
+  handleCephTool,
   getCephStatus,
   listCephOsds,
   createCephOsd,
@@ -205,33 +198,53 @@ export {
   deleteCephPool,
   listCephFs,
   createCephFs,
+  handleCephOsdTool,
+  handleCephMonTool,
+  handleCephMdsTool,
+  handleCephPoolTool,
+  handleCephFsTool,
 } from './ceph.js';
 
-// Console Access tools
+// Console Access tools (consolidated)
 export {
-  getVncProxy,
+  handleConsoleVnc,
+  handleConsoleTerm,
   getSpiceProxy,
-  getTermProxy,
-  getLxcVncProxy,
-  getLxcTermProxy,
 } from './console-access.js';
+
+// Guest Query tools (consolidated VM/LXC)
+export {
+  handleGuestList,
+  handleGuestStatus,
+  handleGuestConfig,
+  handleGuestPending,
+  handleGuestFeature,
+  handleGuestRrddata,
+} from './guest-query.js';
 
 // VM Query & Lifecycle tools
 export { getVMs, getVMStatus, getVMConfig, getLxcConfig, getStorage, getVmPending, getLxcPending, checkVmFeature, checkLxcFeature } from './vm-query.js';
+
+// Guest Lifecycle (consolidated VM/LXC)
 export {
-  startLxc,
-  startVM,
-  stopLxc,
-  stopVM,
-  deleteLxc,
-  deleteVM,
-  rebootLxc,
-  rebootVM,
-  shutdownLxc,
-  shutdownVM,
-  pauseVM,
-  resumeVM,
-} from './vm-lifecycle.js';
+  handleGuestStart,
+  handleGuestStop,
+  handleGuestReboot,
+  handleGuestShutdown,
+  handleGuestDelete,
+  handleGuestPause,
+  handleGuestResume,
+} from './guest-lifecycle.js';
+
+// Guest Modify (consolidated VM/LXC)
+export {
+  handleGuestClone,
+  handleGuestResize,
+  handleGuestConfigUpdate,
+  handleGuestMigrate,
+  handleGuestTemplate,
+} from './guest-modify.js';
+
 export { cloneLxc, cloneVM, resizeLxc, resizeVM, updateVmConfig, updateLxcConfig } from './vm-modify.js';
 
 // VM/LXC Advanced tools
@@ -252,6 +265,13 @@ export {
   agentGetVcpus,
   agentExec,
   agentExecStatus,
+  handleAgentInfo,
+  handleAgentHw,
+  handleAgentExec,
+  handleAgentFile,
+  handleAgentFreeze,
+  handleAgentPower,
+  handleAgentUser,
   listVmFirewallRules,
   getVmFirewallRule,
   createVmFirewallRule,
@@ -262,10 +282,12 @@ export {
   createLxcFirewallRule,
   updateLxcFirewallRule,
   deleteLxcFirewallRule,
+  handleGuestFirewallRule,
 } from './vm-advanced.js';
 
 // Snapshot tools
 export {
+  handleGuestSnapshot,
   createSnapshotLxc,
   createSnapshotVM,
   listSnapshotsLxc,
@@ -278,6 +300,7 @@ export {
 
 // Backup tools
 export {
+  handleBackup,
   createBackupLxc,
   createBackupVM,
   listBackups,
@@ -290,6 +313,11 @@ export {
 export {
   addDiskVM,
   addMountpointLxc,
+  handleGuestDiskResize,
+  handleGuestDiskMove,
+  handleVmDisk,
+  handleLxcMountpoint,
+  handleNodeDiskAdmin,
   resizeDiskVM,
   resizeDiskLxc,
   removeDiskVM,
@@ -308,6 +336,7 @@ export {
 
 // Network tools
 export {
+  handleGuestNetwork,
   addNetworkVm,
   addNetworkLxc,
   updateNetworkVm,
@@ -322,35 +351,14 @@ export { executeVMCommand } from './command.js';
 // Creation tools
 export { listTemplates, createLxc, createVM } from './vm-create.js';
 
-// Cloud-Init tools
-export {
-  getCloudInitConfig,
-  dumpCloudInit,
-  regenerateCloudInit,
-} from './cloud-init.js';
+// Cloud-Init tools (consolidated)
+export { handleCloudInit } from './cloud-init.js';
 
-// Certificate Management tools
-export {
-  getNodeCertificates,
-  uploadCustomCertificate,
-  deleteCustomCertificate,
-  orderAcmeCertificate,
-  renewAcmeCertificate,
-  revokeAcmeCertificate,
-  getNodeAcmeConfig,
-} from './certificate.js';
+// Certificate Management tools (consolidated)
+export { handleCertificate, handleAcmeCert } from './certificate.js';
 
-// ACME Management tools
-export {
-  listAcmeAccounts,
-  getAcmeAccount,
-  createAcmeAccount,
-  updateAcmeAccount,
-  deleteAcmeAccount,
-  listAcmePlugins,
-  getAcmePlugin,
-  getAcmeDirectories,
-} from './acme.js';
+// ACME Management tools (consolidated)
+export { handleAcmeAccount, handleAcmeInfo } from './acme.js';
 
 // QEMU Agent tools (file operations, user management, power control)
 export {
@@ -370,11 +378,5 @@ export {
   agentSuspendHybrid,
 } from './vm-advanced.js';
 
-// Notification Management tools
-export {
-  listNotificationTargets,
-  getNotificationTarget,
-  createNotificationTarget,
-  deleteNotificationTarget,
-  testNotificationTarget,
-} from './notifications.js';
+// Notification Management tools (consolidated)
+export { handleNotification } from './notifications.js';

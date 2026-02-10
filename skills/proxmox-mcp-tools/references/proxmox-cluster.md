@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_add_cluster_firewall_ipset_entry`
+#### `proxmox_cluster_firewall_ipset_entry`
 
 **Description:** Add an entry to a cluster firewall IP set (requires elevated permissions)
 
@@ -26,7 +26,7 @@
 
 ---
 
-#### `proxmox_create_cluster_backup_job`
+#### `proxmox_cluster_backup_job`
 
 **Description:** Create a scheduled cluster backup job (requires elevated permissions)
 
@@ -74,7 +74,7 @@
 
 ---
 
-#### `proxmox_create_cluster_firewall_alias`
+#### `proxmox_cluster_firewall_alias`
 
 **Description:** Create a cluster firewall alias (requires elevated permissions)
 
@@ -90,7 +90,7 @@
 
 ---
 
-#### `proxmox_create_cluster_firewall_group`
+#### `proxmox_cluster_firewall_group`
 
 **Description:** Create a cluster firewall group (requires elevated permissions)
 
@@ -106,7 +106,7 @@
 
 ---
 
-#### `proxmox_create_cluster_firewall_ipset`
+#### `proxmox_cluster_firewall_ipset`
 
 **Description:** Create a cluster firewall IP set (requires elevated permissions)
 
@@ -121,7 +121,7 @@
 
 ---
 
-#### `proxmox_create_cluster_firewall_rule`
+#### `proxmox_cluster_firewall_rule`
 
 **Description:** Create a cluster-wide firewall rule (requires elevated permissions)
 
@@ -147,7 +147,7 @@
 
 ---
 
-#### `proxmox_create_cluster_replication_job`
+#### `proxmox_cluster_replication_job`
 
 **Description:** Create a cluster replication job (requires elevated permissions)
 
@@ -169,7 +169,7 @@
 
 ---
 
-#### `proxmox_create_ha_group`
+#### `proxmox_ha_group`
 
 **Description:** Create a new HA group (requires elevated permissions)
 
@@ -188,7 +188,7 @@
 
 ---
 
-#### `proxmox_create_ha_resource`
+#### `proxmox_ha_resource`
 
 **Description:** Create a new HA resource (requires elevated permissions)
 
@@ -209,7 +209,7 @@
 
 ---
 
-#### `proxmox_delete_cluster_backup_job`
+#### `proxmox_cluster_backup_job`
 
 **Description:** Delete a scheduled cluster backup job (requires elevated permissions)
 
@@ -223,7 +223,7 @@
 
 ---
 
-#### `proxmox_delete_cluster_firewall_alias`
+#### `proxmox_cluster_firewall_alias`
 
 **Description:** Delete a cluster firewall alias (requires elevated permissions)
 
@@ -237,7 +237,7 @@
 
 ---
 
-#### `proxmox_delete_cluster_firewall_group`
+#### `proxmox_cluster_firewall_group`
 
 **Description:** Delete a cluster firewall group (requires elevated permissions)
 
@@ -251,7 +251,7 @@
 
 ---
 
-#### `proxmox_delete_cluster_firewall_ipset`
+#### `proxmox_cluster_firewall_ipset`
 
 **Description:** Delete a cluster firewall IP set (requires elevated permissions)
 
@@ -265,7 +265,7 @@
 
 ---
 
-#### `proxmox_delete_cluster_firewall_ipset_entry`
+#### `proxmox_cluster_firewall_ipset_entry`
 
 **Description:** Delete an entry from a cluster firewall IP set (requires elevated permissions)
 
@@ -280,7 +280,7 @@
 
 ---
 
-#### `proxmox_delete_cluster_firewall_rule`
+#### `proxmox_cluster_firewall_rule`
 
 **Description:** Delete a cluster firewall rule (requires elevated permissions)
 
@@ -295,7 +295,7 @@
 
 ---
 
-#### `proxmox_delete_cluster_replication_job`
+#### `proxmox_cluster_replication_job`
 
 **Description:** Delete a cluster replication job (requires elevated permissions)
 
@@ -311,7 +311,7 @@
 
 ---
 
-#### `proxmox_delete_ha_group`
+#### `proxmox_ha_group`
 
 **Description:** Delete an HA group (requires elevated permissions)
 
@@ -325,7 +325,7 @@
 
 ---
 
-#### `proxmox_delete_ha_resource`
+#### `proxmox_ha_resource`
 
 **Description:** Delete an HA resource (requires elevated permissions)
 
@@ -339,7 +339,7 @@
 
 ---
 
-#### `proxmox_get_cluster_backup_job`
+#### `proxmox_cluster_backup_job`
 
 **Description:** Get a scheduled cluster backup job
 
@@ -353,7 +353,7 @@
 
 ---
 
-#### `proxmox_get_cluster_config`
+#### `proxmox_cluster_config`
 
 **Description:** Get cluster configuration
 
@@ -363,7 +363,7 @@
 
 ---
 
-#### `proxmox_get_cluster_config_node`
+#### `proxmox_cluster_config`
 
 **Description:** Get cluster configuration for a specific node
 
@@ -377,7 +377,7 @@
 
 ---
 
-#### `proxmox_get_cluster_firewall_alias`
+#### `proxmox_cluster_firewall_alias`
 
 **Description:** Get a cluster firewall alias by name
 
@@ -391,7 +391,7 @@
 
 ---
 
-#### `proxmox_get_cluster_firewall_group`
+#### `proxmox_cluster_firewall_group`
 
 **Description:** Get a cluster firewall group by name
 
@@ -405,7 +405,7 @@
 
 ---
 
-#### `proxmox_get_cluster_firewall_options`
+#### `proxmox_cluster_firewall`
 
 **Description:** Get cluster firewall options
 
@@ -415,7 +415,7 @@
 
 ---
 
-#### `proxmox_get_cluster_firewall_rule`
+#### `proxmox_cluster_firewall_rule`
 
 **Description:** Get a cluster firewall rule by position
 
@@ -429,7 +429,7 @@
 
 ---
 
-#### `proxmox_get_cluster_options`
+#### `proxmox_cluster`
 
 **Description:** Get cluster-wide options
 
@@ -439,7 +439,7 @@
 
 ---
 
-#### `proxmox_get_cluster_replication_job`
+#### `proxmox_cluster_replication_job`
 
 **Description:** Get a cluster replication job by ID
 
@@ -453,7 +453,7 @@
 
 ---
 
-#### `proxmox_get_cluster_totem`
+#### `proxmox_cluster_config`
 
 **Description:** Get cluster totem configuration
 
@@ -463,7 +463,7 @@
 
 ---
 
-#### `proxmox_get_ha_group`
+#### `proxmox_ha_group`
 
 **Description:** Get details for a specific HA group
 
@@ -477,7 +477,7 @@
 
 ---
 
-#### `proxmox_get_ha_groups`
+#### `proxmox_ha_group`
 
 **Description:** List High Availability groups in the cluster
 
@@ -487,7 +487,7 @@
 
 ---
 
-#### `proxmox_get_ha_resource`
+#### `proxmox_ha_resource`
 
 **Description:** Get details for a specific HA resource
 
@@ -501,7 +501,7 @@
 
 ---
 
-#### `proxmox_get_ha_resources`
+#### `proxmox_ha_resource`
 
 **Description:** List High Availability resources in the cluster
 
@@ -515,7 +515,7 @@
 
 ---
 
-#### `proxmox_get_ha_status`
+#### `proxmox_ha_resource`
 
 **Description:** Get HA manager status information for the cluster
 
@@ -525,7 +525,7 @@
 
 ---
 
-#### `proxmox_join_cluster`
+#### `proxmox_cluster_config`
 
 **Description:** Join a cluster (requires elevated permissions)
 
@@ -542,7 +542,7 @@
 
 ---
 
-#### `proxmox_list_cluster_backup_jobs`
+#### `proxmox_cluster_backup_job`
 
 **Description:** List scheduled cluster backup jobs
 
@@ -552,7 +552,7 @@
 
 ---
 
-#### `proxmox_list_cluster_config_nodes`
+#### `proxmox_cluster_config`
 
 **Description:** List cluster configuration nodes
 
@@ -562,7 +562,7 @@
 
 ---
 
-#### `proxmox_list_cluster_firewall_aliases`
+#### `proxmox_cluster_firewall_alias`
 
 **Description:** List cluster firewall aliases
 
@@ -572,7 +572,7 @@
 
 ---
 
-#### `proxmox_list_cluster_firewall_groups`
+#### `proxmox_cluster_firewall_group`
 
 **Description:** List cluster firewall security groups
 
@@ -582,7 +582,7 @@
 
 ---
 
-#### `proxmox_list_cluster_firewall_ipset_entries`
+#### `proxmox_cluster_firewall_ipset_entry`
 
 **Description:** List entries in a cluster firewall IP set
 
@@ -596,7 +596,7 @@
 
 ---
 
-#### `proxmox_list_cluster_firewall_ipsets`
+#### `proxmox_cluster_firewall_ipset`
 
 **Description:** List cluster firewall IP sets
 
@@ -606,7 +606,7 @@
 
 ---
 
-#### `proxmox_list_cluster_firewall_macros`
+#### `proxmox_cluster_firewall`
 
 **Description:** List available firewall macros
 
@@ -616,7 +616,7 @@
 
 ---
 
-#### `proxmox_list_cluster_firewall_refs`
+#### `proxmox_cluster_firewall`
 
 **Description:** List firewall references (aliases/ipsets)
 
@@ -630,7 +630,7 @@
 
 ---
 
-#### `proxmox_list_cluster_firewall_rules`
+#### `proxmox_cluster_firewall_rule`
 
 **Description:** List cluster-wide firewall rules
 
@@ -640,7 +640,7 @@
 
 ---
 
-#### `proxmox_list_cluster_replication_jobs`
+#### `proxmox_cluster_replication_job`
 
 **Description:** List cluster replication jobs
 
@@ -650,7 +650,7 @@
 
 ---
 
-#### `proxmox_update_cluster_backup_job`
+#### `proxmox_cluster_backup_job`
 
 **Description:** Update a scheduled cluster backup job (requires elevated permissions)
 
@@ -700,7 +700,7 @@
 
 ---
 
-#### `proxmox_update_cluster_firewall_alias`
+#### `proxmox_cluster_firewall_alias`
 
 **Description:** Update a cluster firewall alias (requires elevated permissions)
 
@@ -717,7 +717,7 @@
 
 ---
 
-#### `proxmox_update_cluster_firewall_group`
+#### `proxmox_cluster_firewall_group`
 
 **Description:** Update a cluster firewall group (requires elevated permissions)
 
@@ -735,7 +735,7 @@
 
 ---
 
-#### `proxmox_update_cluster_firewall_ipset_entry`
+#### `proxmox_cluster_firewall_ipset_entry`
 
 **Description:** Update an entry in a cluster firewall IP set (requires elevated permissions)
 
@@ -752,7 +752,7 @@
 
 ---
 
-#### `proxmox_update_cluster_firewall_options`
+#### `proxmox_cluster_firewall`
 
 **Description:** Update cluster firewall options (requires elevated permissions)
 
@@ -769,7 +769,7 @@
 
 ---
 
-#### `proxmox_update_cluster_firewall_rule`
+#### `proxmox_cluster_firewall_rule`
 
 **Description:** Update a cluster firewall rule (requires elevated permissions)
 
@@ -798,7 +798,7 @@
 
 ---
 
-#### `proxmox_update_cluster_options`
+#### `proxmox_cluster`
 
 **Description:** Update cluster-wide options (requires elevated permissions)
 
@@ -808,7 +808,7 @@
 
 ---
 
-#### `proxmox_update_cluster_replication_job`
+#### `proxmox_cluster_replication_job`
 
 **Description:** Update a cluster replication job (requires elevated permissions)
 
@@ -830,7 +830,7 @@
 
 ---
 
-#### `proxmox_update_ha_group`
+#### `proxmox_ha_group`
 
 **Description:** Update an HA group (requires elevated permissions)
 
@@ -850,7 +850,7 @@
 
 ---
 
-#### `proxmox_update_ha_resource`
+#### `proxmox_ha_resource`
 
 **Description:** Update an HA resource (requires elevated permissions)
 

@@ -29,6 +29,12 @@ import {
   createUserTokenSchema,
   updateUserTokenSchema,
   deleteUserTokenSchema,
+  userToolSchema,
+  groupToolSchema,
+  roleToolSchema,
+  aclToolSchema,
+  domainToolSchema,
+  userTokenToolSchema,
 } from '../schemas/access-control.js';
 import type {
   ListUsersInput,
@@ -56,6 +62,12 @@ import type {
   CreateUserTokenInput,
   UpdateUserTokenInput,
   DeleteUserTokenInput,
+  UserToolInput,
+  GroupToolInput,
+  RoleToolInput,
+  AclToolInput,
+  DomainToolInput,
+  UserTokenToolInput,
 } from '../schemas/access-control.js';
 
 interface AccessUserEntry {
@@ -996,5 +1008,201 @@ export async function deleteUserToken(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Delete User Token');
+  }
+}
+
+export async function handleUserTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: UserToolInput
+): Promise<ToolResponse> {
+  const validated = userToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      const { action: _action, ...payload } = validated;
+      return listUsers(client, config, payload);
+    }
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getUser(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createUser(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateUser(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteUser(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'User Tool'
+      );
+  }
+}
+
+export async function handleGroupTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: GroupToolInput
+): Promise<ToolResponse> {
+  const validated = groupToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      const { action: _action, ...payload } = validated;
+      return listGroups(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createGroup(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateGroup(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteGroup(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Group Tool'
+      );
+  }
+}
+
+export async function handleRoleTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: RoleToolInput
+): Promise<ToolResponse> {
+  const validated = roleToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      const { action: _action, ...payload } = validated;
+      return listRoles(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createRole(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateRole(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteRole(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Role Tool'
+      );
+  }
+}
+
+export async function handleAclTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: AclToolInput
+): Promise<ToolResponse> {
+  const validated = aclToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getAcl(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateAcl(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'ACL Tool'
+      );
+  }
+}
+
+export async function handleDomainTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: DomainToolInput
+): Promise<ToolResponse> {
+  const validated = domainToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      const { action: _action, ...payload } = validated;
+      return listDomains(client, config, payload);
+    }
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getDomain(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createDomain(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateDomain(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteDomain(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Domain Tool'
+      );
+  }
+}
+
+export async function handleUserTokenTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: UserTokenToolInput
+): Promise<ToolResponse> {
+  const validated = userTokenToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      const { action: _action, ...payload } = validated;
+      return listUserTokens(client, config, payload);
+    }
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getUserToken(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createUserToken(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateUserToken(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteUserToken(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'User Token Tool'
+      );
   }
 }

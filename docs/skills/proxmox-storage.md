@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_create_storage`
+#### `proxmox_storage_config`
 
 **Description:** Create a storage configuration (requires elevated permissions)
 
@@ -47,7 +47,7 @@
 
 ---
 
-#### `proxmox_delete_storage`
+#### `proxmox_storage_config`
 
 **Description:** Delete a storage configuration (requires elevated permissions)
 
@@ -61,7 +61,7 @@
 
 ---
 
-#### `proxmox_delete_storage_content`
+#### `proxmox_storage_content`
 
 **Description:** Delete content from storage (requires elevated permissions)
 
@@ -77,7 +77,7 @@
 
 ---
 
-#### `proxmox_download_file_restore`
+#### `proxmox_file_restore`
 
 **Description:** Download a file from backup
 
@@ -94,7 +94,7 @@
 
 ---
 
-#### `proxmox_download_url_to_storage`
+#### `proxmox_storage_content`
 
 **Description:** Download a file from URL to storage (requires elevated permissions)
 
@@ -115,7 +115,7 @@
 
 ---
 
-#### `proxmox_get_disk_smart`
+#### `proxmox_node_disk`
 
 **Description:** Get SMART health data for a specific disk on a Proxmox node
 
@@ -131,7 +131,7 @@
 
 ---
 
-#### `proxmox_get_node_directory`
+#### `proxmox_node_disk`
 
 **Description:** List directory-based storage on a Proxmox node
 
@@ -145,7 +145,7 @@
 
 ---
 
-#### `proxmox_get_node_disks`
+#### `proxmox_node_disk`
 
 **Description:** List physical disks on a Proxmox node (SSD, HDD, NVMe) with health status
 
@@ -162,7 +162,7 @@
 
 ---
 
-#### `proxmox_get_node_lvm`
+#### `proxmox_node_disk`
 
 **Description:** List LVM volume groups and physical volumes on a Proxmox node
 
@@ -176,7 +176,7 @@
 
 ---
 
-#### `proxmox_get_node_lvmthin`
+#### `proxmox_node_disk`
 
 **Description:** List LVM thin pools on a Proxmox node with capacity info
 
@@ -190,7 +190,7 @@
 
 ---
 
-#### `proxmox_get_node_zfs`
+#### `proxmox_node_disk`
 
 **Description:** List ZFS pools on a Proxmox node with health and capacity info
 
@@ -204,7 +204,7 @@
 
 ---
 
-#### `proxmox_get_storage_config`
+#### `proxmox_storage_config`
 
 **Description:** Get a storage configuration by name
 
@@ -218,7 +218,7 @@
 
 ---
 
-#### `proxmox_init_disk_gpt`
+#### `proxmox_node_disk_admin`
 
 **Description:** Initialize GPT partition table on a disk (requires elevated permissions, destructive)
 
@@ -234,7 +234,7 @@
 
 ---
 
-#### `proxmox_list_file_restore`
+#### `proxmox_file_restore`
 
 **Description:** List files in a backup for restore
 
@@ -251,7 +251,7 @@
 
 ---
 
-#### `proxmox_list_storage_config`
+#### `proxmox_storage_config`
 
 **Description:** List storage configurations available in Proxmox
 
@@ -261,7 +261,7 @@
 
 ---
 
-#### `proxmox_list_storage_content`
+#### `proxmox_storage_content`
 
 **Description:** List content stored on a storage
 
@@ -278,7 +278,7 @@
 
 ---
 
-#### `proxmox_prune_backups`
+#### `proxmox_storage_content`
 
 **Description:** Prune old backups from storage (requires elevated permissions)
 
@@ -303,7 +303,7 @@
 
 ---
 
-#### `proxmox_update_storage`
+#### `proxmox_storage_config`
 
 **Description:** Update a storage configuration (requires elevated permissions)
 
@@ -342,7 +342,7 @@
 
 ---
 
-#### `proxmox_upload_to_storage`
+#### `proxmox_storage_content`
 
 **Description:** Upload ISO/template to storage (requires elevated permissions)
 
@@ -361,7 +361,7 @@
 
 ---
 
-#### `proxmox_wipe_disk`
+#### `proxmox_node_disk_admin`
 
 **Description:** Wipe all data from a disk (requires elevated permissions, destructive)
 

@@ -223,3 +223,87 @@ export const deleteSdnSubnetSchema = z.object({
 });
 
 export type DeleteSdnSubnetInput = z.infer<typeof deleteSdnSubnetSchema>;
+
+// ── Consolidated: proxmox_sdn_vnet ────────────────────────────────────────
+export const sdnVnetToolSchema = z.discriminatedUnion('action', [
+  listSdnVnetsSchema.extend({
+    action: z.literal('list'),
+  }),
+  getSdnVnetSchema.extend({
+    action: z.literal('get'),
+  }),
+  createSdnVnetSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateSdnVnetSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteSdnVnetSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type SdnVnetToolInput = z.infer<typeof sdnVnetToolSchema>;
+
+// ── Consolidated: proxmox_sdn_zone ────────────────────────────────────────
+export const sdnZoneToolSchema = z.discriminatedUnion('action', [
+  listSdnZonesSchema.extend({
+    action: z.literal('list'),
+  }),
+  getSdnZoneSchema.extend({
+    action: z.literal('get'),
+  }),
+  createSdnZoneSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateSdnZoneSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteSdnZoneSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type SdnZoneToolInput = z.infer<typeof sdnZoneToolSchema>;
+
+// ── Consolidated: proxmox_sdn_controller ──────────────────────────────────
+export const sdnControllerToolSchema = z.discriminatedUnion('action', [
+  listSdnControllersSchema.extend({
+    action: z.literal('list'),
+  }),
+  getSdnControllerSchema.extend({
+    action: z.literal('get'),
+  }),
+  createSdnControllerSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateSdnControllerSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteSdnControllerSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type SdnControllerToolInput = z.infer<typeof sdnControllerToolSchema>;
+
+// ── Consolidated: proxmox_sdn_subnet ──────────────────────────────────────
+export const sdnSubnetToolSchema = z.discriminatedUnion('action', [
+  listSdnSubnetsSchema.extend({
+    action: z.literal('list'),
+  }),
+  getSdnSubnetSchema.extend({
+    action: z.literal('get'),
+  }),
+  createSdnSubnetSchema.extend({
+    action: z.literal('create'),
+  }),
+  updateSdnSubnetSchema.extend({
+    action: z.literal('update'),
+  }),
+  deleteSdnSubnetSchema.extend({
+    action: z.literal('delete'),
+  }),
+]);
+
+export type SdnSubnetToolInput = z.infer<typeof sdnSubnetToolSchema>;

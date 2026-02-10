@@ -49,7 +49,7 @@ describe('MCP Server Integration', () => {
          expect(response).toBeDefined();
          expect(response.tools).toBeDefined();
          expect(Array.isArray(response.tools)).toBe(true);
-         expect(response.tools).toHaveLength(309);
+         expect(response.tools).toHaveLength(TOOL_NAMES.length);
     });
 
     it('includes correct tool properties', async () => {
@@ -118,8 +118,8 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_nodes',
-          arguments: {},
+          name: 'proxmox_node',
+          arguments: { action: 'list' },
         },
       });
 
@@ -144,8 +144,9 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_node_status',
+          name: 'proxmox_node',
           arguments: {
+            action: 'status',
             node: 'pve1',
           },
         },
@@ -166,7 +167,7 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_vms',
+          name: 'proxmox_guest_list',
           arguments: {},
         },
       });
@@ -211,7 +212,7 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_node_status',
+          name: 'proxmox_guest_status',
           arguments: {},
         },
       });
@@ -230,11 +231,11 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_vm_status',
+          name: 'proxmox_guest_status',
           arguments: {
             node: 'pve1',
             vmid: 'not-a-number',
-            type: 'qemu',
+            type: 'vm',
           },
         },
       });
@@ -254,8 +255,8 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_nodes',
-          arguments: {},
+          name: 'proxmox_node',
+          arguments: { action: 'list' },
         },
       });
 
@@ -274,8 +275,9 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_start_vm',
+          name: 'proxmox_guest_start',
           arguments: {
+            type: 'vm',
             node: 'pve1',
             vmid: 100,
           },
@@ -301,8 +303,9 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_start_vm',
+          name: 'proxmox_guest_start',
           arguments: {
+            type: 'vm',
             node: 'pve1',
             vmid: 100,
           },
@@ -323,8 +326,9 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_start_vm',
+          name: 'proxmox_guest_start',
           arguments: {
+            type: 'vm',
             node: 'pve1',
             vmid: 100,
           },
@@ -350,8 +354,8 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_nodes',
-          arguments: {},
+          name: 'proxmox_node',
+          arguments: { action: 'list' },
         },
       });
 
@@ -372,7 +376,7 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_vms',
+          name: 'proxmox_guest_list',
           arguments: {},
         },
       });
@@ -387,8 +391,8 @@ describe('MCP Server Integration', () => {
         id: 2,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_nodes',
-          arguments: {},
+          name: 'proxmox_node',
+          arguments: { action: 'list' },
         },
       });
       expect(response2.isError).toBe(false);
@@ -404,7 +408,7 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_vms',
+          name: 'proxmox_guest_list',
           arguments: {},
         },
       });
@@ -420,12 +424,12 @@ describe('MCP Server Integration', () => {
 
           const listHandler = getRequestHandlers(server).get('tools/list');
           const listResponse = await listHandler!({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} });
-          expect(listResponse.tools).toHaveLength(309);
+          expect(listResponse.tools).toHaveLength(TOOL_NAMES.length);
 
-      const getNodesToolDef = listResponse.tools.find(
-        (t: { name: string }) => t.name === 'proxmox_get_nodes'
+      const nodeToolDef = listResponse.tools.find(
+        (t: { name: string }) => t.name === 'proxmox_node'
       );
-      expect(getNodesToolDef).toBeDefined();
+      expect(nodeToolDef).toBeDefined();
 
       client.request.mockResolvedValueOnce([
         { node: 'pve1', status: 'online', uptime: 86400 },
@@ -438,8 +442,8 @@ describe('MCP Server Integration', () => {
         id: 2,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_nodes',
-          arguments: {},
+          name: 'proxmox_node',
+          arguments: { action: 'list' },
         },
       });
 
@@ -462,8 +466,8 @@ describe('MCP Server Integration', () => {
         id: 1,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_nodes',
-          arguments: {},
+          name: 'proxmox_node',
+          arguments: { action: 'list' },
         },
       });
       expect(response1.isError).toBe(false);
@@ -479,8 +483,9 @@ describe('MCP Server Integration', () => {
         id: 2,
         method: 'tools/call',
         params: {
-          name: 'proxmox_get_node_status',
+          name: 'proxmox_node',
           arguments: {
+            action: 'status',
             node: 'pve1',
           },
         },

@@ -19,6 +19,7 @@ import {
   updateNetworkLxcSchema,
   removeNetworkVmSchema,
   removeNetworkLxcSchema,
+  guestNetworkSchema,
 } from '../schemas/network.js';
 import type {
   AddNetworkVmInput,
@@ -27,6 +28,7 @@ import type {
   UpdateNetworkLxcInput,
   RemoveNetworkVmInput,
   RemoveNetworkLxcInput,
+  GuestNetworkInput,
 } from '../schemas/network.js';
 
 /**
@@ -391,5 +393,81 @@ export async function removeNetworkLxc(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Remove LXC Network');
+  }
+}
+
+export async function handleGuestNetwork(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: GuestNetworkInput
+): Promise<ToolResponse> {
+  const validated = guestNetworkSchema.parse(input);
+
+  switch (validated.action) {
+    case 'add':
+      if (validated.type === 'vm') {
+        return addNetworkVm(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          net: validated.net,
+          bridge: validated.bridge,
+          model: validated.model ?? 'virtio',
+          macaddr: validated.macaddr,
+          vlan: validated.vlan,
+          firewall: validated.firewall,
+        });
+      }
+
+      return addNetworkLxc(client, config, {
+        node: validated.node,
+        vmid: validated.vmid,
+        net: validated.net,
+        bridge: validated.bridge,
+        ip: validated.ip,
+        gw: validated.gw,
+        firewall: validated.firewall,
+      });
+
+    case 'update':
+      if (validated.type === 'vm') {
+        return updateNetworkVm(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          net: validated.net,
+          bridge: validated.bridge,
+          model: validated.model,
+          macaddr: validated.macaddr,
+          vlan: validated.vlan,
+          firewall: validated.firewall,
+        });
+      }
+
+      return updateNetworkLxc(client, config, {
+        node: validated.node,
+        vmid: validated.vmid,
+        net: validated.net,
+        bridge: validated.bridge,
+        ip: validated.ip,
+        gw: validated.gw,
+        firewall: validated.firewall,
+      });
+
+    case 'remove':
+      if (validated.type === 'vm') {
+        return removeNetworkVm(client, config, {
+          node: validated.node,
+          vmid: validated.vmid,
+          net: validated.net,
+        });
+      }
+
+      return removeNetworkLxc(client, config, {
+        node: validated.node,
+        vmid: validated.vmid,
+        net: validated.net,
+      });
+
+    default:
+      throw new Error(`Unknown action: ${(validated as { action: string }).action}`);
   }
 }

@@ -13,10 +13,12 @@ import {
   addMountpointLxcSchema,
   resizeDiskVmSchema,
   resizeDiskLxcSchema,
+  guestDiskResizeSchema,
   removeDiskVmSchema,
   removeMountpointLxcSchema,
   moveDiskVmSchema,
   moveDiskLxcSchema,
+  guestDiskMoveSchema,
   getNodeLvmSchema,
   getNodeDisksSchema,
   getDiskSmartSchema,
@@ -25,16 +27,21 @@ import {
   wipeDiskSchema,
   getNodeLvmThinSchema,
   getNodeDirectorySchema,
+  vmDiskSchema,
+  lxcMountpointSchema,
+  nodeDiskAdminSchema,
 } from '../schemas/disk.js';
 import type {
   AddDiskVmInput,
   AddMountpointLxcInput,
   ResizeDiskVmInput,
   ResizeDiskLxcInput,
+  GuestDiskResizeInput,
   RemoveDiskVmInput,
   RemoveMountpointLxcInput,
   MoveDiskVmInput,
   MoveDiskLxcInput,
+  GuestDiskMoveInput,
   GetNodeLvmInput,
   GetNodeDisksInput,
   GetDiskSmartInput,
@@ -43,6 +50,9 @@ import type {
   WipeDiskInput,
   GetNodeLvmThinInput,
   GetNodeDirectoryInput,
+  VmDiskInput,
+  LxcMountpointInput,
+  NodeDiskAdminInput,
 } from '../schemas/disk.js';
 
 /**
@@ -376,6 +386,62 @@ export async function moveDiskLxc(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Move LXC Disk');
+  }
+}
+
+export async function handleGuestDiskResize(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: GuestDiskResizeInput
+): Promise<ToolResponse> {
+  const validated = guestDiskResizeSchema.parse(input);
+
+  switch (validated.type) {
+    case 'vm':
+      return resizeDiskVM(client, config, {
+        node: validated.node,
+        vmid: validated.vmid,
+        disk: validated.disk,
+        size: validated.size,
+      });
+    case 'lxc':
+      return resizeDiskLxc(client, config, {
+        node: validated.node,
+        vmid: validated.vmid,
+        disk: validated.disk,
+        size: validated.size,
+      });
+    default:
+      throw new Error(`Unknown type: ${(validated as { type: string }).type}`);
+  }
+}
+
+export async function handleGuestDiskMove(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: GuestDiskMoveInput
+): Promise<ToolResponse> {
+  const validated = guestDiskMoveSchema.parse(input);
+
+  switch (validated.type) {
+    case 'vm':
+      return moveDiskVM(client, config, {
+        node: validated.node,
+        vmid: validated.vmid,
+        disk: validated.disk,
+        storage: validated.storage,
+        delete: validated.delete,
+      });
+    case 'lxc':
+      return moveDiskLxc(client, config, {
+        node: validated.node,
+        vmid: validated.vmid,
+        disk: validated.disk,
+        storage: validated.storage,
+        delete: validated.delete,
+      });
+    default:
+      throw new Error(`Unknown type: ${(validated as { type: string }).type}`);
   }
 }
 
@@ -794,5 +860,62 @@ export async function getNodeDirectory(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Get Node Directory');
+  }
+}
+
+export async function handleVmDisk(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: VmDiskInput
+): Promise<ToolResponse> {
+  const validated = vmDiskSchema.parse(input);
+  switch (validated.action) {
+    case 'add':
+      return addDiskVM(client, config, validated);
+    case 'remove':
+      return removeDiskVM(client, config, validated);
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'VM Disk'
+      );
+  }
+}
+
+export async function handleLxcMountpoint(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: LxcMountpointInput
+): Promise<ToolResponse> {
+  const validated = lxcMountpointSchema.parse(input);
+  switch (validated.action) {
+    case 'add':
+      return addMountpointLxc(client, config, validated);
+    case 'remove':
+      return removeMountpointLxc(client, config, validated);
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'LXC Mountpoint'
+      );
+  }
+}
+
+export async function handleNodeDiskAdmin(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeDiskAdminInput
+): Promise<ToolResponse> {
+  const validated = nodeDiskAdminSchema.parse(input);
+  switch (validated.action) {
+    case 'init_gpt':
+      return initDiskGpt(client, config, validated);
+    case 'wipe':
+      return wipeDisk(client, config, validated);
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Node Disk Admin'
+      );
   }
 }

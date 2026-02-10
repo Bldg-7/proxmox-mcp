@@ -25,7 +25,7 @@
    })
 
 3. Add disk
-   proxmox_add_disk_vm({
+   proxmox_vm_disk({
      node: "pve1",
      vmid: 100,
      disk: "scsi0",
@@ -34,7 +34,7 @@
    })
 
 4. Add network interface
-   proxmox_add_network_vm({
+   proxmox_guest_network({
      node: "pve1",
      vmid: 100,
      net: "net0",
@@ -43,19 +43,19 @@
    })
 
 5. Start VM
-   proxmox_start_vm({
+   proxmox_guest_start({
      node: "pve1",
      vmid: 100
    })
 
 6. Monitor status
-   proxmox_get_vm_status({
+   proxmox_guest_status({
      node: "pve1",
      vmid: 100
    })
 
 7. Create backup
-   proxmox_create_backup({
+   proxmox_backup({
      node: "pve1",
      vmid: 100,
      storage: "local",
@@ -64,13 +64,13 @@
    })
 
 8. Stop VM (when done)
-   proxmox_stop_vm({
+   proxmox_guest_stop({
      node: "pve1",
      vmid: 100
    })
 
 9. Delete VM (if needed)
-   proxmox_delete_vm({
+   proxmox_guest_delete({
      node: "pve1",
      vmid: 100
    })
@@ -102,7 +102,7 @@
    })
 
 3. Start container
-   proxmox_start_lxc({
+   proxmox_guest_start({
      node: "pve1",
      vmid: 200
    })
@@ -115,13 +115,13 @@
    # inside the container
 
 5. Monitor status
-   proxmox_get_lxc_status({
+   proxmox_guest_status({
      node: "pve1",
      vmid: 200
    })
 
 6. Add mount point (if needed)
-   proxmox_add_mountpoint_lxc({
+   proxmox_lxc_mountpoint({
      node: "pve1",
      vmid: 200,
      mp: "mp0",
@@ -142,7 +142,7 @@
 
 ```
 1. Create HA resource for VM
-   proxmox_create_ha_resource({
+   proxmox_ha_resource({
      sid: "vm:100",
      type: "vm",
      group: "production",
@@ -150,12 +150,12 @@
    })
 
 2. Get HA status
-   proxmox_get_ha_resource({
+   proxmox_ha_resource({
      sid: "vm:100"
    })
 
 3. Update HA state
-   proxmox_update_ha_resource({
+   proxmox_ha_resource({
      sid: "vm:100",
      state: "started"
    })
@@ -167,12 +167,12 @@
 
 ```
 1. Check target node resources
-   proxmox_get_node_status({
+   proxmox_node({
      node: "pve2"
    })
 
 2. Migrate VM (online migration)
-   proxmox_migrate_vm({
+   proxmox_guest_migrate({
      node: "pve1",
      vmid: 100,
      target: "pve2",
@@ -180,12 +180,12 @@
    })
 
 3. Monitor migration task
-   proxmox_get_node_tasks({
+   proxmox_node_task({
      node: "pve1"
    })
 
 4. Verify VM on new node
-   proxmox_get_vm_status({
+   proxmox_guest_status({
      node: "pve2",
      vmid: 100
    })
@@ -197,7 +197,7 @@
 
 ```
 1. Create replication job
-   proxmox_create_replication({
+   proxmox_cluster_replication_job({
      id: "100-0",
      type: "local",
      target: "pve2",
@@ -206,12 +206,12 @@
    })
 
 2. Get replication status
-   proxmox_get_replication({
+   proxmox_cluster_replication_job({
      id: "100-0"
    })
 
 3. List all replications
-   proxmox_list_replications()
+   proxmox_cluster_replication_job()
 ```
 
 ---
@@ -224,7 +224,7 @@
 
 ```
 1. Create storage
-   proxmox_create_storage({
+   proxmox_storage_config({
      storage: "nfs-storage",
      type: "nfs",
      server: "192.168.1.100",
@@ -233,10 +233,10 @@
    })
 
 2. List available storage
-   proxmox_list_storage()
+   proxmox_storage_config()
 
 3. Upload ISO (via external tool, then verify)
-   proxmox_list_storage_content({
+   proxmox_storage_content({
      node: "pve1",
      storage: "local",
      content: "iso"
@@ -262,7 +262,7 @@
 
 ```
 1. Create snapshot
-   proxmox_create_snapshot({
+   proxmox_guest_snapshot({
      node: "pve1",
      vmid: 100,
      snapname: "before-upgrade",
@@ -270,20 +270,20 @@
    })
 
 2. List snapshots
-   proxmox_list_snapshots({
+   proxmox_guest_snapshot({
      node: "pve1",
      vmid: 100
    })
 
 3. Rollback to snapshot (if needed)
-   proxmox_rollback_snapshot({
+   proxmox_guest_snapshot({
      node: "pve1",
      vmid: 100,
      snapname: "before-upgrade"
    })
 
 4. Delete snapshot (when no longer needed)
-   proxmox_delete_snapshot({
+   proxmox_guest_snapshot({
      node: "pve1",
      vmid: 100,
      snapname: "before-upgrade"
@@ -296,7 +296,7 @@
 
 ```
 1. Create backup
-   proxmox_create_backup({
+   proxmox_backup({
      node: "pve1",
      vmid: 100,
      storage: "local",
@@ -305,13 +305,13 @@
    })
 
 2. List backups
-   proxmox_list_backups({
+   proxmox_backup({
      node: "pve1",
      vmid: 100
    })
 
 3. Restore from backup (if needed)
-   proxmox_restore_backup({
+   proxmox_backup({
      node: "pve1",
      vmid: 100,
      archive: "local:backup/vzdump-qemu-100-2024_02_06-12_00_00.vma.zst",
@@ -329,18 +329,18 @@
 
 ```
 1. List network interfaces
-   proxmox_get_node_network({
+   proxmox_node({
      node: "pve1"
    })
 
 2. Get specific interface details
-   proxmox_get_network_iface({
+   proxmox_node({
      node: "pve1",
      iface: "vmbr0"
    })
 
 3. Create VLAN interface
-   proxmox_create_network_iface({
+   proxmox_node_network_iface({
      node: "pve1",
      iface: "vmbr0.100",
      type: "vlan",
@@ -349,7 +349,7 @@
    })
 
 4. Apply network changes
-   proxmox_apply_network_changes({
+   proxmox_node_network_iface({
      node: "pve1"
    })
 ```
@@ -364,28 +364,28 @@
 
 ```
 1. List all nodes
-   proxmox_get_nodes()
+   proxmox_node()
 
 2. Check node status
-   proxmox_get_node_status({
+   proxmox_node({
      node: "pve1"
    })
 
 3. List all VMs/containers
-   proxmox_list_vms({
+   proxmox_guest_list({
      type: "all"
    })
 
 4. Check storage usage
-   proxmox_list_storage()
+   proxmox_storage_config()
 
 5. Check recent tasks
-   proxmox_get_node_tasks({
+   proxmox_node_task({
      node: "pve1"
    })
 
 6. Check system logs
-   proxmox_get_node_syslog({
+   proxmox_node_log({
      node: "pve1"
    })
 ```
@@ -400,17 +400,17 @@
 
 ```
 1. View current certificates
-   proxmox_get_node_certificates({node})
+   proxmox_certificate({node})
 
 2. Install certificate (choose one):
    Option A: Upload custom certificate
-   proxmox_upload_custom_certificate({node, certificates, key})
+   proxmox_certificate({node, certificates, key})
    
    Option B: Order ACME certificate
-   proxmox_order_acme_certificate({node, domains})
+   proxmox_acme_cert({node, domains})
 
 3. Verify new certificate active
-   proxmox_get_node_certificates({node})
+   proxmox_certificate({node})
 ```
 
 ---
@@ -423,19 +423,19 @@
 
 ```
 1. List available ACME providers
-   proxmox_get_acme_directories()
+   proxmox_acme_info()
 
 2. Register with ACME provider
-   proxmox_create_acme_account({name, contact, directory})
+   proxmox_acme_account({name, contact, directory})
 
 3. Check available challenge plugins
-   proxmox_list_acme_plugins()
+   proxmox_acme_info()
 
 4. Order certificate
-   proxmox_order_acme_certificate({node, domains})
+   proxmox_acme_cert({node, domains})
 
 5. Set up renewal
-   proxmox_renew_acme_certificate({node})
+   proxmox_acme_cert({node})
 ```
 
 ---
@@ -448,13 +448,13 @@
 
 ```
 1. View existing notification targets
-   proxmox_list_notification_targets()
+   proxmox_notification()
 
 2. Create notification target (SMTP/Gotify/Sendmail)
-   proxmox_create_notification_target({name, type, ...config})
+   proxmox_notification({name, type, ...config})
 
 3. Verify delivery
-   proxmox_test_notification_target({name})
+   proxmox_notification({name})
 ```
 
 ---
@@ -467,19 +467,19 @@
 
 ```
 1. List existing aliases
-   proxmox_list_cluster_firewall_aliases()
+   proxmox_cluster_firewall_alias()
 
 2. Create alias
-   proxmox_create_cluster_firewall_alias({name, cidr, comment})
+   proxmox_cluster_firewall_alias({name, cidr, comment})
 
 3. List IP sets
-   proxmox_list_cluster_firewall_ipsets()
+   proxmox_cluster_firewall_ipset()
 
 4. Create IP set
-   proxmox_create_cluster_firewall_ipset({name, comment})
+   proxmox_cluster_firewall_ipset({name, comment})
 
 5. Add entries to IP set
-   proxmox_add_cluster_firewall_ipset_entry({name, cidr, comment})
+   proxmox_cluster_firewall_ipset_entry({name, cidr, comment})
 ```
 
 ---
@@ -492,16 +492,16 @@
 
 ```
 1. List existing tokens
-   proxmox_list_user_tokens({userid})
+   proxmox_user_token({userid})
 
 2. Create new token with permissions
-   proxmox_create_user_token({userid, tokenid, privsep, expire, comment})
+   proxmox_user_token({userid, tokenid, privsep, expire, comment})
 
 3. Verify token details
-   proxmox_get_user_token({userid, tokenid})
+   proxmox_user_token({userid, tokenid})
 
 4. Revoke when no longer needed
-   proxmox_delete_user_token({userid, tokenid})
+   proxmox_user_token({userid, tokenid})
 ```
 
 ---
@@ -512,8 +512,8 @@
 
 ```
 1. Attempt operation
-2. Check task status via proxmox_get_node_task()
-3. If failed, check logs via proxmox_get_node_syslog()
+2. Check task status via proxmox_node_task()
+3. If failed, check logs via proxmox_node_log()
 4. Retry or rollback as needed
 ```
 

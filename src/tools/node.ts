@@ -62,6 +62,7 @@ import type {
   GetNodeReportInput,
 } from '../schemas/node.js';
 import type { ProxmoxNetwork, ProxmoxDNS } from '../types/proxmox.js';
+import type { NodeToolInput, NodeServiceToolInput, NodeLogToolInput, NodeTaskToolInput, NodeInfoToolInput } from '../schemas/node.js';
 
 /**
  * List all Proxmox cluster nodes with their status and resource usage.
@@ -691,5 +692,92 @@ export async function getNodeReport(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Get Node Report');
+  }
+}
+
+export async function handleNodeTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return getNodes(client, config, {});
+    case 'status':
+      return getNodeStatus(client, config, { node: input.node });
+    case 'network':
+      return getNodeNetwork(client, config, { node: input.node, type: input.type });
+    case 'dns':
+      return getNodeDns(client, config, { node: input.node });
+    case 'iface':
+      return getNetworkIface(client, config, { node: input.node, iface: input.iface });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Tool');
+  }
+}
+
+export async function handleNodeService(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeServiceToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return getNodeServices(client, config, { node: input.node });
+    case 'control':
+      return controlNodeService(client, config, { node: input.node, service: input.service, command: input.command });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Service');
+  }
+}
+
+export async function handleNodeLog(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeLogToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'syslog':
+      return getNodeSyslog(client, config, { node: input.node });
+    case 'journal':
+      return getNodeJournal(client, config, { node: input.node });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Log');
+  }
+}
+
+export async function handleNodeTask(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeTaskToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'list':
+      return getNodeTasks(client, config, { node: input.node });
+    case 'get':
+      return getNodeTask(client, config, { node: input.node, upid: input.upid });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Task');
+  }
+}
+
+export async function handleNodeInfo(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeInfoToolInput
+): Promise<ToolResponse> {
+  switch (input.action) {
+    case 'aplinfo':
+      return getNodeAplinfo(client, config, { node: input.node });
+    case 'netstat':
+      return getNodeNetstat(client, config, { node: input.node });
+    case 'rrddata':
+      return getNodeRrddata(client, config, { node: input.node, timeframe: input.timeframe, cf: input.cf });
+    case 'storage_rrddata':
+      return getStorageRrddata(client, config, { node: input.node, storage: input.storage, timeframe: input.timeframe, cf: input.cf });
+    case 'report':
+      return getNodeReport(client, config, { node: input.node });
+    default:
+      return formatErrorResponse(new Error(`Unknown action: ${(input as any).action}`), 'Node Info');
   }
 }

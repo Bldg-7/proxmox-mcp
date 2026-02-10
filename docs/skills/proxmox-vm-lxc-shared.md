@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_execute_vm_command`
+#### `proxmox_agent_exec`
 
 **Description:** Execute a command via QEMU guest agent (requires elevated permissions)
 
@@ -29,7 +29,7 @@
 
 ---
 
-#### `proxmox_agent_exec_status`
+#### `proxmox_agent_exec`
 
 **Description:** Get status for a QEMU guest agent command
 
@@ -45,7 +45,7 @@
 
 ---
 
-#### `proxmox_agent_file_read`
+#### `proxmox_agent_file`
 
 **Description:** Read file content from guest via QEMU agent (requires elevated permissions)
 
@@ -61,7 +61,7 @@
 
 ---
 
-#### `proxmox_agent_file_write`
+#### `proxmox_agent_file`
 
 **Description:** Write content to file in guest via QEMU agent (requires elevated permissions)
 
@@ -79,7 +79,7 @@
 
 ---
 
-#### `proxmox_agent_fsfreeze_freeze`
+#### `proxmox_agent_freeze`
 
 **Description:** Freeze guest filesystems for consistent backup via QEMU agent (requires elevated permissions)
 
@@ -94,7 +94,7 @@
 
 ---
 
-#### `proxmox_agent_fsfreeze_status`
+#### `proxmox_agent_freeze`
 
 **Description:** Get guest filesystem freeze status via QEMU agent
 
@@ -109,7 +109,7 @@
 
 ---
 
-#### `proxmox_agent_fsfreeze_thaw`
+#### `proxmox_agent_freeze`
 
 **Description:** Thaw (unfreeze) guest filesystems via QEMU agent (requires elevated permissions)
 
@@ -124,7 +124,7 @@
 
 ---
 
-#### `proxmox_agent_fstrim`
+#### `proxmox_agent_freeze`
 
 **Description:** Discard unused blocks on guest filesystems via QEMU agent (requires elevated permissions)
 
@@ -139,7 +139,7 @@
 
 ---
 
-#### `proxmox_agent_get_fsinfo`
+#### `proxmox_agent_info`
 
 **Description:** Get guest filesystem information via QEMU guest agent
 
@@ -154,7 +154,7 @@
 
 ---
 
-#### `proxmox_agent_get_hostname`
+#### `proxmox_agent_hw`
 
 **Description:** Get hostname from guest via QEMU agent
 
@@ -169,7 +169,7 @@
 
 ---
 
-#### `proxmox_agent_get_memory_block_info`
+#### `proxmox_agent_hw`
 
 **Description:** Get guest memory block size information via QEMU agent
 
@@ -184,7 +184,7 @@
 
 ---
 
-#### `proxmox_agent_get_memory_blocks`
+#### `proxmox_agent_hw`
 
 **Description:** Get guest memory block information via QEMU guest agent
 
@@ -199,7 +199,7 @@
 
 ---
 
-#### `proxmox_agent_get_network_interfaces`
+#### `proxmox_agent_info`
 
 **Description:** Get guest network interfaces via QEMU guest agent
 
@@ -214,7 +214,7 @@
 
 ---
 
-#### `proxmox_agent_get_osinfo`
+#### `proxmox_agent_info`
 
 **Description:** Get guest OS information via QEMU guest agent
 
@@ -229,7 +229,7 @@
 
 ---
 
-#### `proxmox_agent_get_time`
+#### `proxmox_agent_info`
 
 **Description:** Get guest time via QEMU guest agent
 
@@ -244,7 +244,7 @@
 
 ---
 
-#### `proxmox_agent_get_timezone`
+#### `proxmox_agent_info`
 
 **Description:** Get guest timezone via QEMU guest agent
 
@@ -259,7 +259,7 @@
 
 ---
 
-#### `proxmox_agent_get_users`
+#### `proxmox_agent_user`
 
 **Description:** Get list of logged-in users from guest via QEMU agent
 
@@ -274,7 +274,7 @@
 
 ---
 
-#### `proxmox_agent_get_vcpus`
+#### `proxmox_agent_hw`
 
 **Description:** Get guest vCPU information via QEMU guest agent
 
@@ -289,7 +289,7 @@
 
 ---
 
-#### `proxmox_agent_ping`
+#### `proxmox_agent_info`
 
 **Description:** Ping the QEMU guest agent to verify availability
 
@@ -304,7 +304,7 @@
 
 ---
 
-#### `proxmox_agent_set_user_password`
+#### `proxmox_agent_user`
 
 **Description:** Set user password in guest via QEMU agent (requires elevated permissions)
 
@@ -322,7 +322,7 @@
 
 ---
 
-#### `proxmox_agent_shutdown`
+#### `proxmox_agent_power`
 
 **Description:** Shutdown guest via QEMU agent (requires elevated permissions)
 
@@ -337,7 +337,7 @@
 
 ---
 
-#### `proxmox_agent_suspend_disk`
+#### `proxmox_agent_power`
 
 **Description:** Suspend guest to disk (hibernate) via QEMU agent (requires elevated permissions)
 
@@ -352,7 +352,7 @@
 
 ---
 
-#### `proxmox_agent_suspend_hybrid`
+#### `proxmox_agent_power`
 
 **Description:** Hybrid suspend guest (RAM + disk) via QEMU agent (requires elevated permissions)
 
@@ -367,7 +367,7 @@
 
 ---
 
-#### `proxmox_agent_suspend_ram`
+#### `proxmox_agent_power`
 
 **Description:** Suspend guest to RAM (sleep) via QEMU agent (requires elevated permissions)
 
@@ -382,7 +382,7 @@
 
 ---
 
-#### `proxmox_create_lxc_firewall_rule`
+#### `proxmox_guest_firewall_rule`
 
 **Description:** Create an LXC firewall rule (requires elevated permissions)
 
@@ -410,7 +410,7 @@
 
 ---
 
-#### `proxmox_create_vm_firewall_rule`
+#### `proxmox_guest_firewall_rule`
 
 **Description:** Create a VM firewall rule (requires elevated permissions)
 
@@ -438,7 +438,7 @@
 
 ---
 
-#### `proxmox_delete_lxc_firewall_rule`
+#### `proxmox_guest_firewall_rule`
 
 **Description:** Delete an LXC firewall rule (requires elevated permissions)
 
@@ -455,7 +455,7 @@
 
 ---
 
-#### `proxmox_delete_vm_firewall_rule`
+#### `proxmox_guest_firewall_rule`
 
 **Description:** Delete a VM firewall rule (requires elevated permissions)
 
@@ -472,7 +472,7 @@
 
 ---
 
-#### `proxmox_get_lxc_firewall_rule`
+#### `proxmox_guest_firewall_rule`
 
 **Description:** Get an LXC firewall rule by position
 
@@ -488,7 +488,7 @@
 
 ---
 
-#### `proxmox_get_vm_firewall_rule`
+#### `proxmox_guest_firewall_rule`
 
 **Description:** Get a VM firewall rule by position
 
@@ -504,7 +504,7 @@
 
 ---
 
-#### `proxmox_list_lxc_firewall_rules`
+#### `proxmox_guest_firewall_rule`
 
 **Description:** List per-LXC firewall rules
 
@@ -519,7 +519,7 @@
 
 ---
 
-#### `proxmox_list_vm_firewall_rules`
+#### `proxmox_guest_firewall_rule`
 
 **Description:** List per-VM firewall rules
 
@@ -534,7 +534,7 @@
 
 ---
 
-#### `proxmox_migrate_lxc`
+#### `proxmox_guest_migrate`
 
 **Description:** Migrate an LXC container to another node (requires elevated permissions)
 
@@ -555,7 +555,7 @@
 
 ---
 
-#### `proxmox_migrate_vm`
+#### `proxmox_guest_migrate`
 
 **Description:** Migrate a QEMU VM to another node (requires elevated permissions)
 
@@ -576,7 +576,7 @@
 
 ---
 
-#### `proxmox_update_lxc_firewall_rule`
+#### `proxmox_guest_firewall_rule`
 
 **Description:** Update an LXC firewall rule (requires elevated permissions)
 
@@ -607,7 +607,7 @@
 
 ---
 
-#### `proxmox_update_vm_firewall_rule`
+#### `proxmox_guest_firewall_rule`
 
 **Description:** Update a VM firewall rule (requires elevated permissions)
 

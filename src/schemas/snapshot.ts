@@ -57,3 +57,45 @@ export type DeleteSnapshotLxcInput = z.infer<typeof deleteSnapshotLxcSchema>;
 export const deleteSnapshotVmSchema = baseSnapshotSchema;
 
 export type DeleteSnapshotVmInput = z.infer<typeof deleteSnapshotVmSchema>;
+
+// proxmox_guest_snapshot - Consolidated snapshot tool with action + type parameters
+export const guestSnapshotCreateSchema = z.object({
+  action: z.literal('create'),
+  type: z.enum(['vm', 'lxc']).describe('Guest type'),
+  node: z.string().min(1).describe('Node name where guest is located'),
+  vmid: z.coerce.number().describe('Guest ID number'),
+  snapname: z.string().min(1).describe('Snapshot name'),
+  description: z.string().optional().describe('Optional snapshot description'),
+});
+
+export const guestSnapshotListSchema = z.object({
+  action: z.literal('list'),
+  type: z.enum(['vm', 'lxc']).describe('Guest type'),
+  node: z.string().min(1).describe('Node name where guest is located'),
+  vmid: z.coerce.number().describe('Guest ID number'),
+});
+
+export const guestSnapshotRollbackSchema = z.object({
+  action: z.literal('rollback'),
+  type: z.enum(['vm', 'lxc']).describe('Guest type'),
+  node: z.string().min(1).describe('Node name where guest is located'),
+  vmid: z.coerce.number().describe('Guest ID number'),
+  snapname: z.string().min(1).describe('Snapshot name'),
+});
+
+export const guestSnapshotDeleteSchema = z.object({
+  action: z.literal('delete'),
+  type: z.enum(['vm', 'lxc']).describe('Guest type'),
+  node: z.string().min(1).describe('Node name where guest is located'),
+  vmid: z.coerce.number().describe('Guest ID number'),
+  snapname: z.string().min(1).describe('Snapshot name'),
+});
+
+export const guestSnapshotSchema = z.discriminatedUnion('action', [
+  guestSnapshotCreateSchema,
+  guestSnapshotListSchema,
+  guestSnapshotRollbackSchema,
+  guestSnapshotDeleteSchema,
+]);
+
+export type GuestSnapshotInput = z.infer<typeof guestSnapshotSchema>;

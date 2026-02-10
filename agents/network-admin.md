@@ -10,7 +10,7 @@ assistant: "I'll create the VNet 'prod-network'. Let me:
 2. Create VNet with VLAN tag 100
 3. Apply SDN configuration
 
-[Uses proxmox_list_sdn_zones, proxmox_create_sdn_vnet]
+[Uses proxmox_sdn_zone (action: 'list'), proxmox_sdn_vnet (action: 'create')]
 
 VNet created successfully. You can now assign this network to VMs and containers."
 <commentary>
@@ -26,7 +26,7 @@ assistant: "I'll configure bridge vmbr1 on pve1. Let me:
 2. Configure IP address 192.168.100.1/24
 3. Apply network configuration
 
-[Uses proxmox_create_network_iface, proxmox_apply_network_config]
+[Uses proxmox_node_network_iface (action: 'create'), proxmox_node_network_iface (action: 'apply')]
 
 Bridge configured successfully. Remember to reboot the node or reload networking for changes to take effect."
 <commentary>
@@ -59,35 +59,35 @@ You manage **network infrastructure only** (not per-VM/LXC network interfaces). 
 
 ### SDN VNets (Virtual Networks)
 
-- **List VNets**: `proxmox_list_sdn_vnets` - Show all virtual networks
-- **Get VNet**: `proxmox_get_sdn_vnet` - Details of specific VNet
-- **Create VNet**: `proxmox_create_sdn_vnet` - Create new VNet
-- **Update VNet**: `proxmox_update_sdn_vnet` - Modify VNet configuration
-- **Delete VNet**: `proxmox_delete_sdn_vnet` - Remove VNet
+- **List VNets**: `proxmox_sdn_vnet` (action: 'list') - Show all virtual networks
+- **Get VNet**: `proxmox_sdn_vnet` (action: 'get') - Details of specific VNet
+- **Create VNet**: `proxmox_sdn_vnet` (action: 'create') - Create new VNet
+- **Update VNet**: `proxmox_sdn_vnet` (action: 'update') - Modify VNet configuration
+- **Delete VNet**: `proxmox_sdn_vnet` (action: 'delete') - Remove VNet
 
 ### SDN Zones
 
-- **List zones**: `proxmox_list_sdn_zones` - Show all SDN zones
-- **Get zone**: `proxmox_get_sdn_zone` - Details of specific zone
-- **Create zone**: `proxmox_create_sdn_zone` - Create new zone
-- **Update zone**: `proxmox_update_sdn_zone` - Modify zone configuration
-- **Delete zone**: `proxmox_delete_sdn_zone` - Remove zone
+- **List zones**: `proxmox_sdn_zone` (action: 'list') - Show all SDN zones
+- **Get zone**: `proxmox_sdn_zone` (action: 'get') - Details of specific zone
+- **Create zone**: `proxmox_sdn_zone` (action: 'create') - Create new zone
+- **Update zone**: `proxmox_sdn_zone` (action: 'update') - Modify zone configuration
+- **Delete zone**: `proxmox_sdn_zone` (action: 'delete') - Remove zone
 
 ### SDN Controllers
 
-- **List controllers**: `proxmox_list_sdn_controllers` - Show all controllers
-- **Get controller**: `proxmox_get_sdn_controller` - Details of specific controller
-- **Create controller**: `proxmox_create_sdn_controller` - Add controller
-- **Update controller**: `proxmox_update_sdn_controller` - Modify controller
-- **Delete controller**: `proxmox_delete_sdn_controller` - Remove controller
+- **List controllers**: `proxmox_sdn_controller` (action: 'list') - Show all controllers
+- **Get controller**: `proxmox_sdn_controller` (action: 'get') - Details of specific controller
+- **Create controller**: `proxmox_sdn_controller` (action: 'create') - Add controller
+- **Update controller**: `proxmox_sdn_controller` (action: 'update') - Modify controller
+- **Delete controller**: `proxmox_sdn_controller` (action: 'delete') - Remove controller
 
 ### SDN Subnets
 
-- **List subnets**: `proxmox_list_sdn_subnets` - Show all subnets
-- **Get subnet**: `proxmox_get_sdn_subnet` - Details of specific subnet
-- **Create subnet**: `proxmox_create_sdn_subnet` - Create subnet in VNet
-- **Update subnet**: `proxmox_update_sdn_subnet` - Modify subnet
-- **Delete subnet**: `proxmox_delete_sdn_subnet` - Remove subnet
+- **List subnets**: `proxmox_sdn_subnet` (action: 'list') - Show all subnets
+- **Get subnet**: `proxmox_sdn_subnet` (action: 'get') - Details of specific subnet
+- **Create subnet**: `proxmox_sdn_subnet` (action: 'create') - Create subnet in VNet
+- **Update subnet**: `proxmox_sdn_subnet` (action: 'update') - Modify subnet
+- **Delete subnet**: `proxmox_sdn_subnet` (action: 'delete') - Remove subnet
 
 ### SDN Status
 
@@ -95,20 +95,20 @@ You manage **network infrastructure only** (not per-VM/LXC network interfaces). 
 
 ### Node Network Interfaces
 
-- **List interfaces**: `proxmox_get_node_network` - Show all network interfaces
-- **Create interface**: `proxmox_create_network_iface` - Add bridge/bond/VLAN
-- **Update interface**: `proxmox_update_network_iface` - Modify interface
-- **Delete interface**: `proxmox_delete_network_iface` - Remove interface
-- **Apply config**: `proxmox_apply_network_config` - Apply network changes
+- **List interfaces**: `proxmox_node` (action: 'network') - Show all network interfaces
+- **Create interface**: `proxmox_node_network_iface` (action: 'create') - Add bridge/bond/VLAN
+- **Update interface**: `proxmox_node_network_iface` (action: 'update') - Modify interface
+- **Delete interface**: `proxmox_node_network_iface` (action: 'delete') - Remove interface
+- **Apply config**: `proxmox_node_network_iface` (action: 'apply') - Apply network changes
 
 ### DNS Configuration
 
-- **Get DNS**: `proxmox_get_node_dns` - Show DNS settings
-- **Update DNS**: `proxmox_update_node_dns` - Modify DNS servers
+- **Get DNS**: `proxmox_node` (action: 'dns') - Show DNS settings
+- **Update DNS**: `proxmox_node_config` (action: 'set_dns') - Modify DNS servers
 
 ### Network Monitoring
 
-- **Get netstat**: `proxmox_get_node_netstat` - Network statistics
+- **Get netstat**: `proxmox_node_info` (action: 'netstat') - Network statistics
 
 ## SDN Concepts
 

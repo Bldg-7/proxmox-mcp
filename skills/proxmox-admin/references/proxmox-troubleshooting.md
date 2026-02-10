@@ -54,7 +54,7 @@ GET /api2/json/nodes/pve1/qemu/999/status
 **Solution**: Treat 500 errors as potential "resource not found" errors. Always verify resource existence before operations:
 
 ```
-1. List VMs: proxmox_list_vms()
+1. List VMs: proxmox_guest_list()
 2. Verify VMID exists in list
 3. Then perform operation on that VMID
 ```
@@ -63,7 +63,7 @@ GET /api2/json/nodes/pve1/qemu/999/status
 
 ### LXC Command Execution Not Available
 
-**Issue**: LXC containers do not support command execution via the Proxmox API. Only QEMU VMs with guest agent support `proxmox_execute_vm_command`.
+**Issue**: LXC containers do not support command execution via the Proxmox API. Only QEMU VMs with guest agent support `proxmox_agent_exec`.
 
 **Why**: The Proxmox API only exposes QEMU guest agent functionality, not LXC `pct exec`.
 
@@ -74,9 +74,9 @@ pct exec 200 -- /bin/bash -c "your-command"
 ```
 
 **Tools Affected**:
-- ❌ `proxmox_execute_vm_command` - Only works with QEMU VMs
-- ✅ `proxmox_start_lxc`, `proxmox_stop_lxc` - Work fine
-- ✅ `proxmox_get_lxc_status` - Works fine
+- ❌ `proxmox_agent_exec` - Only works with QEMU VMs
+- ✅ `proxmox_guest_start`, `proxmox_guest_stop` - Work fine
+- ✅ `proxmox_guest_status` - Works fine
 
 ---
 
@@ -87,9 +87,9 @@ pct exec 200 -- /bin/bash -c "your-command"
 **Impact**: Cannot execute arbitrary commands on Proxmox nodes via MCP when using API token authentication.
 
 **Solution**: Use specific API endpoints instead of generic command execution:
-- Use `proxmox_control_node_service` for service management
-- Use `proxmox_get_node_syslog` for log access
-- Use `proxmox_get_node_tasks` for task monitoring
+- Use `proxmox_node_service` for service management
+- Use `proxmox_node_log` for log access
+- Use `proxmox_node_task` for task monitoring
 
 ---
 
@@ -280,7 +280,7 @@ export PROXMOX_SSL_MODE=verify
 
 **Solution**:
 1. Use task-based operations for long-running tasks
-2. Monitor task status via `proxmox_get_node_task()`
+2. Monitor task status via `proxmox_node_task()`
 3. Increase timeout if needed (not currently configurable in MCP)
 
 ---
@@ -330,7 +330,7 @@ The MCP server operates on individual resources. For bulk operations, call tools
 
 ### No Streaming Output
 
-Command execution (`proxmox_execute_vm_command`) does not stream output. Results are returned after command completes.
+Command execution (`proxmox_agent_exec`) does not stream output. Results are returned after command completes.
 
 ### No File Upload via MCP
 
@@ -359,7 +359,7 @@ Interactive console access (VNC/SPICE) is not available via MCP. Use Proxmox UI 
 3. Use staging ACME directory first for testing
 4. Check ACME account status
 
-**Tools**: `proxmox_order_acme_certificate`, `proxmox_get_node_acme_config`, `proxmox_get_acme_directories`
+**Tools**: `proxmox_acme_cert`, `proxmox_acme_cert`, `proxmox_acme_info`
 
 ---
 
@@ -377,10 +377,10 @@ Interactive console access (VNC/SPICE) is not available via MCP. Use Proxmox UI 
 **Solution**:
 1. Verify target configuration
 2. Check network connectivity
-3. Test with `proxmox_test_notification_target`
+3. Test with `proxmox_notification`
 4. Review notification target details
 
-**Tools**: `proxmox_get_notification_target`, `proxmox_test_notification_target`
+**Tools**: `proxmox_notification`, `proxmox_notification`
 
 ---
 

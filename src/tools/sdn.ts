@@ -24,6 +24,10 @@ import {
   createSdnSubnetSchema,
   updateSdnSubnetSchema,
   deleteSdnSubnetSchema,
+  sdnVnetToolSchema,
+  sdnZoneToolSchema,
+  sdnControllerToolSchema,
+  sdnSubnetToolSchema,
 } from '../schemas/sdn.js';
 import type {
   ListSdnVnetsInput,
@@ -46,6 +50,10 @@ import type {
   CreateSdnSubnetInput,
   UpdateSdnSubnetInput,
   DeleteSdnSubnetInput,
+  SdnVnetToolInput,
+  SdnZoneToolInput,
+  SdnControllerToolInput,
+  SdnSubnetToolInput,
 } from '../schemas/sdn.js';
 
 type SdnRecord = Record<string, unknown>;
@@ -636,5 +644,149 @@ export async function deleteSdnSubnet(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Delete SDN Subnet');
+  }
+}
+
+export async function handleSdnVnetTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: SdnVnetToolInput
+): Promise<ToolResponse> {
+  const validated = sdnVnetToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      const { action: _action, ...payload } = validated;
+      return listSdnVnets(client, config, payload);
+    }
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getSdnVnet(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createSdnVnet(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateSdnVnet(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteSdnVnet(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'SDN Vnet Tool'
+      );
+  }
+}
+
+export async function handleSdnZoneTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: SdnZoneToolInput
+): Promise<ToolResponse> {
+  const validated = sdnZoneToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      const { action: _action, ...payload } = validated;
+      return listSdnZones(client, config, payload);
+    }
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getSdnZone(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createSdnZone(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateSdnZone(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteSdnZone(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'SDN Zone Tool'
+      );
+  }
+}
+
+export async function handleSdnControllerTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: SdnControllerToolInput
+): Promise<ToolResponse> {
+  const validated = sdnControllerToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      const { action: _action, ...payload } = validated;
+      return listSdnControllers(client, config, payload);
+    }
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getSdnController(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createSdnController(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateSdnController(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteSdnController(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'SDN Controller Tool'
+      );
+  }
+}
+
+export async function handleSdnSubnetTool(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: SdnSubnetToolInput
+): Promise<ToolResponse> {
+  const validated = sdnSubnetToolSchema.parse(input);
+
+  switch (validated.action) {
+    case 'list': {
+      const { action: _action, ...payload } = validated;
+      return listSdnSubnets(client, config, payload);
+    }
+    case 'get': {
+      const { action: _action, ...payload } = validated;
+      return getSdnSubnet(client, config, payload);
+    }
+    case 'create': {
+      const { action: _action, ...payload } = validated;
+      return createSdnSubnet(client, config, payload);
+    }
+    case 'update': {
+      const { action: _action, ...payload } = validated;
+      return updateSdnSubnet(client, config, payload);
+    }
+    case 'delete': {
+      const { action: _action, ...payload } = validated;
+      return deleteSdnSubnet(client, config, payload);
+    }
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'SDN Subnet Tool'
+      );
   }
 }

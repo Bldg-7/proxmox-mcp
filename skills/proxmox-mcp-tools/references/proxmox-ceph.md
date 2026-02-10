@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_create_ceph_fs`
+#### `proxmox_ceph_fs`
 
 **Description:** Create a Ceph filesystem (requires elevated permissions)
 
@@ -27,7 +27,7 @@
 
 ---
 
-#### `proxmox_create_ceph_mds`
+#### `proxmox_ceph_mds`
 
 **Description:** Create a Ceph MDS daemon (requires elevated permissions)
 
@@ -42,7 +42,7 @@
 
 ---
 
-#### `proxmox_create_ceph_mon`
+#### `proxmox_ceph_mon`
 
 **Description:** Create a Ceph monitor (requires elevated permissions)
 
@@ -57,7 +57,7 @@
 
 ---
 
-#### `proxmox_create_ceph_osd`
+#### `proxmox_ceph_osd`
 
 **Description:** Create a Ceph OSD (requires elevated permissions)
 
@@ -77,7 +77,7 @@
 
 ---
 
-#### `proxmox_create_ceph_pool`
+#### `proxmox_ceph_pool`
 
 **Description:** Create a Ceph pool (requires elevated permissions)
 
@@ -97,7 +97,7 @@
 
 ---
 
-#### `proxmox_delete_ceph_mds`
+#### `proxmox_ceph_mds`
 
 **Description:** Delete a Ceph MDS daemon (requires elevated permissions)
 
@@ -112,7 +112,7 @@
 
 ---
 
-#### `proxmox_delete_ceph_mon`
+#### `proxmox_ceph_mon`
 
 **Description:** Delete a Ceph monitor (requires elevated permissions)
 
@@ -127,7 +127,7 @@
 
 ---
 
-#### `proxmox_delete_ceph_osd`
+#### `proxmox_ceph_osd`
 
 **Description:** Delete a Ceph OSD (requires elevated permissions)
 
@@ -142,7 +142,7 @@
 
 ---
 
-#### `proxmox_delete_ceph_pool`
+#### `proxmox_ceph_pool`
 
 **Description:** Delete a Ceph pool (requires elevated permissions)
 
@@ -157,7 +157,7 @@
 
 ---
 
-#### `proxmox_get_ceph_status`
+#### `proxmox_ceph`
 
 **Description:** Get Ceph cluster status
 
@@ -171,7 +171,7 @@
 
 ---
 
-#### `proxmox_list_ceph_fs`
+#### `proxmox_ceph_fs`
 
 **Description:** List Ceph filesystems
 
@@ -185,7 +185,7 @@
 
 ---
 
-#### `proxmox_list_ceph_mds`
+#### `proxmox_ceph_mds`
 
 **Description:** List Ceph MDS daemons
 
@@ -199,7 +199,7 @@
 
 ---
 
-#### `proxmox_list_ceph_mons`
+#### `proxmox_ceph_mon`
 
 **Description:** List Ceph monitors
 
@@ -213,7 +213,7 @@
 
 ---
 
-#### `proxmox_list_ceph_osds`
+#### `proxmox_ceph_osd`
 
 **Description:** List Ceph OSDs
 
@@ -227,7 +227,7 @@
 
 ---
 
-#### `proxmox_list_ceph_pools`
+#### `proxmox_ceph_pool`
 
 **Description:** List Ceph pools
 
@@ -241,7 +241,7 @@
 
 ---
 
-#### `proxmox_update_ceph_pool`
+#### `proxmox_ceph_pool`
 
 **Description:** Update a Ceph pool (requires elevated permissions)
 
