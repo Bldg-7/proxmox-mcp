@@ -357,6 +357,13 @@ export const toolPermissions: ToolPermissions = {
     lvmthin: 'basic',
     directory: 'basic',
   },
+  proxmox_guest_firewall_rule: {
+    list: 'basic',
+    get: 'basic',
+    create: 'elevated',
+    update: 'elevated',
+    delete: 'elevated',
+  },
   proxmox_init_disk_gpt: {
     elevated: 'elevated',
   },

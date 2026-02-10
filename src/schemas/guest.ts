@@ -319,3 +319,67 @@ export const guestTemplateSchema = z.discriminatedUnion('type', [
 ]);
 
 export type GuestTemplateInput = z.infer<typeof guestTemplateSchema>;
+
+// ── Consolidated: proxmox_guest_firewall_rule ────────────────────────────
+// Replaces: 10 individual VM/LXC firewall rule tools
+const baseGuestFirewall = z.object({
+  node: z.string().min(1).describe('Node name where guest is located'),
+  vmid: z.coerce.number().describe('Guest ID number'),
+  type: z.enum(['vm', 'lxc']).describe('Guest type (vm or lxc)'),
+});
+
+export const guestFirewallRuleSchema = z.discriminatedUnion('action', [
+  baseGuestFirewall.extend({
+    action: z.literal('list'),
+  }),
+  baseGuestFirewall.extend({
+    action: z.literal('get'),
+    pos: z.number().int().min(0).describe('Rule position'),
+  }),
+  baseGuestFirewall.extend({
+    action: z.literal('create'),
+    rule_action: z.string().min(1).describe('Rule action (ACCEPT, REJECT, DROP)'),
+    rule_type: z.enum(['in', 'out', 'group']).describe('Rule direction'),
+    comment: z.string().optional(),
+    dest: z.string().optional(),
+    dport: z.string().optional(),
+    enable: z.number().int().optional(),
+    iface: z.string().optional(),
+    log: z
+      .enum(['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug', 'nolog'])
+      .optional(),
+    macro: z.string().optional(),
+    pos: z.number().int().optional(),
+    proto: z.string().optional(),
+    source: z.string().optional(),
+    sport: z.string().optional(),
+  }),
+  baseGuestFirewall.extend({
+    action: z.literal('update'),
+    pos: z.number().int().min(0).describe('Rule position'),
+    rule_action: z.string().optional(),
+    comment: z.string().optional(),
+    delete: z.string().optional(),
+    dest: z.string().optional(),
+    digest: z.string().max(64).optional(),
+    dport: z.string().optional(),
+    enable: z.number().int().optional(),
+    iface: z.string().optional(),
+    log: z
+      .enum(['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug', 'nolog'])
+      .optional(),
+    macro: z.string().optional(),
+    moveto: z.number().int().optional(),
+    proto: z.string().optional(),
+    source: z.string().optional(),
+    sport: z.string().optional(),
+    rule_type: z.enum(['in', 'out', 'group']).optional(),
+  }),
+  baseGuestFirewall.extend({
+    action: z.literal('delete'),
+    pos: z.number().int().min(0).describe('Rule position'),
+    digest: z.string().max(64).optional().describe('Config digest'),
+  }),
+]);
+
+export type GuestFirewallRuleInput = z.infer<typeof guestFirewallRuleSchema>;

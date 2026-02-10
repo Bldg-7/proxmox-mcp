@@ -1,9 +1,9 @@
 {
-  "active_plan": "/Users/snark/Documents/GitHub/proxmox-mcp/.sisyphus/plans/tool-consolidation.md",
-  "started_at": "2026-02-09T16:47:54.300Z",
+  "active_plan": "/Users/snark/Documents/dev/proxmox-mcp/.sisyphus/plans/tool-consolidation-finalize.md",
+  "started_at": "2026-02-10T05:08:36.274Z",
   "session_ids": [
-    "ses_3bcec396fffek37FveqfzWc0Iz"
+    "ses_3d400eb1dffeKd4WDY8OIavIPs"
   ],
-  "plan_name": "tool-consolidation",
+  "plan_name": "tool-consolidation-finalize",
   "agent": "atlas"
 }

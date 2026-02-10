@@ -5,6 +5,7 @@ import type { ProxmoxFirewallRule } from '../types/proxmox.js';
 import { formatToolResponse, formatErrorResponse } from '../formatters/index.js';
 import { requireElevated } from '../middleware/index.js';
 import { validateNodeName, validateVMID, validateFirewallRulePos, validateFilePath, validateUsername } from '../validators/index.js';
+import { guestFirewallRuleSchema, type GuestFirewallRuleInput } from '../schemas/guest.js';
 import {
   migrateVmSchema,
   migrateLxcSchema,
@@ -1702,5 +1703,52 @@ export async function handleAgentUser(
     }
   } catch (error) {
     return formatErrorResponse(error as Error, 'Agent User');
+  }
+}
+
+export async function handleGuestFirewallRule(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: GuestFirewallRuleInput
+): Promise<ToolResponse> {
+  const validated = guestFirewallRuleSchema.parse(input);
+  const isVm = validated.type === 'vm';
+
+  switch (validated.action) {
+    case 'list':
+      return isVm
+        ? listVmFirewallRules(client, config, validated)
+        : listLxcFirewallRules(client, config, validated);
+    case 'get':
+      return isVm
+        ? getVmFirewallRule(client, config, validated)
+        : getLxcFirewallRule(client, config, validated);
+    case 'create': {
+      const { action: _a, type: _t, rule_action, rule_type, ...rest } = validated;
+      const payload = { ...rest, action: rule_action, type: rule_type };
+      return isVm
+        ? createVmFirewallRule(client, config, payload)
+        : createLxcFirewallRule(client, config, payload);
+    }
+    case 'update': {
+      const { action: _a, type: _t, rule_action, rule_type, ...rest } = validated;
+      const payload = {
+        ...rest,
+        ...(rule_action ? { action: rule_action } : {}),
+        ...(rule_type ? { type: rule_type } : {}),
+      };
+      return isVm
+        ? updateVmFirewallRule(client, config, payload)
+        : updateLxcFirewallRule(client, config, payload);
+    }
+    case 'delete':
+      return isVm
+        ? deleteVmFirewallRule(client, config, validated)
+        : deleteLxcFirewallRule(client, config, validated);
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Guest Firewall Rule'
+      );
   }
 }

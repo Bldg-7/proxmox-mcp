@@ -102,16 +102,7 @@ import {
   handleAgentFreeze,
   handleAgentPower,
   handleAgentUser,
-   listVmFirewallRules,
-  getVmFirewallRule,
-  createVmFirewallRule,
-  updateVmFirewallRule,
-  deleteVmFirewallRule,
-  listLxcFirewallRules,
-  getLxcFirewallRule,
-  createLxcFirewallRule,
-  updateLxcFirewallRule,
-  deleteLxcFirewallRule,
+  handleGuestFirewallRule,
   handleConsoleVnc,
   handleConsoleTerm,
   getSpiceProxy,
@@ -218,17 +209,8 @@ import {
   agentFreezeSchema,
   agentPowerSchema,
   agentUserSchema,
-   listVmFirewallRulesSchema,
-  getVmFirewallRuleSchema,
-  createVmFirewallRuleSchema,
-  updateVmFirewallRuleSchema,
-  deleteVmFirewallRuleSchema,
-  listLxcFirewallRulesSchema,
-  getLxcFirewallRuleSchema,
-  createLxcFirewallRuleSchema,
-  updateLxcFirewallRuleSchema,
-  deleteLxcFirewallRuleSchema,
 } from '../schemas/vm-advanced.js';
+import { guestFirewallRuleSchema } from '../schemas/guest.js';
 import {
   guestSnapshotSchema,
 } from '../schemas/snapshot.js';
@@ -407,42 +389,9 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_agent_freeze: { handler: handleAgentFreeze, schema: agentFreezeSchema },
   proxmox_agent_power: { handler: handleAgentPower, schema: agentPowerSchema },
   proxmox_agent_user: { handler: handleAgentUser, schema: agentUserSchema },
-   proxmox_list_vm_firewall_rules: {
-    handler: listVmFirewallRules,
-    schema: listVmFirewallRulesSchema,
-  },
-  proxmox_get_vm_firewall_rule: { handler: getVmFirewallRule, schema: getVmFirewallRuleSchema },
-  proxmox_create_vm_firewall_rule: {
-    handler: createVmFirewallRule,
-    schema: createVmFirewallRuleSchema,
-  },
-  proxmox_update_vm_firewall_rule: {
-    handler: updateVmFirewallRule,
-    schema: updateVmFirewallRuleSchema,
-  },
-  proxmox_delete_vm_firewall_rule: {
-    handler: deleteVmFirewallRule,
-    schema: deleteVmFirewallRuleSchema,
-  },
-  proxmox_list_lxc_firewall_rules: {
-    handler: listLxcFirewallRules,
-    schema: listLxcFirewallRulesSchema,
-  },
-  proxmox_get_lxc_firewall_rule: {
-    handler: getLxcFirewallRule,
-    schema: getLxcFirewallRuleSchema,
-  },
-  proxmox_create_lxc_firewall_rule: {
-    handler: createLxcFirewallRule,
-    schema: createLxcFirewallRuleSchema,
-  },
-  proxmox_update_lxc_firewall_rule: {
-    handler: updateLxcFirewallRule,
-    schema: updateLxcFirewallRuleSchema,
-  },
-  proxmox_delete_lxc_firewall_rule: {
-    handler: deleteLxcFirewallRule,
-    schema: deleteLxcFirewallRuleSchema,
+  proxmox_guest_firewall_rule: {
+    handler: handleGuestFirewallRule,
+    schema: guestFirewallRuleSchema,
   },
 
   // Snapshots

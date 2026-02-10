@@ -117,16 +117,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_agent_freeze: 'Manage filesystem freeze via QEMU agent. operation=status|freeze|thaw|fstrim (requires elevated permissions)',
   proxmox_agent_power: 'Guest power control via QEMU agent. operation=shutdown|suspend_disk|suspend_ram|suspend_hybrid (requires elevated permissions)',
   proxmox_agent_user: 'Manage guest users via QEMU agent. operation=set_password (requires elevated permissions)',
-   proxmox_list_vm_firewall_rules: 'List per-VM firewall rules',
-  proxmox_get_vm_firewall_rule: 'Get a VM firewall rule by position',
-  proxmox_create_vm_firewall_rule: 'Create a VM firewall rule (requires elevated permissions)',
-  proxmox_update_vm_firewall_rule: 'Update a VM firewall rule (requires elevated permissions)',
-  proxmox_delete_vm_firewall_rule: 'Delete a VM firewall rule (requires elevated permissions)',
-  proxmox_list_lxc_firewall_rules: 'List per-LXC firewall rules',
-  proxmox_get_lxc_firewall_rule: 'Get an LXC firewall rule by position',
-  proxmox_create_lxc_firewall_rule: 'Create an LXC firewall rule (requires elevated permissions)',
-  proxmox_update_lxc_firewall_rule: 'Update an LXC firewall rule (requires elevated permissions)',
-  proxmox_delete_lxc_firewall_rule: 'Delete an LXC firewall rule (requires elevated permissions)',
+  proxmox_guest_firewall_rule: 'Manage per-guest firewall rules. action=list|get: query rules | action=create|update|delete: manage rules (elevated). type=vm|lxc. Uses rule_action for firewall action (ACCEPT/REJECT/DROP), rule_type for direction (in/out/group).',
 
   // Snapshots
   proxmox_guest_snapshot: 'Manage guest snapshots (create, list, rollback, delete) for VMs and LXC containers (requires elevated permissions)',

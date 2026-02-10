@@ -281,6 +281,7 @@ export {
   createLxcFirewallRule,
   updateLxcFirewallRule,
   deleteLxcFirewallRule,
+  handleGuestFirewallRule,
 } from './vm-advanced.js';
 
 // Snapshot tools
