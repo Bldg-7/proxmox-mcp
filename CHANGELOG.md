@@ -1,5 +1,13 @@
 # @bldg-7/proxmox-mcp
 
+## 1.0.1
+
+### Patch Changes
+
+- 60c714d: Fix MCP startup metadata to report the package version from `package.json` instead of a stale hardcoded value.
+
+  Also update startup logging to report the current registered tool count dynamically and emit a clear warning when `NODE_TLS_REJECT_UNAUTHORIZED=0` is set.
+
 ## 1.0.0
 
 ### Major Changes
