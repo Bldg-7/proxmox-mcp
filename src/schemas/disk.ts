@@ -174,6 +174,27 @@ export const wipeDiskSchema = z.object({
 
 export type WipeDiskInput = z.infer<typeof wipeDiskSchema>;
 
+export const vmDiskSchema = z.discriminatedUnion('action', [
+  addDiskVmSchema.extend({ action: z.literal('add') }),
+  removeDiskVmSchema.extend({ action: z.literal('remove') }),
+]);
+
+export type VmDiskInput = z.infer<typeof vmDiskSchema>;
+
+export const lxcMountpointSchema = z.discriminatedUnion('action', [
+  addMountpointLxcSchema.extend({ action: z.literal('add') }),
+  removeMountpointLxcSchema.extend({ action: z.literal('remove') }),
+]);
+
+export type LxcMountpointInput = z.infer<typeof lxcMountpointSchema>;
+
+export const nodeDiskAdminSchema = z.discriminatedUnion('action', [
+  initDiskGptSchema.extend({ action: z.literal('init_gpt') }),
+  wipeDiskSchema.extend({ action: z.literal('wipe') }),
+]);
+
+export type NodeDiskAdminInput = z.infer<typeof nodeDiskAdminSchema>;
+
 // proxmox_get_node_lvmthin - Get LVM thin pools on a node
 export const getNodeLvmThinSchema = z.object({
   node: z.string().min(1).describe('Node name'),

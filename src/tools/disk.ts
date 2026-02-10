@@ -27,6 +27,9 @@ import {
   wipeDiskSchema,
   getNodeLvmThinSchema,
   getNodeDirectorySchema,
+  vmDiskSchema,
+  lxcMountpointSchema,
+  nodeDiskAdminSchema,
 } from '../schemas/disk.js';
 import type {
   AddDiskVmInput,
@@ -47,6 +50,9 @@ import type {
   WipeDiskInput,
   GetNodeLvmThinInput,
   GetNodeDirectoryInput,
+  VmDiskInput,
+  LxcMountpointInput,
+  NodeDiskAdminInput,
 } from '../schemas/disk.js';
 
 /**
@@ -854,5 +860,62 @@ export async function getNodeDirectory(
     return formatToolResponse(output);
   } catch (error) {
     return formatErrorResponse(error as Error, 'Get Node Directory');
+  }
+}
+
+export async function handleVmDisk(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: VmDiskInput
+): Promise<ToolResponse> {
+  const validated = vmDiskSchema.parse(input);
+  switch (validated.action) {
+    case 'add':
+      return addDiskVM(client, config, validated);
+    case 'remove':
+      return removeDiskVM(client, config, validated);
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'VM Disk'
+      );
+  }
+}
+
+export async function handleLxcMountpoint(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: LxcMountpointInput
+): Promise<ToolResponse> {
+  const validated = lxcMountpointSchema.parse(input);
+  switch (validated.action) {
+    case 'add':
+      return addMountpointLxc(client, config, validated);
+    case 'remove':
+      return removeMountpointLxc(client, config, validated);
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'LXC Mountpoint'
+      );
+  }
+}
+
+export async function handleNodeDiskAdmin(
+  client: ProxmoxApiClient,
+  config: Config,
+  input: NodeDiskAdminInput
+): Promise<ToolResponse> {
+  const validated = nodeDiskAdminSchema.parse(input);
+  switch (validated.action) {
+    case 'init_gpt':
+      return initDiskGpt(client, config, validated);
+    case 'wipe':
+      return wipeDisk(client, config, validated);
+    default:
+      return formatErrorResponse(
+        new Error(`Unknown action: ${(validated as { action: string }).action}`),
+        'Node Disk Admin'
+      );
   }
 }

@@ -299,11 +299,9 @@ describe('Disk and network consolidated tools', () => {
   });
 
   describe('tool-name mapping guardrails', () => {
-    it('keeps VM disk and LXC mountpoint add/remove tools separate', () => {
-      expect(TOOL_NAMES).toContain('proxmox_add_disk_vm');
-      expect(TOOL_NAMES).toContain('proxmox_add_mountpoint_lxc');
-      expect(TOOL_NAMES).toContain('proxmox_remove_disk_vm');
-      expect(TOOL_NAMES).toContain('proxmox_remove_mountpoint_lxc');
+    it('has consolidated VM disk and LXC mountpoint tools', () => {
+      expect(TOOL_NAMES).toContain('proxmox_vm_disk');
+      expect(TOOL_NAMES).toContain('proxmox_lxc_mountpoint');
     });
 
     it('replaces legacy resize/move/network/node-disk query tools', () => {

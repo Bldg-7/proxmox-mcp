@@ -107,15 +107,12 @@ import {
   getSpiceProxy,
   handleGuestSnapshot,
   handleBackup,
-  addDiskVM,
-  addMountpointLxc,
+  handleVmDisk,
+  handleLxcMountpoint,
   handleGuestDiskResize,
-  removeDiskVM,
-  removeMountpointLxc,
   handleGuestDiskMove,
   handleNodeDisk,
-  initDiskGpt,
-  wipeDisk,
+  handleNodeDiskAdmin,
   handleGuestNetwork,
   executeVMCommand,
   listTemplates,
@@ -216,14 +213,11 @@ import {
   backupSchema,
 } from '../schemas/backup.js';
 import {
-  addDiskVmSchema,
-  addMountpointLxcSchema,
+  vmDiskSchema,
+  lxcMountpointSchema,
   guestDiskResizeSchema,
-  removeDiskVmSchema,
-  removeMountpointLxcSchema,
   guestDiskMoveSchema,
-  initDiskGptSchema,
-  wipeDiskSchema,
+  nodeDiskAdminSchema,
 } from '../schemas/disk.js';
 import {
   guestNetworkSchema,
@@ -395,15 +389,13 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_backup: { handler: handleBackup, schema: backupSchema },
 
    // Disks
-   proxmox_add_disk_vm: { handler: addDiskVM, schema: addDiskVmSchema },
-   proxmox_add_mountpoint_lxc: { handler: addMountpointLxc, schema: addMountpointLxcSchema },
+   proxmox_vm_disk: { handler: handleVmDisk, schema: vmDiskSchema },
+   proxmox_lxc_mountpoint: { handler: handleLxcMountpoint, schema: lxcMountpointSchema },
    proxmox_guest_disk_resize: { handler: handleGuestDiskResize, schema: guestDiskResizeSchema },
-   proxmox_remove_disk_vm: { handler: removeDiskVM, schema: removeDiskVmSchema },
-   proxmox_remove_mountpoint_lxc: { handler: removeMountpointLxc, schema: removeMountpointLxcSchema },
+
    proxmox_guest_disk_move: { handler: handleGuestDiskMove, schema: guestDiskMoveSchema },
    proxmox_node_disk: { handler: handleNodeDisk, schema: nodeDiskSchema },
-   proxmox_init_disk_gpt: { handler: initDiskGpt, schema: initDiskGptSchema },
-   proxmox_wipe_disk: { handler: wipeDisk, schema: wipeDiskSchema },
+   proxmox_node_disk_admin: { handler: handleNodeDiskAdmin, schema: nodeDiskAdminSchema },
 
   // Network
   proxmox_guest_network: { handler: handleGuestNetwork, schema: guestNetworkSchema },

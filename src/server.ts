@@ -125,11 +125,10 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_backup: 'Manage guest backups (create, list, restore, delete) for VMs and LXC containers (requires elevated permissions)',
 
   // Disks
-  proxmox_add_disk_vm: 'Add a new disk to a QEMU virtual machine (requires elevated permissions)',
-  proxmox_add_mountpoint_lxc: 'Add a mount point to an LXC container (requires elevated permissions)',
+  proxmox_vm_disk: 'Manage VM disks. action=add: add disk | action=remove: remove disk (all elevated)',
+  proxmox_lxc_mountpoint: 'Manage LXC mount points. action=add: add mountpoint | action=remove: remove mountpoint (all elevated)',
   proxmox_guest_disk_resize: 'Resize guest storage for VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
-  proxmox_remove_disk_vm: 'Remove a disk from a QEMU virtual machine (requires elevated permissions)',
-  proxmox_remove_mountpoint_lxc: 'Remove a mount point from an LXC container (requires elevated permissions)',
+
   proxmox_guest_disk_move: 'Move guest storage for VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
 
   // Network
@@ -145,8 +144,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
 
     // Node Disk Query
     proxmox_node_disk: 'Query node disk information. action=list|smart|lvm|zfs|lvmthin|directory',
-    proxmox_init_disk_gpt: 'Initialize GPT partition table on a disk (requires elevated permissions, destructive)',
-    proxmox_wipe_disk: 'Wipe all data from a disk (requires elevated permissions, destructive)',
+     proxmox_node_disk_admin: 'Destructive disk operations. action=init_gpt: initialize GPT | action=wipe: wipe disk (all elevated)',
 
     // Cloud-Init
      proxmox_cloudinit: 'Manage cloud-init for a QEMU VM. action=get: list config | action=dump: dump rendered config (dump_type=user|network|meta) | action=regenerate: regenerate drive (requires elevated)',
