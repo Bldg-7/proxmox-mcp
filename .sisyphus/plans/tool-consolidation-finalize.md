@@ -360,7 +360,7 @@ Wave 3 (Finalization — SEQUENTIAL after Wave 2):
 
 ---
 
-- [ ] 3. Agents + Skills + README 업데이트
+- [x] 3. Agents + Skills + README 업데이트
 
   **What to do**:
   
@@ -477,7 +477,7 @@ Wave 3 (Finalization — SEQUENTIAL after Wave 2):
 
 ---
 
-- [ ] 4. MIGRATION.md 작성
+- [x] 4. MIGRATION.md 작성
 
   **What to do**:
   - `MIGRATION.md` 신규 파일 작성 (프로젝트 루트)
@@ -540,7 +540,7 @@ Wave 3 (Finalization — SEQUENTIAL after Wave 2):
 
 ---
 
-- [ ] 5. Changeset 생성 + 최종 통합 검증
+- [x] 5. Changeset 생성 + 최종 통합 검증
 
   **What to do**:
   
