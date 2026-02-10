@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_apply_network_config`
+#### `proxmox_node_network_iface`
 
 **Description:** Apply or revert pending network changes on a Proxmox node (requires elevated permissions)
 
@@ -24,7 +24,7 @@
 
 ---
 
-#### `proxmox_apt_update`
+#### `proxmox_apt`
 
 **Description:** Update APT package lists (requires elevated permissions)
 
@@ -38,7 +38,7 @@
 
 ---
 
-#### `proxmox_apt_upgrade`
+#### `proxmox_apt`
 
 **Description:** Upgrade packages via APT (requires elevated permissions)
 
@@ -52,7 +52,7 @@
 
 ---
 
-#### `proxmox_apt_versions`
+#### `proxmox_apt`
 
 **Description:** List installed/upgradable APT package versions
 
@@ -67,7 +67,7 @@
 
 ---
 
-#### `proxmox_control_node_service`
+#### `proxmox_node_service`
 
 **Description:** Start/stop/restart a system service on a Proxmox node (requires elevated permissions)
 
@@ -83,7 +83,7 @@
 
 ---
 
-#### `proxmox_create_network_iface`
+#### `proxmox_node_network_iface`
 
 **Description:** Create a network interface on a Proxmox node (requires elevated permissions)
 
@@ -117,7 +117,7 @@
 
 ---
 
-#### `proxmox_delete_network_iface`
+#### `proxmox_node_network_iface`
 
 **Description:** Delete a network interface on a Proxmox node (requires elevated permissions)
 
@@ -133,7 +133,7 @@
 
 ---
 
-#### `proxmox_delete_node_subscription`
+#### `proxmox_node_subscription`
 
 **Description:** Delete subscription information for a Proxmox node (requires elevated permissions)
 
@@ -147,7 +147,7 @@
 
 ---
 
-#### `proxmox_get_cluster_status`
+#### `proxmox_cluster`
 
 **Description:** Get overall cluster status including nodes and resource usage
 
@@ -157,7 +157,7 @@
 
 ---
 
-#### `proxmox_get_lxc_term_proxy`
+#### `proxmox_console_term`
 
 **Description:** Get a terminal proxy ticket for an LXC container (requires elevated permissions)
 
@@ -172,7 +172,7 @@
 
 ---
 
-#### `proxmox_get_lxc_vnc_proxy`
+#### `proxmox_console_vnc`
 
 **Description:** Get a VNC proxy ticket for an LXC container (requires elevated permissions)
 
@@ -187,7 +187,7 @@
 
 ---
 
-#### `proxmox_get_network_iface`
+#### `proxmox_node`
 
 **Description:** Get details for a specific network interface on a Proxmox node
 
@@ -212,7 +212,7 @@
 
 ---
 
-#### `proxmox_get_node_aplinfo`
+#### `proxmox_node_info`
 
 **Description:** List available appliance templates on a Proxmox node
 
@@ -226,7 +226,7 @@
 
 ---
 
-#### `proxmox_get_node_dns`
+#### `proxmox_node`
 
 **Description:** Get DNS configuration for a specific Proxmox node
 
@@ -240,7 +240,7 @@
 
 ---
 
-#### `proxmox_get_node_hosts`
+#### `proxmox_node_config`
 
 **Description:** Get hosts file entries for a Proxmox node
 
@@ -254,7 +254,7 @@
 
 ---
 
-#### `proxmox_get_node_journal`
+#### `proxmox_node_log`
 
 **Description:** Read systemd journal entries from a Proxmox node
 
@@ -268,7 +268,7 @@
 
 ---
 
-#### `proxmox_get_node_netstat`
+#### `proxmox_node_info`
 
 **Description:** Get network connection statistics for a Proxmox node
 
@@ -282,7 +282,7 @@
 
 ---
 
-#### `proxmox_get_node_network`
+#### `proxmox_node`
 
 **Description:** Get network interfaces for a specific Proxmox node
 
@@ -297,7 +297,7 @@
 
 ---
 
-#### `proxmox_get_node_replication_log`
+#### `proxmox_node_replication`
 
 **Description:** Get node replication job log
 
@@ -312,7 +312,7 @@
 
 ---
 
-#### `proxmox_get_node_replication_status`
+#### `proxmox_node_replication`
 
 **Description:** Get node replication job status
 
@@ -327,7 +327,7 @@
 
 ---
 
-#### `proxmox_get_node_report`
+#### `proxmox_node_info`
 
 **Description:** Get node diagnostic report with system information
 
@@ -341,7 +341,7 @@
 
 ---
 
-#### `proxmox_get_node_rrddata`
+#### `proxmox_node_info`
 
 **Description:** Get node RRD performance metrics (CPU, memory, disk I/O)
 
@@ -357,7 +357,7 @@
 
 ---
 
-#### `proxmox_get_node_services`
+#### `proxmox_node_service`
 
 **Description:** List system services on a Proxmox node
 
@@ -371,7 +371,7 @@
 
 ---
 
-#### `proxmox_get_node_status`
+#### `proxmox_node`
 
 **Description:** Get detailed status information for a specific Proxmox node
 
@@ -385,7 +385,7 @@
 
 ---
 
-#### `proxmox_get_node_subscription`
+#### `proxmox_node_subscription`
 
 **Description:** Get subscription information for a Proxmox node
 
@@ -399,7 +399,7 @@
 
 ---
 
-#### `proxmox_get_node_syslog`
+#### `proxmox_node_log`
 
 **Description:** Read syslog entries from a Proxmox node
 
@@ -413,7 +413,7 @@
 
 ---
 
-#### `proxmox_get_node_task`
+#### `proxmox_node_task`
 
 **Description:** Get status details for a specific Proxmox node task
 
@@ -428,7 +428,7 @@
 
 ---
 
-#### `proxmox_get_node_tasks`
+#### `proxmox_node_task`
 
 **Description:** List recent tasks for a Proxmox node
 
@@ -442,7 +442,7 @@
 
 ---
 
-#### `proxmox_get_node_time`
+#### `proxmox_node_config`
 
 **Description:** Get node time and timezone information
 
@@ -456,7 +456,7 @@
 
 ---
 
-#### `proxmox_get_nodes`
+#### `proxmox_node`
 
 **Description:** List all Proxmox cluster nodes with their status and resources
 
@@ -466,7 +466,7 @@
 
 ---
 
-#### `proxmox_get_spice_proxy`
+#### `proxmox_console_spice`
 
 **Description:** Get a SPICE proxy ticket for a QEMU VM (requires elevated permissions)
 
@@ -481,7 +481,7 @@
 
 ---
 
-#### `proxmox_get_storage_rrddata`
+#### `proxmox_node_info`
 
 **Description:** Get storage RRD performance metrics (read/write throughput, usage)
 
@@ -498,7 +498,7 @@
 
 ---
 
-#### `proxmox_get_term_proxy`
+#### `proxmox_console_term`
 
 **Description:** Get a terminal proxy ticket for a QEMU VM (requires elevated permissions)
 
@@ -513,7 +513,7 @@
 
 ---
 
-#### `proxmox_get_vnc_proxy`
+#### `proxmox_console_vnc`
 
 **Description:** Get a VNC proxy ticket for a QEMU VM (requires elevated permissions)
 
@@ -528,7 +528,7 @@
 
 ---
 
-#### `proxmox_migrate_all`
+#### `proxmox_node_bulk`
 
 **Description:** Migrate all VMs/containers to another node (requires elevated permissions)
 
@@ -545,7 +545,7 @@
 
 ---
 
-#### `proxmox_node_reboot`
+#### `proxmox_node_power`
 
 **Description:** Reboot a node (requires elevated permissions)
 
@@ -559,7 +559,7 @@
 
 ---
 
-#### `proxmox_node_shutdown`
+#### `proxmox_node_power`
 
 **Description:** Shutdown a node (requires elevated permissions)
 
@@ -573,7 +573,7 @@
 
 ---
 
-#### `proxmox_node_wakeonlan`
+#### `proxmox_node_power`
 
 **Description:** Wake a node via Wake-on-LAN (requires elevated permissions)
 
@@ -587,7 +587,7 @@
 
 ---
 
-#### `proxmox_schedule_node_replication`
+#### `proxmox_node_replication`
 
 **Description:** Schedule immediate node replication (requires elevated permissions)
 
@@ -602,7 +602,7 @@
 
 ---
 
-#### `proxmox_set_node_subscription`
+#### `proxmox_node_subscription`
 
 **Description:** Set subscription information for a Proxmox node (requires elevated permissions)
 
@@ -617,7 +617,7 @@
 
 ---
 
-#### `proxmox_start_all`
+#### `proxmox_node_bulk`
 
 **Description:** Start all VMs/containers on a node (requires elevated permissions)
 
@@ -631,7 +631,7 @@
 
 ---
 
-#### `proxmox_stop_all`
+#### `proxmox_node_bulk`
 
 **Description:** Stop all VMs/containers on a node (requires elevated permissions)
 
@@ -645,7 +645,7 @@
 
 ---
 
-#### `proxmox_update_network_iface`
+#### `proxmox_node_network_iface`
 
 **Description:** Update a network interface on a Proxmox node (requires elevated permissions)
 
@@ -681,7 +681,7 @@
 
 ---
 
-#### `proxmox_update_node_dns`
+#### `proxmox_node_config`
 
 **Description:** Update DNS configuration on a Proxmox node (requires elevated permissions)
 
@@ -700,7 +700,7 @@
 
 ---
 
-#### `proxmox_update_node_hosts`
+#### `proxmox_node_config`
 
 **Description:** Add/update a hosts entry on a Proxmox node (requires elevated permissions)
 
@@ -718,7 +718,7 @@
 
 ---
 
-#### `proxmox_update_node_time`
+#### `proxmox_node_config`
 
 **Description:** Update node time or timezone (requires elevated permissions)
 

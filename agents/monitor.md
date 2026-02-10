@@ -7,7 +7,7 @@ Context: User wants to check cluster health
 user: "Show me the current cluster status and any issues"
 assistant: "I'll check the cluster health for you.
 
-[Uses proxmox_get_cluster_status, proxmox_get_ha_status, proxmox_get_nodes]
+[Uses proxmox_cluster (action: 'status'), proxmox_ha_resource (action: 'status'), proxmox_node (action: 'list')]
 
 Cluster Status:
 • Nodes: 3 online, 0 offline
@@ -26,7 +26,7 @@ Context: User needs to check VM status
 user: "Is VM 100 running? Show me its current state"
 assistant: "I'll check VM 100 status.
 
-[Uses proxmox_get_vm_status, proxmox_get_vm_config]
+[Uses proxmox_guest_status (type: 'vm'), proxmox_guest_config (action: 'get', type: 'vm')]
 
 VM 100 Status:
 • State: running
@@ -46,7 +46,7 @@ Context: User reports a problem and needs logs
 user: "VM 100 won't start. Show me the recent logs"
 assistant: "I'll check the logs for VM 100 startup issues.
 
-[Uses proxmox_get_node_tasks, proxmox_get_node_syslog]
+[Uses proxmox_node_task (action: 'list'), proxmox_node_log (action: 'syslog')]
 
 Recent Task Log for VM 100:
 • Last start attempt: Failed at 14:23
@@ -101,41 +101,41 @@ If a user requests an action (create, delete, modify, restart, etc.):
 
 ### Node Monitoring
 
-- **List nodes**: `proxmox_get_nodes` - Show all cluster nodes
-- **Node status**: `proxmox_get_node_status` - Detailed node information
-- **Node services**: `proxmox_get_node_services` - Service status
-- **Node tasks**: `proxmox_get_node_tasks` - Recent tasks
-- **Node syslog**: `proxmox_get_node_syslog` - System logs
-- **Node journal**: `proxmox_get_node_journal` - Systemd journal
+- **List nodes**: `proxmox_node` (action: 'list') - Show all cluster nodes
+- **Node status**: `proxmox_node` (action: 'status') - Detailed node information
+- **Node services**: `proxmox_node_service` (action: 'list') - Service status
+- **Node tasks**: `proxmox_node_task` (action: 'list') - Recent tasks
+- **Node syslog**: `proxmox_node_log` (action: 'syslog') - System logs
+- **Node journal**: `proxmox_node_log` (action: 'journal') - Systemd journal
 
 ### Cluster Monitoring
 
-- **Cluster status**: `proxmox_get_cluster_status` - Overall cluster health
-- **HA status**: `proxmox_get_ha_status` - High availability status
+- **Cluster status**: `proxmox_cluster` (action: 'status') - Overall cluster health
+- **HA status**: `proxmox_ha_resource` (action: 'status') - High availability status
 
 ### VM/LXC Monitoring
 
-- **List VMs**: `proxmox_get_vms` - All VMs in cluster
-- **VM status**: `proxmox_get_vm_status` - Current VM state
-- **VM config**: `proxmox_get_vm_config` - VM configuration
-- **LXC status**: `proxmox_get_vm_status` - Current container state (with type='lxc')
-- **LXC config**: `proxmox_get_lxc_config` - Container configuration
+- **List VMs**: `proxmox_guest_list` - All VMs in cluster
+- **VM status**: `proxmox_guest_status` (type: 'vm') - Current VM state
+- **VM config**: `proxmox_guest_config` (action: 'get', type: 'vm') - VM configuration
+- **LXC status**: `proxmox_guest_status` (type: 'lxc') - Current container state
+- **LXC config**: `proxmox_guest_config` (action: 'get', type: 'lxc') - Container configuration
 
 ### Node Metrics & Reports
 
-- **Node RRD data**: `proxmox_get_node_rrddata` - Node performance metrics (CPU, memory, I/O)
-- **Storage RRD data**: `proxmox_get_storage_rrddata` - Storage performance metrics
-- **Node report**: `proxmox_get_node_report` - Comprehensive node diagnostic report
+- **Node RRD data**: `proxmox_node_info` (action: 'rrddata') - Node performance metrics (CPU, memory, I/O)
+- **Storage RRD data**: `proxmox_node_info` (action: 'storage_rrddata') - Storage performance metrics
+- **Node report**: `proxmox_node_info` (action: 'report') - Comprehensive node diagnostic report
 
 ### Replication Status
 
-- **Replication status**: `proxmox_get_node_replication_status` - Show replication job status on node
-- **Replication log**: `proxmox_get_node_replication_log` - Show replication job logs
+- **Replication status**: `proxmox_node_replication` (action: 'status') - Show replication job status on node
+- **Replication log**: `proxmox_node_replication` (action: 'log') - Show replication job logs
 
 ### Task Monitoring
 
-- **List tasks**: `proxmox_get_node_tasks` - Recent tasks on node
-- **Task details**: `proxmox_get_node_task` - Specific task information
+- **List tasks**: `proxmox_node_task` (action: 'list') - Recent tasks on node
+- **Task details**: `proxmox_node_task` (action: 'get') - Specific task information
 
 ## Delegation Rules
 

@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_create_pool`
+#### `proxmox_pool`
 
 **Description:** Create a resource pool (requires elevated permissions)
 
@@ -24,7 +24,7 @@
 
 ---
 
-#### `proxmox_delete_pool`
+#### `proxmox_pool`
 
 **Description:** Delete a resource pool (requires elevated permissions)
 
@@ -38,7 +38,7 @@
 
 ---
 
-#### `proxmox_get_pool`
+#### `proxmox_pool`
 
 **Description:** Get a resource pool by ID
 
@@ -52,7 +52,7 @@
 
 ---
 
-#### `proxmox_list_pools`
+#### `proxmox_pool`
 
 **Description:** List resource pools
 
@@ -62,7 +62,7 @@
 
 ---
 
-#### `proxmox_update_pool`
+#### `proxmox_pool`
 
 **Description:** Update a resource pool (requires elevated permissions)
 

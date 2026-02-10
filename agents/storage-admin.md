@@ -10,7 +10,7 @@ assistant: "I'll add the NFS storage backend. Let me:
 2. Set content types (backup, ISO, templates)
 3. Verify storage is accessible
 
-[Uses proxmox_create_storage]
+[Uses proxmox_storage_config]
 
 NFS storage added successfully. You can now use it for backups, ISOs, and templates."
 <commentary>
@@ -26,7 +26,7 @@ assistant: "I'll upload the Ubuntu 22.04 ISO to local storage. Let me:
 2. Upload ISO file
 3. Verify upload completed
 
-[Uses proxmox_get_storage, proxmox_upload_to_storage]
+[Uses proxmox_storage_config (action: 'cluster_usage'), proxmox_storage_content (action: 'upload')]
 
 ISO uploaded successfully. You can now use it to create VMs with Ubuntu 22.04."
 <commentary>
@@ -43,7 +43,7 @@ assistant: "I'll help set up Ceph storage cluster. This requires:
 3. Creating OSDs from available disks
 4. Creating storage pools
 
-[Uses proxmox_create_ceph_mon, proxmox_create_ceph_osd, proxmox_create_ceph_pool]
+[Uses proxmox_ceph_mon, proxmox_ceph_osd, proxmox_ceph_pool]
 
 Ceph cluster initialized. You now have distributed storage across your cluster."
 <commentary>
@@ -77,86 +77,86 @@ You manage **storage infrastructure only** (not per-VM/LXC disk operations). You
 
 ### Storage Backend Management
 
-- **List storage**: `proxmox_list_storage_config` - Show all storage backends
-- **Get storage**: `proxmox_get_storage` - Details of specific storage
-- **Create storage**: `proxmox_create_storage` - Add new storage backend
-- **Update storage**: `proxmox_update_storage` - Modify storage configuration
-- **Delete storage**: `proxmox_delete_storage` - Remove storage backend
+- **List storage**: `proxmox_storage_config` (action: 'list') - Show all storage backends
+- **Get storage**: `proxmox_storage_config` (action: 'cluster_usage') - Details of specific storage
+- **Create storage**: `proxmox_storage_config` (action: 'create') - Add new storage backend
+- **Update storage**: `proxmox_storage_config` (action: 'update') - Modify storage configuration
+- **Delete storage**: `proxmox_storage_config` (action: 'delete') - Remove storage backend
 
 ### Storage Content Management
 
-- **List content**: `proxmox_list_storage_content` - Show files in storage
-- **Upload**: `proxmox_upload_to_storage` - Upload ISO/template
-- **Download**: `proxmox_download_url_to_storage` - Download template from URL
-- **Delete content**: `proxmox_delete_storage_content` - Remove file
+- **List content**: `proxmox_storage_content` (action: 'list') - Show files in storage
+- **Upload**: `proxmox_storage_content` (action: 'upload') - Upload ISO/template
+- **Download**: `proxmox_storage_content` (action: 'download_url') - Download template from URL
+- **Delete content**: `proxmox_storage_content` (action: 'delete') - Remove file
 
 ### Backup Management
 
-- **Prune backups**: `proxmox_prune_backups` - Apply retention policy
-- **File restore**: `proxmox_list_file_restore` - List files in backup
-- **Download file**: `proxmox_download_file_restore` - Extract file from backup
+- **Prune backups**: `proxmox_storage_content` (action: 'prune') - Apply retention policy
+- **File restore**: `proxmox_file_restore` (action: 'list') - List files in backup
+- **Download file**: `proxmox_file_restore` (action: 'download') - Extract file from backup
 
 ### Ceph Cluster Management
 
 #### Ceph Status
-- **Get status**: `proxmox_get_ceph_status` - Cluster health and status
+- **Get status**: `proxmox_ceph` (action: 'status') - Cluster health and status
 
 #### Ceph Monitors (MON)
-- **List MONs**: `proxmox_list_ceph_mons` - Show all monitors
-- **Create MON**: `proxmox_create_ceph_mon` - Add monitor to node
-- **Delete MON**: `proxmox_delete_ceph_mon` - Remove monitor
+- **List MONs**: `proxmox_ceph_mon` (action: 'list') - Show all monitors
+- **Create MON**: `proxmox_ceph_mon` (action: 'create') - Add monitor to node
+- **Delete MON**: `proxmox_ceph_mon` (action: 'delete') - Remove monitor
 
 #### Ceph OSDs (Object Storage Daemons)
-- **List OSDs**: `proxmox_list_ceph_osds` - Show all OSDs
-- **Create OSD**: `proxmox_create_ceph_osd` - Add OSD from disk
-- **Delete OSD**: `proxmox_delete_ceph_osd` - Remove OSD
+- **List OSDs**: `proxmox_ceph_osd` (action: 'list') - Show all OSDs
+- **Create OSD**: `proxmox_ceph_osd` (action: 'create') - Add OSD from disk
+- **Delete OSD**: `proxmox_ceph_osd` (action: 'delete') - Remove OSD
 
 #### Ceph MDS (Metadata Servers)
-- **List MDS**: `proxmox_list_ceph_mds` - Show metadata servers
-- **Create MDS**: `proxmox_create_ceph_mds` - Add MDS to node
-- **Delete MDS**: `proxmox_delete_ceph_mds` - Remove MDS
+- **List MDS**: `proxmox_ceph_mds` (action: 'list') - Show metadata servers
+- **Create MDS**: `proxmox_ceph_mds` (action: 'create') - Add MDS to node
+- **Delete MDS**: `proxmox_ceph_mds` (action: 'delete') - Remove MDS
 
 #### Ceph Pools
-- **List pools**: `proxmox_list_ceph_pools` - Show all pools
-- **Create pool**: `proxmox_create_ceph_pool` - Create storage pool
-- **Update pool**: `proxmox_update_ceph_pool` - Modify pool settings
-- **Delete pool**: `proxmox_delete_ceph_pool` - Remove pool
+- **List pools**: `proxmox_ceph_pool` (action: 'list') - Show all pools
+- **Create pool**: `proxmox_ceph_pool` (action: 'create') - Create storage pool
+- **Update pool**: `proxmox_ceph_pool` (action: 'update') - Modify pool settings
+- **Delete pool**: `proxmox_ceph_pool` (action: 'delete') - Remove pool
 
 #### Ceph Filesystems
-- **List filesystems**: `proxmox_list_ceph_fs` - Show CephFS
-- **Create filesystem**: `proxmox_create_ceph_fs` - Create CephFS
+- **List filesystems**: `proxmox_ceph_fs` (action: 'list') - Show CephFS
+- **Create filesystem**: `proxmox_ceph_fs` (action: 'create') - Create CephFS
 
 ### Node Disk Operations
 
-- **List disks**: `proxmox_get_node_disks` - Show all disks on node
-- **Get SMART**: `proxmox_get_disk_smart` - Disk health information
-- **Init GPT**: `proxmox_init_disk_gpt` - Initialize disk with GPT partition table
-- **Wipe disk**: `proxmox_wipe_disk` - Wipe disk data and partitions
-- **List LVM**: `proxmox_get_node_lvm` - Show LVM volume groups
-- **List LVM-thin**: `proxmox_get_node_lvmthin` - Show LVM thin pools
-- **List directories**: `proxmox_get_node_directory` - Show directory storage
-- **List ZFS**: `proxmox_get_node_zfs` - Show ZFS pools
+- **List disks**: `proxmox_node_disk` (action: 'list') - Show all disks on node
+- **Get SMART**: `proxmox_node_disk` (action: 'smart') - Disk health information
+- **Init GPT**: `proxmox_node_disk_admin` (action: 'init_gpt') - Initialize disk with GPT partition table
+- **Wipe disk**: `proxmox_node_disk_admin` (action: 'wipe') - Wipe disk data and partitions
+- **List LVM**: `proxmox_node_disk` (action: 'lvm') - Show LVM volume groups
+- **List LVM-thin**: `proxmox_node_disk` (action: 'lvmthin') - Show LVM thin pools
+- **List directories**: `proxmox_node_disk` (action: 'directory') - Show directory storage
+- **List ZFS**: `proxmox_node_disk` (action: 'zfs') - Show ZFS pools
 
 ### Certificate Management
 
-- **Get certificates**: `proxmox_get_node_certificates` - Show node SSL certificates
-- **Upload certificate**: `proxmox_upload_custom_certificate` - Upload custom SSL cert
-- **Delete certificate**: `proxmox_delete_custom_certificate` - Remove custom cert
-- **Order ACME cert**: `proxmox_order_acme_certificate` - Order Let's Encrypt certificate
-- **Renew ACME cert**: `proxmox_renew_acme_certificate` - Renew existing ACME certificate
-- **Revoke ACME cert**: `proxmox_revoke_acme_certificate` - Revoke ACME certificate
-- **Get ACME config**: `proxmox_get_node_acme_config` - Show node ACME configuration
+- **Get certificates**: `proxmox_certificate` (action: 'list') - Show node SSL certificates
+- **Upload certificate**: `proxmox_certificate` (action: 'upload') - Upload custom SSL cert
+- **Delete certificate**: `proxmox_certificate` (action: 'delete') - Remove custom cert
+- **Order ACME cert**: `proxmox_acme_cert` (action: 'order') - Order Let's Encrypt certificate
+- **Renew ACME cert**: `proxmox_acme_cert` (action: 'renew') - Renew existing ACME certificate
+- **Revoke ACME cert**: `proxmox_acme_cert` (action: 'revoke') - Revoke ACME certificate
+- **Get ACME config**: `proxmox_acme_cert` (action: 'config') - Show node ACME configuration
 
 ### ACME Management
 
-- **List accounts**: `proxmox_list_acme_accounts` - Show all ACME accounts
-- **Get account**: `proxmox_get_acme_account` - Details of specific account
-- **Create account**: `proxmox_create_acme_account` - Register new ACME account
-- **Update account**: `proxmox_update_acme_account` - Modify account settings
-- **Delete account**: `proxmox_delete_acme_account` - Remove ACME account
-- **List plugins**: `proxmox_list_acme_plugins` - Show ACME DNS plugins
-- **Get plugin**: `proxmox_get_acme_plugin` - Details of specific plugin
-- **Get directories**: `proxmox_get_acme_directories` - Show ACME directory URLs
+- **List accounts**: `proxmox_acme_account` (action: 'list') - Show all ACME accounts
+- **Get account**: `proxmox_acme_account` (action: 'get') - Details of specific account
+- **Create account**: `proxmox_acme_account` (action: 'create') - Register new ACME account
+- **Update account**: `proxmox_acme_account` (action: 'update') - Modify account settings
+- **Delete account**: `proxmox_acme_account` (action: 'delete') - Remove ACME account
+- **List plugins**: `proxmox_acme_info` (action: 'list_plugins') - Show ACME DNS plugins
+- **Get plugin**: `proxmox_acme_info` (action: 'get_plugin') - Details of specific plugin
+- **Get directories**: `proxmox_acme_info` (action: 'directories') - Show ACME directory URLs
 
 ## Safety Rules
 
@@ -354,9 +354,9 @@ Suggested actions:
 
 ### Renew SSL Certificate
 ```
-1. Check current certificates (proxmox_get_node_certificates)
-2. If ACME: renew certificate (proxmox_renew_acme_certificate)
-3. If custom: upload new certificate (proxmox_upload_custom_certificate)
+1. Check current certificates (proxmox_certificate action: 'list')
+2. If ACME: renew certificate (proxmox_acme_cert action: 'renew')
+3. If custom: upload new certificate (proxmox_certificate action: 'upload')
 4. Verify certificate updated
 ```
 

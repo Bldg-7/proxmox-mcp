@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_delete_custom_certificate`
+#### `proxmox_certificate`
 
 **Description:** Delete the custom SSL certificate from a Proxmox node (requires elevated permissions)
 
@@ -23,7 +23,7 @@
 
 ---
 
-#### `proxmox_get_node_acme_config`
+#### `proxmox_acme_cert`
 
 **Description:** Get ACME configuration for a Proxmox node
 
@@ -37,7 +37,7 @@
 
 ---
 
-#### `proxmox_get_node_certificates`
+#### `proxmox_certificate`
 
 **Description:** Get SSL certificate information for a Proxmox node
 
@@ -51,7 +51,7 @@
 
 ---
 
-#### `proxmox_order_acme_certificate`
+#### `proxmox_acme_cert`
 
 **Description:** Order a new ACME (Let's Encrypt) certificate for a Proxmox node (requires elevated permissions)
 
@@ -66,7 +66,7 @@
 
 ---
 
-#### `proxmox_renew_acme_certificate`
+#### `proxmox_acme_cert`
 
 **Description:** Renew the ACME certificate for a Proxmox node (requires elevated permissions)
 
@@ -81,7 +81,7 @@
 
 ---
 
-#### `proxmox_revoke_acme_certificate`
+#### `proxmox_acme_cert`
 
 **Description:** Revoke the ACME certificate for a Proxmox node (requires elevated permissions)
 
@@ -95,7 +95,7 @@
 
 ---
 
-#### `proxmox_upload_custom_certificate`
+#### `proxmox_certificate`
 
 **Description:** Upload a custom SSL certificate to a Proxmox node (requires elevated permissions)
 

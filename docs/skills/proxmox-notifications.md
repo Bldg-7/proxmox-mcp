@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_create_notification_target`
+#### `proxmox_notification`
 
 **Description:** Create a new notification target (requires elevated permissions)
 
@@ -36,7 +36,7 @@
 
 ---
 
-#### `proxmox_delete_notification_target`
+#### `proxmox_notification`
 
 **Description:** Delete a notification target (requires elevated permissions)
 
@@ -51,7 +51,7 @@
 
 ---
 
-#### `proxmox_get_notification_target`
+#### `proxmox_notification`
 
 **Description:** Get detailed configuration for a specific notification target
 
@@ -66,7 +66,7 @@
 
 ---
 
-#### `proxmox_list_notification_targets`
+#### `proxmox_notification`
 
 **Description:** List all notification targets (SMTP, Gotify, Sendmail)
 
@@ -76,7 +76,7 @@
 
 ---
 
-#### `proxmox_test_notification_target`
+#### `proxmox_notification`
 
 **Description:** Send a test notification to a target (requires elevated permissions)
 

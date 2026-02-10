@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_create_acme_account`
+#### `proxmox_acme_account`
 
 **Description:** Create a new ACME account (requires elevated permissions)
 
@@ -26,7 +26,7 @@
 
 ---
 
-#### `proxmox_delete_acme_account`
+#### `proxmox_acme_account`
 
 **Description:** Delete an ACME account (requires elevated permissions)
 
@@ -40,7 +40,7 @@
 
 ---
 
-#### `proxmox_get_acme_account`
+#### `proxmox_acme_account`
 
 **Description:** Get detailed information about a specific ACME account
 
@@ -54,7 +54,7 @@
 
 ---
 
-#### `proxmox_get_acme_directories`
+#### `proxmox_acme_info`
 
 **Description:** Get available ACME directory endpoints (Let's Encrypt, etc.)
 
@@ -64,7 +64,7 @@
 
 ---
 
-#### `proxmox_get_acme_plugin`
+#### `proxmox_acme_info`
 
 **Description:** Get detailed configuration for a specific ACME plugin
 
@@ -78,7 +78,7 @@
 
 ---
 
-#### `proxmox_list_acme_accounts`
+#### `proxmox_acme_account`
 
 **Description:** List all ACME accounts configured in the cluster
 
@@ -88,7 +88,7 @@
 
 ---
 
-#### `proxmox_list_acme_plugins`
+#### `proxmox_acme_info`
 
 **Description:** List all ACME challenge plugins configured in the cluster
 
@@ -98,7 +98,7 @@
 
 ---
 
-#### `proxmox_update_acme_account`
+#### `proxmox_acme_account`
 
 **Description:** Update an existing ACME account (requires elevated permissions)
 

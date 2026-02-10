@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_add_disk_vm`
+#### `proxmox_vm_disk`
 
 **Description:** Add a new disk to a QEMU virtual machine (requires elevated permissions)
 
@@ -27,7 +27,7 @@
 
 ---
 
-#### `proxmox_add_network_vm`
+#### `proxmox_guest_network`
 
 **Description:** Add network interface to QEMU VM (requires elevated permissions)
 
@@ -48,7 +48,7 @@
 
 ---
 
-#### `proxmox_check_vm_feature`
+#### `proxmox_guest_feature`
 
 **Description:** Check if a feature (snapshot, clone, copy) is available for a QEMU VM
 
@@ -64,7 +64,7 @@
 
 ---
 
-#### `proxmox_clone_vm`
+#### `proxmox_guest_clone`
 
 **Description:** Clone a QEMU virtual machine (requires elevated permissions)
 
@@ -81,7 +81,7 @@
 
 ---
 
-#### `proxmox_create_template_vm`
+#### `proxmox_guest_template`
 
 **Description:** Convert a QEMU VM to a template (requires elevated permissions)
 
@@ -120,7 +120,7 @@
 
 ---
 
-#### `proxmox_delete_vm`
+#### `proxmox_guest_delete`
 
 **Description:** Delete a QEMU virtual machine (requires elevated permissions)
 
@@ -135,7 +135,7 @@
 
 ---
 
-#### `proxmox_dump_cloudinit`
+#### `proxmox_cloudinit`
 
 **Description:** Dump rendered cloud-init config (user-data, network-config, or meta-data) for a QEMU VM
 
@@ -151,7 +151,7 @@
 
 ---
 
-#### `proxmox_execute_vm_command`
+#### `proxmox_agent_exec`
 
 **Description:** Execute a shell command on a QEMU VM via guest agent (requires QEMU Guest Agent; LXC unsupported)
 
@@ -168,7 +168,7 @@
 
 ---
 
-#### `proxmox_get_cloudinit_config`
+#### `proxmox_cloudinit`
 
 **Description:** Get cloud-init configuration items for a QEMU VM
 
@@ -183,7 +183,7 @@
 
 ---
 
-#### `proxmox_get_storage`
+#### `proxmox_storage_config`
 
 **Description:** List all storage pools and their usage across the cluster
 
@@ -197,7 +197,7 @@
 
 ---
 
-#### `proxmox_get_vm_config`
+#### `proxmox_guest_config`
 
 **Description:** Get hardware configuration for a QEMU VM (disks, network, CPU, memory)
 
@@ -212,7 +212,7 @@
 
 ---
 
-#### `proxmox_get_vm_pending`
+#### `proxmox_guest_pending`
 
 **Description:** Get pending configuration changes for a QEMU VM
 
@@ -227,7 +227,7 @@
 
 ---
 
-#### `proxmox_get_vm_rrddata`
+#### `proxmox_guest_rrddata`
 
 **Description:** Get performance metrics (RRD data) for a QEMU VM
 
@@ -244,7 +244,7 @@
 
 ---
 
-#### `proxmox_get_vm_status`
+#### `proxmox_guest_status`
 
 **Description:** Get detailed status information for a specific VM
 
@@ -260,7 +260,7 @@
 
 ---
 
-#### `proxmox_get_vms`
+#### `proxmox_guest_list`
 
 **Description:** List all virtual machines across the cluster with their status
 
@@ -275,7 +275,7 @@
 
 ---
 
-#### `proxmox_list_templates`
+#### `proxmox_storage_content`
 
 **Description:** List available LXC container templates on a storage
 
@@ -290,7 +290,7 @@
 
 ---
 
-#### `proxmox_move_disk_vm`
+#### `proxmox_guest_disk_move`
 
 **Description:** Move a QEMU VM disk to different storage (requires elevated permissions)
 
@@ -308,7 +308,7 @@
 
 ---
 
-#### `proxmox_pause_vm`
+#### `proxmox_guest_pause`
 
 **Description:** Pause a QEMU virtual machine (requires elevated permissions)
 
@@ -323,7 +323,7 @@
 
 ---
 
-#### `proxmox_reboot_vm`
+#### `proxmox_guest_reboot`
 
 **Description:** Reboot a QEMU virtual machine (requires elevated permissions)
 
@@ -338,7 +338,7 @@
 
 ---
 
-#### `proxmox_regenerate_cloudinit`
+#### `proxmox_cloudinit`
 
 **Description:** Regenerate the cloud-init drive for a QEMU VM (requires elevated permissions)
 
@@ -353,7 +353,7 @@
 
 ---
 
-#### `proxmox_remove_disk_vm`
+#### `proxmox_vm_disk`
 
 **Description:** Remove a disk from a QEMU virtual machine (requires elevated permissions)
 
@@ -369,7 +369,7 @@
 
 ---
 
-#### `proxmox_remove_network_vm`
+#### `proxmox_guest_network`
 
 **Description:** Remove network interface from QEMU VM (requires elevated permissions)
 
@@ -385,7 +385,7 @@
 
 ---
 
-#### `proxmox_resize_disk_vm`
+#### `proxmox_guest_disk_resize`
 
 **Description:** Resize a QEMU VM disk (requires elevated permissions)
 
@@ -402,7 +402,7 @@
 
 ---
 
-#### `proxmox_resize_vm`
+#### `proxmox_guest_resize`
 
 **Description:** Resize a QEMU VM CPU/memory (requires elevated permissions)
 
@@ -419,7 +419,7 @@
 
 ---
 
-#### `proxmox_resume_vm`
+#### `proxmox_guest_resume`
 
 **Description:** Resume a paused QEMU virtual machine (requires elevated permissions)
 
@@ -434,7 +434,7 @@
 
 ---
 
-#### `proxmox_shutdown_vm`
+#### `proxmox_guest_shutdown`
 
 **Description:** Gracefully shutdown a QEMU virtual machine (requires elevated permissions)
 
@@ -449,7 +449,7 @@
 
 ---
 
-#### `proxmox_start_vm`
+#### `proxmox_guest_start`
 
 **Description:** Start a QEMU virtual machine (requires elevated permissions)
 
@@ -464,7 +464,7 @@
 
 ---
 
-#### `proxmox_stop_vm`
+#### `proxmox_guest_stop`
 
 **Description:** Stop a QEMU virtual machine (requires elevated permissions)
 
@@ -479,7 +479,7 @@
 
 ---
 
-#### `proxmox_update_network_vm`
+#### `proxmox_guest_network`
 
 **Description:** Update/modify VM network interface configuration (requires elevated permissions)
 
@@ -500,9 +500,9 @@
 
 ---
 
-#### `proxmox_update_vm_config`
+#### `proxmox_guest_config_update`
 
-**Description:** Update QEMU VM configuration with arbitrary key-value pairs via PUT /config (requires elevated permissions). Supports cloud-init (ciuser, cipassword, ipconfig0), boot order, serial console, guest agent, and all other Proxmox config params. For resize (memory/cores) prefer proxmox_resize_vm. For disk/network prefer their specific tools. Use proxmox_get_vm_config to discover valid parameters.
+**Description:** Update QEMU VM configuration with arbitrary key-value pairs via PUT /config (requires elevated permissions). Supports cloud-init (ciuser, cipassword, ipconfig0), boot order, serial console, guest agent, and all other Proxmox config params. For resize (memory/cores) prefer proxmox_guest_resize. For disk/network prefer their specific tools. Use proxmox_guest_config to discover valid parameters.
 
 **Permission:** elevated
 
@@ -512,7 +512,7 @@
 |------|------|----------|-------------|
 | `node` | string | Yes | Node name where VM is located |
 | `vmid` | number | Yes | VM ID number |
-| `config` | object | No | Key-value pairs of VM configuration to set. Common keys: ciuser, cipassword, ipconfig0 (cloud-init), boot (boot order), agent (QEMU agent), serial0, vga, cpu, balloon, tags, description. Use proxmox_get_vm_config to discover valid keys. |
+| `config` | object | No | Key-value pairs of VM configuration to set. Common keys: ciuser, cipassword, ipconfig0 (cloud-init), boot (boot order), agent (QEMU agent), serial0, vga, cpu, balloon, tags, description. Use proxmox_guest_config to discover valid keys. |
 | `delete` | string | No | Comma-separated list of config keys to REMOVE (e.g. "ciuser,cipassword"). Does NOT delete the VM. |
 
 ---

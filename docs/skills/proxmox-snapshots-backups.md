@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_create_backup_lxc`
+#### `proxmox_backup`
 
 **Description:** Create a backup of an LXC container (requires elevated permissions)
 
@@ -27,7 +27,7 @@
 
 ---
 
-#### `proxmox_create_backup_vm`
+#### `proxmox_backup`
 
 **Description:** Create a backup of a QEMU virtual machine (requires elevated permissions)
 
@@ -45,7 +45,7 @@
 
 ---
 
-#### `proxmox_create_snapshot_lxc`
+#### `proxmox_guest_snapshot`
 
 **Description:** Create a snapshot of an LXC container (requires elevated permissions)
 
@@ -62,7 +62,7 @@
 
 ---
 
-#### `proxmox_create_snapshot_vm`
+#### `proxmox_guest_snapshot`
 
 **Description:** Create a snapshot of a QEMU virtual machine (requires elevated permissions)
 
@@ -79,7 +79,7 @@
 
 ---
 
-#### `proxmox_delete_backup`
+#### `proxmox_backup`
 
 **Description:** Delete a backup file from storage (requires elevated permissions)
 
@@ -95,7 +95,7 @@
 
 ---
 
-#### `proxmox_delete_snapshot_lxc`
+#### `proxmox_guest_snapshot`
 
 **Description:** Delete a snapshot of an LXC container (requires elevated permissions)
 
@@ -111,7 +111,7 @@
 
 ---
 
-#### `proxmox_delete_snapshot_vm`
+#### `proxmox_guest_snapshot`
 
 **Description:** Delete a snapshot of a QEMU virtual machine (requires elevated permissions)
 
@@ -127,7 +127,7 @@
 
 ---
 
-#### `proxmox_list_backups`
+#### `proxmox_backup`
 
 **Description:** List all backups on a storage (requires elevated permissions)
 
@@ -142,7 +142,7 @@
 
 ---
 
-#### `proxmox_list_snapshots_lxc`
+#### `proxmox_guest_snapshot`
 
 **Description:** List all snapshots of an LXC container (requires elevated permissions)
 
@@ -157,7 +157,7 @@
 
 ---
 
-#### `proxmox_list_snapshots_vm`
+#### `proxmox_guest_snapshot`
 
 **Description:** List all snapshots of a QEMU virtual machine (requires elevated permissions)
 
@@ -172,7 +172,7 @@
 
 ---
 
-#### `proxmox_restore_backup_lxc`
+#### `proxmox_backup`
 
 **Description:** Restore an LXC container from backup (requires elevated permissions)
 
@@ -189,7 +189,7 @@
 
 ---
 
-#### `proxmox_restore_backup_vm`
+#### `proxmox_backup`
 
 **Description:** Restore a QEMU virtual machine from backup (requires elevated permissions)
 
@@ -206,7 +206,7 @@
 
 ---
 
-#### `proxmox_rollback_snapshot_lxc`
+#### `proxmox_guest_snapshot`
 
 **Description:** Rollback an LXC container to a snapshot (requires elevated permissions)
 
@@ -222,7 +222,7 @@
 
 ---
 
-#### `proxmox_rollback_snapshot_vm`
+#### `proxmox_guest_snapshot`
 
 **Description:** Rollback a QEMU virtual machine to a snapshot (requires elevated permissions)
 

@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_add_mountpoint_lxc`
+#### `proxmox_lxc_mountpoint`
 
 **Description:** Add a mount point to an LXC container (requires elevated permissions)
 
@@ -27,7 +27,7 @@
 
 ---
 
-#### `proxmox_add_network_lxc`
+#### `proxmox_guest_network`
 
 **Description:** Add network interface to LXC container (requires elevated permissions)
 
@@ -47,7 +47,7 @@
 
 ---
 
-#### `proxmox_check_lxc_feature`
+#### `proxmox_guest_feature`
 
 **Description:** Check if a feature (snapshot, clone, copy) is available for an LXC container
 
@@ -63,7 +63,7 @@
 
 ---
 
-#### `proxmox_clone_lxc`
+#### `proxmox_guest_clone`
 
 **Description:** Clone an LXC container (requires elevated permissions)
 
@@ -102,7 +102,7 @@
 
 ---
 
-#### `proxmox_create_template_lxc`
+#### `proxmox_guest_template`
 
 **Description:** Convert an LXC container to a template (requires elevated permissions)
 
@@ -117,7 +117,7 @@
 
 ---
 
-#### `proxmox_delete_lxc`
+#### `proxmox_guest_delete`
 
 **Description:** Delete an LXC container (requires elevated permissions)
 
@@ -132,7 +132,7 @@
 
 ---
 
-#### `proxmox_get_lxc_config`
+#### `proxmox_guest_config`
 
 **Description:** Get hardware configuration for an LXC container (mount points, network, CPU, memory)
 
@@ -147,7 +147,7 @@
 
 ---
 
-#### `proxmox_get_lxc_pending`
+#### `proxmox_guest_pending`
 
 **Description:** Get pending configuration changes for an LXC container
 
@@ -162,7 +162,7 @@
 
 ---
 
-#### `proxmox_get_lxc_rrddata`
+#### `proxmox_guest_rrddata`
 
 **Description:** Get performance metrics (RRD data) for an LXC container
 
@@ -179,7 +179,7 @@
 
 ---
 
-#### `proxmox_move_disk_lxc`
+#### `proxmox_guest_disk_move`
 
 **Description:** Move an LXC container disk to different storage (requires elevated permissions)
 
@@ -197,7 +197,7 @@
 
 ---
 
-#### `proxmox_reboot_lxc`
+#### `proxmox_guest_reboot`
 
 **Description:** Reboot an LXC container (requires elevated permissions)
 
@@ -212,7 +212,7 @@
 
 ---
 
-#### `proxmox_remove_mountpoint_lxc`
+#### `proxmox_lxc_mountpoint`
 
 **Description:** Remove a mount point from an LXC container (requires elevated permissions)
 
@@ -228,7 +228,7 @@
 
 ---
 
-#### `proxmox_remove_network_lxc`
+#### `proxmox_guest_network`
 
 **Description:** Remove network interface from LXC container (requires elevated permissions)
 
@@ -244,7 +244,7 @@
 
 ---
 
-#### `proxmox_resize_disk_lxc`
+#### `proxmox_guest_disk_resize`
 
 **Description:** Resize an LXC container disk or mount point (requires elevated permissions)
 
@@ -261,7 +261,7 @@
 
 ---
 
-#### `proxmox_resize_lxc`
+#### `proxmox_guest_resize`
 
 **Description:** Resize an LXC container CPU/memory (requires elevated permissions)
 
@@ -278,7 +278,7 @@
 
 ---
 
-#### `proxmox_shutdown_lxc`
+#### `proxmox_guest_shutdown`
 
 **Description:** Gracefully shutdown an LXC container (requires elevated permissions)
 
@@ -293,7 +293,7 @@
 
 ---
 
-#### `proxmox_start_lxc`
+#### `proxmox_guest_start`
 
 **Description:** Start an LXC container (requires elevated permissions)
 
@@ -308,7 +308,7 @@
 
 ---
 
-#### `proxmox_stop_lxc`
+#### `proxmox_guest_stop`
 
 **Description:** Stop an LXC container (requires elevated permissions)
 
@@ -323,9 +323,9 @@
 
 ---
 
-#### `proxmox_update_lxc_config`
+#### `proxmox_guest_config_update`
 
-**Description:** Update LXC container configuration with arbitrary key-value pairs via PUT /config (requires elevated permissions). Supports hostname, memory, cores, swap, mount points, network, and all other Proxmox LXC config params. For resize (memory/cores) prefer proxmox_resize_lxc. For network prefer proxmox_update_network_lxc. Use proxmox_get_lxc_config to discover valid parameters.
+**Description:** Update LXC container configuration with arbitrary key-value pairs via PUT /config (requires elevated permissions). Supports hostname, memory, cores, swap, mount points, network, and all other Proxmox LXC config params. For resize (memory/cores) prefer proxmox_guest_resize. For network prefer proxmox_guest_network. Use proxmox_guest_config to discover valid parameters.
 
 **Permission:** elevated
 
@@ -335,12 +335,12 @@
 |------|------|----------|-------------|
 | `node` | string | Yes | Node name where container is located |
 | `vmid` | number | Yes | Container ID number |
-| `config` | object | No | Key-value pairs of container configuration to set. Common keys: hostname, memory, swap, cores, cpulimit, cpuunits, nameserver, searchdomain, tags, description, mp0-mpN (mount points). Use proxmox_get_lxc_config to discover valid keys. |
+| `config` | object | No | Key-value pairs of container configuration to set. Common keys: hostname, memory, swap, cores, cpulimit, cpuunits, nameserver, searchdomain, tags, description, mp0-mpN (mount points). Use proxmox_guest_config to discover valid keys. |
 | `delete` | string | No | Comma-separated list of config keys to REMOVE (e.g. "mp0,nameserver"). Does NOT delete the container. |
 
 ---
 
-#### `proxmox_update_network_lxc`
+#### `proxmox_guest_network`
 
 **Description:** Update/modify LXC network interface configuration (requires elevated permissions)
 

@@ -11,7 +11,7 @@ assistant: "I'll create the user account. Let me:
 3. Assign 'PVEVMAdmin' role with appropriate ACL
 4. Verify user can log in
 
-[Uses proxmox_create_user, proxmox_update_user, proxmox_update_acl]
+[Uses proxmox_user, proxmox_user, proxmox_acl]
 
 User created successfully. John can now log in and manage VMs."
 <commentary>
@@ -28,7 +28,7 @@ assistant: "I'll set up the developers group. Let me:
 3. Create ACL granting PVEVMUser role for VMs 100-110
 4. Verify permissions
 
-[Uses proxmox_create_group, proxmox_update_group, proxmox_update_acl]
+[Uses proxmox_group, proxmox_group, proxmox_acl]
 
 Group created successfully. Developers can now access VMs 100-110."
 <commentary>
@@ -61,46 +61,46 @@ You manage **access control only**. Your responsibilities include:
 
 ### User Management
 
-- **List users**: `proxmox_list_users` - Show all users
-- **Get user**: `proxmox_get_user` - Details of specific user
-- **Create user**: `proxmox_create_user` - Add new user
-- **Update user**: `proxmox_update_user` - Modify user settings
-- **Delete user**: `proxmox_delete_user` - Remove user
+- **List users**: `proxmox_user` (action: 'list') - Show all users
+- **Get user**: `proxmox_user` (action: 'get') - Details of specific user
+- **Create user**: `proxmox_user` (action: 'create') - Add new user
+- **Update user**: `proxmox_user` (action: 'update') - Modify user settings
+- **Delete user**: `proxmox_user` (action: 'delete') - Remove user
 
 ### Group Management
 
-- **List groups**: `proxmox_list_groups` - Show all groups
-- **Create group**: `proxmox_create_group` - Add new group
-- **Update group**: `proxmox_update_group` - Modify group (add/remove users)
-- **Delete group**: `proxmox_delete_group` - Remove group
+- **List groups**: `proxmox_group` (action: 'list') - Show all groups
+- **Create group**: `proxmox_group` (action: 'create') - Add new group
+- **Update group**: `proxmox_group` (action: 'update') - Modify group (add/remove users)
+- **Delete group**: `proxmox_group` (action: 'delete') - Remove group
 
 ### Role Management
 
-- **List roles**: `proxmox_list_roles` - Show all roles
-- **Create role**: `proxmox_create_role` - Define custom role
-- **Update role**: `proxmox_update_role` - Modify role permissions
-- **Delete role**: `proxmox_delete_role` - Remove role
+- **List roles**: `proxmox_role` (action: 'list') - Show all roles
+- **Create role**: `proxmox_role` (action: 'create') - Define custom role
+- **Update role**: `proxmox_role` (action: 'update') - Modify role permissions
+- **Delete role**: `proxmox_role` (action: 'delete') - Remove role
 
 ### API Token Management
 
-- **List tokens**: `proxmox_list_user_tokens` - Show all tokens for a user
-- **Get token**: `proxmox_get_user_token` - Details of specific token
-- **Create token**: `proxmox_create_user_token` - Generate API token
-- **Update token**: `proxmox_update_user_token` - Modify token settings
-- **Delete token**: `proxmox_delete_user_token` - Remove API token
+- **List tokens**: `proxmox_user_token` (action: 'list') - Show all tokens for a user
+- **Get token**: `proxmox_user_token` (action: 'get') - Details of specific token
+- **Create token**: `proxmox_user_token` (action: 'create') - Generate API token
+- **Update token**: `proxmox_user_token` (action: 'update') - Modify token settings
+- **Delete token**: `proxmox_user_token` (action: 'delete') - Remove API token
 
 ### ACL Management
 
-- **Get ACLs**: `proxmox_get_acl` - Show access control lists
-- **Update ACL**: `proxmox_update_acl` - Grant/revoke permissions
+- **Get ACLs**: `proxmox_acl` (action: 'get') - Show access control lists
+- **Update ACL**: `proxmox_acl` (action: 'update') - Grant/revoke permissions
 
 ### Authentication Domains
 
-- **List domains**: `proxmox_list_domains` - Show all auth domains
-- **Get domain**: `proxmox_get_domain` - Details of specific domain
-- **Create domain**: `proxmox_create_domain` - Add auth domain (LDAP/AD)
-- **Update domain**: `proxmox_update_domain` - Modify domain settings
-- **Delete domain**: `proxmox_delete_domain` - Remove domain
+- **List domains**: `proxmox_domain` (action: 'list') - Show all auth domains
+- **Get domain**: `proxmox_domain` (action: 'get') - Details of specific domain
+- **Create domain**: `proxmox_domain` (action: 'create') - Add auth domain (LDAP/AD)
+- **Update domain**: `proxmox_domain` (action: 'update') - Modify domain settings
+- **Delete domain**: `proxmox_domain` (action: 'delete') - Remove domain
 
 ## Proxmox Permission Model
 
@@ -328,8 +328,8 @@ Suggested actions:
 ### API Token for Automation
 ```
 1. Create user for automation (e.g., 'automation@pve')
-2. Create API token (proxmox_create_user_token)
-3. List tokens to verify (proxmox_list_user_tokens)
+2. Create API token (proxmox_user_token action: 'create')
+3. List tokens to verify (proxmox_user_token action: 'list')
 4. Assign appropriate role via ACL
 5. Store token securely
 6. Use token in automation scripts

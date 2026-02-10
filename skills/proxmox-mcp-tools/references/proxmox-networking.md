@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_create_sdn_controller`
+#### `proxmox_sdn_controller`
 
 **Description:** Create an SDN controller (requires elevated permissions)
 
@@ -30,7 +30,7 @@
 
 ---
 
-#### `proxmox_create_sdn_subnet`
+#### `proxmox_sdn_subnet`
 
 **Description:** Create an SDN subnet (requires elevated permissions)
 
@@ -53,7 +53,7 @@
 
 ---
 
-#### `proxmox_create_sdn_vnet`
+#### `proxmox_sdn_vnet`
 
 **Description:** Create an SDN virtual network (requires elevated permissions)
 
@@ -77,7 +77,7 @@
 
 ---
 
-#### `proxmox_create_sdn_zone`
+#### `proxmox_sdn_zone`
 
 **Description:** Create an SDN zone (requires elevated permissions)
 
@@ -99,7 +99,7 @@
 
 ---
 
-#### `proxmox_delete_sdn_controller`
+#### `proxmox_sdn_controller`
 
 **Description:** Delete an SDN controller (requires elevated permissions)
 
@@ -113,7 +113,7 @@
 
 ---
 
-#### `proxmox_delete_sdn_subnet`
+#### `proxmox_sdn_subnet`
 
 **Description:** Delete an SDN subnet (requires elevated permissions)
 
@@ -127,7 +127,7 @@
 
 ---
 
-#### `proxmox_delete_sdn_vnet`
+#### `proxmox_sdn_vnet`
 
 **Description:** Delete an SDN virtual network (requires elevated permissions)
 
@@ -141,7 +141,7 @@
 
 ---
 
-#### `proxmox_delete_sdn_zone`
+#### `proxmox_sdn_zone`
 
 **Description:** Delete an SDN zone (requires elevated permissions)
 
@@ -155,7 +155,7 @@
 
 ---
 
-#### `proxmox_get_sdn_controller`
+#### `proxmox_sdn_controller`
 
 **Description:** Get an SDN controller by name
 
@@ -169,7 +169,7 @@
 
 ---
 
-#### `proxmox_get_sdn_subnet`
+#### `proxmox_sdn_subnet`
 
 **Description:** Get an SDN subnet by name
 
@@ -183,7 +183,7 @@
 
 ---
 
-#### `proxmox_get_sdn_vnet`
+#### `proxmox_sdn_vnet`
 
 **Description:** Get an SDN virtual network by name
 
@@ -197,7 +197,7 @@
 
 ---
 
-#### `proxmox_get_sdn_zone`
+#### `proxmox_sdn_zone`
 
 **Description:** Get an SDN zone by name
 
@@ -211,7 +211,7 @@
 
 ---
 
-#### `proxmox_list_sdn_controllers`
+#### `proxmox_sdn_controller`
 
 **Description:** List SDN controllers
 
@@ -221,7 +221,7 @@
 
 ---
 
-#### `proxmox_list_sdn_subnets`
+#### `proxmox_sdn_subnet`
 
 **Description:** List SDN subnets
 
@@ -231,7 +231,7 @@
 
 ---
 
-#### `proxmox_list_sdn_vnets`
+#### `proxmox_sdn_vnet`
 
 **Description:** List SDN virtual networks
 
@@ -241,7 +241,7 @@
 
 ---
 
-#### `proxmox_list_sdn_zones`
+#### `proxmox_sdn_zone`
 
 **Description:** List SDN zones
 
@@ -251,7 +251,7 @@
 
 ---
 
-#### `proxmox_update_sdn_controller`
+#### `proxmox_sdn_controller`
 
 **Description:** Update an SDN controller (requires elevated permissions)
 
@@ -274,7 +274,7 @@
 
 ---
 
-#### `proxmox_update_sdn_subnet`
+#### `proxmox_sdn_subnet`
 
 **Description:** Update an SDN subnet (requires elevated permissions)
 
@@ -299,7 +299,7 @@
 
 ---
 
-#### `proxmox_update_sdn_vnet`
+#### `proxmox_sdn_vnet`
 
 **Description:** Update an SDN virtual network (requires elevated permissions)
 
@@ -325,7 +325,7 @@
 
 ---
 
-#### `proxmox_update_sdn_zone`
+#### `proxmox_sdn_zone`
 
 **Description:** Update an SDN zone (requires elevated permissions)
 

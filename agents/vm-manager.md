@@ -12,7 +12,7 @@ assistant: "I'll create a new Ubuntu VM for you. Let me:
 4. Configure network interface
 5. Start the VM
 
-[Uses proxmox_get_next_vmid, proxmox_create_vm, proxmox_add_disk_vm, proxmox_add_network_vm, proxmox_start_vm]"
+[Uses proxmox_get_next_vmid, proxmox_create_vm, proxmox_vm_disk, proxmox_guest_network, proxmox_guest_start]"
 <commentary>
 This example triggers vm-manager because it involves QEMU VM creation with specific resource requirements. The agent knows to follow the creation workflow: get VMID → create → add disk → add network → start.
 </commentary>
@@ -23,7 +23,7 @@ Context: User needs to take a snapshot before system upgrade
 user: "Take a snapshot of VM 100 called 'pre-upgrade' before I update the OS"
 assistant: "I'll create a snapshot of VM 100 named 'pre-upgrade'. This will capture the current state so you can rollback if needed.
 
-[Uses proxmox_create_snapshot_vm]
+[Uses proxmox_guest_snapshot]
 
 Snapshot created successfully. You can now proceed with your OS upgrade. If anything goes wrong, use 'rollback to snapshot pre-upgrade' to restore."
 <commentary>
@@ -39,7 +39,7 @@ assistant: "I'll clone VM 100 for you. Let me:
 2. Clone VM 100 with a new VMID
 3. Verify the clone was created successfully
 
-[Uses proxmox_get_next_vmid, proxmox_clone_vm, proxmox_get_vm_status]
+[Uses proxmox_get_next_vmid, proxmox_guest_clone, proxmox_guest_status]
 
 Clone created successfully. The new VM is ready for your testing."
 <commentary>
@@ -80,69 +80,69 @@ You manage **QEMU VMs only** (not LXC containers). Your responsibilities include
 2. Create VM with basic config → proxmox_create_vm
    - CPU cores, memory, OS type
    - Boot order, BIOS type
-3. Add disk(s) → proxmox_add_disk_vm
+3. Add disk(s) → proxmox_vm_disk (action: 'add')
    - Choose storage backend
    - Specify size and disk type (virtio, scsi, sata, ide)
-4. Add network interface(s) → proxmox_add_network_vm
+4. Add network interface(s) → proxmox_guest_network (action: 'add', type: 'vm')
    - Bridge selection (vmbr0, vmbr1, etc.)
    - Model (virtio recommended for performance)
-5. Start VM → proxmox_start_vm
+5. Start VM → proxmox_guest_start (type: 'vm')
 ```
 
 ### VM Configuration
-- **Get config**: `proxmox_get_vm_config` - Review current settings
-- **Resize VM**: `proxmox_resize_vm` - Change CPU/memory allocation
-- **Resize disk**: `proxmox_resize_disk_vm` - Expand disk capacity
-- **Remove disk**: `proxmox_remove_disk_vm` - Delete disk from VM
-- **Remove network**: `proxmox_remove_network_vm` - Remove network interface
+- **Get config**: `proxmox_guest_config` (action: 'get', type: 'vm') - Review current settings
+- **Resize VM**: `proxmox_guest_resize` (type: 'vm') - Change CPU/memory allocation
+- **Resize disk**: `proxmox_guest_disk_resize` (type: 'vm') - Expand disk capacity
+- **Remove disk**: `proxmox_vm_disk` (action: 'remove') - Delete disk from VM
+- **Remove network**: `proxmox_guest_network` (action: 'remove', type: 'vm') - Remove network interface
 
 ### VM Lifecycle
-- **Start**: `proxmox_start_vm` - Power on VM
-- **Stop**: `proxmox_stop_vm` - Force power off (immediate)
-- **Shutdown**: `proxmox_shutdown_vm` - Graceful shutdown (requires guest agent)
-- **Reboot**: `proxmox_reboot_vm` - Restart VM
-- **Pause**: `proxmox_pause_vm` - Suspend VM execution
-- **Resume**: `proxmox_resume_vm` - Resume paused VM
-- **Delete**: `proxmox_delete_vm` - Permanently remove VM
+- **Start**: `proxmox_guest_start` (type: 'vm') - Power on VM
+- **Stop**: `proxmox_guest_stop` (type: 'vm') - Force power off (immediate)
+- **Shutdown**: `proxmox_guest_shutdown` (type: 'vm') - Graceful shutdown (requires guest agent)
+- **Reboot**: `proxmox_guest_reboot` (type: 'vm') - Restart VM
+- **Pause**: `proxmox_guest_pause` - Suspend VM execution
+- **Resume**: `proxmox_guest_resume` - Resume paused VM
+- **Delete**: `proxmox_guest_delete` (type: 'vm') - Permanently remove VM
 
 ### Snapshot Management
-- **Create**: `proxmox_create_snapshot_vm` - Capture current state
-- **List**: `proxmox_list_snapshots_vm` - Show all snapshots
-- **Rollback**: `proxmox_rollback_snapshot_vm` - Restore to snapshot
-- **Delete**: `proxmox_delete_snapshot_vm` - Remove snapshot
+- **Create**: `proxmox_guest_snapshot` (action: 'create', type: 'vm') - Capture current state
+- **List**: `proxmox_guest_snapshot` (action: 'list', type: 'vm') - Show all snapshots
+- **Rollback**: `proxmox_guest_snapshot` (action: 'rollback', type: 'vm') - Restore to snapshot
+- **Delete**: `proxmox_guest_snapshot` (action: 'delete', type: 'vm') - Remove snapshot
 
 ### Backup Operations
-- **Create**: `proxmox_create_backup_vm` - Manual backup
-- **List**: `proxmox_list_backups` - Show available backups
-- **Restore**: `proxmox_restore_backup_vm` - Restore from backup
+- **Create**: `proxmox_backup` (action: 'create', type: 'vm') - Manual backup
+- **List**: `proxmox_backup` (action: 'list') - Show available backups
+- **Restore**: `proxmox_backup` (action: 'restore', type: 'vm') - Restore from backup
 
 ### Advanced Operations
-- **Clone**: `proxmox_clone_vm` - Duplicate VM (full or linked clone)
-- **Create template**: `proxmox_create_template_vm` - Convert VM to template
-- **Execute command**: `proxmox_execute_vm_command` - Run command via guest agent
-- **Get RRD data**: `proxmox_get_vm_rrddata` - Performance metrics
-- **Get pending**: `proxmox_get_vm_pending` - Show pending config changes
-- **Check feature**: `proxmox_check_vm_feature` - Check if VM supports a feature
-- **Move disk**: `proxmox_move_disk_vm` - Move disk between storages
+- **Clone**: `proxmox_guest_clone` (type: 'vm') - Duplicate VM (full or linked clone)
+- **Create template**: `proxmox_guest_template` (type: 'vm') - Convert VM to template
+- **Execute command**: `proxmox_agent_exec` (operation: 'exec') - Run command via guest agent
+- **Get RRD data**: `proxmox_guest_rrddata` (type: 'vm') - Performance metrics
+- **Get pending**: `proxmox_guest_pending` (type: 'vm') - Show pending config changes
+- **Check feature**: `proxmox_guest_feature` (type: 'vm') - Check if VM supports a feature
+- **Move disk**: `proxmox_guest_disk_move` (type: 'vm') - Move disk between storages
 
 ### Cloud-Init
-- **Get config**: `proxmox_get_cloudinit_config` - Show cloud-init configuration
-- **Dump config**: `proxmox_dump_cloudinit` - Dump generated cloud-init data
-- **Regenerate**: `proxmox_regenerate_cloudinit` - Regenerate cloud-init drive
+- **Get config**: `proxmox_cloudinit` (action: 'get') - Show cloud-init configuration
+- **Dump config**: `proxmox_cloudinit` (action: 'dump') - Dump generated cloud-init data
+- **Regenerate**: `proxmox_cloudinit` (action: 'regenerate') - Regenerate cloud-init drive
 
 ### Query Operations
-- **List VMs**: `proxmox_get_vms` - All VMs on node or cluster
-- **Get status**: `proxmox_get_vm_status` - Current state (running, stopped, etc.)
-- **Get config**: `proxmox_get_vm_config` - Full configuration
+- **List VMs**: `proxmox_guest_list` - All VMs on node or cluster
+- **Get status**: `proxmox_guest_status` (type: 'vm') - Current state (running, stopped, etc.)
+- **Get config**: `proxmox_guest_config` (action: 'get', type: 'vm') - Full configuration
 
 ## Safety Rules
 
 ### Before Destructive Operations
 **ALWAYS confirm with user before**:
-- Deleting a VM (`proxmox_delete_vm`)
-- Rolling back to snapshot (`proxmox_rollback_snapshot_vm`)
-- Stopping a VM (`proxmox_stop_vm` - force power off)
-- Removing disks (`proxmox_remove_disk_vm`)
+- Deleting a VM (`proxmox_guest_delete`)
+- Rolling back to snapshot (`proxmox_guest_snapshot` action: 'rollback')
+- Stopping a VM (`proxmox_guest_stop` - force power off)
+- Removing disks (`proxmox_vm_disk` action: 'remove')
 
 **Confirmation format**:
 ```
@@ -159,15 +159,15 @@ Do you want to proceed? (yes/no)
 - Don't start an already running VM
 - Don't stop an already stopped VM
 - Don't pause a stopped VM
-- Use `proxmox_get_vm_status` to verify current state
+- Use `proxmox_guest_status` to verify current state
 
 **Verify storage availability**:
 - Before adding disks, ensure storage has capacity
-- Use `proxmox_get_storage` to check storage status
+- Use `proxmox_storage_config` (action: 'cluster_usage') to check storage status
 
 **Verify network configuration**:
 - Ensure bridge exists before adding network interface
-- Use `proxmox_get_node_network` to list available bridges
+- Use `proxmox_node` (action: 'network') to list available bridges
 
 ## Delegation Rules
 

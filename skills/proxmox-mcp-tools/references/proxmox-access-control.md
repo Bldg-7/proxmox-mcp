@@ -9,7 +9,7 @@
 
 ## Tools
 
-#### `proxmox_create_domain`
+#### `proxmox_domain`
 
 **Description:** Create an authentication domain (requires elevated permissions)
 
@@ -37,7 +37,7 @@
 
 ---
 
-#### `proxmox_create_group`
+#### `proxmox_group`
 
 **Description:** Create a Proxmox group (requires elevated permissions)
 
@@ -53,7 +53,7 @@
 
 ---
 
-#### `proxmox_create_role`
+#### `proxmox_role`
 
 **Description:** Create a Proxmox role (requires elevated permissions)
 
@@ -69,7 +69,7 @@
 
 ---
 
-#### `proxmox_create_user`
+#### `proxmox_user`
 
 **Description:** Create a Proxmox user (requires elevated permissions)
 
@@ -91,7 +91,7 @@
 
 ---
 
-#### `proxmox_create_user_token`
+#### `proxmox_user_token`
 
 **Description:** Create a new API token for a user (requires elevated permissions)
 
@@ -109,7 +109,7 @@
 
 ---
 
-#### `proxmox_delete_domain`
+#### `proxmox_domain`
 
 **Description:** Delete an authentication domain (requires elevated permissions)
 
@@ -123,7 +123,7 @@
 
 ---
 
-#### `proxmox_delete_group`
+#### `proxmox_group`
 
 **Description:** Delete a Proxmox group (requires elevated permissions)
 
@@ -137,7 +137,7 @@
 
 ---
 
-#### `proxmox_delete_role`
+#### `proxmox_role`
 
 **Description:** Delete a Proxmox role (requires elevated permissions)
 
@@ -151,7 +151,7 @@
 
 ---
 
-#### `proxmox_delete_user`
+#### `proxmox_user`
 
 **Description:** Delete a Proxmox user (requires elevated permissions)
 
@@ -165,7 +165,7 @@
 
 ---
 
-#### `proxmox_delete_user_token`
+#### `proxmox_user_token`
 
 **Description:** Delete a user API token (requires elevated permissions)
 
@@ -180,7 +180,7 @@
 
 ---
 
-#### `proxmox_get_acl`
+#### `proxmox_acl`
 
 **Description:** Get ACL entries
 
@@ -197,7 +197,7 @@
 
 ---
 
-#### `proxmox_get_domain`
+#### `proxmox_domain`
 
 **Description:** Get authentication domain details
 
@@ -211,7 +211,7 @@
 
 ---
 
-#### `proxmox_get_user`
+#### `proxmox_user`
 
 **Description:** Get details for a Proxmox user
 
@@ -225,7 +225,7 @@
 
 ---
 
-#### `proxmox_get_user_token`
+#### `proxmox_user_token`
 
 **Description:** Get details of a specific user API token
 
@@ -240,7 +240,7 @@
 
 ---
 
-#### `proxmox_list_domains`
+#### `proxmox_domain`
 
 **Description:** List authentication domains
 
@@ -250,7 +250,7 @@
 
 ---
 
-#### `proxmox_list_groups`
+#### `proxmox_group`
 
 **Description:** List Proxmox groups
 
@@ -260,7 +260,7 @@
 
 ---
 
-#### `proxmox_list_roles`
+#### `proxmox_role`
 
 **Description:** List Proxmox roles
 
@@ -270,7 +270,7 @@
 
 ---
 
-#### `proxmox_list_user_tokens`
+#### `proxmox_user_token`
 
 **Description:** List API tokens for a user
 
@@ -284,7 +284,7 @@
 
 ---
 
-#### `proxmox_list_users`
+#### `proxmox_user`
 
 **Description:** List Proxmox users
 
@@ -294,7 +294,7 @@
 
 ---
 
-#### `proxmox_update_acl`
+#### `proxmox_acl`
 
 **Description:** Update ACL entries (requires elevated permissions)
 
@@ -314,7 +314,7 @@
 
 ---
 
-#### `proxmox_update_domain`
+#### `proxmox_domain`
 
 **Description:** Update an authentication domain (requires elevated permissions)
 
@@ -344,7 +344,7 @@
 
 ---
 
-#### `proxmox_update_group`
+#### `proxmox_group`
 
 **Description:** Update a Proxmox group (requires elevated permissions)
 
@@ -363,7 +363,7 @@
 
 ---
 
-#### `proxmox_update_role`
+#### `proxmox_role`
 
 **Description:** Update a Proxmox role (requires elevated permissions)
 
@@ -382,7 +382,7 @@
 
 ---
 
-#### `proxmox_update_user`
+#### `proxmox_user`
 
 **Description:** Update a Proxmox user (requires elevated permissions)
 
@@ -407,7 +407,7 @@
 
 ---
 
-#### `proxmox_update_user_token`
+#### `proxmox_user_token`
 
 **Description:** Update a user API token (requires elevated permissions)
 

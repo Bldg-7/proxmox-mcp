@@ -1,6 +1,6 @@
 # Proxmox MCP Server - Tool Reference
 
-> Model Context Protocol server providing **309 tools** for Proxmox Virtual Environment management.
+> Model Context Protocol server providing **91 tools** for Proxmox Virtual Environment management.
 
 **Generated:** 2026-02-08T04:04:42.008Z
 
