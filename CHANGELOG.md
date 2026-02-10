@@ -1,5 +1,16 @@
 # @bldg-7/proxmox-mcp
 
+## 1.0.0
+
+### Major Changes
+
+- 75978bd: BREAKING CHANGE: Consolidate 309 tools to 91 tools
+
+  - VM/LXC tool pairs merged with `type` parameter (vm|lxc)
+  - CRUD tool groups merged with `action` parameter
+  - Guest agent tools merged with `operation` parameter
+  - See MIGRATION.md for complete old→new tool mapping
+
 ## 0.6.0
 
 ### Minor Changes
