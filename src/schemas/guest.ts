@@ -252,7 +252,15 @@ export const guestConfigUpdateSchema = z.discriminatedUnion('type', [
     type: z.literal('vm'),
     node: z.string().min(1).describe('Node name where VM is located'),
     vmid: z.coerce.number().describe('VM ID number'),
-    config: z.record(z.string(), z.any()).optional().describe(
+    config: z.preprocess(
+      (val) => {
+        if (typeof val === 'string') {
+          try { return JSON.parse(val); } catch { return val; }
+        }
+        return val;
+      },
+      z.record(z.string(), z.any())
+    ).optional().describe(
       'Key-value pairs of VM configuration to set. Use proxmox_guest_config with type=vm to discover valid keys.'
     ),
     delete: z.string().optional().describe(
@@ -263,7 +271,15 @@ export const guestConfigUpdateSchema = z.discriminatedUnion('type', [
     type: z.literal('lxc'),
     node: z.string().min(1).describe('Node name where container is located'),
     vmid: z.coerce.number().describe('Container ID number'),
-    config: z.record(z.string(), z.any()).optional().describe(
+    config: z.preprocess(
+      (val) => {
+        if (typeof val === 'string') {
+          try { return JSON.parse(val); } catch { return val; }
+        }
+        return val;
+      },
+      z.record(z.string(), z.any())
+    ).optional().describe(
       'Key-value pairs of container configuration to set. Use proxmox_guest_config with type=lxc to discover valid keys.'
     ),
     delete: z.string().optional().describe(
