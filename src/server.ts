@@ -187,6 +187,14 @@ export function createServer(client: ProxmoxApiClient, config: Config): Server {
     const { $schema, ...inputSchema } = jsonSchema;
     void $schema;
 
+    // MCP SDK v1.25.3 requires type: 'object' at the root (types.ts:1229).
+    // z.discriminatedUnion() emits { anyOf: [...] } without a root type.
+    // See: https://github.com/modelcontextprotocol/typescript-sdk/issues/685
+    // See: https://github.com/modelcontextprotocol/modelcontextprotocol/issues/834
+    if (!('type' in inputSchema) && 'anyOf' in inputSchema) {
+      (inputSchema as Record<string, unknown>).type = 'object';
+    }
+
     return {
       name,
       description: TOOL_DESCRIPTIONS[name],
