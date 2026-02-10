@@ -231,15 +231,15 @@ Wave 3 (Finalization — SEQUENTIAL after Wave 2):
   - `.sisyphus/plans/tool-mapping-table.md:95-101` — singleton 매핑 (get_storage→storage_config, list_templates→storage_content, execute_vm_command→agent_exec, get_next_vmid→cluster)
 
   **Acceptance Criteria**:
-  - [ ] `TOOL_NAMES.length` < 100 (pnpm build 후 검증)
-  - [ ] 10개 firewall tool names가 `src/types/tools.ts`에서 제거됨
-  - [ ] `proxmox_guest_firewall_rule` 등록됨 (types, server, registry, permissions)
-  - [ ] file_restore, vm_disk, lxc_mountpoint, node_disk_admin 각각 통합됨
-  - [ ] `proxmox_get_storage`, `proxmox_list_templates`, `proxmox_execute_vm_command` 제거됨
-  - [ ] `proxmox_get_next_vmid` 유지됨
-  - [ ] `proxmox_get_spice_proxy` → `proxmox_console_spice` 변경됨
-  - [ ] 각 Group마다 `pnpm build && pnpm test` 통과 후 커밋됨
-  - [ ] 최종: `pnpm test` ≥ 1100 tests pass
+  - [x] `TOOL_NAMES.length` < 100 (pnpm build 후 검증)
+  - [x] 10개 firewall tool names가 `src/types/tools.ts`에서 제거됨
+  - [x] `proxmox_guest_firewall_rule` 등록됨 (types, server, registry, permissions)
+  - [x] file_restore, vm_disk, lxc_mountpoint, node_disk_admin 각각 통합됨
+  - [x] `proxmox_get_storage`, `proxmox_list_templates`, `proxmox_execute_vm_command` 제거됨
+  - [x] `proxmox_get_next_vmid` 유지됨
+  - [x] `proxmox_get_spice_proxy` → `proxmox_console_spice` 변경됨
+  - [x] 각 Group마다 `pnpm build && pnpm test` 통과 후 커밋됨
+  - [x] 최종: `pnpm test` ≥ 1100 tests pass
 
   **Agent-Executed QA Scenarios:**
 
@@ -324,11 +324,11 @@ Wave 3 (Finalization — SEQUENTIAL after Wave 2):
   - `.sisyphus/plans/tool-mapping-table.md` — old→new 전체 매핑
 
   **Acceptance Criteria**:
-  - [ ] `docs/TOOLS.md`의 tool count가 `TOOL_NAMES.length`와 일치
-  - [ ] `docs/TOOLS_ko.md`의 tool count가 `TOOL_NAMES.length`와 일치
-  - [ ] 제거된 tool (proxmox_start_vm, proxmox_list_vm_firewall_rules 등)의 섹션이 없음
-  - [ ] 새 통합 tool (proxmox_guest_firewall_rule, proxmox_file_restore 등)의 섹션이 있음
-  - [ ] 각 tool 섹션에 action/type 파라미터 설명 포함
+  - [x] `docs/TOOLS.md`의 tool count가 `TOOL_NAMES.length`와 일치
+  - [x] `docs/TOOLS_ko.md`의 tool count가 `TOOL_NAMES.length`와 일치
+  - [x] 제거된 tool (proxmox_start_vm, proxmox_list_vm_firewall_rules 등)의 섹션이 없음
+  - [x] 새 통합 tool (proxmox_guest_firewall_rule, proxmox_file_restore 등)의 섹션이 있음
+  - [x] 각 tool 섹션에 action/type 파라미터 설명 포함
 
   **Agent-Executed QA Scenarios:**
 
@@ -426,11 +426,11 @@ Wave 3 (Finalization — SEQUENTIAL after Wave 2):
   - `docs/skills/*.md` — 21개 mirror 파일
 
   **Acceptance Criteria**:
-  - [ ] `grep -r "309" README.md README_ko.md agents/ skills/ docs/skills/` → zero matches
-  - [ ] `grep -rE "proxmox_start_vm|proxmox_stop_lxc|proxmox_get_vm_config|proxmox_get_lxc_config" agents/ skills/ docs/skills/ README.md README_ko.md` → zero matches
-  - [ ] `skills/proxmox-mcp-tools/SKILL.md`의 `tool_count:` frontmatter가 실제 값과 일치
-  - [ ] `docs/skills/proxmox-mcp-tools.md`의 `tool_count:` frontmatter가 실제 값과 일치
-  - [ ] 모든 `docs/skills/` mirror 파일이 대응하는 `skills/` 파일과 일치
+  - [x] `grep -r "309" README.md README_ko.md agents/ skills/ docs/skills/` → zero matches
+  - [x] `grep -rE "proxmox_start_vm|proxmox_stop_lxc|proxmox_get_vm_config|proxmox_get_lxc_config" agents/ skills/ docs/skills/ README.md README_ko.md` → zero matches
+  - [x] `skills/proxmox-mcp-tools/SKILL.md`의 `tool_count:` frontmatter가 실제 값과 일치
+  - [x] `docs/skills/proxmox-mcp-tools.md`의 `tool_count:` frontmatter가 실제 값과 일치
+  - [x] 모든 `docs/skills/` mirror 파일이 대응하는 `skills/` 파일과 일치
 
   **Agent-Executed QA Scenarios:**
 
@@ -515,10 +515,10 @@ Wave 3 (Finalization — SEQUENTIAL after Wave 2):
   - `.sisyphus/notepads/tool-consolidation/decisions.md` — 설계 결정 기록
 
   **Acceptance Criteria**:
-  - [ ] `MIGRATION.md` 파일 존재
-  - [ ] 309개 old tool name이 모두 매핑됨 (grep count ≥ 309)
-  - [ ] before/after 코드 예시 포함
-  - [ ] 유지된 tool 목록 포함
+  - [x] `MIGRATION.md` 파일 존재
+  - [x] 309개 old tool name이 모두 매핑됨 (grep count ≥ 309)
+  - [x] before/after 코드 예시 포함
+  - [x] 유지된 tool 목록 포함
 
   **Agent-Executed QA Scenarios:**
 
@@ -592,12 +592,12 @@ Wave 3 (Finalization — SEQUENTIAL after Wave 2):
   - `src/__tests__/integration/server.test.ts` — 기존 integration test
 
   **Acceptance Criteria**:
-  - [ ] `.changeset/*.md` 파일 존재 (major bump changeset)
-  - [ ] `pnpm build` exit 0
-  - [ ] `pnpm test` ≥ 1100 tests pass
-  - [ ] `TOOL_NAMES.length` < 100
-  - [ ] `grep -r "309" docs/ README*.md skills/ agents/` → zero matches
-  - [ ] 모든 doc/agent/skill의 `proxmox_*` 참조가 TOOL_NAMES에 존재
+  - [x] `.changeset/*.md` 파일 존재 (major bump changeset)
+  - [x] `pnpm build` exit 0
+  - [x] `pnpm test` ≥ 1100 tests pass
+  - [x] `TOOL_NAMES.length` < 100
+  - [x] `grep -r "309" docs/ README*.md skills/ agents/` → zero matches
+  - [x] 모든 doc/agent/skill의 `proxmox_*` 참조가 TOOL_NAMES에 존재
 
   **Agent-Executed QA Scenarios:**
 
