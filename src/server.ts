@@ -5,13 +5,25 @@ import {
   type CallToolResult,
 } from '@modelcontextprotocol/sdk/types.js';
 import { toJsonSchemaCompat } from '@modelcontextprotocol/sdk/server/zod-json-schema-compat.js';
+import { readFileSync } from 'node:fs';
 import type { ProxmoxApiClient } from './client/proxmox.js';
 import type { Config } from './config/index.js';
 import type { ToolName } from './types/tools.js';
 import { toolRegistry } from './tools/registry.js';
 import { TOOL_NAMES } from './types/tools.js';
 
-const SERVER_VERSION = '0.1.0';
+function getServerVersion(): string {
+  const packageJsonRaw = readFileSync(new URL('../package.json', import.meta.url), 'utf8');
+  const packageJson = JSON.parse(packageJsonRaw) as { version?: unknown };
+
+  if (typeof packageJson.version !== 'string' || packageJson.version.length === 0) {
+    throw new Error('Invalid package version: expected non-empty string');
+  }
+
+  return packageJson.version;
+}
+
+const SERVER_VERSION = getServerVersion();
 
 const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   // Node & Cluster (consolidated)

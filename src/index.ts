@@ -4,10 +4,17 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { loadConfig } from './config/index.js';
 import { ProxmoxApiClient } from './client/proxmox.js';
 import { createServer } from './server.js';
+import { TOOL_NAMES } from './types/tools.js';
 import { logger } from './utils/index.js';
 
 export async function main(): Promise<void> {
   try {
+    if (process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0') {
+      logger.warn(
+        'NODE_TLS_REJECT_UNAUTHORIZED=0 disables TLS certificate verification for all HTTPS requests. Remove it and use PROXMOX_SSL_MODE/PROXMOX_SSL_CA_CERT instead.'
+      );
+    }
+
     // Load configuration from environment variables
     const config = loadConfig();
     logger.info('Configuration loaded successfully');
@@ -18,7 +25,7 @@ export async function main(): Promise<void> {
 
     // Create MCP server with all tools registered
     const server = createServer(client, config);
-    logger.info('MCP server created with 55 tools registered');
+    logger.info(`MCP server created with ${TOOL_NAMES.length} tools registered`);
 
     // Create stdio transport and connect server
     const transport = new StdioServerTransport();
