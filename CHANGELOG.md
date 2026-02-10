@@ -1,5 +1,13 @@
 # @bldg-7/proxmox-mcp
 
+## 1.0.2
+
+### Patch Changes
+
+- 9b0caf3: Fix MCP tools capability advertisement to include `listChanged: true`.
+
+  This ensures MCP clients properly recognize and display the server's tool catalog during capability negotiation. Without this, some clients may not show tools even when the `tools/list` response contains them.
+
 ## 1.0.1
 
 ### Patch Changes
