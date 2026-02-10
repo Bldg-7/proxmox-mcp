@@ -1,6 +1,6 @@
 {
   "name": "@bldg-7/proxmox-mcp",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Proxmox MCP Server - TypeScript rewrite",
   "type": "module",
   "packageManager": "pnpm@10.13.1",
