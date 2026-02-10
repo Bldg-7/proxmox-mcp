@@ -172,7 +172,9 @@ export function createServer(client: ProxmoxApiClient, config: Config): Server {
     },
     {
       capabilities: {
-        tools: {},
+        tools: {
+          listChanged: true,
+        },
       },
     }
   );
