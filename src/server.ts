@@ -89,8 +89,6 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_guest_pending: 'Get pending configuration changes for a VM (type=vm) or LXC container (type=lxc)',
   proxmox_guest_feature: 'Check if a feature (snapshot, clone, copy) is available for a VM (type=vm) or LXC container (type=lxc)',
   proxmox_guest_rrddata: 'Get performance metrics (RRD data) for a VM (type=vm) or LXC container (type=lxc)',
-  proxmox_get_storage: 'List all storage pools and their usage across the cluster',
-
   // Guest Lifecycle (consolidated VM/LXC)
   proxmox_guest_start: 'Start a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
   proxmox_guest_stop: 'Forcefully stop a VM (type=vm) or LXC container (type=lxc) (requires elevated permissions)',
@@ -134,11 +132,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   // Network
   proxmox_guest_network: 'Manage guest network interfaces. action=add|update|remove with type=vm|lxc (requires elevated permissions)',
 
-  // Command
-  proxmox_execute_vm_command: 'Execute a shell command on a QEMU VM via guest agent (QEMU only)',
-
    // Creation
-   proxmox_list_templates: 'List available LXC container templates on a storage',
    proxmox_create_lxc: 'Create a new LXC container (requires elevated permissions)',
    proxmox_create_vm: 'Create a new QEMU virtual machine (requires elevated permissions)',
 

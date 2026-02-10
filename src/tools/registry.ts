@@ -80,7 +80,6 @@ import {
   handleCephPoolTool,
   handleCephFsTool,
 
-  getStorage,
   handleGuestStart,
   handleGuestStop,
   handleGuestReboot,
@@ -114,8 +113,6 @@ import {
   handleNodeDisk,
   handleNodeDiskAdmin,
   handleGuestNetwork,
-  executeVMCommand,
-  listTemplates,
   createLxc,
   createVM,
   handleCloudInit,
@@ -190,9 +187,6 @@ import {
   cephFsToolSchema,
 } from '../schemas/ceph.js';
 import {
-  getStorageSchema,
-  executeVmCommandSchema,
-  listTemplatesSchema,
   createLxcSchema,
   createVmSchema,
 } from '../schemas/vm.js';
@@ -347,7 +341,6 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_guest_pending: { handler: handleGuestPending, schema: guestPendingSchema },
   proxmox_guest_feature: { handler: handleGuestFeature, schema: guestFeatureSchema },
   proxmox_guest_rrddata: { handler: handleGuestRrddata, schema: guestRrddataSchema },
-  proxmox_get_storage: { handler: getStorage, schema: getStorageSchema },
 
   // Guest Lifecycle (consolidated VM/LXC)
   proxmox_guest_start: { handler: handleGuestStart, schema: guestStartSchema },
@@ -400,11 +393,7 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   // Network
   proxmox_guest_network: { handler: handleGuestNetwork, schema: guestNetworkSchema },
 
-  // Command
-  proxmox_execute_vm_command: { handler: executeVMCommand, schema: executeVmCommandSchema },
-
    // Creation
-   proxmox_list_templates: { handler: listTemplates, schema: listTemplatesSchema },
    proxmox_create_lxc: { handler: createLxc, schema: createLxcSchema },
    proxmox_create_vm: { handler: createVM, schema: createVmSchema },
 
