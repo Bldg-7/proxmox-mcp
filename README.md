@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-A comprehensive MCP server providing 309 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
+A comprehensive MCP server providing 91 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
 
 ## Credits & Background
 
@@ -23,20 +23,20 @@ This project is a TypeScript rewrite of [mcp-proxmox-server](https://github.com/
 - Giant switch statement (55 cases) → tool registry with handler/schema pairs
 
 **Quality**:
-- 0 tests → 808 tests
+- 0 tests → 1,114 tests
 - No input validation → Zod runtime validation on every tool call
 - Implicit error handling → structured MCP error responses with context
 - No permission checks → two-tier permission model (basic / elevated)
 
 **Developer Experience**:
 - `npx @bldg-7/proxmox-mcp` just works
-- All 309 tool descriptions exposed via MCP `ListTools`
+- All 91 tool descriptions exposed via MCP `ListTools`
 - Rate limiter middleware included
 - Pino structured logging instead of `console.log`
 
 ## Features
 
-- **309 comprehensive tools** for Proxmox management
+- **91 comprehensive tools** for Proxmox management
 - **Full TypeScript implementation** with strict type safety
 - **Support for both QEMU VMs and LXC containers**
 - **Secure authentication** (API token)
@@ -125,35 +125,30 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
 
 ## Available Tools
 
-This server provides **309 comprehensive tools** for Proxmox management:
+This server provides **91 comprehensive tools** for Proxmox management:
 
 | Category | Tools | Permission |
 |----------|-------|------------|
-| Node & Cluster | 7 | Mixed |
-| Node Management | 8 | Mixed |
-| System Operations | 20 | Mixed |
-| Node Network Config | 4 | Elevated 🔒 |
-| Cluster Management | 54 | Mixed |
-| Storage Management | 12 | Mixed |
-| Access Control | 25 | Mixed |
-| Pool Management | 5 | Mixed |
-| SDN Networking | 20 | Mixed |
-| Ceph | 16 | Mixed |
-| VM Query | 9 | Basic |
-| VM Lifecycle | 12 | Elevated 🔒 |
-| VM Modify | 4 | Elevated 🔒 |
-| VM/LXC Advanced | 30 | Mixed |
-| Snapshots | 8 | Mixed |
-| Backups | 6 | Elevated 🔒 |
-| Disks | 16 | Mixed |
-| VM/LXC Network | 6 | Elevated 🔒 |
-| Console Access | 5 | Elevated 🔒 |
-| Command Execution | 1 | Elevated 🔒 |
-| VM Creation | 6 | Mixed |
-| Certificates | 7 | Mixed |
-| ACME | 8 | Mixed |
-| Notifications | 5 | Mixed |
-| **Total** | **309** | |
+| Node Management | 14 | Mixed |
+| Guest (VM/LXC) | 23 | Mixed |
+| Guest Creation | 2 | Elevated 🔒 |
+| QEMU Agent | 7 | Elevated 🔒 |
+| Cluster Operations | 5 | Mixed |
+| Cluster Firewall | 6 | Mixed |
+| High Availability | 2 | Mixed |
+| Storage | 3 | Mixed |
+| SDN Networking | 4 | Mixed |
+| Access Control | 7 | Mixed |
+| Ceph | 6 | Mixed |
+| Console Access | 3 | Elevated 🔒 |
+| Backup | 1 | Mixed |
+| VM Disks | 1 | Elevated 🔒 |
+| LXC Mount Points | 1 | Elevated 🔒 |
+| Cloud-Init | 1 | Mixed |
+| Certificates | 1 | Mixed |
+| ACME | 3 | Mixed |
+| Notifications | 1 | Mixed |
+| **Total** | **91** | |
 
 📖 **[Full Tools Reference →](docs/TOOLS.md)**
 
@@ -165,7 +160,7 @@ This package includes **Agent Skills** - AI-optimized documentation that teaches
 
 | Skill | Description | Tools/Topics |
 |-------|-------------|--------------|
-| **proxmox-mcp-tools** | Complete MCP tool reference for Proxmox VE | 309 tools across 14 domains (VMs, LXC, cluster, storage, networking, Ceph, certificates, ACME, notifications) |
+| **proxmox-mcp-tools** | Complete MCP tool reference for Proxmox VE | 91 tools across 14 domains (VMs, LXC, cluster, storage, networking, Ceph, certificates, ACME, notifications) |
 | **proxmox-admin** | Operational expertise for Proxmox infrastructure | VM lifecycle, storage management, HA configuration, troubleshooting |
 
 ### Installation
@@ -202,9 +197,9 @@ You: "Create an Ubuntu VM with 4 cores, 8GB RAM, and 50GB disk on pve1"
 Agent knows the workflow from the skill:
   1. proxmox_get_next_vmid        → gets available VM ID (e.g., 105)
   2. proxmox_create_vm            → creates VM 105 with 4 cores, 8GB RAM
-  3. proxmox_add_disk_vm          → attaches 50GB virtio disk
-  4. proxmox_add_network_vm       → adds network interface on vmbr0
-  5. proxmox_start_vm             → powers on the VM
+  3. proxmox_vm_disk              → attaches 50GB virtio disk (action: 'add')
+  4. proxmox_guest_network        → adds network interface on vmbr0 (action: 'add', type: 'vm')
+  5. proxmox_guest_start          → powers on the VM (type: 'vm')
 ```
 
 **Example — Setting up HA** (agent uses `proxmox-admin` skill):
@@ -212,9 +207,9 @@ Agent knows the workflow from the skill:
 You: "Make VM 100 highly available"
 
 Agent knows the operational playbook:
-  1. proxmox_get_ha_groups        → checks existing HA groups
-  2. proxmox_create_ha_resource   → adds VM 100 to HA with priority
-  3. proxmox_get_ha_status        → verifies HA is active
+  1. proxmox_ha_group             → checks existing HA groups (action: 'list')
+  2. proxmox_ha_resource          → adds VM 100 to HA with priority (action: 'create')
+  3. proxmox_ha_resource          → verifies HA is active (action: 'status')
 ```
 
 **Example — Troubleshooting** (agent uses both skills together):
@@ -222,10 +217,10 @@ Agent knows the operational playbook:
 You: "VM 100 won't start, help me figure out why"
 
 Agent combines tool knowledge + operational expertise:
-  1. proxmox_get_vm_status        → checks current state
-  2. proxmox_get_vm_config        → reviews configuration
-  3. proxmox_get_node_status      → checks node resource availability
-  4. proxmox_get_node_tasks       → finds recent failed tasks
+  1. proxmox_guest_status         → checks current state (type: 'vm')
+  2. proxmox_guest_config         → reviews configuration (action: 'get', type: 'vm')
+  3. proxmox_node                 → checks node resource availability (action: 'status')
+  4. proxmox_node_task            → finds recent failed tasks (action: 'list')
   → Diagnoses: "Node pve1 has insufficient memory. VM requires 8GB but only 2GB free."
   → Suggests: resize VM memory, migrate to another node, or free resources
 ```
@@ -233,7 +228,7 @@ Agent combines tool knowledge + operational expertise:
 ### Skill Contents
 
 **proxmox-mcp-tools** — Tool Reference:
-- 309 tools organized into 14 domains (VMs, LXC, cluster, storage, networking, Ceph, access control, pools, certificates, ACME, notifications)
+- 91 tools organized into 14 domains (VMs, LXC, cluster, storage, networking, Ceph, access control, pools, certificates, ACME, notifications)
 - Parameters, types, and descriptions for every tool
 - Permission levels (basic vs elevated 🔒)
 - Common workflow patterns (create VM, backup/restore, clone, migrate)
