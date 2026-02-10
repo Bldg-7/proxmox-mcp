@@ -62,13 +62,13 @@ feat/tool-consolidation-309-to-107 브랜치 마감. Task 0~14 완료 상태에�
 - `.changeset/*.md` — major version changeset
 
 ### Definition of Done
-- [ ] `pnpm build` exit 0
-- [ ] `pnpm test` ≥ 1100 tests pass
-- [ ] `TOOL_NAMES.length` < 100
-- [ ] `grep -r "309" docs/ README*.md skills/ agents/` → zero matches
-- [ ] `grep -rE "proxmox_start_vm|proxmox_start_lxc|proxmox_stop_vm|proxmox_list_vm_firewall" src/types/tools.ts` → zero matches
-- [ ] MIGRATION.md에 모든 removed tool 매핑됨
-- [ ] changeset 파일 존재
+- [x] `pnpm build` exit 0
+- [x] `pnpm test` ≥ 1100 tests pass (1114 tests passing)
+- [x] `TOOL_NAMES.length` < 100 (91 tools)
+- [x] `grep -r "309" docs/ README*.md skills/ agents/` → zero matches
+- [x] `grep -rE "proxmox_start_vm|proxmox_start_lxc|proxmox_stop_vm|proxmox_list_vm_firewall" src/types/tools.ts` → zero matches
+- [x] MIGRATION.md에 모든 removed tool 매핑됨 (391 proxmox_ references)
+- [x] changeset 파일 존재
 
 ### Must Have
 - 기존 309개 tool 기능 100% 보존
@@ -678,11 +678,11 @@ cat MIGRATION.md | grep -c "proxmox_"  # Expected: >= 309
 ```
 
 ### Final Checklist
-- [ ] All "Must Have" present (기능 보존, atomic commit, MIGRATION, changeset)
-- [ ] All "Must NOT Have" absent (내부 함수 변경 없음, 새 기능 없음, 직접 version bump 없음)
-- [ ] Tool count < 100
-- [ ] All tests pass
-- [ ] Documentation fully updated (52+ files)
-- [ ] Migration guide complete
-- [ ] Changeset file created (major)
-- [ ] Branch ready for PR
+- [x] All "Must Have" present (기능 보존, atomic commit, MIGRATION, changeset)
+- [x] All "Must NOT Have" absent (내부 함수 변경 없음, 새 기능 없음, 직접 version bump 없음)
+- [x] Tool count < 100 (91 tools)
+- [x] All tests pass (1114 tests)
+- [x] Documentation fully updated (52+ files)
+- [x] Migration guide complete (MIGRATION.md with 391 tool references)
+- [x] Changeset file created (major)
+- [x] Branch ready for PR
