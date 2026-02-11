@@ -162,6 +162,8 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_acme_info: 'Query ACME information. action=list_plugins|get_plugin|directories',
 
   proxmox_notification: 'Manage notification targets. action=list|get: query targets | action=create|delete|test: manage targets (requires elevated)',
+
+  proxmox_lxc_exec: 'Execute a command inside an LXC container via SSH + pct exec (requires elevated + PROXMOX_SSH_ENABLED=true)',
 };
 
 export function createServer(client: ProxmoxApiClient, config: Config): Server {

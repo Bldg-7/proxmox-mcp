@@ -30,6 +30,31 @@ export const configSchema = z.object({
   sslCaCert: z
     .string()
     .optional(),
+  sshEnabled: z
+    .boolean()
+    .default(false),
+  sshHost: z
+    .string()
+    .optional(),
+  sshPort: z
+    .number()
+    .int()
+    .min(1)
+    .max(65535)
+    .default(22),
+  sshUser: z
+    .string()
+    .min(1)
+    .default('root'),
+  sshKeyPath: z
+    .string()
+    .optional(),
+  sshNode: z
+    .string()
+    .optional(),
+  sshHostKeyFingerprint: z
+    .string()
+    .optional(),
 });
 
 export type Config = z.infer<typeof configSchema>;

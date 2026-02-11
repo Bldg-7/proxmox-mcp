@@ -12,6 +12,9 @@ export function createTestConfig(overrides: Partial<Config> = {}): Config {
     tokenValue: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
     allowElevated: false,
     sslMode: 'insecure',
+    sshEnabled: false,
+    sshPort: 22,
+    sshUser: 'root',
     ...overrides,
   };
 }

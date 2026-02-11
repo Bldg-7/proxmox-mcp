@@ -380,3 +380,6 @@ export {
 
 // Notification Management tools (consolidated)
 export { handleNotification } from './notifications.js';
+
+// LXC Exec (SSH-based)
+export { handleLxcExec } from './lxc-exec.js';

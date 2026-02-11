@@ -121,6 +121,7 @@ import {
   handleAcmeAccount,
   handleAcmeInfo,
   handleNotification,
+  handleLxcExec,
 } from './index.js';
 
 // Import all schemas
@@ -225,6 +226,7 @@ import { cloudInitSchema } from '../schemas/cloud-init.js';
 import { certificateSchema, acmeCertSchema } from '../schemas/certificate.js';
 import { acmeAccountSchema, acmeInfoSchema } from '../schemas/acme.js';
 import { notificationSchema } from '../schemas/notifications.js';
+import { lxcExecSchema } from '../schemas/lxc-exec.js';
 
 // Tool handler type - accepts any input type for flexibility
 export type ToolHandler = (
@@ -410,6 +412,9 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
 
    // Notification Management (consolidated)
    proxmox_notification: { handler: handleNotification, schema: notificationSchema },
+
+   // LXC Exec (SSH-based)
+   proxmox_lxc_exec: { handler: handleLxcExec, schema: lxcExecSchema },
 };
 
 // Helper to get tool handler

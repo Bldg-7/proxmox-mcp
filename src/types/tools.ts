@@ -92,6 +92,7 @@ export const TOOL_NAMES = [
   'proxmox_acme_account',
   'proxmox_acme_info',
   'proxmox_notification',
+  'proxmox_lxc_exec',
 ] as const;
 
 export type ToolName = (typeof TOOL_NAMES)[number];

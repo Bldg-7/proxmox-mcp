@@ -26,6 +26,13 @@ export function loadConfig(): Config {
     allowElevated: process.env.PROXMOX_ALLOW_ELEVATED === 'true',
     sslMode: parseSslMode(process.env.PROXMOX_SSL_MODE),
     sslCaCert: process.env.PROXMOX_SSL_CA_CERT || undefined,
+    sshEnabled: process.env.PROXMOX_SSH_ENABLED === 'true',
+    sshHost: process.env.PROXMOX_SSH_HOST || undefined,
+    sshPort: process.env.PROXMOX_SSH_PORT ? parseInt(process.env.PROXMOX_SSH_PORT, 10) : undefined,
+    sshUser: process.env.PROXMOX_SSH_USER || undefined,
+    sshKeyPath: process.env.PROXMOX_SSH_KEY_PATH || undefined,
+    sshNode: process.env.PROXMOX_SSH_NODE || undefined,
+    sshHostKeyFingerprint: process.env.PROXMOX_SSH_HOST_KEY_FINGERPRINT || undefined,
   };
 
   const result = configSchema.safeParse(rawConfig);
