@@ -1,10 +1,10 @@
 # Proxmox MCP Tools Reference
 
-> Complete reference for all 91 consolidated tools in the Proxmox MCP server
+> Complete reference for all 92 consolidated tools in the Proxmox MCP server
 
 **Current Version**: 0.6.1  
-**Total Tools**: 91  
-**Last Updated**: 2026-02-10
+**Total Tools**: 92  
+**Last Updated**: 2026-02-12
 
 ---
 
@@ -24,6 +24,7 @@
   - [Guest Firewall (1 tool)](#guest-firewall-1-tool)
   - [Snapshots & Backups (2 tools)](#snapshots--backups-2-tools)
   - [Disks & Network (7 tools)](#disks--network-7-tools)
+  - [LXC Exec (1 tool)](#lxc-exec-1-tool)
   - [Console Access (3 tools)](#console-access-3-tools)
   - [Cloud-Init, Certificates & ACME (5 tools)](#cloud-init-certificates--acme-5-tools)
   - [Notifications (1 tool)](#notifications-1-tool)
@@ -32,7 +33,7 @@
 
 ## Overview
 
-This document provides a complete reference for all 91 consolidated tools available in the Proxmox MCP server. Each tool uses an `action`, `type`, or `operation` parameter to multiplex related operations into a single tool, reducing tool count while maintaining full API coverage.
+This document provides a complete reference for all 92 consolidated tools available in the Proxmox MCP server. Each tool uses an `action`, `type`, or `operation` parameter to multiplex related operations into a single tool, reducing tool count while maintaining full API coverage.
 
 ### Tool Distribution
 
@@ -51,8 +52,9 @@ This document provides a complete reference for all 91 consolidated tools availa
 | Disks & Network | 7 | Mixed |
 | Console Access | 3 | Elevated |
 | Cloud-Init, Certificates & ACME | 5 | Mixed |
+| LXC Exec | 1 | Elevated |
 | Notifications | 1 | Mixed |
-| **Total** | **91** | |
+| **Total** | **92** | |
 
 ---
 
@@ -925,6 +927,38 @@ Destructive disk operations. action=init_gpt: initialize GPT | action=wipe: wipe
 |--------|------------|-------------|
 | `init_gpt` | Elevated 🔒 | Initialize GPT on disk |
 | `wipe` | Elevated 🔒 | Wipe disk |
+
+---
+
+### LXC Exec (1 tool)
+
+#### `proxmox_lxc_exec` 🔒
+Execute a command inside an LXC container via SSH to Proxmox host using `pct exec`. Requires double opt-in: both `PROXMOX_ALLOW_ELEVATED=true` and `PROXMOX_SSH_ENABLED=true` must be set.
+
+**Permission**: Elevated 🔒 (double opt-in)
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `node` | string | Yes | Proxmox node name (must match `PROXMOX_SSH_NODE`) |
+| `vmid` | number | Yes | LXC container ID (100-999999999) |
+| `command` | string | Yes | Command to execute inside the container |
+| `timeout` | number | No | Timeout in seconds (default: 30, max: 120) |
+
+**Security**:
+- SSH key authentication only (no password)
+- Command validation blocks dangerous characters (`;`, `|`, `` ` ``, `$()`, `>>`, etc.)
+- Commands are shell-quoted and executed via `/usr/sbin/pct exec {vmid} -- /bin/sh -c '{command}'`
+- Node name must match configured `PROXMOX_SSH_NODE`
+- Output limited to 64KB
+- Optional host key fingerprint verification via `PROXMOX_SSH_HOST_KEY_FINGERPRINT`
+
+**Required Environment Variables**:
+```bash
+PROXMOX_ALLOW_ELEVATED=true
+PROXMOX_SSH_ENABLED=true
+PROXMOX_SSH_KEY_PATH=/path/to/ssh/key
+PROXMOX_SSH_NODE=pve1
+```
 
 ---
 

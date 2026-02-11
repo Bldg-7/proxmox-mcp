@@ -1,6 +1,6 @@
 ---
 name: proxmox-mcp-tools
-description: Comprehensive MCP tool reference for Proxmox Virtual Environment management - 91 tools across 14 domains including QEMU VMs, LXC containers, cluster operations, storage, networking, Ceph, certificates, ACME, and notifications
+description: Comprehensive MCP tool reference for Proxmox Virtual Environment management - 92 tools across 14 domains including QEMU VMs, LXC containers, cluster operations, storage, networking, Ceph, certificates, ACME, and notifications
 license: MIT
 compatibility:
   - claude-code
@@ -10,23 +10,23 @@ compatibility:
   - gemini-cli
   - vscode
 metadata:
-  version: 0.6.0
-  tool_count: 91
+  version: 0.6.1
+  tool_count: 92
   domains: 14
   generated: 2026-02-08
 ---
 
 # Proxmox MCP Tools Reference
 
-> **AI Agent Skill**: Complete reference for 91 Proxmox Virtual Environment management tools via Model Context Protocol
+> **AI Agent Skill**: Complete reference for 92 Proxmox Virtual Environment management tools via Model Context Protocol
 
 ## Overview
 
-This skill teaches AI agents how to use the **@bldg-7/proxmox-mcp** server, which provides 91 comprehensive tools for managing Proxmox VE infrastructure through the Model Context Protocol (MCP).
+This skill teaches AI agents how to use the **@bldg-7/proxmox-mcp** server, which provides 92 comprehensive tools for managing Proxmox VE infrastructure through the Model Context Protocol (MCP).
 
 **What you'll learn**:
 - How to connect to Proxmox VE via MCP
-- 91 tools organized into 14 functional domains
+- 92 tools organized into 14 functional domains
 - Permission model (basic vs elevated operations)
 - Common workflows and patterns
 - Troubleshooting API quirks
@@ -54,6 +54,17 @@ PROXMOX_ALLOW_ELEVATED=true     # Enable create/modify/delete (default: false)
 PROXMOX_PORT=8006               # Default: 8006
 ```
 
+**SSH Configuration** (for `proxmox_lxc_exec`):
+```bash
+PROXMOX_SSH_ENABLED=true        # Enable SSH-based LXC exec (default: false)
+PROXMOX_SSH_HOST=pve.example.com # SSH host (falls back to PROXMOX_HOST)
+PROXMOX_SSH_PORT=22             # SSH port (default: 22)
+PROXMOX_SSH_USER=root           # SSH username (default: root)
+PROXMOX_SSH_KEY_PATH=~/.ssh/id_rsa # Path to SSH private key (required when SSH enabled)
+PROXMOX_SSH_NODE=pve1           # Proxmox node name (required when SSH enabled)
+PROXMOX_SSH_HOST_KEY_FINGERPRINT=sha256:... # Optional host key verification
+```
+
 ### Permission Model
 
 | Level | Operations | Env Var Required |
@@ -61,7 +72,7 @@ PROXMOX_PORT=8006               # Default: 8006
 | **Basic** | Read-only (list, get, status) | None |
 | **Elevated** 🔒 | Create, modify, delete | `PROXMOX_ALLOW_ELEVATED=true` |
 
-**102 basic tools** + **207 elevated tools** = **91 total**
+**102 basic tools** + **207 elevated tools** = **92 total**
 
 ### SSL Modes
 
@@ -77,7 +88,7 @@ PROXMOX_PORT=8006               # Default: 8006
 |--------|-------|----------------|-----------|
 | **Nodes** | 47 | Node status, network config, system ops, console access | [proxmox-nodes.md](references/proxmox-nodes.md) |
 | **QEMU VMs** | 26 | VM lifecycle, config, disks, network, commands | [proxmox-vm.md](references/proxmox-vm.md) |
-| **LXC Containers** | 19 | Container lifecycle, config, mount points, network | [proxmox-lxc.md](references/proxmox-lxc.md) |
+| **LXC Containers** | 20 | Container lifecycle, config, mount points, network, exec | [proxmox-lxc.md](references/proxmox-lxc.md) |
 | **VM/LXC Shared** | 22 | Agent, firewall, migration (works for both) | [proxmox-vm-lxc-shared.md](references/proxmox-vm-lxc-shared.md) |
 | **Snapshots & Backups** | 14 | Create/restore snapshots, backup jobs | [proxmox-snapshots-backups.md](references/proxmox-snapshots-backups.md) |
 | **Storage** | 16 | Storage config, content, file operations, node disks | [proxmox-storage.md](references/proxmox-storage.md) |
@@ -90,7 +101,7 @@ PROXMOX_PORT=8006               # Default: 8006
 | **ACME** | 8 | ACME accounts, plugins, directories | [proxmox-acme.md](references/proxmox-acme.md) |
 | **Notifications** | 5 | Notification targets, SMTP/Gotify testing | [proxmox-notifications.md](references/proxmox-notifications.md) |
 
-**Total**: 91 tools
+**Total**: 92 tools
 
 ---
 
@@ -229,7 +240,7 @@ All tools return structured MCP responses:
 
 - **[proxmox-nodes.md](references/proxmox-nodes.md)** - Node management, network config, system operations (47 tools)
 - **[proxmox-vm.md](references/proxmox-vm.md)** - QEMU VM operations (26 tools)
-- **[proxmox-lxc.md](references/proxmox-lxc.md)** - LXC container operations (19 tools)
+- **[proxmox-lxc.md](references/proxmox-lxc.md)** - LXC container operations (20 tools)
 - **[proxmox-vm-lxc-shared.md](references/proxmox-vm-lxc-shared.md)** - Shared VM/LXC operations (22 tools)
 - **[proxmox-snapshots-backups.md](references/proxmox-snapshots-backups.md)** - Snapshots and backups (14 tools)
 - **[proxmox-storage.md](references/proxmox-storage.md)** - Storage management (16 tools)

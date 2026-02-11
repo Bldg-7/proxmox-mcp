@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-A comprehensive MCP server providing 91 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
+A comprehensive MCP server providing 92 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
 
 ## Credits & Background
 
@@ -23,20 +23,20 @@ This project is a TypeScript rewrite of [mcp-proxmox-server](https://github.com/
 - Giant switch statement (55 cases) → tool registry with handler/schema pairs
 
 **Quality**:
-- 0 tests → 1,114 tests
+- 0 tests → 1,134 tests
 - No input validation → Zod runtime validation on every tool call
 - Implicit error handling → structured MCP error responses with context
 - No permission checks → two-tier permission model (basic / elevated)
 
 **Developer Experience**:
 - `npx @bldg-7/proxmox-mcp` just works
-- All 91 tool descriptions exposed via MCP `ListTools`
+- All 92 tool descriptions exposed via MCP `ListTools`
 - Rate limiter middleware included
 - Pino structured logging instead of `console.log`
 
 ## Features
 
-- **91 comprehensive tools** for Proxmox management
+- **92 comprehensive tools** for Proxmox management
 - **Full TypeScript implementation** with strict type safety
 - **Support for both QEMU VMs and LXC containers**
 - **Secure authentication** (API token)
@@ -70,6 +70,13 @@ Set the following environment variables before starting the server:
 | `PROXMOX_SSL_MODE` | No | SSL verification mode | `strict` |
 | `PROXMOX_ALLOW_ELEVATED` | No | Allow elevated operations | `false` |
 | `PROXMOX_PORT` | No | Proxmox API port | `8006` |
+| `PROXMOX_SSH_ENABLED` | No | Enable SSH-based LXC exec | `false` |
+| `PROXMOX_SSH_HOST` | No | SSH host (falls back to PROXMOX_HOST) | - |
+| `PROXMOX_SSH_PORT` | No | SSH port | `22` |
+| `PROXMOX_SSH_USER` | No | SSH username | `root` |
+| `PROXMOX_SSH_KEY_PATH` | When SSH enabled | Path to SSH private key | - |
+| `PROXMOX_SSH_NODE` | When SSH enabled | Proxmox node name reachable via SSH | - |
+| `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | No | Host key fingerprint for verification | - |
 
 ### SSL Modes
 
@@ -125,7 +132,7 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
 
 ## Available Tools
 
-This server provides **91 comprehensive tools** for Proxmox management:
+This server provides **92 comprehensive tools** for Proxmox management:
 
 | Category | Tools | Permission |
 |----------|-------|------------|
@@ -144,11 +151,12 @@ This server provides **91 comprehensive tools** for Proxmox management:
 | Backup | 1 | Mixed |
 | VM Disks | 1 | Elevated 🔒 |
 | LXC Mount Points | 1 | Elevated 🔒 |
+| LXC Exec | 1 | Elevated 🔒 |
 | Cloud-Init | 1 | Mixed |
 | Certificates | 1 | Mixed |
 | ACME | 3 | Mixed |
 | Notifications | 1 | Mixed |
-| **Total** | **91** | |
+| **Total** | **92** | |
 
 📖 **[Full Tools Reference →](docs/TOOLS.md)**
 
@@ -160,7 +168,7 @@ This package includes **Agent Skills** - AI-optimized documentation that teaches
 
 | Skill | Description | Tools/Topics |
 |-------|-------------|--------------|
-| **proxmox-mcp-tools** | Complete MCP tool reference for Proxmox VE | 91 tools across 14 domains (VMs, LXC, cluster, storage, networking, Ceph, certificates, ACME, notifications) |
+| **proxmox-mcp-tools** | Complete MCP tool reference for Proxmox VE | 92 tools across 14 domains (VMs, LXC, cluster, storage, networking, Ceph, certificates, ACME, notifications) |
 | **proxmox-admin** | Operational expertise for Proxmox infrastructure | VM lifecycle, storage management, HA configuration, troubleshooting |
 
 ### Installation
@@ -228,7 +236,7 @@ Agent combines tool knowledge + operational expertise:
 ### Skill Contents
 
 **proxmox-mcp-tools** — Tool Reference:
-- 91 tools organized into 14 domains (VMs, LXC, cluster, storage, networking, Ceph, access control, pools, certificates, ACME, notifications)
+- 92 tools organized into 14 domains (VMs, LXC, cluster, storage, networking, Ceph, access control, pools, certificates, ACME, notifications)
 - Parameters, types, and descriptions for every tool
 - Permission levels (basic vs elevated 🔒)
 - Common workflow patterns (create VM, backup/restore, clone, migrate)

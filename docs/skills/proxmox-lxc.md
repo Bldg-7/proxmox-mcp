@@ -2,8 +2,8 @@
 
 > LXC container creation, lifecycle management, mount points, network configuration, and performance monitoring.
 
-**Tools in this file:** 21  
-**Generated:** 2026-02-08T04:04:42.008Z
+**Tools in this file:** 22  
+**Generated:** 2026-02-12
 
 ---
 
@@ -357,6 +357,27 @@
 | `ip` | unknown | No | - |
 | `gw` | unknown | No | - |
 | `firewall` | unknown | No | - |
+
+---
+
+#### `proxmox_lxc_exec`
+
+**Description:** Execute a command inside an LXC container via SSH to Proxmox host using `pct exec`. Requires double opt-in: `PROXMOX_ALLOW_ELEVATED=true` and `PROXMOX_SSH_ENABLED=true`.
+
+**Permission:** elevated (double opt-in)
+
+**Parameters:**
+
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| `node` | string | Yes | Proxmox node name (must match `PROXMOX_SSH_NODE`) |
+| `vmid` | number | Yes | LXC container ID (100-999999999) |
+| `command` | string | Yes | Command to execute inside the container |
+| `timeout` | number | No | Timeout in seconds (default: 30, max: 120) |
+
+**Security**: SSH key auth only, command validation blocks dangerous characters, shell-quoted execution via `pct exec`, node name enforcement, 64KB output limit.
+
+**Required Environment Variables**: `PROXMOX_SSH_ENABLED=true`, `PROXMOX_SSH_KEY_PATH`, `PROXMOX_SSH_NODE`
 
 ---
 

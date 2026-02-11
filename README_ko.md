@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 91개 도구를 제공하는 MCP 서버입니다.
+Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 92개 도구를 제공하는 MCP 서버입니다.
 
 ## 참고 프로젝트 & 개선사항
 
@@ -23,20 +23,20 @@ Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 91개 도구
 - 55개 case의 거대한 switch문 → handler/schema 쌍의 도구 레지스트리
 
 **품질**:
-- 테스트 0건 → 1,114건
+- 테스트 0건 → 1,134건
 - 입력 검증 없음 → 모든 도구 호출에 Zod 런타임 검증
 - 암묵적 에러 처리 → 컨텍스트를 포함한 구조화된 MCP 에러 응답
 - 권한 체크 없음 → 2단계 권한 모델 (기본 / 관리자)
 
 **개발자 경험**:
 - `npx @bldg-7/proxmox-mcp`로 바로 실행
-- MCP `ListTools`를 통해 91개 도구 설명 자동 노출
+- MCP `ListTools`를 통해 92개 도구 설명 자동 노출
 - Rate Limiter 미들웨어 내장
 - `console.log` 대신 Pino 구조화 로깅
 
 ## 주요 기능
 
-- **91개 관리 도구** - Proxmox 전 영역 커버
+- **92개 관리 도구** - Proxmox 전 영역 커버
 - **완전한 TypeScript 구현** - 엄격한 타입 안전성
 - **QEMU VM + LXC 컨테이너** 동시 지원
 - **보안 인증** - API 토큰
@@ -68,6 +68,13 @@ npx @bldg-7/proxmox-mcp
 | `PROXMOX_SSL_MODE` | 아니오 | SSL 검증 모드 | `strict` |
 | `PROXMOX_ALLOW_ELEVATED` | 아니오 | 관리자 작업 허용 여부 | `false` |
 | `PROXMOX_PORT` | 아니오 | Proxmox API 포트 | `8006` |
+| `PROXMOX_SSH_ENABLED` | 아니오 | SSH 기반 LXC 실행 활성화 | `false` |
+| `PROXMOX_SSH_HOST` | 아니오 | SSH 호스트 (PROXMOX_HOST로 폴백) | - |
+| `PROXMOX_SSH_PORT` | 아니오 | SSH 포트 | `22` |
+| `PROXMOX_SSH_USER` | 아니오 | SSH 사용자명 | `root` |
+| `PROXMOX_SSH_KEY_PATH` | SSH 활성화 시 | SSH 개인 키 경로 | - |
+| `PROXMOX_SSH_NODE` | SSH 활성화 시 | SSH로 접근 가능한 Proxmox 노드명 | - |
+| `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | 아니오 | 호스트 키 지문 검증용 | - |
 
 ### SSL 모드
 
@@ -122,7 +129,7 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 ## 도구 목록
 
-이 서버는 Proxmox 관리를 위한 **91개의 종합 도구**를 제공합니다:
+이 서버는 Proxmox 관리를 위한 **92개의 종합 도구**를 제공합니다:
 
 | 카테고리 | 도구 수 | 권한 |
 |----------|---------|------|
@@ -141,11 +148,12 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 | 백업 | 1 | 혼합 |
 | VM 디스크 | 1 | 🔒 관리자 |
 | LXC 마운트 포인트 | 1 | 🔒 관리자 |
+| LXC 실행 | 1 | 🔒 관리자 |
 | Cloud-Init | 1 | 혼합 |
 | 인증서 | 1 | 혼합 |
 | ACME | 3 | 혼합 |
 | 알림 | 1 | 혼합 |
-| **합계** | **91** | |
+| **합계** | **92** | |
 
 📖 **[전체 도구 레퍼런스 →](docs/TOOLS_ko.md)**
 

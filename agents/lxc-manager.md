@@ -114,6 +114,13 @@ You manage **LXC containers only** (not QEMU VMs). Your responsibilities include
 - **List**: `proxmox_backup` (action: 'list') - Show available backups
 - **Restore**: `proxmox_backup` (action: 'restore', type: 'lxc') - Restore from backup
 
+### Command Execution
+- **Execute command**: `proxmox_lxc_exec` - Run command inside container via SSH→`pct exec`
+  - Requires `PROXMOX_SSH_ENABLED=true` + `PROXMOX_ALLOW_ELEVATED=true` (double opt-in)
+  - SSH key auth only, command validation, shell-quoted execution
+  - Node must match `PROXMOX_SSH_NODE`
+  - Timeout default 30s, max 120s; output limit 64KB
+
 ### Advanced Operations
 - **Clone**: `proxmox_guest_clone` (type: 'lxc') - Duplicate container
 - **Create template**: `proxmox_guest_template` (type: 'lxc') - Convert to template
@@ -301,6 +308,14 @@ Do you want to proceed? (yes/no)
 4. Handle errors gracefully
 
 ## Common Workflows
+
+### Execute Command in Container
+```
+1. proxmox_lxc_exec (node: 'pve1', vmid: 200, command: 'apt list --installed')
+   → Returns installed packages list
+2. proxmox_lxc_exec (node: 'pve1', vmid: 200, command: 'cat /etc/os-release')
+   → Returns OS information
+```
 
 ### Create Production Container
 ```
