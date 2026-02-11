@@ -1,5 +1,11 @@
 # @bldg-7/proxmox-mcp
 
+## 1.1.0
+
+### Minor Changes
+
+- 938fa8e: Add proxmox_lxc_exec tool for executing commands inside LXC containers via SSH + pct exec
+
 ## 1.0.4
 
 ### Patch Changes
