@@ -127,5 +127,36 @@ describe('Command Tools', () => {
       expect(result.isError).toBe(true);
       expect(result.content[0].text).toContain('Invalid VM ID');
     });
+
+    it('allows dangerous characters when allowUnsafeCommands is true', async () => {
+      const client = createMockProxmoxClient();
+      const config = createTestConfig({ allowElevated: true, allowUnsafeCommands: true });
+      client.request.mockResolvedValue({ pid: 99 });
+
+      const result = await executeVMCommand(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        command: 'ls -la | grep test',
+        type: 'qemu',
+      });
+
+      expect(result.isError).toBe(false);
+      expect(result.content[0].text).toContain('ls -la | grep test');
+    });
+
+    it('still rejects dangerous characters when allowUnsafeCommands is false', async () => {
+      const client = createMockProxmoxClient();
+      const config = createTestConfig({ allowElevated: true, allowUnsafeCommands: false });
+
+      const result = await executeVMCommand(client, config, {
+        node: 'pve1',
+        vmid: 100,
+        command: 'ls | grep test',
+        type: 'qemu',
+      });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('dangerous characters');
+    });
   });
 });

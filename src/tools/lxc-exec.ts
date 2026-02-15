@@ -38,7 +38,7 @@ export async function handleLxcExec(
     const validated = lxcExecSchema.parse(input);
     const safeNode = validateNodeName(validated.node);
     const safeVmid = validateVMID(validated.vmid);
-    const safeCommand = validateCommand(validated.command);
+    const safeCommand = validateCommand(validated.command, { allowUnsafe: config.allowUnsafeCommands });
 
     if (safeNode !== config.sshNode) {
       throw new Error(

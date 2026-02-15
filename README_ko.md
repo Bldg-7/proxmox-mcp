@@ -68,6 +68,7 @@ npx @bldg-7/proxmox-mcp
 | `PROXMOX_SSL_MODE` | 아니오 | SSL 검증 모드 | `strict` |
 | `PROXMOX_ALLOW_ELEVATED` | 아니오 | 관리자 작업 허용 여부 | `false` |
 | `PROXMOX_PORT` | 아니오 | Proxmox API 포트 | `8006` |
+| `PROXMOX_ALLOW_UNSAFE_COMMANDS` | 아니오 | exec 명령에서 셸 특수문자 허용 | `false` |
 | `PROXMOX_SSH_ENABLED` | 아니오 | SSH 기반 LXC 실행 활성화 | `false` |
 | `PROXMOX_SSH_HOST` | 아니오 | SSH 호스트 (PROXMOX_HOST로 폴백) | - |
 | `PROXMOX_SSH_PORT` | 아니오 | SSH 포트 | `22` |

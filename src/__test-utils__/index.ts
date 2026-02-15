@@ -15,6 +15,7 @@ export function createTestConfig(overrides: Partial<Config> = {}): Config {
     sshEnabled: false,
     sshPort: 22,
     sshUser: 'root',
+    allowUnsafeCommands: false,
     ...overrides,
   };
 }

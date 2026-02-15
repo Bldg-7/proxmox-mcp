@@ -143,6 +143,10 @@ describe('validateCommand', () => {
     expect(() => validateCommand('$(whoami)')).toThrow('dangerous characters');
   });
 
+  it('includes env var hint in dangerous characters error', () => {
+    expect(() => validateCommand('ls | grep test')).toThrow('PROXMOX_ALLOW_UNSAFE_COMMANDS');
+  });
+
   it('rejects too long commands', () => {
     expect(() => validateCommand('a'.repeat(1001))).toThrow('exceeds maximum allowed length');
   });
@@ -150,6 +154,28 @@ describe('validateCommand', () => {
   it('accepts max length command', () => {
     const maxCmd = 'a'.repeat(1000);
     expect(validateCommand(maxCmd)).toBe(maxCmd);
+  });
+
+  it('allows dangerous characters when allowUnsafe is true', () => {
+    const opts = { allowUnsafe: true };
+    expect(validateCommand('ls | grep test', opts)).toBe('ls | grep test');
+    expect(validateCommand('ls; echo hello', opts)).toBe('ls; echo hello');
+    expect(validateCommand('echo $(whoami)', opts)).toBe('echo $(whoami)');
+    expect(validateCommand('cat /etc/passwd && pwd', opts)).toBe('cat /etc/passwd && pwd');
+    expect(validateCommand('echo `date`', opts)).toBe('echo `date`');
+  });
+
+  it('still rejects non-string input when allowUnsafe is true', () => {
+    const opts = { allowUnsafe: true };
+    expect(() => validateCommand(null, opts)).toThrow('Command is required and must be a string');
+    expect(() => validateCommand('', opts)).toThrow('Command is required and must be a string');
+  });
+
+  it('uses relaxed length limit (4000) when allowUnsafe is true', () => {
+    const opts = { allowUnsafe: true };
+    const cmd = 'a'.repeat(4000);
+    expect(validateCommand(cmd, opts)).toBe(cmd);
+    expect(() => validateCommand('a'.repeat(4001), opts)).toThrow('exceeds maximum allowed length (4000');
   });
 });
 

@@ -946,7 +946,7 @@ SSH를 통해 Proxmox 호스트에 접속하여 `pct exec`로 LXC 컨테이너 �
 
 **보안**:
 - SSH 키 인증만 지원 (비밀번호 불가)
-- 위험 문자 차단 (`;`, `|`, `` ` ``, `$()`, `>>` 등)
+- 위험 문자 차단 (`;`, `|`, `` ` ``, `$()`, `>>` 등) — `PROXMOX_ALLOW_UNSAFE_COMMANDS=true`로 우회 가능
 - 명령은 셸 이스케이프 후 `/usr/sbin/pct exec {vmid} -- /bin/sh -c '{command}'`로 실행
 - 노드명은 설정된 `PROXMOX_SSH_NODE`과 일치해야 함
 - 출력 64KB 제한

@@ -285,4 +285,50 @@ describe('proxmox_lxc_exec', () => {
       30,
     );
   });
+
+  it('allows dangerous characters when allowUnsafeCommands is true', async () => {
+    mockExec.mockResolvedValue({
+      stdout: 'root\n',
+      stderr: '',
+      exitCode: 0,
+    });
+
+    const config = createTestConfig({
+      allowElevated: true,
+      sshEnabled: true,
+      sshKeyPath: '/tmp/test_key',
+      sshNode: 'pve1',
+      allowUnsafeCommands: true,
+    });
+
+    const result = await handleLxcExec(client, config, {
+      node: 'pve1',
+      vmid: 100,
+      command: 'cat /etc/passwd | grep root',
+      timeout: 30,
+    });
+
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text).toContain('root');
+  });
+
+  it('still rejects dangerous characters when allowUnsafeCommands is false', async () => {
+    const config = createTestConfig({
+      allowElevated: true,
+      sshEnabled: true,
+      sshKeyPath: '/tmp/test_key',
+      sshNode: 'pve1',
+      allowUnsafeCommands: false,
+    });
+
+    const result = await handleLxcExec(client, config, {
+      node: 'pve1',
+      vmid: 100,
+      command: 'ls | grep test',
+      timeout: 30,
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0].text).toContain('dangerous');
+  });
 });

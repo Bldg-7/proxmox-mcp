@@ -946,7 +946,7 @@ Execute a command inside an LXC container via SSH to Proxmox host using `pct exe
 
 **Security**:
 - SSH key authentication only (no password)
-- Command validation blocks dangerous characters (`;`, `|`, `` ` ``, `$()`, `>>`, etc.)
+- Command validation blocks dangerous characters (`;`, `|`, `` ` ``, `$()`, `>>`, etc.) — set `PROXMOX_ALLOW_UNSAFE_COMMANDS=true` to bypass
 - Commands are shell-quoted and executed via `/usr/sbin/pct exec {vmid} -- /bin/sh -c '{command}'`
 - Node name must match configured `PROXMOX_SSH_NODE`
 - Output limited to 64KB

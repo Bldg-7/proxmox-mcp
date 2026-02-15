@@ -70,6 +70,7 @@ Set the following environment variables before starting the server:
 | `PROXMOX_SSL_MODE` | No | SSL verification mode | `strict` |
 | `PROXMOX_ALLOW_ELEVATED` | No | Allow elevated operations | `false` |
 | `PROXMOX_PORT` | No | Proxmox API port | `8006` |
+| `PROXMOX_ALLOW_UNSAFE_COMMANDS` | No | Allow shell special characters in exec commands | `false` |
 | `PROXMOX_SSH_ENABLED` | No | Enable SSH-based LXC exec | `false` |
 | `PROXMOX_SSH_HOST` | No | SSH host (falls back to PROXMOX_HOST) | - |
 | `PROXMOX_SSH_PORT` | No | SSH port | `22` |

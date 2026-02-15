@@ -21,7 +21,7 @@ export async function executeVMCommand(
     const validated = executeVmCommandSchema.parse(input);
     const safeNode = validateNodeName(validated.node);
     const safeVmid = validateVMID(validated.vmid);
-     const safeCommand = validateCommand(validated.command);
+     const safeCommand = validateCommand(validated.command, { allowUnsafe: config.allowUnsafeCommands });
      const type = validated.type || 'qemu';
 
      const result = (await client.request(

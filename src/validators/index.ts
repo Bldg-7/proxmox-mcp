@@ -214,29 +214,42 @@ export function validateVMID(vmid: unknown): string {
   return id.toString();
 }
 
+export interface ValidateCommandOptions {
+  /** When true, skip dangerous character validation (PROXMOX_ALLOW_UNSAFE_COMMANDS) */
+  allowUnsafe?: boolean;
+}
+
 /**
  * Validates a shell command for execution.
  * Blocks dangerous characters that could be used for command injection.
- * Maximum length: 1000 characters.
+ * Maximum length: 1000 characters (4000 when allowUnsafe is true).
+ *
+ * When `allowUnsafe` is true, the dangerous character check is skipped
+ * but the command must still be a non-empty string within the length limit.
  *
  * @throws {Error} If command contains dangerous characters or is too long
  */
-export function validateCommand(command: unknown): string {
+export function validateCommand(command: unknown, options?: ValidateCommandOptions): string {
   if (!command || typeof command !== 'string') {
     throw new Error('Command is required and must be a string');
   }
 
+  const allowUnsafe = options?.allowUnsafe === true;
+
   // Check for dangerous characters that could be used for command injection
-  const dangerousChars = /[;&|`$(){}[\]<>\\]/g;
-  if (dangerousChars.test(command)) {
-    throw new Error(
-      'Command contains potentially dangerous characters: ; & | ` $ ( ) { } [ ] < > \\'
-    );
+  if (!allowUnsafe) {
+    const dangerousChars = /[;&|`$(){}[\]<>\\]/g;
+    if (dangerousChars.test(command)) {
+      throw new Error(
+        'Command contains potentially dangerous characters: ; & | ` $ ( ) { } [ ] < > \\\n' +
+          'Set PROXMOX_ALLOW_UNSAFE_COMMANDS=true to allow these characters.'
+      );
+    }
   }
 
-  // Limit command length
-  if (command.length > 1000) {
-    throw new Error('Command exceeds maximum allowed length (1000 characters)');
+  const maxLength = allowUnsafe ? 4000 : 1000;
+  if (command.length > maxLength) {
+    throw new Error(`Command exceeds maximum allowed length (${maxLength} characters)`);
   }
 
   return command;

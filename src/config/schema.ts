@@ -55,6 +55,9 @@ export const configSchema = z.object({
   sshHostKeyFingerprint: z
     .string()
     .optional(),
+  allowUnsafeCommands: z
+    .boolean()
+    .default(false),
 });
 
 export type Config = z.infer<typeof configSchema>;
