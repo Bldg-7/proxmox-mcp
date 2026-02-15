@@ -1,5 +1,11 @@
 # @bldg-7/proxmox-mcp
 
+## 1.2.0
+
+### Minor Changes
+
+- 3a7f020: Add PROXMOX_ALLOW_UNSAFE_COMMANDS env var to bypass shell special character restrictions in exec commands (proxmox_lxc_exec and QEMU agent exec)
+
 ## 1.1.0
 
 ### Minor Changes
