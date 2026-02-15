@@ -25,6 +25,95 @@ function getServerVersion(): string {
 
 const SERVER_VERSION = getServerVersion();
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function flattenAnyOfSchema(inputSchema: Record<string, unknown>): Record<string, unknown> {
+  const anyOf = inputSchema.anyOf;
+  if (!Array.isArray(anyOf)) {
+    return inputSchema;
+  }
+
+  const mergedProperties: Record<string, unknown> = {};
+  const discriminatorValues = new Map<string, Set<string>>();
+  const discriminatorDescriptions = new Map<string, string>();
+  const requiredSets: Set<string>[] = [];
+  const refPattern = /^#\/anyOf\/(\d+)\/properties\/([^/]+)$/;
+
+  for (const variant of anyOf) {
+    if (!isRecord(variant)) {
+      continue;
+    }
+
+    const required = Array.isArray(variant.required)
+      ? variant.required.filter((item): item is string => typeof item === 'string')
+      : [];
+    requiredSets.push(new Set(required));
+
+    const properties = isRecord(variant.properties) ? variant.properties : {};
+    for (const [propertyName, rawDefinition] of Object.entries(properties)) {
+      let definition = rawDefinition;
+
+      if (isRecord(rawDefinition) && typeof rawDefinition.$ref === 'string') {
+        const match = rawDefinition.$ref.match(refPattern);
+        if (match) {
+          const refVariantIndex = Number.parseInt(match[1], 10);
+          const refPropertyName = match[2];
+          const refVariant = anyOf[refVariantIndex];
+          if (isRecord(refVariant) && isRecord(refVariant.properties)) {
+            const resolved = refVariant.properties[refPropertyName];
+            if (resolved !== undefined) {
+              definition = resolved;
+            }
+          }
+        }
+      }
+
+      if (isRecord(definition) && typeof definition.const === 'string') {
+        if (!discriminatorValues.has(propertyName)) {
+          discriminatorValues.set(propertyName, new Set<string>());
+        }
+        discriminatorValues.get(propertyName)?.add(definition.const);
+
+        if (!discriminatorDescriptions.has(propertyName) && typeof definition.description === 'string') {
+          discriminatorDescriptions.set(propertyName, definition.description);
+        }
+
+        continue;
+      }
+
+      if (!(propertyName in mergedProperties)) {
+        mergedProperties[propertyName] = definition;
+      }
+    }
+  }
+
+  for (const [propertyName, values] of discriminatorValues.entries()) {
+    const discriminatorProperty: Record<string, unknown> = {
+      type: 'string',
+      enum: Array.from(values),
+    };
+
+    const description = discriminatorDescriptions.get(propertyName);
+    if (description) {
+      discriminatorProperty.description = description;
+    }
+
+    mergedProperties[propertyName] = discriminatorProperty;
+  }
+
+  const required = requiredSets.length
+    ? Array.from(requiredSets[0]).filter((field) => requiredSets.every((set) => set.has(field)))
+    : [];
+
+  return {
+    type: 'object',
+    properties: mergedProperties,
+    required,
+  };
+}
+
 const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   // Node & Cluster (consolidated)
   proxmox_node: 'Query Proxmox node info. action=list: list all nodes | action=status: node status (elevated) | action=network: network interfaces | action=dns: DNS config | action=iface: specific interface details',
@@ -189,18 +278,14 @@ export function createServer(client: ProxmoxApiClient, config: Config): Server {
     const { $schema, ...inputSchema } = jsonSchema;
     void $schema;
 
-    // MCP SDK v1.25.3 requires type: 'object' at the root (types.ts:1229).
-    // z.discriminatedUnion() emits { anyOf: [...] } without a root type.
-    // See: https://github.com/modelcontextprotocol/typescript-sdk/issues/685
-    // See: https://github.com/modelcontextprotocol/modelcontextprotocol/issues/834
-    if (!('type' in inputSchema) && 'anyOf' in inputSchema) {
-      (inputSchema as Record<string, unknown>).type = 'object';
-    }
+    const finalSchema = 'anyOf' in inputSchema
+      ? flattenAnyOfSchema(inputSchema as Record<string, unknown>)
+      : inputSchema;
 
     return {
       name,
       description: TOOL_DESCRIPTIONS[name],
-      inputSchema: inputSchema as {
+      inputSchema: finalSchema as {
         type: 'object';
         properties?: Record<string, unknown>;
         required?: string[];
