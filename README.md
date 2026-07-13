@@ -68,6 +68,7 @@ Set the following environment variables before starting the server:
 | `PROXMOX_TOKEN_NAME` | **Yes** | API token name | - |
 | `PROXMOX_TOKEN_VALUE` | **Yes** | API token value | - |
 | `PROXMOX_SSL_MODE` | No | SSL verification mode | `strict` |
+| `PROXMOX_SSL_CA_CERT` | No | Path to a CA certificate (PEM) trusted in `verify` mode | - |
 | `PROXMOX_ALLOW_ELEVATED` | No | Allow elevated operations | `false` |
 | `PROXMOX_PORT` | No | Proxmox API port | `8006` |
 | `PROXMOX_ALLOW_UNSAFE_COMMANDS` | No | Allow shell special characters in exec commands | `false` |
@@ -78,12 +79,23 @@ Set the following environment variables before starting the server:
 | `PROXMOX_SSH_KEY_PATH` | When SSH enabled | Path to SSH private key | - |
 | `PROXMOX_SSH_NODE` | When SSH enabled | Proxmox node name reachable via SSH | - |
 | `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | No | Host key fingerprint for verification | - |
+| `PROXMOX_LOG_LEVEL` | No | Log verbosity (`trace`, `debug`, `info`, `warn`, `error`, `fatal`) | `info` |
 
 ### SSL Modes
 
-- **`strict`**: Full SSL certificate verification (recommended for production)
-- **`verify`**: Verify SSL but allow self-signed certificates
+- **`strict`**: Full SSL certificate verification against the system CA store (recommended for production)
+- **`verify`**: Same as `strict`, but additionally trusts the CA certificate given via `PROXMOX_SSL_CA_CERT`. For self-signed certificates, point `PROXMOX_SSL_CA_CERT` at the server certificate (or your internal CA) in PEM format. Without `PROXMOX_SSL_CA_CERT`, this mode behaves exactly like `strict`.
 - **`insecure`**: No SSL verification (development only, not recommended)
+
+Do not use `NODE_TLS_REJECT_UNAUTHORIZED=0` to work around certificate errors — it disables TLS verification for the entire process, and the server logs a warning when it is set. Use `PROXMOX_SSL_MODE` and `PROXMOX_SSL_CA_CERT` instead.
+
+### Legacy Environment Variables
+
+Workarounds required by old versions are no longer needed — remove them from existing MCP configurations:
+
+- `NODE_ENV=production` — required before v0.1.3, where the server crashed on startup without it (it tried to load the `pino-pretty` dev dependency whenever `NODE_ENV` was unset). Today `NODE_ENV` is only used to enable pretty dev logs via `NODE_ENV=development`.
+- `NODE_TLS_REJECT_UNAUTHORIZED=0` — before v0.1.5, SSL options were not actually applied to requests, so this was the only way to connect to hosts with self-signed certificates. Use `PROXMOX_SSL_MODE`/`PROXMOX_SSL_CA_CERT` instead.
+- `PROXMOX_SSL_VERIFY` — replaced by `PROXMOX_SSL_MODE` in v0.1.5 and now ignored.
 
 ### Permission Model
 
@@ -104,6 +116,7 @@ export PROXMOX_HOST=pve.example.com
 export PROXMOX_TOKEN_NAME=mytoken
 export PROXMOX_TOKEN_VALUE=abc123-def456-ghi789
 export PROXMOX_SSL_MODE=verify
+export PROXMOX_SSL_CA_CERT=/path/to/proxmox-ca.pem  # needed with verify for self-signed certs
 export PROXMOX_ALLOW_ELEVATED=true
 
 npx @bldg-7/proxmox-mcp
@@ -124,6 +137,7 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
         "PROXMOX_TOKEN_NAME": "mytoken",
         "PROXMOX_TOKEN_VALUE": "abc123-def456-ghi789",
         "PROXMOX_SSL_MODE": "verify",
+        "PROXMOX_SSL_CA_CERT": "/path/to/proxmox-ca.pem",
         "PROXMOX_ALLOW_ELEVATED": "true"
       }
     }
@@ -397,9 +411,10 @@ All tools return structured responses following the MCP protocol:
 **Problem**: `UNABLE_TO_VERIFY_LEAF_SIGNATURE` or SSL errors
 
 **Solutions**:
-- Use `PROXMOX_SSL_MODE=verify` for self-signed certificates
+- For self-signed certificates, set `PROXMOX_SSL_MODE=verify` **and** `PROXMOX_SSL_CA_CERT=/path/to/cert.pem` (the server certificate or your internal CA) — `verify` without `PROXMOX_SSL_CA_CERT` behaves like `strict` and still fails
 - Use `PROXMOX_SSL_MODE=insecure` for development (not recommended for production)
 - Install proper SSL certificates on Proxmox server for production use
+- Do not set `NODE_TLS_REJECT_UNAUTHORIZED=0`; it disables TLS verification process-wide
 
 ### Permission Denied Errors
 

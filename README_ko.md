@@ -66,6 +66,7 @@ npx @bldg-7/proxmox-mcp
 | `PROXMOX_TOKEN_NAME` | **예** | API 토큰 이름 | - |
 | `PROXMOX_TOKEN_VALUE` | **예** | API 토큰 값 | - |
 | `PROXMOX_SSL_MODE` | 아니오 | SSL 검증 모드 | `strict` |
+| `PROXMOX_SSL_CA_CERT` | 아니오 | `verify` 모드에서 신뢰할 CA 인증서 경로 (PEM) | - |
 | `PROXMOX_ALLOW_ELEVATED` | 아니오 | 관리자 작업 허용 여부 | `false` |
 | `PROXMOX_PORT` | 아니오 | Proxmox API 포트 | `8006` |
 | `PROXMOX_ALLOW_UNSAFE_COMMANDS` | 아니오 | exec 명령에서 셸 특수문자 허용 | `false` |
@@ -76,12 +77,23 @@ npx @bldg-7/proxmox-mcp
 | `PROXMOX_SSH_KEY_PATH` | SSH 활성화 시 | SSH 개인 키 경로 | - |
 | `PROXMOX_SSH_NODE` | SSH 활성화 시 | SSH로 접근 가능한 Proxmox 노드명 | - |
 | `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | 아니오 | 호스트 키 지문 검증용 | - |
+| `PROXMOX_LOG_LEVEL` | 아니오 | 로그 레벨 (`trace`, `debug`, `info`, `warn`, `error`, `fatal`) | `info` |
 
 ### SSL 모드
 
-- **`strict`**: 전체 SSL 인증서 검증 (운영 환경 권장)
-- **`verify`**: SSL 검증하되 자체 서명 인증서 허용
+- **`strict`**: 시스템 CA 저장소 기준 전체 SSL 인증서 검증 (운영 환경 권장)
+- **`verify`**: `strict`와 동일하되 `PROXMOX_SSL_CA_CERT`로 지정한 CA 인증서를 추가로 신뢰. 자체 서명 인증서는 해당 인증서(또는 내부 CA)를 PEM 형식으로 `PROXMOX_SSL_CA_CERT`에 지정. `PROXMOX_SSL_CA_CERT` 없이는 `strict`와 동일하게 동작
 - **`insecure`**: SSL 검증 안 함 (개발용, 비권장)
+
+인증서 오류를 우회하려고 `NODE_TLS_REJECT_UNAUTHORIZED=0`을 사용하지 마세요. 프로세스 전체의 TLS 검증이 꺼지며, 설정되어 있으면 서버가 경고를 출력합니다. 대신 `PROXMOX_SSL_MODE`와 `PROXMOX_SSL_CA_CERT`를 사용하세요.
+
+### 구버전 환경 변수 정리
+
+구버전에서 필요했던 우회 설정은 더 이상 필요 없으므로 기존 MCP 설정에서 제거하세요:
+
+- `NODE_ENV=production` — v0.1.3 이전에는 이 값이 없으면 서버가 시작 시 크래시했음 (`NODE_ENV` 미설정 시 개발 의존성인 `pino-pretty`를 로드하려 했기 때문). 현재는 `NODE_ENV=development`로 개발용 로그를 켜는 용도 외에는 사용되지 않음
+- `NODE_TLS_REJECT_UNAUTHORIZED=0` — v0.1.5 이전에는 SSL 옵션이 실제 요청에 적용되지 않아 자체 서명 인증서 연결에 이 방법뿐이었음. 대신 `PROXMOX_SSL_MODE`/`PROXMOX_SSL_CA_CERT`를 사용
+- `PROXMOX_SSL_VERIFY` — v0.1.5에서 `PROXMOX_SSL_MODE`로 대체되어 현재는 무시됨
 
 ### 권한 모델
 
@@ -101,6 +113,7 @@ export PROXMOX_HOST=pve.example.com
 export PROXMOX_TOKEN_NAME=mytoken
 export PROXMOX_TOKEN_VALUE=abc123-def456-ghi789
 export PROXMOX_SSL_MODE=verify
+export PROXMOX_SSL_CA_CERT=/path/to/proxmox-ca.pem  # verify 모드에서 자체 서명 인증서 사용 시 필요
 export PROXMOX_ALLOW_ELEVATED=true
 
 proxmox-mcp
@@ -121,6 +134,7 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
         "PROXMOX_TOKEN_NAME": "mytoken",
         "PROXMOX_TOKEN_VALUE": "abc123-def456-ghi789",
         "PROXMOX_SSL_MODE": "verify",
+        "PROXMOX_SSL_CA_CERT": "/path/to/proxmox-ca.pem",
         "PROXMOX_ALLOW_ELEVATED": "true"
       }
     }
@@ -204,9 +218,10 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 ### SSL 인증서 오류
 
 `UNABLE_TO_VERIFY_LEAF_SIGNATURE` 시:
-- 자체 서명 인증서: `PROXMOX_SSL_MODE=verify`
+- 자체 서명 인증서: `PROXMOX_SSL_MODE=verify` + `PROXMOX_SSL_CA_CERT=/path/to/cert.pem` (서버 인증서 또는 내부 CA). CA 인증서 없이 `verify`만 설정하면 `strict`와 동일해서 여전히 실패함
 - 개발용: `PROXMOX_SSL_MODE=insecure` (운영 환경 비권장)
 - 운영 환경: Proxmox 서버에 적절한 SSL 인증서 설치
+- `NODE_TLS_REJECT_UNAUTHORIZED=0`은 프로세스 전체 TLS 검증을 꺼버리므로 사용 금지
 
 ### 권한 거부 오류
 
