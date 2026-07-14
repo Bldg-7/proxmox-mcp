@@ -89,14 +89,6 @@ Set the following environment variables before starting the server:
 
 Do not use `NODE_TLS_REJECT_UNAUTHORIZED=0` to work around certificate errors — it disables TLS verification for the entire process, and the server logs a warning when it is set. Use `PROXMOX_SSL_MODE` and `PROXMOX_SSL_CA_CERT` instead.
 
-### Legacy Environment Variables
-
-Workarounds required by old versions are no longer needed — remove them from existing MCP configurations:
-
-- `NODE_ENV=production` — required before v0.1.3, where the server crashed on startup without it (it tried to load the `pino-pretty` dev dependency whenever `NODE_ENV` was unset). Today `NODE_ENV` is only used to enable pretty dev logs via `NODE_ENV=development`.
-- `NODE_TLS_REJECT_UNAUTHORIZED=0` — before v0.1.5, SSL options were not actually applied to requests, so this was the only way to connect to hosts with self-signed certificates. Use `PROXMOX_SSL_MODE`/`PROXMOX_SSL_CA_CERT` instead.
-- `PROXMOX_SSL_VERIFY` — replaced by `PROXMOX_SSL_MODE` in v0.1.5 and now ignored.
-
 ### Permission Model
 
 The server implements a two-tier permission model:

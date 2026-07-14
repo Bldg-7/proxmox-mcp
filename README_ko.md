@@ -87,14 +87,6 @@ npx @bldg-7/proxmox-mcp
 
 인증서 오류를 우회하려고 `NODE_TLS_REJECT_UNAUTHORIZED=0`을 사용하지 마세요. 프로세스 전체의 TLS 검증이 꺼지며, 설정되어 있으면 서버가 경고를 출력합니다. 대신 `PROXMOX_SSL_MODE`와 `PROXMOX_SSL_CA_CERT`를 사용하세요.
 
-### 구버전 환경 변수 정리
-
-구버전에서 필요했던 우회 설정은 더 이상 필요 없으므로 기존 MCP 설정에서 제거하세요:
-
-- `NODE_ENV=production` — v0.1.3 이전에는 이 값이 없으면 서버가 시작 시 크래시했음 (`NODE_ENV` 미설정 시 개발 의존성인 `pino-pretty`를 로드하려 했기 때문). 현재는 `NODE_ENV=development`로 개발용 로그를 켜는 용도 외에는 사용되지 않음
-- `NODE_TLS_REJECT_UNAUTHORIZED=0` — v0.1.5 이전에는 SSL 옵션이 실제 요청에 적용되지 않아 자체 서명 인증서 연결에 이 방법뿐이었음. 대신 `PROXMOX_SSL_MODE`/`PROXMOX_SSL_CA_CERT`를 사용
-- `PROXMOX_SSL_VERIFY` — v0.1.5에서 `PROXMOX_SSL_MODE`로 대체되어 현재는 무시됨
-
 ### 권한 모델
 
 서버는 2단계 권한 모델을 사용합니다:
