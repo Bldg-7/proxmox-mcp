@@ -50,8 +50,10 @@ PROXMOX_TOKEN_VALUE=abc123-def456-ghi789
 ```bash
 PROXMOX_USER=root@pam          # Default: root@pam
 PROXMOX_SSL_MODE=verify         # strict|verify|insecure (default: strict)
+PROXMOX_SSL_CA_CERT=/path/ca.pem # CA cert (PEM) trusted in verify mode — required for self-signed certs
 PROXMOX_ALLOW_ELEVATED=true     # Enable create/modify/delete (default: false)
 PROXMOX_PORT=8006               # Default: 8006
+PROXMOX_LOG_LEVEL=info          # trace|debug|info|warn|error|fatal (default: info)
 ```
 
 **SSH Configuration** (for `proxmox_lxc_exec`):
@@ -72,12 +74,12 @@ PROXMOX_SSH_HOST_KEY_FINGERPRINT=sha256:... # Optional host key verification
 | **Basic** | Read-only (list, get, status) | None |
 | **Elevated** 🔒 | Create, modify, delete | `PROXMOX_ALLOW_ELEVATED=true` |
 
-**102 basic tools** + **207 elevated tools** = **92 total**
+**92 tools total** — read operations are basic; create/modify/delete operations require elevated permissions (many tools are mixed: elevation depends on the `action`)
 
 ### SSL Modes
 
 - `strict`: Full certificate verification (production)
-- `verify`: Allow self-signed certificates (common for Proxmox)
+- `verify`: Like `strict`, plus trusts the CA from `PROXMOX_SSL_CA_CERT` — set it for self-signed certificates; without it, identical to `strict`
 - `insecure`: No verification (development only)
 
 ---
