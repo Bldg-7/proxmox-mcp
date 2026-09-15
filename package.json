@@ -37,7 +37,7 @@
     "release": "pnpm build && changeset publish"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.25.3",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "dotenv": "^16.4.5",
     "pino": "^9.6.0",
     "ssh2": "^1.17.0",
