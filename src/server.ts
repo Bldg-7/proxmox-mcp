@@ -10,6 +10,7 @@ import type { ProxmoxApiClient } from './client/proxmox.js';
 import type { Config } from './config/index.js';
 import type { ToolName } from './types/tools.js';
 import { toolRegistry } from './tools/registry.js';
+import { TOOL_METADATA } from './tools/metadata.js';
 import { TOOL_NAMES } from './types/tools.js';
 
 function getServerVersion(): string {
@@ -274,22 +275,31 @@ export function createServer(client: ProxmoxApiClient, config: Config): Server {
     const entry = toolRegistry[name];
     const jsonSchema = toJsonSchemaCompat(entry.schema) as Record<string, unknown>;
 
-    // $schema meta-property is not part of the MCP tool inputSchema spec
-    const { $schema, ...inputSchema } = jsonSchema;
-    void $schema;
+    // Separate the dialect declaration so flattenAnyOfSchema only sees the schema body.
+    const { $schema, ...schemaBody } = jsonSchema;
 
-    const finalSchema = 'anyOf' in inputSchema
-      ? flattenAnyOfSchema(inputSchema as Record<string, unknown>)
-      : inputSchema;
+    const flattened = 'anyOf' in schemaBody
+      ? flattenAnyOfSchema(schemaBody as Record<string, unknown>)
+      : schemaBody;
+
+    // Re-attach $schema. Tool.inputSchema explicitly permits it, and MCP assumes
+    // JSON Schema 2020-12 when it is absent - but zod emits draft-07, so dropping
+    // the declaration would advertise the wrong dialect to clients.
+    const finalSchema =
+      typeof $schema === 'string' ? { $schema, ...flattened } : flattened;
+
+    const { title, annotations } = TOOL_METADATA[name];
 
     return {
       name,
+      title,
       description: TOOL_DESCRIPTIONS[name],
       inputSchema: finalSchema as {
         type: 'object';
         properties?: Record<string, unknown>;
         required?: string[];
       },
+      annotations,
     };
   });
 
