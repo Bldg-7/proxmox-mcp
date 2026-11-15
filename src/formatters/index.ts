@@ -50,6 +50,7 @@ export function formatCpuPercent(fraction: number): string {
 }
 
 import type { ToolResponse } from '../types/tools.js';
+import { sanitizeDiagnostic } from '../security/diagnostics.js';
 
 /**
  * Format a successful tool response.
@@ -69,7 +70,7 @@ export function formatToolResponse(text: string): ToolResponse {
  * @example formatErrorResponse(new Error('Connection failed'), 'Get VM Status')
  */
 export function formatErrorResponse(error: Error, context: string): ToolResponse {
-  const message = `❌ **Error in ${context}**\n\n${error.message}`;
+  const message = sanitizeDiagnostic(`❌ **Error in ${context}**\n\n${error.message}`);
   return {
     content: [{ type: 'text', text: message }],
     isError: true,

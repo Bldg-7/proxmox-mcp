@@ -76,8 +76,15 @@ npx @bldg-7/proxmox-mcp
 | `PROXMOX_SSH_USER` | 아니오 | SSH 사용자명 | `root` |
 | `PROXMOX_SSH_KEY_PATH` | SSH 활성화 시 | SSH 개인 키 경로 | - |
 | `PROXMOX_SSH_NODE` | SSH 활성화 시 | SSH로 접근 가능한 Proxmox 노드명 | - |
-| `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | 아니오 | 호스트 키 지문 검증용 | - |
+| `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | SSH 활성화 시 (명시적 insecure 모드 제외) | 패딩 없는 OpenSSH `SHA256:<base64>` 또는 64자리 SHA-256 hex | - |
+| `PROXMOX_SSH_ALLOW_INSECURE` | 아니오 | SSH 호스트 키 검증 생략을 명시적으로 허용 (테스트 네트워크 전용) | `false` |
 | `PROXMOX_LOG_LEVEL` | 아니오 | 로그 레벨 (`trace`, `debug`, `info`, `warn`, `error`, `fatal`) | `info` |
+
+### SSH 신뢰 설정 및 진단 출력
+
+기존 SSH 사용자는 업그레이드 전에 fingerprint를 설정하거나 insecure 모드를 명시적으로 선택해야 합니다. 신뢰할 수 있는 노드 콘솔에서 `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub -E sha256` 등을 실행해 SSH 연결에서 사용하는 호스트 키의 `SHA256:...` 값을 확인하세요. 검증되지 않은 네트워크에서 수집한 지문을 그대로 신뢰하면 안 됩니다. fingerprint를 지정하면 insecure 모드에서도 반드시 검증하며 잘못된 형식이나 불일치는 거부합니다.
+
+노드 진단 report는 이제 `PROXMOX_ALLOW_ELEVATED=true`가 필요합니다. 마스킹 후 report는 16,000자, 오류 응답은 4,096자로 제한하고 잘림 표시를 추가합니다. 진단 로그에도 중첩 credential 필드와 일반적인 토큰·비밀번호·인증 패턴 마스킹을 적용합니다. 이는 best-effort이며 이름표 없는 임의 비밀값까지 완벽히 제거하지는 못합니다. 자격증명 생성 성공 응답을 전역 마스킹하지는 않습니다.
 
 ### SSL 모드
 
@@ -91,8 +98,8 @@ npx @bldg-7/proxmox-mcp
 
 서버는 2단계 권한 모델을 사용합니다:
 
-- **기본 작업**: 읽기 전용 (조회, 상태 확인) - 항상 허용
-- **관리자 작업**: 생성, 수정, 삭제 - `PROXMOX_ALLOW_ELEVATED=true` 필요
+- **기본 작업**: 일반 읽기 전용 (조회, 상태 확인)
+- **관리자 작업**: 생성, 수정, 삭제 및 민감 조회(노드 진단 report 포함) - `PROXMOX_ALLOW_ELEVATED=true` 필요
 
 의도치 않은 파괴적 작업을 방지하기 위한 안전 장치입니다.
 

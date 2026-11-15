@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parseHostFingerprint } from '../security/ssh-host-key.js';
 
 export const sslModeSchema = z.enum(['strict', 'verify', 'insecure']);
 export type SslMode = z.infer<typeof sslModeSchema>;
@@ -52,12 +53,17 @@ export const configSchema = z.object({
   sshNode: z
     .string()
     .optional(),
-  sshHostKeyFingerprint: z
-    .string()
-    .optional(),
+  sshHostKeyFingerprint: z.string().refine((value) => {
+    try { parseHostFingerprint(value); return true; } catch { return false; }
+  }, 'Expected OpenSSH SHA256:<base64> or 64-digit SHA-256 hex').optional(),
+  sshAllowInsecure: z.boolean().default(false),
   allowUnsafeCommands: z
     .boolean()
     .default(false),
+}).superRefine((config, ctx) => {
+  if (config.sshEnabled && !config.sshHostKeyFingerprint && !config.sshAllowInsecure) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sshHostKeyFingerprint'], message: 'PROXMOX_SSH_HOST_KEY_FINGERPRINT is required when SSH is enabled unless PROXMOX_SSH_ALLOW_INSECURE=true' });
+  }
 });
 
 export type Config = z.infer<typeof configSchema>;

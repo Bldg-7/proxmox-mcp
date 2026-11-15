@@ -54,6 +54,7 @@ export async function handleLxcExec(
       username: config.sshUser,
       privateKeyPath: config.sshKeyPath,
       hostKeyFingerprint: config.sshHostKeyFingerprint,
+      allowInsecure: config.sshAllowInsecure,
     });
 
     // Fixed command template: only `pct exec` is allowed via SSH

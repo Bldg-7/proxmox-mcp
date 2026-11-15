@@ -140,7 +140,7 @@ Query node information. action=aplinfo: appliance templates | action=netstat: ne
 | `netstat` | Basic | Network connection stats |
 | `rrddata` | Basic | Node performance metrics |
 | `storage_rrddata` | Basic | Storage performance metrics |
-| `report` | Basic | Diagnostic report |
+| `report` | Elevated 🔒 | Redacted diagnostic report, limited to 16,000 characters (truncation notice included) |
 
 ---
 

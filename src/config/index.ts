@@ -33,6 +33,7 @@ export function loadConfig(): Config {
     sshKeyPath: process.env.PROXMOX_SSH_KEY_PATH || undefined,
     sshNode: process.env.PROXMOX_SSH_NODE || undefined,
     sshHostKeyFingerprint: process.env.PROXMOX_SSH_HOST_KEY_FINGERPRINT || undefined,
+    sshAllowInsecure: process.env.PROXMOX_SSH_ALLOW_INSECURE === 'true',
     allowUnsafeCommands: process.env.PROXMOX_ALLOW_UNSAFE_COMMANDS === 'true',
   };
 

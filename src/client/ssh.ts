@@ -2,6 +2,7 @@ import { Client } from 'ssh2';
 import type { ConnectConfig, ClientChannel } from 'ssh2';
 import { readFileSync } from 'node:fs';
 import { logger } from '../utils/index.js';
+import { parseHostFingerprint, verifyHostKey } from '../security/ssh-host-key.js';
 
 /** Maximum output size per stream (stdout/stderr) in bytes */
 const MAX_OUTPUT_BYTES = 65_536;
@@ -13,8 +14,9 @@ export interface SshConfig {
   port: number;
   username: string;
   privateKeyPath: string;
-  /** Optional host key fingerprint for verification (sha256 format) */
+  /** OpenSSH SHA256:<base64> or SHA-256 hex. Required unless allowInsecure is explicit. */
   hostKeyFingerprint?: string;
+  allowInsecure?: boolean;
 }
 
 export interface ExecResult {
@@ -28,9 +30,15 @@ export class SshClient {
   private connectPromise: Promise<Client> | null = null;
   private idleTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly config: SshConfig;
+  private readonly expectedFingerprint?: Buffer;
 
   constructor(config: SshConfig) {
-    this.config = config;
+    this.config = { ...config };
+    if (config.hostKeyFingerprint !== undefined) {
+      this.expectedFingerprint = parseHostFingerprint(config.hostKeyFingerprint);
+    } else if (config.allowInsecure !== true) {
+      throw new Error('PROXMOX_SSH_HOST_KEY_FINGERPRINT is required; only use PROXMOX_SSH_ALLOW_INSECURE=true on trusted test networks.');
+    }
   }
 
   async exec(command: string, timeoutSeconds = 30): Promise<ExecResult> {
@@ -65,6 +73,7 @@ export class SshClient {
       return conn;
     } catch (error) {
       this.connectPromise = null;
+      this.clearIdleTimer();
       throw error;
     }
   }
@@ -97,19 +106,16 @@ export class SshClient {
         keepaliveCountMax: 3,
       };
 
-      // Host key verification
-      if (this.config.hostKeyFingerprint) {
-        const expectedFingerprint = this.config.hostKeyFingerprint;
-        connectConfig.hostVerifier = (keyHash: string): boolean => {
-          const matches = keyHash === expectedFingerprint;
-          if (!matches) {
-            logger.error(
-              { expected: expectedFingerprint, received: keyHash },
-              'SSH host key fingerprint mismatch'
-            );
-          }
+      // Without hostHash, ssh2 passes the raw public key Buffer (not a hash string).
+      const expected = this.expectedFingerprint;
+      if (expected) {
+        connectConfig.hostVerifier = (key: Buffer): boolean => {
+          const matches = verifyHostKey(key, expected);
+          if (!matches) logger.error('SSH host key fingerprint mismatch');
           return matches;
         };
+      } else {
+        logger.warn('SSH host key verification is disabled by PROXMOX_SSH_ALLOW_INSECURE=true');
       }
 
       conn
@@ -250,10 +256,17 @@ export class SshClient {
 }
 
 let sshClientInstance: SshClient | null = null;
+let sshClientConfigKey: string | null = null;
 
 export function getSshClient(config: SshConfig): SshClient {
+  const key = JSON.stringify([config.host, config.port, config.username, config.privateKeyPath,
+    config.hostKeyFingerprint ?? null, config.allowInsecure === true]);
+  if (sshClientInstance && key !== sshClientConfigKey) {
+    throw new Error('SSH configuration changed; close the existing SSH client before changing host identity or trust policy.');
+  }
   if (!sshClientInstance) {
     sshClientInstance = new SshClient(config);
+    sshClientConfigKey = key;
   }
   return sshClientInstance;
 }
@@ -262,6 +275,7 @@ export function closeSshClient(): void {
   if (sshClientInstance) {
     sshClientInstance.close();
     sshClientInstance = null;
+    sshClientConfigKey = null;
   }
 }
 

@@ -78,8 +78,15 @@ Set the following environment variables before starting the server:
 | `PROXMOX_SSH_USER` | No | SSH username | `root` |
 | `PROXMOX_SSH_KEY_PATH` | When SSH enabled | Path to SSH private key | - |
 | `PROXMOX_SSH_NODE` | When SSH enabled | Proxmox node name reachable via SSH | - |
-| `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | No | Host key fingerprint for verification | - |
+| `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | When SSH enabled (unless explicitly insecure) | OpenSSH `SHA256:<base64>` without padding, or 64-digit SHA-256 hex | - |
+| `PROXMOX_SSH_ALLOW_INSECURE` | No | Explicitly allow SSH without host-key verification (test networks only) | `false` |
 | `PROXMOX_LOG_LEVEL` | No | Log verbosity (`trace`, `debug`, `info`, `warn`, `error`, `fatal`) | `info` |
+
+### SSH trust and diagnostic output
+
+Existing SSH users must configure a host fingerprint before upgrading, or explicitly opt into insecure mode. Obtain the fingerprint from a trusted node console, for example `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub -E sha256`, and copy the `SHA256:...` value for the host key negotiated by SSH. Do not blindly trust a fingerprint collected over an unverified network. A supplied fingerprint is always checked, even if insecure mode is enabled; malformed or mismatched fingerprints are rejected.
+
+Node diagnostic reports now require `PROXMOX_ALLOW_ELEVATED=true`. Reports are redacted and limited to 16,000 characters; error responses are limited to 4,096 characters, with a truncation notice. Diagnostic logs redact nested credential fields and common token/password/authorization patterns. Redaction is best-effort, not a guarantee for arbitrary unlabelled secrets. Intentional credential-creation success responses are not globally masked.
 
 ### SSL Modes
 
@@ -93,8 +100,8 @@ Do not use `NODE_TLS_REJECT_UNAUTHORIZED=0` to work around certificate errors â€
 
 The server implements a two-tier permission model:
 
-- **Basic operations**: Read-only operations (list, get, status) - always allowed
-- **Elevated operations**: Create, modify, delete operations - require `PROXMOX_ALLOW_ELEVATED=true`
+- **Basic operations**: Ordinary read-only operations (list, get, status)
+- **Elevated operations**: Create, modify, delete and sensitive reads (including node diagnostic reports) - require `PROXMOX_ALLOW_ELEVATED=true`
 
 This prevents accidental destructive operations and provides an additional safety layer.
 

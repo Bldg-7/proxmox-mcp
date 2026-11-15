@@ -19,6 +19,7 @@ import {
   formatCpuPercent,
 } from '../formatters/index.js';
 import { requireElevated } from '../middleware/index.js';
+import { sanitizeDiagnostic, MAX_REPORT_CHARS } from '../security/diagnostics.js';
 import {
   validateNodeName,
   validateInterfaceName,
@@ -669,15 +670,15 @@ export async function getStorageRrddata(
 }
 
 /**
- * Get node diagnostic report.
- * No elevated permissions required.
+ * Get a bounded, redacted node diagnostic report (elevated: reports may contain secrets).
  */
 export async function getNodeReport(
   client: ProxmoxApiClient,
-  _config: Config,
+  config: Config,
   input: GetNodeReportInput
 ): Promise<ToolResponse> {
   try {
+    requireElevated(config, 'read node diagnostic report');
     const validated = getNodeReportSchema.parse(input);
     const safeNode = validateNodeName(validated.node);
 
@@ -691,7 +692,7 @@ export async function getNodeReport(
       return formatToolResponse(output);
     }
 
-    output += '```\n' + report + '\n```';
+    output += '```\n' + sanitizeDiagnostic(report, MAX_REPORT_CHARS - output.length - 8, [config.tokenValue]) + '\n```';
 
     return formatToolResponse(output);
   } catch (error) {

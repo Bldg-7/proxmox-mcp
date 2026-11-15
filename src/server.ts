@@ -12,6 +12,7 @@ import type { ToolName } from './types/tools.js';
 import { toolRegistry } from './tools/registry.js';
 import { TOOL_METADATA } from './tools/metadata.js';
 import { TOOL_NAMES } from './types/tools.js';
+import { sanitizeDiagnostic, MAX_ERROR_CHARS } from './security/diagnostics.js';
 
 function getServerVersion(): string {
   const packageJsonRaw = readFileSync(new URL('../package.json', import.meta.url), 'utf8');
@@ -125,7 +126,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_node_service: 'Manage node services. action=list: list services | action=control: start/stop/restart a service (elevated)',
   proxmox_node_log: 'Read node logs. action=syslog: read syslog | action=journal: read systemd journal',
   proxmox_node_task: 'Query node tasks. action=list: archived and active tasks (source=all by default; optional limit, vmid, typefilter) | action=get: get task status by UPID',
-  proxmox_node_info: 'Query node information. action=aplinfo: appliance templates | action=netstat: network stats | action=rrddata: performance metrics | action=storage_rrddata: storage metrics | action=report: diagnostic report',
+  proxmox_node_info: 'Query node information. action=aplinfo: appliance templates | action=netstat: network stats | action=rrddata: performance metrics | action=storage_rrddata: storage metrics | action=report: redacted diagnostic report (elevated, output limited)',
   proxmox_node_config: 'Manage node configuration. action=get_time|set_time(elevated)|set_dns(elevated)|get_hosts|set_hosts(elevated)',
   proxmox_node_subscription: 'Manage node subscription. action=get: get info | action=set: set key (elevated) | action=delete: remove (elevated)',
   proxmox_apt: 'Manage APT packages. action=update(elevated)|upgrade(elevated): package ops | action=versions: list versions',
@@ -316,7 +317,7 @@ export function createServer(client: ProxmoxApiClient, config: Config): Server {
         content: [
           {
             type: 'text' as const,
-            text: `Error: Unknown tool "${name}". Use ListTools to see available tools.`,
+            text: sanitizeDiagnostic(`Error: Unknown tool "${name}". Use ListTools to see available tools.`, MAX_ERROR_CHARS, [config.tokenValue]),
           },
         ],
         isError: true,
@@ -327,14 +328,17 @@ export function createServer(client: ProxmoxApiClient, config: Config): Server {
       const validated = entry.schema.parse(args ?? {});
       const result = await entry.handler(client, config, validated);
 
-      return { ...result };
+      return result.isError ? {
+        ...result,
+        content: result.content.map(item => ({ ...item, text: sanitizeDiagnostic(item.text, MAX_ERROR_CHARS, [config.tokenValue]) })),
+      } : { ...result };
     } catch (error) {
       if (error instanceof Error && error.name === 'ZodError') {
         return {
           content: [
             {
               type: 'text' as const,
-              text: `Validation error for tool "${name}": ${error.message}`,
+              text: sanitizeDiagnostic(`Validation error for tool "${name}": ${error.message}`, MAX_ERROR_CHARS, [config.tokenValue]),
             },
           ],
           isError: true,
@@ -346,7 +350,7 @@ export function createServer(client: ProxmoxApiClient, config: Config): Server {
         content: [
           {
             type: 'text' as const,
-            text: `Error executing tool "${name}": ${errorMessage}`,
+            text: sanitizeDiagnostic(`Error executing tool "${name}": ${errorMessage}`, MAX_ERROR_CHARS, [config.tokenValue]),
           },
         ],
         isError: true,

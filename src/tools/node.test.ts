@@ -820,7 +820,7 @@ describe('getNodeReport', () => {
   });
 
   it('returns formatted diagnostic report', async () => {
-    const config = createTestConfig();
+    const config = createTestConfig({ allowElevated: true });
     const sampleReport = 'PROXMOX REPORT\nNode: pve1\nStatus: OK\nUptime: 30 days';
     client.request.mockResolvedValue(sampleReport);
 
@@ -833,7 +833,7 @@ describe('getNodeReport', () => {
   });
 
   it('calls correct API endpoint', async () => {
-    const config = createTestConfig();
+    const config = createTestConfig({ allowElevated: true });
     client.request.mockResolvedValue('report data');
 
     await getNodeReport(client, config, { node: 'pve1' });

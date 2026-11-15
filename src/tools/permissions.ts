@@ -308,7 +308,7 @@ export const toolPermissions: ToolPermissions = {
     netstat: 'basic',
     rrddata: 'basic',
     storage_rrddata: 'basic',
-    report: 'basic',
+    report: 'elevated',
   },
   proxmox_node_config: {
     get_time: 'basic',
