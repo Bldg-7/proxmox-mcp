@@ -124,7 +124,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   // Node Management (consolidated)
   proxmox_node_service: 'Manage node services. action=list: list services | action=control: start/stop/restart a service (elevated)',
   proxmox_node_log: 'Read node logs. action=syslog: read syslog | action=journal: read systemd journal',
-  proxmox_node_task: 'Query node tasks. action=list: list recent tasks | action=get: get task details by UPID',
+  proxmox_node_task: 'Query node tasks. action=list: archived and active tasks (source=all by default; optional limit, vmid, typefilter) | action=get: get task status by UPID',
   proxmox_node_info: 'Query node information. action=aplinfo: appliance templates | action=netstat: network stats | action=rrddata: performance metrics | action=storage_rrddata: storage metrics | action=report: diagnostic report',
   proxmox_node_config: 'Manage node configuration. action=get_time|set_time(elevated)|set_dns(elevated)|get_hosts|set_hosts(elevated)',
   proxmox_node_subscription: 'Manage node subscription. action=get: get info | action=set: set key (elevated) | action=delete: remove (elevated)',
@@ -211,7 +211,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
 
   proxmox_agent_info: 'Query guest info via QEMU agent. operation=ping|osinfo|fsinfo|network_interfaces|time|timezone (requires elevated permissions)',
   proxmox_agent_hw: 'Query guest hardware via QEMU agent. operation=memory_blocks|vcpus|memory_block_info|hostname|users (requires elevated permissions)',
-  proxmox_agent_exec: 'Execute commands via QEMU agent. operation=exec: run command | operation=status: check execution status (requires elevated permissions)',
+  proxmox_agent_exec: 'Execute commands via QEMU agent. operation=exec: executable command + args, returns PID (no timeout or implicit shell) | operation=status: retrieve completion and output by PID (requires elevated permissions)',
   proxmox_agent_file: 'Read/write files via QEMU agent. operation=read|write (requires elevated permissions)',
   proxmox_agent_freeze: 'Manage filesystem freeze via QEMU agent. operation=status|freeze|thaw|fstrim (requires elevated permissions)',
   proxmox_agent_power: 'Guest power control via QEMU agent. operation=shutdown|suspend_disk|suspend_ram|suspend_hybrid (requires elevated permissions)',

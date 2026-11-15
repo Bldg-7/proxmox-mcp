@@ -125,7 +125,9 @@ Proxmox 클러스터 정보를 조회합니다. action=status: 노드 및 리소
 | Action | 권한 | 설명 |
 |--------|------|------|
 | `list` | 기본 | 최근 작업 목록 |
-| `get` | 기본 | UPID로 작업 상세 조회 |
+| `get` | 기본 | UPID로 작업 상태 조회 (API 토큰 UPID 포함) |
+
+`list`의 선택 옵션: `source`는 `all`(기본값), `active`, `archive` 중 하나입니다. `limit`(양의 정수, PVE 기본값 50), `vmid`, `typefilter`로 결과를 제한할 수 있습니다. `get`은 로그가 아닌 작업 상태를 조회합니다.
 
 ---
 
@@ -174,6 +176,8 @@ APT 패키지를 관리합니다. action=update(관리자)|upgrade(관리자): �
 | `update` | 관리자 🔒 | 패키지 목록 업데이트 |
 | `upgrade` | 관리자 🔒 | 패키지 업그레이드 |
 | `versions` | 기본 | 패키지 버전 목록 |
+
+`versions`의 선택 옵션 `package`는 대소문자를 구별하지 않는 부분 문자열 필터이며 응답에 로컬 적용됩니다. PVE가 제공하면 실행 중 커널과 manager 버전도 표시합니다.
 
 ---
 
@@ -387,6 +391,10 @@ QEMU 에이전트를 통해 명령을 실행합니다. operation=exec: 명령 �
 | `exec` | 게스트에서 명령 실행 |
 | `status` | 실행 상태 확인 |
 
+`exec`의 `command`에는 실행 파일 이름/경로, `args`에는 인자 배열을 전달합니다. 문자열을 자동으로 shell 분리하지 않습니다. 예: `{"node":"pve1","vmid":100,"operation":"exec","command":"uname","args":["-a"]}`. 선택 옵션 `input-data`는 표준 입력입니다. 실행 후 받은 PID로 `operation=status`를 호출해 stdout/stderr와 종료 상태를 조회합니다.
+
+호환성: deprecated 옵션 `capture-output=true`는 허용하지만 PVE에 전송하지 않습니다. PVE는 출력을 항상 수집합니다. `capture-output=false` 및 모든 `timeout` 값은 실행 전에 명확한 오류로 거부하므로 생략해야 합니다. 자동 폴링은 구현하지 않았습니다.
+
 ---
 
 #### `proxmox_agent_file` 🔒
@@ -445,6 +453,8 @@ QEMU 에이전트를 통해 게스트 사용자를 관리합니다. operation=se
 | `update` | 관리자 🔒 | 스토리지 설정 업데이트 |
 | `delete` | 관리자 🔒 | 스토리지 설정 삭제 |
 | `cluster_usage` | 기본 | 클러스터 스토리지 사용량 조회 |
+
+`cluster_usage`에서 `node`를 생략하면 모든 노드를 조회합니다. 공유 스토리지를 포함해 `(node, storage)`별 결과를 유지하며, 고유 물리 용량의 합계가 아닌 노드별 조회 결과입니다.
 
 ---
 

@@ -264,7 +264,7 @@ describe('System Operations Tools', () => {
     it('lists package versions with package filter', async () => {
       const config = createTestConfig();
       client.request.mockResolvedValue([
-        { package: 'pve-manager', version: '8.2.1', arch: 'amd64' },
+        { Package: 'pve-manager', Version: '8.2.1', Arch: 'amd64' },
       ]);
 
       const result = await aptVersions(client, config, sampleAptVersions);
@@ -273,7 +273,7 @@ describe('System Operations Tools', () => {
       expect(result.content[0].text).toContain('APT Package Versions');
       expect(result.content[0].text).toContain('pve-manager');
       expect(client.request).toHaveBeenCalledWith(
-        '/nodes/pve1/apt/versions?package=pve-manager'
+        '/nodes/pve1/apt/versions'
       );
     });
   });

@@ -204,7 +204,7 @@ export const storageConfigToolSchema = z.discriminatedUnion('action', [
   }),
   z.object({
     action: z.literal('cluster_usage'),
-    node: z.string().min(1).describe('Node name'),
+    node: z.string().min(1).optional().describe('Node name; omit to query all nodes'),
   }),
   z.object({
     action: z.literal('create'),

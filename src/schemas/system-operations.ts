@@ -89,7 +89,7 @@ export type AptUpgradeInput = z.infer<typeof aptUpgradeSchema>;
 // proxmox_apt_versions - List package versions
 export const aptVersionsSchema = z.object({
   node: z.string().min(1).describe('Node name'),
-  package: z.string().optional().describe('Filter by package name'),
+  package: z.string().optional().describe('Local case-insensitive substring filter on package name'),
 });
 
 export type AptVersionsInput = z.infer<typeof aptVersionsSchema>;
@@ -232,11 +232,7 @@ export const aptToolSchema = z.discriminatedUnion('action', [
     action: z.literal('upgrade'),
     node: z.string().min(1).describe('Node name'),
   }),
-  z.object({
-    action: z.literal('versions'),
-    node: z.string().min(1).describe('Node name'),
-    package: z.string().optional().describe('Filter by package name'),
-  }),
+  aptVersionsSchema.extend({ action: z.literal('versions') }),
 ]);
 
 export type AptToolInput = z.infer<typeof aptToolSchema>;

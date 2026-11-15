@@ -77,12 +77,15 @@ interface ProxmoxSubscriptionInfo {
 }
 
 interface ProxmoxAptVersion {
-  package?: string;
-  version?: string;
-  oldversion?: string;
-  newversion?: string;
-  arch?: string;
-  description?: string;
+  Package?: string;
+  Version?: string;
+  OldVersion?: string;
+  Arch?: string;
+  Title?: string;
+  Description?: string;
+  CurrentState?: string;
+  RunningKernel?: string;
+  ManagerVersion?: string;
 }
 
 const formatEpoch = (value?: number): string =>
@@ -433,12 +436,11 @@ export async function aptVersions(
     const validated = aptVersionsSchema.parse(input);
     const safeNode = validateNodeName(validated.node);
 
-    let path = `/nodes/${safeNode}/apt/versions`;
-    if (validated.package) {
-      path += `?package=${validated.package}`;
-    }
-
-    const versions = (await client.request(path)) as ProxmoxAptVersion[];
+    const response = await client.request<ProxmoxAptVersion[]>(`/nodes/${safeNode}/apt/versions`);
+    const filter = validated.package?.toLowerCase();
+    const versions = filter
+      ? response.filter((entry) => entry.Package?.toLowerCase().includes(filter))
+      : response;
 
     if (versions.length === 0) {
       return formatToolResponse('No package versions found.');
@@ -446,13 +448,16 @@ export async function aptVersions(
 
     let output = '📦 **APT Package Versions**\n\n';
     for (const entry of versions) {
-      const name = entry.package || 'unknown';
-      const version = entry.version || entry.newversion || 'N/A';
+      const name = entry.Package || 'unknown';
+      const version = entry.Version || 'N/A';
       output += `• **${name}**: ${version}\n`;
-      if (entry.arch) output += `   • Arch: ${entry.arch}\n`;
-      if (entry.oldversion) output += `   • Current: ${entry.oldversion}\n`;
-      if (entry.newversion) output += `   • Candidate: ${entry.newversion}\n`;
-      if (entry.description) output += `   • Description: ${entry.description}\n`;
+      if (entry.Arch) output += `   • Arch: ${entry.Arch}\n`;
+      if (entry.OldVersion) output += `   • Current: ${entry.OldVersion}\n`;
+      if (entry.Title) output += `   • Title: ${entry.Title}\n`;
+      if (entry.Description) output += `   • Description: ${entry.Description}\n`;
+      if (entry.CurrentState) output += `   • State: ${entry.CurrentState}\n`;
+      if (entry.RunningKernel) output += `   • Running Kernel: ${entry.RunningKernel}\n`;
+      if (entry.ManagerVersion) output += `   • Manager Version: ${entry.ManagerVersion}\n`;
     }
 
     return formatToolResponse(output);

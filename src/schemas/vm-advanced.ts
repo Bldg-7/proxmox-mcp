@@ -101,11 +101,11 @@ export type AgentGetVcpusInput = z.input<typeof agentGetVcpusSchema>;
 
 // proxmox_agent_exec - Execute command via QEMU guest agent
 export const agentExecSchema = baseVmSchema.extend({
-  command: z.string().min(1).describe('Command to execute'),
+  command: z.string().min(1).describe('Executable name or path; pass arguments separately (no implicit shell)'),
   args: z.array(z.string()).optional().describe('Command arguments'),
   ['input-data']: z.string().optional().describe('Input data for stdin'),
-  ['capture-output']: z.boolean().optional().describe('Capture stdout/stderr'),
-  timeout: z.number().int().min(0).optional().describe('Timeout in seconds')
+  ['capture-output']: z.boolean().optional().describe('Deprecated: omit or use true; false is unsupported. Read output with operation=status.'),
+  timeout: z.number().int().min(0).optional().describe('Unsupported: omit. Exec is asynchronous; poll operation=status instead.')
 });
 
 export type AgentExecInput = z.input<typeof agentExecSchema>;
@@ -216,14 +216,7 @@ export type AgentHwInput = z.input<typeof agentHwSchema>;
 
 // proxmox_agent_exec - Execute commands via guest agent (exec, status)
 export const agentExecToolSchema = z.discriminatedUnion('operation', [
-  baseVmSchema.extend({
-    operation: z.literal('exec'),
-    command: z.string().min(1).describe('Command to execute'),
-    args: z.array(z.string()).optional().describe('Command arguments'),
-    ['input-data']: z.string().optional().describe('Input data for stdin'),
-    ['capture-output']: z.boolean().optional().describe('Capture stdout/stderr'),
-    timeout: z.number().int().min(0).optional().describe('Timeout in seconds'),
-  }),
+  agentExecSchema.extend({ operation: z.literal('exec') }),
   baseVmSchema.extend({
     operation: z.literal('status'),
     pid: z.coerce.number().int().min(1).describe('Process ID returned by agent exec'),

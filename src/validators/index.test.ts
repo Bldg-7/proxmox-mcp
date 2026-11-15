@@ -72,6 +72,11 @@ describe('validateServiceName', () => {
 });
 
 describe('validateUpid', () => {
+  it('accepts API token task owners', () => {
+    const upid = 'UPID:lab:00156910:61860286:6AF9941C:vzdump:100:root@pam!claude-mcp:';
+    expect(validateUpid(upid)).toBe(upid);
+  });
+
   it('accepts valid UPIDs', () => {
     expect(validateUpid('UPID:pve1:0002E0B4:0000001D:64A539CB:qmstart:100:root@pam:')).toBe(
       'UPID:pve1:0002E0B4:0000001D:64A539CB:qmstart:100:root@pam:'

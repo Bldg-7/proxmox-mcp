@@ -1,0 +1,92 @@
+import { describe, it, expect, vi } from 'vitest';
+import { createMockProxmoxClient, createTestConfig } from '../__test-utils__/index.js';
+import { toolRegistry } from '../tools/registry.js';
+import { createServer } from '../server.js';
+import { getStorage, getVMs } from '../tools/vm-query.js';
+import { Client } from 'ssh2';
+import { SshClient } from '../client/ssh.js';
+
+const config = createTestConfig({ allowElevated: true });
+const client = () => createMockProxmoxClient();
+const text = (r: {content: Array<{text: string}>}) => r.content.map(c => c.text).join('\n');
+async function call(name: keyof typeof toolRegistry, args: unknown, c: ReturnType<typeof client>) {
+  const entry = toolRegistry[name];
+  return entry.handler(c, config, entry.schema.parse(args));
+}
+describe('Temporary audit probes: assert observed defects, not desired behavior', () => {
+  it('1 forwards unsupported exec parameters', async () => {
+    const c = client(); c.request.mockResolvedValue({pid: 1});
+    await call('proxmox_agent_exec', {node:'lab',vmid:102,operation:'exec',command:'uname',args:['-a'],'capture-output':true,timeout:5}, c);
+    expect(c.request).toHaveBeenCalledWith('/nodes/lab/qemu/102/agent/exec','POST',{command:'uname',args:['-a'],'capture-output':true,timeout:5});
+  });
+  it('2 loses real APT field names and forwards package filter', async () => {
+    const c = client(); c.request.mockResolvedValue([{Package:'proxmox-ve',Version:'9.0',RunningKernel:'6.17'}]);
+    const r = await call('proxmox_apt',{action:'versions',node:'lab',package:'kernel'},c);
+    expect(text(r)).toContain('unknown'); expect(text(r)).toContain('N/A');
+    expect(c.request).toHaveBeenCalledWith('/nodes/lab/apt/versions?package=kernel');
+  });
+  it('3 rejects token UPID before HTTP', async () => {
+    const c = client();
+    const r = await call('proxmox_node_task',{action:'get',node:'lab',upid:'UPID:lab:00156910:61860286:6AF9941C:vzdump:100:root@pam!test:'},c);
+    expect(r.isError).toBe(true); expect(c.request).not.toHaveBeenCalled();
+  });
+  it('4 omits source for task list', async () => {
+    const c = client(); c.request.mockResolvedValue([]);
+    await call('proxmox_node_task',{action:'list',node:'lab'},c);
+    expect(c.request).toHaveBeenCalledWith('/nodes/lab/tasks');
+  });
+  it.each(['vm','lxc'])('5 counts unchanged values and omits pending for %s', async type => {
+    const c = client(); c.request.mockResolvedValue([{key:'cores',value:2},{key:'memory',value:1024,pending:2048}]);
+    const r = await call('proxmox_guest_pending',{type,node:'lab',vmid:102},c);
+    expect(text(r)).toContain('**Pending Changes** (2)'); expect(text(r)).not.toContain('2048');
+  });
+  it('6 stringifies ping object', async () => {
+    const c = client(); c.request.mockResolvedValue({result:{}});
+    const r = await call('proxmox_agent_info',{operation:'ping',node:'lab',vmid:102},c);
+    expect(text(r)).toContain('[object Object]');
+  });
+  it('7 requires node for cluster usage', () => {
+    expect(toolRegistry.proxmox_storage_config.schema.safeParse({action:'cluster_usage'}).success).toBe(false);
+  });
+  it('extra: task get queries directory index instead of status', async () => {
+    const c = client(); c.request.mockResolvedValue([{name:'log'},{name:'status'}]);
+    const upid = 'UPID:lab:00156910:61860286:6AF9941C:vzdump:100:root@pam:';
+    const r = await call('proxmox_node_task',{action:'get',node:'lab',upid},c);
+    expect(c.request).toHaveBeenCalledWith(`/nodes/lab/tasks/${upid}`);
+    expect(text(r)).toContain('**Status**: N/A'); expect(r.isError).toBe(false);
+  });
+  it('extra: drops distinct node-local storage with same ID', async () => {
+    const c = client(); c.request.mockResolvedValueOnce([{node:'lab'},{node:'epyc'}])
+      .mockResolvedValueOnce([{storage:'local',type:'dir',enabled:1,total:100,used:10}])
+      .mockResolvedValueOnce([{storage:'local',type:'dir',enabled:1,total:200,used:50}]);
+    const r = await getStorage(c,config,{});
+    expect(text(r)).toContain('lab'); expect(text(r)).not.toContain('epyc');
+  });
+  it('extra: guest CPU is actually memory usage', async () => {
+    const c = client(); c.request.mockResolvedValue([{vmid:102,status:'running',cpu:0.1,mem:512,maxmem:1024}]);
+    const r = await getVMs(c,config,{node:'lab',type:'qemu'});
+    expect(text(r)).toContain('CPU: 50.00%');
+  });
+  it('extra: flattened schema loses required operation-specific fields', async () => {
+    const server = createServer(client(),config);
+    const handlers = (server as unknown as {_requestHandlers:Map<string,(r:unknown)=>Promise<{tools:Array<{name:string,inputSchema:{required:string[]}}>}> >})._requestHandlers;
+    const r = await handlers.get('tools/list')!({method:'tools/list',params:{}});
+    const schema = r.tools.find(t => t.name==='proxmox_node_task')!.inputSchema;
+    expect(schema.required).not.toContain('upid');
+    expect(toolRegistry.proxmox_node_task.schema.safeParse({action:'get',node:'lab'}).success).toBe(false);
+  });
+  it('extra: configured SSH fingerprint receives un-hashed Buffer', async () => {
+    let captured: Record<string, unknown> = {};
+    const spy = vi.spyOn(Client.prototype,'connect').mockImplementation(function(this:Client, options) {
+      captured = options as unknown as Record<string,unknown>;
+      queueMicrotask(() => this.emit('error',new Error('audit: stop before network')));
+      return this;
+    });
+    const ssh = new SshClient({host:'invalid',port:22,username:'test',privateKeyPath:'package.json',hostKeyFingerprint:'SHA256:test'});
+    try {
+      await expect(ssh.exec('true')).rejects.toThrow('audit: stop before network');
+      expect(captured.hostHash).toBeUndefined();
+      expect((captured.hostVerifier as (b:Buffer)=>boolean)(Buffer.from('key'))).toBe(false);
+    } finally { ssh.close(); spy.mockRestore(); }
+  });
+});

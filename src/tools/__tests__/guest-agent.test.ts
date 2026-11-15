@@ -262,7 +262,7 @@ describe('guest agent consolidated tools', () => {
       expect(client.request).toHaveBeenCalledWith(
         '/nodes/pve1/qemu/100/agent/exec',
         'POST',
-        expect.objectContaining({ command: 'ls' })
+        { command: ['ls', '-la'] }
       );
     });
 

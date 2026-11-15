@@ -138,7 +138,7 @@ describe('System Operations & Node Management Consolidation (Wave 4, Task 14)', 
 
       expect(result.isError).toBe(false);
       expect(result.content[0].text).toContain('Node Tasks');
-      expect(mockClient.request).toHaveBeenCalledWith('/nodes/pve1/tasks');
+      expect(mockClient.request).toHaveBeenCalledWith('/nodes/pve1/tasks?source=all');
     });
 
     it('action=get: should get specific task details', async () => {
@@ -157,7 +157,7 @@ describe('System Operations & Node Management Consolidation (Wave 4, Task 14)', 
       expect(result.isError).toBe(false);
       expect(result.content[0].text).toContain('Task Details');
       expect(mockClient.request).toHaveBeenCalledWith(
-        '/nodes/pve1/tasks/UPID:pve1:000:000'
+        '/nodes/pve1/tasks/UPID%3Apve1%3A000%3A000/status'
       );
     });
   });
@@ -423,7 +423,7 @@ describe('System Operations & Node Management Consolidation (Wave 4, Task 14)', 
 
     it('action=versions: should list package versions', async () => {
       (mockClient.request as any).mockResolvedValue([
-        { package: 'pve-manager', version: '8.0.0' },
+        { Package: 'pve-manager', Version: '8.0.0' },
       ]);
 
       const result = await handleApt(mockClient, mockConfig, {

@@ -26,6 +26,7 @@ export interface ProxmoxVM {
   node?: string;
   type?: VMType;
   cpus: number;
+  cpu?: number;
   maxmem: number;
   maxdisk: number;
   uptime: number;

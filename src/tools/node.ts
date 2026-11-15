@@ -439,8 +439,12 @@ export async function getNodeTasks(
     const validated = getNodeTasksSchema.parse(input);
     const safeNode = validateNodeName(validated.node);
 
+    const params = new URLSearchParams({ source: validated.source ?? 'all' });
+    if (validated.limit !== undefined) params.set('limit', String(validated.limit));
+    if (validated.vmid !== undefined) params.set('vmid', String(validated.vmid));
+    if (validated.typefilter !== undefined) params.set('typefilter', validated.typefilter);
     const tasks = (await client.request(
-      `/nodes/${safeNode}/tasks`
+      `/nodes/${safeNode}/tasks?${params}`
     )) as ProxmoxTask[];
 
     if (tasks.length === 0) {
@@ -481,7 +485,7 @@ export async function getNodeTask(
     const safeUpid = validateUpid(validated.upid);
 
     const task = (await client.request(
-      `/nodes/${safeNode}/tasks/${safeUpid}`
+      `/nodes/${safeNode}/tasks/${encodeURIComponent(safeUpid)}/status`
     )) as ProxmoxTask;
 
     let output = `📌 **Task Details**\n\n`;
@@ -753,7 +757,7 @@ export async function handleNodeTask(
 ): Promise<ToolResponse> {
   switch (input.action) {
     case 'list':
-      return getNodeTasks(client, config, { node: input.node });
+      return getNodeTasks(client, config, input);
     case 'get':
       return getNodeTask(client, config, { node: input.node, upid: input.upid });
     default:

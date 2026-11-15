@@ -361,11 +361,17 @@ export async function agentPing(
       'POST'
     );
 
+    const details = result && typeof result === 'object' && 'result' in result
+      ? result.result
+      : result;
+    const extra = details && typeof details === 'object' && Object.keys(details).length > 0
+      ? formatJsonBlock(details)
+      : '';
     const output =
       `✅ **QEMU Guest Agent Ping**\n\n` +
       `• **VM ID**: ${safeVmid}\n` +
       `• **Node**: ${safeNode}\n` +
-      `• **Result**: ${result ?? 'pong'}`;
+      `• **Result**: pong` + extra;
 
     return formatToolResponse(output);
   } catch (error) {
@@ -576,15 +582,16 @@ export async function agentExec(
     const safeNode = validateNodeName(validated.node);
     const safeVmid = validateVMID(validated.vmid);
 
-    const payload: Record<string, unknown> = {
-      command: validated.command,
-    };
-    if (validated.args) payload.args = validated.args;
-    if (validated['input-data']) payload['input-data'] = validated['input-data'];
-    if (validated['capture-output'] !== undefined) {
-      payload['capture-output'] = validated['capture-output'];
+    if (validated.timeout !== undefined) {
+      throw new Error('timeout is not supported for asynchronous agent exec. Omit it and poll operation=status using the returned PID.');
     }
-    if (validated.timeout !== undefined) payload.timeout = validated.timeout;
+    if (validated['capture-output'] === false) {
+      throw new Error('capture-output=false is not supported by PVE. Output is always available via operation=status.');
+    }
+    const payload: Record<string, unknown> = {
+      command: [validated.command, ...(validated.args ?? [])],
+    };
+    if (validated['input-data'] !== undefined) payload['input-data'] = validated['input-data'];
 
     const result = (await client.request(
       `/nodes/${safeNode}/qemu/${safeVmid}/agent/exec`,

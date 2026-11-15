@@ -53,7 +53,7 @@ export function validateServiceName(service: unknown): string {
 
 /**
  * Validates a Proxmox task UPID.
- * Allows alphanumeric characters, colons, hyphens, underscores, dots, and @.
+ * Allows alphanumeric characters, colons, hyphens, underscores, dots, @, and ! (API tokens).
  * Maximum length: 512 characters.
  *
  * @throws {Error} If UPID is invalid
@@ -63,9 +63,9 @@ export function validateUpid(upid: unknown): string {
     throw new Error('Task UPID is required and must be a string');
   }
 
-  if (!/^[a-zA-Z0-9:._@-]+$/.test(upid)) {
+  if (!/^[a-zA-Z0-9:._@!-]+$/.test(upid)) {
     throw new Error(
-      'Invalid task UPID format. Only alphanumeric, colons, hyphens, underscores, dots, and @ allowed'
+      'Invalid task UPID format. Only alphanumeric, colons, hyphens, underscores, dots, @, and ! allowed'
     );
   }
 

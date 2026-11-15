@@ -177,7 +177,7 @@ describe('handleGuestPending', () => {
   it('returns VM pending changes when type=vm', async () => {
     const config = createTestConfig();
     client.request.mockResolvedValue([
-      { key: 'memory', value: 8192 },
+      { key: 'memory', value: '4096', pending: '8192' },
     ]);
 
     const result = await handleGuestPending(client, config, { type: 'vm', node: 'pve1', vmid: 100 });

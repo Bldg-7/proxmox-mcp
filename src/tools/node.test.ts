@@ -645,7 +645,7 @@ describe('getNodeTasks', () => {
 
     await getNodeTasks(client, config, { node: 'pve1' });
 
-    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/tasks');
+    expect(client.request).toHaveBeenCalledWith('/nodes/pve1/tasks?source=all');
   });
 });
 
@@ -680,7 +680,7 @@ describe('getNodeTask', () => {
 
     await getNodeTask(client, config, { node: 'pve1', upid });
 
-    expect(client.request).toHaveBeenCalledWith(`/nodes/pve1/tasks/${upid}`);
+    expect(client.request).toHaveBeenCalledWith(`/nodes/pve1/tasks/${encodeURIComponent(upid)}/status`);
   });
 });
 

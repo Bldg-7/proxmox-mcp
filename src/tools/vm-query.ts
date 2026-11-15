@@ -74,10 +74,10 @@ export async function getVMs(
       for (const vm of vms) {
         const status = vm.status === 'running' ? '🟢' : vm.status === 'stopped' ? '🔴' : '🟡';
         const typeIcon = vm.type === 'qemu' ? '🖥️' : '📦';
-        const uptime = vm.uptime ? formatUptime(vm.uptime) : 'N/A';
-        const cpuUsage = vm.mem && vm.maxmem ? formatCpuPercent(vm.mem / vm.maxmem) : 'N/A';
+        const uptime = vm.uptime !== undefined ? formatUptime(vm.uptime) : 'N/A';
+        const cpuUsage = vm.cpu !== undefined ? formatCpuPercent(vm.cpu) : 'N/A';
         const memUsage =
-          vm.mem && vm.maxmem ? `${formatBytes(vm.mem)} / ${formatBytes(vm.maxmem)}` : 'N/A';
+          vm.mem !== undefined && vm.maxmem !== undefined ? `${formatBytes(vm.mem)} / ${formatBytes(vm.maxmem)}` : 'N/A';
 
         output += `${status} ${typeIcon} **${vm.name || `VM-${vm.vmid}`}** (ID: ${vm.vmid})\n`;
         output += `   • Node: ${vm.node}\n`;
@@ -139,17 +139,17 @@ export async function getVMStatus(
     output += `• **Type**: ${type.toUpperCase()}\n`;
 
     if (vmStatus.status === 'running') {
-      output += `• **Uptime**: ${vmStatus.uptime ? formatUptime(vmStatus.uptime) : 'N/A'}\n`;
-      output += `• **CPU Usage**: ${vmStatus.cpu ? formatCpuPercent(vmStatus.cpu) : 'N/A'}\n`;
+      output += `• **Uptime**: ${vmStatus.uptime !== undefined ? formatUptime(vmStatus.uptime) : 'N/A'}\n`;
+      output += `• **CPU Usage**: ${vmStatus.cpu !== undefined ? formatCpuPercent(vmStatus.cpu) : 'N/A'}\n`;
       output += `• **Memory**: ${
-        vmStatus.mem && vmStatus.maxmem
+        vmStatus.mem !== undefined && vmStatus.maxmem !== undefined && vmStatus.maxmem > 0
           ? `${formatBytes(vmStatus.mem)} / ${formatBytes(vmStatus.maxmem)} (${((vmStatus.mem / vmStatus.maxmem) * 100).toFixed(1)}%)`
           : 'N/A'
       }\n`;
-      output += `• **Disk Read**: ${vmStatus.diskread ? formatBytes(vmStatus.diskread) : 'N/A'}\n`;
-      output += `• **Disk Write**: ${vmStatus.diskwrite ? formatBytes(vmStatus.diskwrite) : 'N/A'}\n`;
-      output += `• **Network In**: ${vmStatus.netin ? formatBytes(vmStatus.netin) : 'N/A'}\n`;
-      output += `• **Network Out**: ${vmStatus.netout ? formatBytes(vmStatus.netout) : 'N/A'}\n`;
+      output += `• **Disk Read**: ${vmStatus.diskread !== undefined ? formatBytes(vmStatus.diskread) : 'N/A'}\n`;
+      output += `• **Disk Write**: ${vmStatus.diskwrite !== undefined ? formatBytes(vmStatus.diskwrite) : 'N/A'}\n`;
+      output += `• **Network In**: ${vmStatus.netin !== undefined ? formatBytes(vmStatus.netin) : 'N/A'}\n`;
+      output += `• **Network Out**: ${vmStatus.netout !== undefined ? formatBytes(vmStatus.netout) : 'N/A'}\n`;
     }
 
     return formatToolResponse(output);
@@ -315,12 +315,12 @@ export async function getStorage(
        }
      }
 
-     // Deduplicate by storage ID (keep first occurrence)
+     // Preserve per-node usage, including same-name local and shared storage.
      const uniqueStorages: StorageWithNode[] = [];
      const seen = new Set<string>();
 
      for (const storage of storages) {
-       const key = storage.storage;
+       const key = `${storage.node}/${storage.storage}`;
        if (!seen.has(key)) {
          seen.add(key);
          uniqueStorages.push(storage);
@@ -339,13 +339,14 @@ export async function getStorage(
        for (const storage of uniqueStorages) {
          const status = storage.enabled ? '🟢' : '🔴';
          const usagePercent =
-           storage.total && storage.used ? ((storage.used / storage.total) * 100).toFixed(1) : 'N/A';
+           storage.total !== undefined && storage.total > 0 && storage.used !== undefined
+             ? ((storage.used / storage.total) * 100).toFixed(1) : 'N/A';
 
          output += `${status} **${storage.storage}**\n`;
          output += `   • Type: ${storage.type || 'N/A'}\n`;
          output += `   • Node: ${storage.node}\n`;
          output += `   • Content: ${storage.content || 'N/A'}\n`;
-         if (storage.total && storage.used) {
+         if (storage.total !== undefined && storage.used !== undefined) {
            output += `   • Usage: ${formatBytes(storage.used)} / ${formatBytes(storage.total)} (${usagePercent}%)\n`;
          }
          output += `   • Status: ${storage.enabled ? 'Enabled' : 'Disabled'}\n\n`;
@@ -356,6 +357,19 @@ export async function getStorage(
    } catch (error) {
      return formatErrorResponse(error as Error, 'Get Storage');
    }
+}
+
+function isPendingChange(change: Record<string, unknown>): boolean {
+  return change.pending !== undefined || change.delete === 1 || change.delete === 2;
+}
+
+function formatPendingChange(change: Record<string, unknown>): string {
+  let output = `\n• **${change.key || 'unknown'}**\n`;
+  if (change.value !== undefined) output += `  • Current: ${change.value}\n`;
+  if (change.pending !== undefined) output += `  • Pending: ${change.pending === '' ? '""' : change.pending}\n`;
+  if (change.delete === 1) output += '  • Delete: scheduled\n';
+  if (change.delete === 2) output += '  • Delete: force-delete scheduled\n';
+  return output;
 }
 
 /**
@@ -372,9 +386,9 @@ export async function getVmPending(
      const safeNode = validateNodeName(validated.node);
      const safeVMID = validateVMID(validated.vmid);
 
-     const pending = (await client.request(
+     const pending = ((await client.request(
        `/nodes/${safeNode}/qemu/${safeVMID}/pending`
-     )) as Array<Record<string, unknown>>;
+     )) as Array<Record<string, unknown>>).filter(isPendingChange);
 
      let output = `🖥️ **QEMU VM Pending Changes** (ID: ${safeVMID})\n\n`;
      output += `• **Node**: ${safeNode}\n\n`;
@@ -383,15 +397,7 @@ export async function getVmPending(
        output += 'No pending changes.\n';
      } else {
        output += `**Pending Changes** (${pending.length}):\n`;
-       for (const change of pending) {
-         output += `\n• **${change.key || 'unknown'}**\n`;
-         if (change.value !== undefined) {
-           output += `  • Value: ${change.value}\n`;
-         }
-         if (change.delete !== undefined) {
-           output += `  • Delete: ${change.delete}\n`;
-         }
-       }
+       for (const change of pending) output += formatPendingChange(change);
      }
 
      return formatToolResponse(output);
@@ -414,9 +420,9 @@ export async function getLxcPending(
       const safeNode = validateNodeName(validated.node);
       const safeVMID = validateVMID(validated.vmid);
 
-      const pending = (await client.request(
+      const pending = ((await client.request(
         `/nodes/${safeNode}/lxc/${safeVMID}/pending`
-      )) as Array<Record<string, unknown>>;
+      )) as Array<Record<string, unknown>>).filter(isPendingChange);
 
       let output = `📦 **LXC Container Pending Changes** (ID: ${safeVMID})\n\n`;
       output += `• **Node**: ${safeNode}\n\n`;
@@ -425,15 +431,7 @@ export async function getLxcPending(
         output += 'No pending changes.\n';
       } else {
         output += `**Pending Changes** (${pending.length}):\n`;
-        for (const change of pending) {
-          output += `\n• **${change.key || 'unknown'}**\n`;
-          if (change.value !== undefined) {
-            output += `  • Value: ${change.value}\n`;
-          }
-          if (change.delete !== undefined) {
-            output += `  • Delete: ${change.delete}\n`;
-          }
-        }
+        for (const change of pending) output += formatPendingChange(change);
       }
 
       return formatToolResponse(output);

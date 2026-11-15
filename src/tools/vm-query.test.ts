@@ -374,7 +374,7 @@ describe('getStorage', () => {
     expect(mockRequest).toHaveBeenCalledWith('/nodes/pve1/storage');
   });
 
-  it('deduplicates storage pools', async () => {
+  it('preserves same-name storage pools on different nodes', async () => {
     const mockRequest = vi.mocked(client.request);
     mockRequest.mockResolvedValueOnce(sampleNodes);
     mockRequest.mockResolvedValueOnce(sampleStorage);
@@ -384,7 +384,7 @@ describe('getStorage', () => {
     const result = await getStorage(client, config, {});
 
     const localCount = (result.content[0].text.match(/\*\*local\*\*/g) || []).length;
-    expect(localCount).toBe(1);
+    expect(localCount).toBe(2);
   });
 
   it('sorts storage by name', async () => {
@@ -462,8 +462,8 @@ describe('getVmPending', () => {
 
   it('returns pending changes for a QEMU VM', async () => {
     const mockPending = [
-      { key: 'memory', value: '8192' },
-      { key: 'cores', value: '4' },
+      { key: 'memory', value: '4096', pending: '8192' },
+      { key: 'cores', value: '2', pending: '4' },
     ];
 
     const mockRequest = vi.mocked(client.request);
@@ -526,8 +526,8 @@ describe('getLxcPending', () => {
 
    it('returns pending changes for an LXC container', async () => {
      const mockPending = [
-       { key: 'memory', value: '2048' },
-       { key: 'cores', value: '2' },
+       { key: 'memory', value: '1024', pending: '2048' },
+       { key: 'cores', value: '1', pending: '2' },
      ];
 
      const mockRequest = vi.mocked(client.request);

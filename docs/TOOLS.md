@@ -125,7 +125,9 @@ Query node tasks. action=list: list recent tasks | action=get: get task details 
 | Action | Permission | Description |
 |--------|------------|-------------|
 | `list` | Basic | List recent tasks |
-| `get` | Basic | Get task details by UPID |
+| `get` | Basic | Get task status by UPID (including API-token UPIDs) |
+
+For `list`, optional `source` is `all` (default), `active`, or `archive`. Optional `limit` (positive integer; PVE default 50), `vmid`, and `typefilter` narrow the results. `get` reads the task status endpoint, not task logs.
 
 ---
 
@@ -174,6 +176,8 @@ Manage APT packages. action=update(elevated)|upgrade(elevated): package ops | ac
 | `update` | Elevated 🔒 | Update package lists |
 | `upgrade` | Elevated 🔒 | Upgrade packages |
 | `versions` | Basic | List package versions |
+
+`versions` supports an optional `package` case-insensitive substring filter, applied locally. Running kernel and manager versions are shown when supplied by PVE.
 
 ---
 
@@ -387,6 +391,10 @@ Execute commands via QEMU agent. operation=exec: run command | operation=status:
 | `exec` | Run command in guest |
 | `status` | Check execution status |
 
+For `exec`, `command` is the literal executable name/path and `args` is its argument array; no implicit shell splitting occurs. Example: `{"node":"pve1","vmid":100,"operation":"exec","command":"uname","args":["-a"]}`. Optional `input-data` supplies stdin. Execution returns a PID; use `operation=status` to retrieve stdout/stderr and completion status.
+
+Compatibility: deprecated `capture-output=true` is accepted but not sent to PVE, which always captures output. `capture-output=false` and any `timeout` value are explicitly rejected before execution; omit these options. Automatic polling is not implemented.
+
 ---
 
 #### `proxmox_agent_file` 🔒
@@ -445,6 +453,8 @@ Manage storage configurations (list, get, create, update, delete, cluster_usage)
 | `update` | Elevated 🔒 | Update storage configuration |
 | `delete` | Elevated 🔒 | Delete storage configuration |
 | `cluster_usage` | Basic | Get cluster-wide storage usage |
+
+For `cluster_usage`, omit `node` to query all nodes or supply it to restrict the query. Results retain each `(node, storage)` pair, including shared storage; they are per-node views, not a sum of unique physical capacity.
 
 ---
 

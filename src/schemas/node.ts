@@ -158,6 +158,10 @@ export type GetNodeJournalInput = z.infer<typeof getNodeJournalSchema>;
 // proxmox_get_node_tasks - List node tasks
 export const getNodeTasksSchema = z.object({
   node: z.string().min(1).describe('Node name'),
+  source: z.enum(['archive', 'active', 'all']).optional().describe('Task source (default: all)'),
+  limit: z.number().int().min(1).optional().describe('Maximum number of tasks (PVE default: 50)'),
+  vmid: z.number().int().min(1).optional().describe('Filter by guest ID'),
+  typefilter: z.string().min(1).optional().describe('Filter by task type, e.g. vzdump'),
 });
 
 export type GetNodeTasksInput = z.infer<typeof getNodeTasksSchema>;
@@ -242,10 +246,7 @@ export type NodeLogToolInput = z.infer<typeof nodeLogToolSchema>;
 
 // ── Consolidated: proxmox_node_task ──────────────────────────────────────
 export const nodeTaskToolSchema = z.discriminatedUnion('action', [
-  z.object({
-    action: z.literal('list'),
-    node: z.string().min(1).describe('Node name'),
-  }),
+  getNodeTasksSchema.extend({ action: z.literal('list') }),
   z.object({
     action: z.literal('get'),
     node: z.string().min(1).describe('Node name'),
