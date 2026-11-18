@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { StorageTransferClient } from './storage-transfer.js';
 import { Agent, type Dispatcher } from 'undici';
 import type { Config } from '../config/schema.js';
 import { logger } from '../utils/index.js';
@@ -64,6 +65,7 @@ export class ProxmoxApiClient {
   private readonly authHeader: string;
   private readonly dispatcher: Dispatcher;
   private readonly tokenValue: string;
+  readonly storageTransfer: StorageTransferClient;
 
   constructor(config: Config) {
     this.tokenValue = config.tokenValue;
@@ -88,6 +90,7 @@ export class ProxmoxApiClient {
     }
 
     this.dispatcher = new Agent({ connect: connectOptions });
+    this.storageTransfer = new StorageTransferClient(new URL(this.baseUrl).origin, this.dispatcher, this.authHeader);
   }
 
   async request<T>(endpoint: string, method = 'GET', body?: unknown): Promise<T> {

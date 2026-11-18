@@ -199,8 +199,8 @@ export const toolPermissions: ToolPermissions = {
     delete: 'elevated',
   },
   proxmox_file_restore: {
-    list: 'basic',
-    download: 'basic',
+    list: 'elevated',
+    download: 'elevated',
   },
   proxmox_ceph_fs: {
     list: 'basic',

@@ -184,7 +184,7 @@ describe('Storage consolidated tools', () => {
       expect(result.content[0].text).toContain('Permission denied');
     });
 
-    it('supports action=upload with elevated permissions', async () => {
+    it('rejects action=upload until local file transfers are enabled', async () => {
       const config = createTestConfig({ allowElevated: true });
       client.request.mockResolvedValue('UPID:pve1:123');
 
@@ -196,8 +196,9 @@ describe('Storage consolidated tools', () => {
         filename: 'test.iso',
       });
 
-      expect(result.isError).toBe(false);
-      expect(result.content[0].text).toContain('Upload');
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('not enabled');
+      expect(client.request).not.toHaveBeenCalled();
     });
 
     it('requires elevated permissions for action=download_url', async () => {

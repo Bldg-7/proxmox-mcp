@@ -3,6 +3,7 @@ import type { Config } from '../config/index.js';
 import type { ToolResponse } from '../types/index.js';
 import { formatToolResponse, formatErrorResponse } from '../formatters/index.js';
 import { requireElevated } from '../middleware/index.js';
+import { formatRestoreListing } from '../formatters/restore-list.js';
 import { validateNodeName, validateStorageName } from '../validators/index.js';
 import {
   listStorageConfigSchema,
@@ -10,12 +11,10 @@ import {
   createStorageSchema,
   updateStorageSchema,
   deleteStorageSchema,
-  uploadToStorageSchema,
   downloadUrlToStorageSchema,
   listStorageContentSchema,
   deleteStorageContentSchema,
   listFileRestoreSchema,
-  downloadFileRestoreSchema,
   pruneBackupsSchema,
   fileRestoreSchema,
 } from '../schemas/storage-management.js';
@@ -53,15 +52,6 @@ interface StorageContentEntry {
   ctime?: number;
   vmid?: number;
   notes?: string;
-  [key: string]: unknown;
-}
-
-interface FileRestoreEntry {
-  filepath?: string;
-  path?: string;
-  filename?: string;
-  size?: number;
-  type?: string;
   [key: string]: unknown;
 }
 
@@ -281,41 +271,14 @@ export async function deleteStorage(
  * Upload ISO/template file to storage.
  */
 export async function uploadToStorage(
-  client: ProxmoxApiClient,
+  _client: ProxmoxApiClient,
   config: Config,
-  input: UploadToStorageInput
+  _input: UploadToStorageInput
 ): Promise<ToolResponse> {
   try {
     requireElevated(config, 'upload to storage');
 
-    const validated = uploadToStorageSchema.parse(input);
-    const safeNode = validateNodeName(validated.node);
-    const safeStorage = validateStorageName(validated.storage);
-    const payload: Record<string, unknown> = {
-      content: validated.content,
-      filename: validated.filename,
-    };
-
-    if (validated.checksum) payload.checksum = validated.checksum;
-    if (validated['checksum-algorithm']) {
-      payload['checksum-algorithm'] = validated['checksum-algorithm'];
-    }
-
-    const result = await client.request(
-      `/nodes/${safeNode}/storage/${safeStorage}/upload`,
-      'POST',
-      payload
-    );
-
-    let output = '📤 **Storage Upload Started**\n\n';
-    output += `• **Node**: ${safeNode}\n`;
-    output += `• **Storage**: ${safeStorage}\n`;
-    output += `• **Content**: ${validated.content}\n`;
-    output += `• **Filename**: ${validated.filename}\n`;
-    output += `• **Task ID**: ${result ?? 'N/A'}\n\n`;
-    output += 'Upload runs asynchronously.';
-
-    return formatToolResponse(output);
+    throw new Error('Local file transfers are not enabled in this version.');
   } catch (error) {
     return formatErrorResponse(error as Error, 'Upload to Storage');
   }
@@ -456,41 +419,19 @@ export async function deleteStorageContent(
  */
 export async function listFileRestore(
   client: ProxmoxApiClient,
-  _config: Config,
+  config: Config,
   input: ListFileRestoreInput
 ): Promise<ToolResponse> {
   try {
+    requireElevated(config, 'list files inside a PBS backup');
     const validated = listFileRestoreSchema.parse(input);
+    if (validated.path !== undefined && validated.filepath !== undefined) throw new Error('Specify only filepath, not both filepath and path');
     const safeNode = validateNodeName(validated.node);
     const safeStorage = validateStorageName(validated.storage);
 
-    const params = new URLSearchParams();
-    params.set('volume', validated.volume);
-    if (validated.path) params.set('path', validated.path);
-
-    const path = `/nodes/${safeNode}/storage/${safeStorage}/file-restore/list?${params}`;
-    const files = (await client.request(path)) as FileRestoreEntry[];
-
-    let output = '🧾 **File Restore Listing**\n\n';
-    output += `• **Node**: ${safeNode}\n`;
-    output += `• **Storage**: ${safeStorage}\n`;
-    output += `• **Volume**: ${validated.volume}\n\n`;
-
-    if (!files || files.length === 0) {
-      output += 'No files found in backup.';
-      return formatToolResponse(output);
-    }
-
-    for (const file of files) {
-      const name = file.filepath ?? file.path ?? file.filename ?? 'unknown';
-      output += `• **${name}**`;
-      if (file.type) output += ` (${file.type})`;
-      if (file.size !== undefined) output += ` - ${file.size} bytes`;
-      output += '\n';
-    }
-
-    output += `\n**Total**: ${files.length} item(s)`;
-    return formatToolResponse(output);
+    const files = await client.storageTransfer.list({ node: safeNode, storage: safeStorage,
+      volume: validated.volume, filepath: validated.filepath ?? validated.path ?? '/' });
+    return formatToolResponse(formatRestoreListing(safeNode, safeStorage, validated.volume, files));
   } catch (error) {
     return formatErrorResponse(error as Error, 'List File Restore');
   }
@@ -500,30 +441,13 @@ export async function listFileRestore(
  * Download file from backup.
  */
 export async function downloadFileRestore(
-  client: ProxmoxApiClient,
-  _config: Config,
-  input: DownloadFileRestoreInput
+  _client: ProxmoxApiClient,
+  config: Config,
+  _input: DownloadFileRestoreInput
 ): Promise<ToolResponse> {
   try {
-    const validated = downloadFileRestoreSchema.parse(input);
-    const safeNode = validateNodeName(validated.node);
-    const safeStorage = validateStorageName(validated.storage);
-
-    const params = new URLSearchParams();
-    params.set('volume', validated.volume);
-    params.set('filepath', validated.filepath);
-
-    const path = `/nodes/${safeNode}/storage/${safeStorage}/file-restore/download?${params}`;
-    const result = await client.request(path);
-
-    let output = '📥 **File Restore Download**\n\n';
-    output += `• **Node**: ${safeNode}\n`;
-    output += `• **Storage**: ${safeStorage}\n`;
-    output += `• **Volume**: ${validated.volume}\n`;
-    output += `• **File**: ${validated.filepath}\n`;
-    output += `• **Result**: ${result ?? 'OK'}`;
-
-    return formatToolResponse(output);
+    requireElevated(config, 'download files from a PBS backup');
+    throw new Error('Local file transfers are not enabled in this version.');
   } catch (error) {
     return formatErrorResponse(error as Error, 'Download File Restore');
   }

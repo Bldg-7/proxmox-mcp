@@ -46,13 +46,13 @@ export const sampleStorageContent = [
 
 export const sampleFileRestoreList = [
   {
-    filepath: '/etc/hosts',
-    type: 'file',
+    filepath: 'L2V0Yy9ob3N0cw==', text: '/etc/hosts', leaf: 1,
+    type: 'f',
     size: 512,
   },
   {
-    filepath: '/var/log',
-    type: 'directory',
+    filepath: 'L3Zhci9sb2c=', text: 'log', leaf: 0,
+    type: 'd',
   },
 ];
 

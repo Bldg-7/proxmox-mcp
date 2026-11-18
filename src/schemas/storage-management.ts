@@ -148,12 +148,20 @@ export const deleteStorageContentSchema = z.object({
 
 export type DeleteStorageContentInput = z.input<typeof deleteStorageContentSchema>;
 
+// PBS paths are opaque bytes, not necessarily UTF-8. Never reconstruct them from display text.
+export const restoreEntryId = z.string().min(1).max(8192).refine(
+  value => value.length <= 8192 && Buffer.from(value, 'base64').toString('base64') === value,
+  'Expected the base64 filepath returned by PBS',
+);
+const restoreListPath = z.union([z.literal('/'), restoreEntryId]);
+
 // proxmox_list_file_restore - List files in backup for restore
 export const listFileRestoreSchema = z.object({
   node: z.string().min(1).describe('Node name'),
   storage: z.string().min(1).describe('Storage identifier'),
-  volume: z.string().min(1).describe('Backup volume identifier'),
-  path: z.string().optional().describe('Directory path inside backup'),
+  volume: z.string().min(1).max(1024).describe('PBS snapshot volume ID or name'),
+  filepath: restoreListPath.optional().describe('Omit for root, or pass a filepath from a previous listing'),
+  path: restoreListPath.optional().describe('Deprecated alias for filepath; do not supply both'),
 });
 
 export type ListFileRestoreInput = z.input<typeof listFileRestoreSchema>;

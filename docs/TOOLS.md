@@ -465,7 +465,7 @@ Manage storage content (list, list_templates, upload, download_url, delete, prun
 |--------|------------|-------------|
 | `list` | Basic | List storage content |
 | `list_templates` | Basic | List available templates |
-| `upload` | Elevated 🔒 | Upload file to storage |
+| `upload` | Elevated 🔒 | Local file upload is not enabled; no file is read or sent |
 | `download_url` | Elevated 🔒 | Download from URL to storage |
 | `delete` | Elevated 🔒 | Delete storage content |
 | `prune` | Elevated 🔒 | Prune old backups |
@@ -473,12 +473,14 @@ Manage storage content (list, list_templates, upload, download_url, delete, prun
 ---
 
 #### `proxmox_file_restore`
-Restore files from backup. action=list: list files in backup | action=download: download file from backup
+Browse the contents of PBS snapshots. Local downloads are not yet available.
 
 | Action | Permission | Description |
 |--------|------------|-------------|
-| `list` | Basic | List files in backup |
-| `download` | Basic | Download file from backup |
+| `list` | Elevated 🔒 | Browse a PBS snapshot; omit `filepath` for root, then pass a returned base64 `filepath` unchanged (not its display `text`) |
+| `download` | Elevated 🔒 | Local file download is not enabled; nothing is fetched or written |
+
+The MCP server requires elevated access for this sensitive listing, independently of PVE volume ACLs. `path` is a deprecated alias for `filepath`; do not pass both. A listing over 1 MiB is rejected; output is limited to 100 complete entries and 16,000 characters, not server-side pagination.
 
 ---
 

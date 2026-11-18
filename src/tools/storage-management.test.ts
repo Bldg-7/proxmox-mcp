@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createMockProxmoxClient, createTestConfig } from '../__test-utils__/index.js';
 import {
   sampleStorageConfigs,
@@ -158,25 +158,19 @@ describe('uploadToStorage', () => {
     expect(result.isError).toBe(true);
   });
 
-  it('calls correct API endpoint', async () => {
+  it('fails closed without a local file policy', async () => {
     const config = createTestConfig({ allowElevated: true });
-    client.request.mockResolvedValue('UPID:pve1:00001234');
-
-    await uploadToStorage(client, config, {
+    const upload = vi.spyOn(client.storageTransfer, 'upload');
+    const result = await uploadToStorage(client, config, {
       node: 'pve1',
       storage: 'local',
       content: 'iso',
       filename: 'ubuntu.iso',
     });
 
-    expect(client.request).toHaveBeenCalledWith(
-      '/nodes/pve1/storage/local/upload',
-      'POST',
-      {
-        content: 'iso',
-        filename: 'ubuntu.iso',
-      }
-    );
+    expect(result.isError).toBe(true);
+    expect(client.request).not.toHaveBeenCalled();
+    expect(upload).not.toHaveBeenCalled();
   });
 });
 
@@ -257,15 +251,45 @@ describe('listFileRestore', () => {
     client = createMockProxmoxClient();
   });
 
-  it('lists files available for restore', async () => {
-    const config = createTestConfig();
-    client.request.mockResolvedValue(sampleFileRestoreList);
+  const target = { node: 'lab', storage: 'pbs', volume: 'backup/vm/102/t' };
+  it('checks permission before contacting PVE', async () => {
+    const list = vi.spyOn(client.storageTransfer, 'list');
+    const result = await listFileRestore(client, createTestConfig(), target);
+    expect(result.isError).toBe(true);
+    expect(list).not.toHaveBeenCalled();
+  });
 
-    const result = await listFileRestore(client, config, {
-      node: 'pve1',
-      storage: 'backup-nfs',
-      volume: 'backup-nfs:backup/vzdump-qemu-100-2024_01_01-12_00_00.vma.zst',
-    });
+  it.each([{filepath:'/etc/hosts'}, {path:'//8=',filepath:'/'}, {filepath:'//9='}])('rejects ambiguous or noncanonical input %j', async args => {
+    const list = vi.spyOn(client.storageTransfer, 'list');
+    const result = await listFileRestore(client, createTestConfig({allowElevated:true}), {...target,...args});
+    expect(result.isError).toBe(true); expect(list).not.toHaveBeenCalled();
+  });
+
+  it('accepts opaque binary legacy path and bounds rendered output', async () => {
+    const list = vi.spyOn(client.storageTransfer, 'list').mockResolvedValue(Array(101).fill(sampleFileRestoreList[0]));
+    const result = await listFileRestore(client, createTestConfig({allowElevated:true}), {...target,path:'//8='});
+    expect(list).toHaveBeenCalledWith({...target,filepath:'//8='});
+    expect(result.content[0].text).toContain('Shown 100 of 101 entries (output truncated)');
+    expect(result.content[0].text).toContain('"leaf":true');
+  });
+
+  it('rejects an invalid upstream listing instead of displaying an unusable ID', async () => {
+    vi.spyOn(client.storageTransfer, 'list').mockResolvedValue([{text:'etc',filepath:'/plain/path',leaf:0,type:'d'}]);
+    const result = await listFileRestore(client, createTestConfig({allowElevated:true}), target);
+    expect(result.isError).toBe(true);
+  });
+
+  it('lists files available for restore', async () => {
+    const config = createTestConfig({ allowElevated: true });
+    const list = vi.spyOn(client.storageTransfer, 'list').mockResolvedValue(sampleFileRestoreList);
+
+    const target = {node: 'pve1', storage: 'pbs', volume: 'pbs:backup/vm/100/2024-01-01T12:00:00Z'};
+    const result = await listFileRestore(client, config, target);
+    expect(list).toHaveBeenCalledWith({...target, filepath: '/'});
+    const id = sampleFileRestoreList[1].filepath;
+    expect(result.content[0].text).toContain(id);
+    await listFileRestore(client, config, {...target, filepath: id});
+    expect(list).toHaveBeenLastCalledWith({...target, filepath: id});
 
     expect(result.isError).toBe(false);
     expect(result.content[0].text).toContain('File Restore Listing');
@@ -280,9 +304,9 @@ describe('downloadFileRestore', () => {
     client = createMockProxmoxClient();
   });
 
-  it('downloads file from backup', async () => {
-    const config = createTestConfig();
-    client.request.mockResolvedValue('OK');
+  it('does not request binary data before local transfer support is enabled', async () => {
+    const config = createTestConfig({ allowElevated: true });
+    const download = vi.spyOn(client.storageTransfer, 'download');
 
     const result = await downloadFileRestore(client, config, {
       node: 'pve1',
@@ -291,8 +315,9 @@ describe('downloadFileRestore', () => {
       filepath: '/etc/hosts',
     });
 
-    expect(result.isError).toBe(false);
-    expect(result.content[0].text).toContain('File Restore Download');
+    expect(result.isError).toBe(true);
+    expect(client.request).not.toHaveBeenCalled();
+    expect(download).not.toHaveBeenCalled();
   });
 });
 

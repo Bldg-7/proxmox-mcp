@@ -167,8 +167,8 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
 
   // Storage Management (consolidated)
   proxmox_storage_config: 'Manage storage configurations (list, get, create, update, delete, cluster_usage)',
-  proxmox_storage_content: 'Manage storage content (list, list_templates, upload, download_url, delete, prune)',
-  proxmox_file_restore: 'Restore files from backup. action=list: list files in backup | action=download: download file from backup',
+  proxmox_storage_content: 'Manage storage content (list, list_templates, download_url, delete, prune); local upload is not enabled',
+  proxmox_file_restore: 'Browse PBS backups (elevated). action=list: use filepath=/ for root or the opaque filepath from a listing. Local download is not enabled.',
 
   // Ceph Integration (consolidated)
   proxmox_ceph: 'Query Ceph cluster. action=status: get Ceph cluster health, FSID, monitors, OSDs, and placement groups',
