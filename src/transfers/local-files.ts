@@ -16,6 +16,7 @@ export interface LocalFilePolicy {
 }
 interface Digest { size: number; sha256: string }
 export interface LocalSnapshot extends Digest { bytes: AsyncIterable<Uint8Array> }
+export interface FileIdentity { device: string; inode: string }
 export interface LocalArtifact extends Digest {
   id: string; filename: string; integrity: 'received' | 'checksum_matched';
 }
@@ -27,12 +28,19 @@ function limit(value: number): number {
   if (!Number.isSafeInteger(value) || value < 1) throw new Error('Transfer byte limits must be positive safe integers');
   return value;
 }
+function assertJobId(id: string): void {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(id)) throw new Error('Invalid local job id');
+}
+async function openExisting(path: string): Promise<FileHandle | undefined> {
+  try { return await open(path, F.O_RDONLY | F.O_NONBLOCK | F.O_NOFOLLOW); }
+  catch (err) { if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err; return undefined; }
+}
 function validateDigest(value?: string): void {
   if (value !== undefined && !/^[a-fA-F0-9]{64}$/.test(value)) throw new Error('Invalid expected SHA-256');
 }
 
 interface Root { path: string; identity: string; ancestors: Set<string> }
-async function privateRoot(path: string, uid: number): Promise<Root> {
+export async function privateRoot(path: string, uid: number): Promise<Root> {
   if (!isAbsolute(path) || resolve(path) !== path || path === '/') throw new Error('Use a dedicated absolute canonical transfer directory');
   const ancestors = new Set<string>();
   let identity = '';
@@ -108,7 +116,8 @@ export class LocalTransferFiles {
       limit(policy.uploadMaxBytes ?? 2 * GiB), limit(policy.downloadMaxBytes ?? 2 * GiB));
   }
 
-  private async locked<T>(signal: AbortSignal, roots: Root[], work: (available: number) => Promise<T>): Promise<T> {
+  private async locked<T>(signal: AbortSignal, roots: Root[], owner: string | undefined, work: (available: number) => Promise<T>): Promise<T> {
+    if (owner !== undefined) assertJobId(owner);
     signal.throwIfAborted();
     // Do not keep using a path whose permissions or identity changed between jobs.
     for (const root of roots) {
@@ -123,6 +132,7 @@ export class LocalTransferFiles {
       throw err;
     }
     try {
+      if (owner) { await fd.writeFile(owner); await fd.sync(); }
       const available = this.quota - await usedBytes(this.managed.path, this.quota);
       signal.throwIfAborted();
       return await work(available);
@@ -131,13 +141,52 @@ export class LocalTransferFiles {
     }
   }
 
+  /** Called only under the journal's exclusive lease. Never remove another writer's lock. */
+  async recoverJob(id: string, intent?: LocalArtifact, witness?: FileIdentity): Promise<boolean> {
+    assertJobId(id);
+    const root = this.managed.path;
+    const current = await privateRoot(root, process.geteuid!());
+    if (current.identity !== this.managed.identity) throw new Error('Configured transfer directory was replaced');
+    const lockPath = join(root, lockName);
+    let owned = false;
+    const lock = await openExisting(lockPath);
+    if (lock) {
+      try {
+        const st = await lock.stat();
+        owned = st.isFile() && st.nlink === 1 && st.size === id.length && (await lock.readFile('utf8')) === id;
+      } finally { await lock.close(); }
+    }
+    let verified = false;
+    if (intent && witness && intent.id === id && intent.filename === `${id}.bin`) {
+      const final = await openExisting(join(root, `${id}.bin`));
+      if (final) {
+        try {
+          const st = await final.stat({bigint:true});
+          if (st.isFile() && st.dev.toString() === witness.device && st.ino.toString() === witness.inode &&
+              st.size === BigInt(intent.size) && st.size <= BigInt(this.downloadMax)) {
+            const hash = createHash('sha256');
+            for await (const chunk of final.createReadStream({autoClose:false, end:Math.max(0, Number(st.size)-1)})) hash.update(chunk);
+            verified = hash.digest('hex') === intent.sha256;
+          }
+        } finally { await final.close(); }
+      }
+    }
+    if (owned) {
+      for (const name of [`.${id}.partial`, `.${id}.snapshot`, lockName]) {
+        try { await unlink(join(root, name)); }
+        catch (err) { if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err; }
+      }
+    }
+    return verified;
+  }
+
   /** Snapshot lifetime, quota reservation and FD release include the entire async consumer. */
-  async withSnapshot<T>(basename: string, signal: AbortSignal, consume: (snapshot: LocalSnapshot) => Promise<T>, expectedSha256?: string): Promise<T> {
+  async withSnapshot<T>(basename: string, signal: AbortSignal, consume: (snapshot: LocalSnapshot) => Promise<T>, expectedSha256?: string, owner?: string): Promise<T> {
     if (!this.uploads) throw new Error('No upload directory configured');
     if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,254}$/.test(basename)) throw new Error('Expected a single safe upload basename');
     validateDigest(expectedSha256);
     const path = join(this.uploads.path, basename);
-    return this.locked(signal, [this.managed, this.uploads], async available => {
+    return this.locked(signal, [this.managed, this.uploads], owner, async available => {
       // Do not open devices/FIFOs. Recheck identity and type on the actual descriptor.
       const pre = await lstat(path, { bigint: true });
       if (!pre.isFile() || pre.nlink !== 1n) throw new Error('Expected a single-link regular upload file');
@@ -147,7 +196,7 @@ export class LocalTransferFiles {
         if (!start.isFile() || start.nlink !== 1n || pre.ino !== start.ino || pre.dev !== start.dev) throw new Error('Upload source changed');
         if (start.size <= 0n || start.size > BigInt(this.uploadMax)) throw new Error('Invalid upload size');
         if (start.size > BigInt(available)) throw new Error('Transfer quota exceeded');
-        const temp = join(this.managed.path, `.${randomUUID()}.snapshot`);
+        const temp = join(this.managed.path, `.${owner ?? randomUUID()}.snapshot`);
         const stage = await open(temp, exclusive, 0o600);
         try {
           // Anonymous inode: neither an in-progress upload nor a crash leaves a readable snapshot path.
@@ -167,22 +216,29 @@ export class LocalTransferFiles {
 
   /** Input must observe the same signal (as StorageTransferClient.download does).
    * Final artifact is published only after EOF, optional digest verification and fsync. */
-  async receive(input: AsyncIterable<Uint8Array>, signal: AbortSignal, expectedSha256?: string): Promise<LocalArtifact> {
+  async receive(input: AsyncIterable<Uint8Array>, signal: AbortSignal, expectedSha256?: string,
+    job?: { id: string; beforePublish: (artifact: LocalArtifact, witness: FileIdentity) => void; afterPublish?: () => void }): Promise<LocalArtifact> {
     validateDigest(expectedSha256);
-    return this.locked(signal, [this.managed], async available => {
-      const id = randomUUID();
+    return this.locked(signal, [this.managed], job?.id, async available => {
+      const id = job?.id ?? randomUUID();
       const filename = `${id}.bin`;
       const temp = join(this.managed.path, `.${id}.partial`);
       const out = await open(temp, exclusive, 0o600);
       try {
         let digest: Digest;
+        let witness: FileIdentity;
         try {
           digest = await copyBytes(input, out, this.downloadMax, available, signal, expectedSha256);
           await out.sync();
+          const st = await out.stat({bigint:true});
+          witness = {device:st.dev.toString(), inode:st.ino.toString()};
         } finally { await out.close(); }
         signal.throwIfAborted();
+        const artifact: LocalArtifact = { id, filename, ...digest, integrity: expectedSha256 ? 'checksum_matched' : 'received' };
+        job?.beforePublish(artifact, witness);
         await link(temp, join(this.managed.path, filename)); // atomic no-replace, no rename fallback
-        return { id, filename, ...digest, integrity: expectedSha256 ? 'checksum_matched' : 'received' };
+        job?.afterPublish?.();
+        return artifact;
       } finally { await unlink(temp); }
     });
   }
