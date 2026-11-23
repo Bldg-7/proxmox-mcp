@@ -76,8 +76,9 @@ npx @bldg-7/proxmox-mcp
 | `PROXMOX_SSH_USER` | 아니오 | SSH 사용자명 | `root` |
 | `PROXMOX_SSH_KEY_PATH` | SSH 활성화 시 | SSH 개인 키 경로 | - |
 | `PROXMOX_SSH_NODE` | SSH 활성화 시 | SSH로 접근 가능한 Proxmox 노드명 | - |
-| `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | SSH 활성화 시 (명시적 insecure 모드 제외) | 패딩 없는 OpenSSH `SHA256:<base64>` 또는 64자리 SHA-256 hex | - |
-| `PROXMOX_SSH_ALLOW_INSECURE` | 아니오 | SSH 호스트 키 검증 생략을 명시적으로 허용 (테스트 네트워크 전용) | `false` |
+| `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | 아니오 | 고정 호스트 키 지문, 가장 먼저 확인: 패딩 없는 OpenSSH `SHA256:<base64>` 또는 64자리 SHA-256 hex | - |
+| `PROXMOX_SSH_KNOWN_HOSTS` | 아니오 | 확인할 known_hosts 파일 (절대 경로 또는 `~/...`). insecure 모드에서도 확인 | `~/.ssh/known_hosts` |
+| `PROXMOX_SSH_ALLOW_INSECURE` | 아니오 | 위 두 설정이 모두 없을 때 호스트 키 검증 생략 (테스트 네트워크 전용) | `false` |
 | `PROXMOX_LOG_LEVEL` | 아니오 | 로그 레벨 (`trace`, `debug`, `info`, `warn`, `error`, `fatal`) | `info` |
 
 ### 로컬 파일 전송 (기본 비활성)
@@ -97,7 +98,18 @@ npx @bldg-7/proxmox-mcp
 
 ### SSH 신뢰 설정 및 진단 출력
 
-기존 SSH 사용자는 업그레이드 전에 fingerprint를 설정하거나 insecure 모드를 명시적으로 선택해야 합니다. 신뢰할 수 있는 노드 콘솔에서 `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub -E sha256` 등을 실행해 SSH 연결에서 사용하는 호스트 키의 `SHA256:...` 값을 확인하세요. 검증되지 않은 네트워크에서 수집한 지문을 그대로 신뢰하면 안 됩니다. fingerprint를 지정하면 insecure 모드에서도 반드시 검증하며 잘못된 형식이나 불일치는 거부합니다.
+`proxmox_lxc_exec`는 명령을 보내기 전에 노드의 SSH 호스트 키를 검증합니다. 서버는 아래 순서에서 처음 해당하는 신뢰 기준을 씁니다.
+
+1. `PROXMOX_SSH_HOST_KEY_FINGERPRINT`가 있으면 그 지문
+2. `PROXMOX_SSH_KNOWN_HOSTS`가 있으면 그 파일. insecure 모드에서도 이 파일은 확인합니다.
+3. `PROXMOX_SSH_ALLOW_INSECURE=true`이면 검증하지 않음. 신뢰할 수 있는 테스트 네트워크에서만 쓰세요.
+4. MCP 서버를 실행하는 사용자의 `~/.ssh/known_hosts`
+
+그 사용자가 이미 `ssh`로 노드에 접속해 키를 받아 두었다면, 4번이 적용되므로 추가 설정이 필요 없습니다. 그렇지 않다면 그 사용자로 `ssh -p <포트> <사용자>@<호스트>`를 한 번 실행하세요. 화면의 지문이 신뢰할 수 있는 노드 콘솔의 지문(예: `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub -E sha256`)과 같을 때만 키를 받으세요. 검증되지 않은 네트워크에서 얻은 지문이나 키를 그대로 신뢰하면 안 됩니다.
+
+서버는 22번 포트이면 `호스트`, 다른 포트이면 `[호스트]:포트` 항목을 찾습니다. 호스트는 `PROXMOX_SSH_HOST`이고, 이 값이 없으면 `PROXMOX_HOST`입니다. 해시된 호스트 이름, 와일드카드, 부정 패턴, `@revoked` 항목을 지원합니다. `@cert-authority` 항목은 지원하지 않습니다. 서버는 파일에 있는 키 종류로만 협상하므로, RSA 키만 있는 파일도 동작합니다. 새로 연결할 때마다 파일을 다시 읽습니다.
+
+서버는 시작할 때 신뢰 기준을 확인합니다. SSH를 켰는데 해당하는 신뢰 기준이 없거나, known_hosts 파일에 노드 항목이 없으면 시작하지 않습니다. 형식이 잘못되었거나 일치하지 않는 지문은 거부합니다.
 
 노드 진단 report는 이제 `PROXMOX_ALLOW_ELEVATED=true`가 필요합니다. 마스킹 후 report는 16,000자, 오류 응답은 4,096자로 제한하고 잘림 표시를 추가합니다. 진단 로그에도 중첩 credential 필드와 일반적인 토큰·비밀번호·인증 패턴 마스킹을 적용합니다. 이는 best-effort이며 이름표 없는 임의 비밀값까지 완벽히 제거하지는 못합니다. 자격증명 생성 성공 응답을 전역 마스킹하지는 않습니다.
 

@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { configSchema, sslModeSchema, type Config, type SslMode } from './schema.js';
+import { resolveHostTrust } from '../security/ssh-host-key.js';
 
 export { type Config, type SslMode } from './schema.js';
 
@@ -33,6 +34,7 @@ export function loadConfig(): Config {
     sshKeyPath: process.env.PROXMOX_SSH_KEY_PATH || undefined,
     sshNode: process.env.PROXMOX_SSH_NODE || undefined,
     sshHostKeyFingerprint: process.env.PROXMOX_SSH_HOST_KEY_FINGERPRINT || undefined,
+    sshKnownHostsPath: process.env.PROXMOX_SSH_KNOWN_HOSTS || undefined,
     sshAllowInsecure: process.env.PROXMOX_SSH_ALLOW_INSECURE === 'true',
     fileTransfer: process.env.PROXMOX_FILE_TRANSFER_ENABLED === 'true' ? {
       transferRoot: process.env.PROXMOX_TRANSFER_ROOT,
@@ -55,5 +57,21 @@ export function loadConfig(): Config {
     throw new Error(`Invalid configuration:\n${errors}`);
   }
 
-  return result.data;
+  const config = result.data;
+  if (config.sshEnabled) {
+    // Fail at startup, not on the first lxc_exec call, when no host key can be trusted.
+    try {
+      resolveHostTrust({
+        host: config.sshHost ?? config.host,
+        port: config.sshPort,
+        hostKeyFingerprint: config.sshHostKeyFingerprint,
+        knownHostsPath: config.sshKnownHostsPath,
+        allowInsecure: config.sshAllowInsecure,
+      });
+    } catch (error) {
+      throw new Error(`Invalid configuration:\n  ssh: ${(error as Error).message}`);
+    }
+  }
+
+  return config;
 }

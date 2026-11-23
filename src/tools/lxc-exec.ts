@@ -54,6 +54,7 @@ export async function handleLxcExec(
       username: config.sshUser,
       privateKeyPath: config.sshKeyPath,
       hostKeyFingerprint: config.sshHostKeyFingerprint,
+      knownHostsPath: config.sshKnownHostsPath,
       allowInsecure: config.sshAllowInsecure,
     });
 

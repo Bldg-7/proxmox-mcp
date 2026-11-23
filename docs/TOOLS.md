@@ -982,7 +982,7 @@ Execute a command inside an LXC container via SSH to Proxmox host using `pct exe
 - Commands are shell-quoted and executed via `/usr/sbin/pct exec {vmid} -- /bin/sh -c '{command}'`
 - Node name must match configured `PROXMOX_SSH_NODE`
 - Output limited to 64KB
-- Optional host key fingerprint verification via `PROXMOX_SSH_HOST_KEY_FINGERPRINT`
+- Host key verification before each connection: `PROXMOX_SSH_HOST_KEY_FINGERPRINT`, `PROXMOX_SSH_KNOWN_HOSTS`, or `~/.ssh/known_hosts` (see README)
 
 **Required Environment Variables**:
 ```bash
