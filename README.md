@@ -78,9 +78,6 @@ Set the following environment variables before starting the server:
 | `PROXMOX_SSH_USER` | No | SSH username | `root` |
 | `PROXMOX_SSH_KEY_PATH` | When SSH enabled | Path to SSH private key | - |
 | `PROXMOX_SSH_NODE` | When SSH enabled | Proxmox node name reachable via SSH | - |
-| `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | No | Pinned host key, checked first: OpenSSH `SHA256:<base64>` without padding, or 64-digit SHA-256 hex | - |
-| `PROXMOX_SSH_KNOWN_HOSTS` | No | known_hosts file to check (absolute path or `~/...`). Checked even in insecure mode | `~/.ssh/known_hosts` |
-| `PROXMOX_SSH_ALLOW_INSECURE` | No | Skip host key verification when neither of the two settings above is set (test networks only) | `false` |
 | `PROXMOX_LOG_LEVEL` | No | Log verbosity (`trace`, `debug`, `info`, `warn`, `error`, `fatal`) | `info` |
 
 ### Local file transfers (off by default)
@@ -98,20 +95,13 @@ To opt in, set **both** `PROXMOX_FILE_TRANSFER_ENABLED=true` and `PROXMOX_ALLOW_
 
 Roots are checked on startup; invalid settings prevent startup. Files are local to the MCP **server**, not the requesting user's machine. See [transfer actions and examples](docs/TOOLS.md#proxmox_file_transfer). PBS browsing requires elevated access but not file transfer opt-in. `download_url` is a different operation: PVE fetches a URL, not a local file.
 
-### SSH trust and diagnostic output
+### SSH host keys and diagnostic output
 
-`proxmox_lxc_exec` verifies the SSH host key of the node before it sends a command. The server uses the first trust source that applies:
+`proxmox_lxc_exec` checks the node's SSH host key against `~/.ssh/known_hosts` of the user that runs the MCP server, the same file the `ssh` command uses. There is no setting for this.
 
-1. `PROXMOX_SSH_HOST_KEY_FINGERPRINT`, if set.
-2. `PROXMOX_SSH_KNOWN_HOSTS`, if set. This file is checked even when insecure mode is on.
-3. No verification, if `PROXMOX_SSH_ALLOW_INSECURE=true`. Use this on trusted test networks only.
-4. `~/.ssh/known_hosts` of the user that runs the MCP server.
+If that user has already connected to the node with `ssh`, nothing else is needed. Otherwise, run `ssh -p <port> <user>@<host>` once as that user, and accept the key only if it matches the fingerprint on the node console (`ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub -E sha256`).
 
-If that user has already connected to the node with `ssh` and accepted its key, step 4 works with no extra settings. Otherwise, run `ssh -p <port> <user>@<host>` once as that user. Accept the key only after it matches the fingerprint on a trusted node console, for example `ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub -E sha256`. Do not trust a fingerprint or key collected over an unverified network.
-
-The server looks up `host` for port 22 and `[host]:port` for other ports. The host is `PROXMOX_SSH_HOST`, or `PROXMOX_HOST` when that is not set. Hashed host names, wildcards, negated patterns and `@revoked` entries are supported. `@cert-authority` entries are not. The server offers only the host key types that the file has for the node, so a file with only an RSA key still works. It re-reads the file for each new connection.
-
-The server checks the trust source at startup. It does not start when SSH is enabled and no trust source applies, or when the known_hosts file has no entry for the node. Malformed or mismatched fingerprints are rejected.
+With SSH enabled, the server does not start when the file has no entry for the node. It looks up `host` for port 22 and `[host]:port` for other ports, where the host is `PROXMOX_SSH_HOST` (or `PROXMOX_HOST`). Hashed names, wildcards and `@revoked` entries work; `@cert-authority` entries do not.
 
 Node diagnostic reports now require `PROXMOX_ALLOW_ELEVATED=true`. Reports are redacted and limited to 16,000 characters; error responses are limited to 4,096 characters, with a truncation notice. Diagnostic logs redact nested credential fields and common token/password/authorization patterns. Redaction is best-effort, not a guarantee for arbitrary unlabelled secrets. Intentional credential-creation success responses are not globally masked.
 

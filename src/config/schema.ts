@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { parseHostFingerprint } from '../security/ssh-host-key.js';
 
 export const sslModeSchema = z.enum(['strict', 'verify', 'insecure']);
 export type SslMode = z.infer<typeof sslModeSchema>;
@@ -53,14 +52,6 @@ export const configSchema = z.object({
   sshNode: z
     .string()
     .optional(),
-  sshHostKeyFingerprint: z.string().refine((value) => {
-    try { parseHostFingerprint(value); return true; } catch { return false; }
-  }, 'Expected OpenSSH SHA256:<base64> or 64-digit SHA-256 hex').optional(),
-  sshKnownHostsPath: z.string().min(1).refine(
-    (value) => value.startsWith('/') || value.startsWith('~/'),
-    'PROXMOX_SSH_KNOWN_HOSTS must be an absolute path or start with ~/',
-  ).optional(),
-  sshAllowInsecure: z.boolean().default(false),
   // Absent unless the operator explicitly enables local file transfers.
   fileTransfer: z.object({
     transferRoot: z.string().min(1),

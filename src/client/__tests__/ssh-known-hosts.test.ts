@@ -1,10 +1,10 @@
 // Real SSH handshakes against a local ssh2 server on 127.0.0.1. No Proxmox or external network.
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Server, utils } from 'ssh2';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { SshClient } from '../ssh.js';
 
 const hostEd25519 = utils.generateKeyPairSync('ed25519');
@@ -17,9 +17,14 @@ let server: Server;
 let port: number;
 let dir: string;
 let keyPath: string;
+let knownHosts: string;
 
 beforeAll(async () => {
+  // The client reads ~/.ssh/known_hosts, so give it a private HOME.
   dir = mkdtempSync(join(tmpdir(), 'ssh-known-hosts-'));
+  vi.stubEnv('HOME', dir);
+  mkdirSync(join(dir, '.ssh'));
+  knownHosts = join(dir, '.ssh', 'known_hosts');
   keyPath = join(dir, 'id_ed25519');
   writeFileSync(keyPath, clientKey.private, { mode: 0o600 });
   // The server can present either key; the client decides which type it accepts.
@@ -43,13 +48,13 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await new Promise<void>(resolve => server.close(() => resolve()));
+  vi.unstubAllEnvs();
   rmSync(dir, { recursive: true, force: true });
 });
 
-async function runWith(knownHosts: string): Promise<string> {
-  const path = join(dir, `known_hosts_${Math.random().toString(16).slice(2)}`);
-  writeFileSync(path, knownHosts);
-  const ssh = new SshClient({ host: '127.0.0.1', port, username: 'root', privateKeyPath: keyPath, knownHostsPath: path });
+async function runWith(text: string): Promise<string> {
+  writeFileSync(knownHosts, text);
+  const ssh = new SshClient({ host: '127.0.0.1', port, username: 'root', privateKeyPath: keyPath });
   try {
     return (await ssh.exec('echo ok', 10)).stdout;
   } finally {
@@ -76,9 +81,8 @@ describe('SSH known_hosts verification (real handshake)', () => {
   });
 
   it('refuses to start without an entry for the host and port', () => {
-    const path = join(dir, 'known_hosts_other_port');
-    writeFileSync(path, entry('127.0.0.1', hostEd25519.public));
-    expect(() => new SshClient({ host: '127.0.0.1', port, username: 'root', privateKeyPath: keyPath, knownHostsPath: path }))
+    writeFileSync(knownHosts, entry('127.0.0.1', hostEd25519.public));
+    expect(() => new SshClient({ host: '127.0.0.1', port, username: 'root', privateKeyPath: keyPath }))
       .toThrow(`No usable SSH host key for [127.0.0.1]:${port}`);
   });
 });

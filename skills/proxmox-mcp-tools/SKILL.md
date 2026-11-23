@@ -64,9 +64,7 @@ PROXMOX_SSH_PORT=22             # SSH port (default: 22)
 PROXMOX_SSH_USER=root           # SSH username (default: root)
 PROXMOX_SSH_KEY_PATH=~/.ssh/id_rsa # Path to SSH private key (required when SSH enabled)
 PROXMOX_SSH_NODE=pve1           # Proxmox node name (required when SSH enabled)
-PROXMOX_SSH_HOST_KEY_FINGERPRINT=SHA256:... # Pinned host key (checked first)
-PROXMOX_SSH_KNOWN_HOSTS=~/.ssh/known_hosts  # known_hosts file (default: ~/.ssh/known_hosts)
-PROXMOX_SSH_ALLOW_INSECURE=false            # true skips host key checks (test networks only)
+# Host key is checked against ~/.ssh/known_hosts (connect once with ssh first)
 ```
 
 ### Permission Model

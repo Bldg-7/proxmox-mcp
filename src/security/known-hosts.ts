@@ -1,7 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { readFileSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
-import { isAbsolute, join } from 'node:path';
+import { join } from 'node:path';
 
 /** OpenSSH known_hosts files are small; refuse to parse something that is clearly not one. */
 const MAX_KNOWN_HOSTS_BYTES = 4 * 1024 * 1024;
@@ -28,15 +28,17 @@ export interface KnownHostKeys {
   algorithms: string[];
 }
 
-export function defaultKnownHostsPath(): string {
-  return join(homedir(), '.ssh', 'known_hosts');
+export interface HostTrust {
+  /** The known_hosts file the keys came from. */
+  path: string;
+  /** Host key algorithms to offer to the server. */
+  algorithms: string[];
+  verify: (key: Buffer) => boolean;
 }
 
-/** Expand a leading "~/" (MCP client configs do not run a shell) and require an absolute path. */
-export function expandKnownHostsPath(path: string): string {
-  const expanded = path.startsWith('~/') ? join(homedir(), path.slice(2)) : path;
-  if (!isAbsolute(expanded)) throw new Error('PROXMOX_SSH_KNOWN_HOSTS must be an absolute path or start with ~/');
-  return expanded;
+function howToAddHost(host: string, port: number): string {
+  return `Connect once with OpenSSH as the user that runs this server (ssh -p ${port} <user>@${host}) ` +
+    'and accept the key only after it matches the fingerprint shown on the node console.';
 }
 
 /** The name OpenSSH records for a host: "host" on port 22, "[host]:port" otherwise. */
@@ -110,21 +112,37 @@ export function parseKnownHosts(text: string, host: string, port: number): Known
   return { trusted, revoked, algorithms };
 }
 
-/** Load host keys for host:port. Throws when the file is unreadable or holds no usable key for the host. */
-export function loadKnownHostKeys(path: string, host: string, port: number): KnownHostKeys {
-  if (statSync(path).size > MAX_KNOWN_HOSTS_BYTES) throw new Error(`known_hosts file is too large: ${path}`);
-  const keys = parseKnownHosts(readFileSync(path, 'utf8'), host, port);
-  if (keys.trusted.length === 0) {
-    throw new Error(
-      `No usable SSH host key for ${knownHostsName(host, port)} in ${path}. ` +
-      `Connect once with OpenSSH (ssh -p ${port} <user>@${host}) and accept the key only after it matches ` +
-      'the fingerprint shown on the node console. ed25519, ECDSA and RSA keys are supported; @cert-authority entries are not.'
-    );
-  }
-  return keys;
-}
-
 export function matchesKnownHostKey(key: Buffer, keys: KnownHostKeys): boolean {
   if (keys.revoked.some(revoked => revoked.equals(key))) return false;
   return keys.trusted.some(trusted => trusted.equals(key));
+}
+
+/**
+ * Trust the host key that ~/.ssh/known_hosts of the service user records for host:port,
+ * the same file the OpenSSH client uses. There is no setting to skip or replace this check.
+ * The file is read on every call, so call it again before each new connection.
+ */
+export function loadHostTrust(host: string, port: number): HostTrust {
+  const path = join(homedir(), '.ssh', 'known_hosts');
+  let text: string;
+  try {
+    if (statSync(path).size > MAX_KNOWN_HOSTS_BYTES) throw new Error(`known_hosts file is too large: ${path}`);
+    text = readFileSync(path, 'utf8');
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      throw new Error(`SSH host key verification needs ${path}, but it does not exist. ${howToAddHost(host, port)}`);
+    }
+    if ((error as NodeJS.ErrnoException).code !== undefined) {
+      throw new Error(`Cannot read ${path}: ${(error as Error).message}`);
+    }
+    throw error;
+  }
+  const keys = parseKnownHosts(text, host, port);
+  if (keys.trusted.length === 0) {
+    throw new Error(
+      `No usable SSH host key for ${knownHostsName(host, port)} in ${path}. ${howToAddHost(host, port)} ` +
+      'ed25519, ECDSA and RSA keys are supported; @cert-authority entries are not.'
+    );
+  }
+  return { path, algorithms: keys.algorithms, verify: key => matchesKnownHostKey(key, keys) };
 }

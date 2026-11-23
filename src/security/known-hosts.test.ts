@@ -4,10 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { utils } from 'ssh2';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import {
-  expandKnownHostsPath, knownHostsName, loadKnownHostKeys, matchesKnownHostKey, parseKnownHosts,
-} from './known-hosts.js';
-import { resolveHostTrust } from './ssh-host-key.js';
+import { knownHostsName, loadHostTrust, matchesKnownHostKey, parseKnownHosts } from './known-hosts.js';
 
 function makeKey(type: 'ed25519' | 'rsa' | 'ecdsa'): { line: string; blob: Buffer } {
   const pair = type === 'ed25519' ? utils.generateKeyPairSync('ed25519')
@@ -25,17 +22,21 @@ const rsa = makeKey('rsa');
 const ecdsa = makeKey('ecdsa');
 const other = makeKey('ed25519');
 
-let dir: string | undefined;
+let home: string | undefined;
 afterEach(() => {
   vi.unstubAllEnvs();
-  if (dir) rmSync(dir, { recursive: true, force: true });
-  dir = undefined;
+  if (home) rmSync(home, { recursive: true, force: true });
+  home = undefined;
 });
-function writeKnownHosts(text: string): string {
-  dir = mkdtempSync(join(tmpdir(), 'known-hosts-'));
-  const path = join(dir, 'known_hosts');
-  writeFileSync(path, text);
-  return path;
+/** Point HOME at a fresh directory; write ~/.ssh/known_hosts when text is given. */
+function useHome(text?: string): string {
+  home = mkdtempSync(join(tmpdir(), 'known-hosts-home-'));
+  vi.stubEnv('HOME', home);
+  if (text !== undefined) {
+    mkdirSync(join(home, '.ssh'));
+    writeFileSync(join(home, '.ssh', 'known_hosts'), text);
+  }
+  return home;
 }
 
 describe('known_hosts host matching', () => {
@@ -102,45 +103,25 @@ describe('known_hosts keys', () => {
       .toEqual(['ssh-ed25519', 'ecdsa-sha2-nistp256', 'rsa-sha2-512', 'rsa-sha2-256', 'ssh-rsa']);
   });
 
-  it('explains how to add a missing host', () => {
-    const path = writeKnownHosts(`other.example ${ed.line}\n@cert-authority pve.example ${rsa.line}\n`);
-    expect(() => loadKnownHostKeys(path, 'pve.example', 22)).toThrow(/No usable SSH host key for pve\.example in .*known_hosts/);
-  });
 });
 
-describe('host trust resolution', () => {
-  it('prefers a fingerprint over every known_hosts file', () => {
-    const fingerprint = 'a'.repeat(64);
-    expect(resolveHostTrust({ host: 'h', port: 22, hostKeyFingerprint: fingerprint, knownHostsPath: '/nonexistent' }).mode)
-      .toBe('fingerprint');
+describe('loading ~/.ssh/known_hosts', () => {
+  it('trusts the keys recorded for the host', () => {
+    const dir = useHome(`h ${ed.line}\nh ${rsa.line}\n`);
+    const trust = loadHostTrust('h', 22);
+    expect(trust.path).toBe(join(dir, '.ssh', 'known_hosts'));
+    expect(trust.algorithms).toEqual(['ssh-ed25519', 'rsa-sha2-512', 'rsa-sha2-256', 'ssh-rsa']);
+    expect(trust.verify(ed.blob)).toBe(true);
+    expect(trust.verify(other.blob)).toBe(false);
   });
 
-  it('checks an explicit known_hosts file even in insecure mode', () => {
-    const path = writeKnownHosts(`other ${ed.line}\n`);
-    expect(() => resolveHostTrust({ host: 'h', port: 22, knownHostsPath: path, allowInsecure: true }))
-      .toThrow('No usable SSH host key');
-    expect(() => resolveHostTrust({ host: 'h', port: 22, knownHostsPath: join(dir!, 'missing'), allowInsecure: true }))
-      .toThrow('Cannot read SSH known_hosts file');
+  it('explains how to add the host when the file is missing', () => {
+    useHome();
+    expect(() => loadHostTrust('pve.example', 22)).toThrow(/known_hosts, but it does not exist.*ssh -p 22 <user>@pve\.example/s);
   });
 
-  it('uses ~/.ssh/known_hosts unless insecure mode is explicit', () => {
-    const home = mkdtempSync(join(tmpdir(), 'known-hosts-home-'));
-    dir = home;
-    vi.stubEnv('HOME', home);
-    expect(() => resolveHostTrust({ host: 'h', port: 22 })).toThrow(/needs a trust source.*PROXMOX_SSH_KNOWN_HOSTS/s);
-    expect(resolveHostTrust({ host: 'h', port: 22, allowInsecure: true }).mode).toBe('insecure');
-
-    mkdirSync(join(home, '.ssh'));
-    writeFileSync(join(home, '.ssh', 'known_hosts'), `h ${ed.line}\n`);
-    expect(resolveHostTrust({ host: 'h', port: 22 }))
-      .toMatchObject({ mode: 'known_hosts', path: join(home, '.ssh', 'known_hosts'), algorithms: ['ssh-ed25519'] });
-    // An explicit insecure opt-in skips the default file.
-    expect(resolveHostTrust({ host: 'h', port: 22, allowInsecure: true }).mode).toBe('insecure');
-  });
-
-  it('expands ~/ and rejects relative paths', () => {
-    vi.stubEnv('HOME', '/home/mcp');
-    expect(expandKnownHostsPath('~/.ssh/pve_known_hosts')).toBe('/home/mcp/.ssh/pve_known_hosts');
-    expect(() => expandKnownHostsPath('known_hosts')).toThrow('absolute path');
+  it('explains how to add the host when it has no usable entry', () => {
+    useHome(`other.example ${ed.line}\n@cert-authority pve.example ${rsa.line}\n`);
+    expect(() => loadHostTrust('pve.example', 22)).toThrow(/No usable SSH host key for pve\.example in .*known_hosts/);
   });
 });

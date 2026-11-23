@@ -2,7 +2,7 @@ import { Client } from 'ssh2';
 import type { ConnectConfig, ClientChannel, ServerHostKeyAlgorithm } from 'ssh2';
 import { readFileSync } from 'node:fs';
 import { logger } from '../utils/index.js';
-import { resolveHostTrust, type HostTrust } from '../security/ssh-host-key.js';
+import { loadHostTrust, type HostTrust } from '../security/known-hosts.js';
 
 /** Maximum output size per stream (stdout/stderr) in bytes */
 const MAX_OUTPUT_BYTES = 65_536;
@@ -14,11 +14,6 @@ export interface SshConfig {
   port: number;
   username: string;
   privateKeyPath: string;
-  /** OpenSSH SHA256:<base64> or SHA-256 hex. Takes precedence over every other trust source. */
-  hostKeyFingerprint?: string;
-  /** known_hosts file to check. Without it, ~/.ssh/known_hosts is used unless allowInsecure is true. */
-  knownHostsPath?: string;
-  allowInsecure?: boolean;
 }
 
 export interface ExecResult {
@@ -32,12 +27,11 @@ export class SshClient {
   private connectPromise: Promise<Client> | null = null;
   private idleTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly config: SshConfig;
-  private readonly trust: HostTrust;
 
   constructor(config: SshConfig) {
     this.config = { ...config };
-    // Resolve now so a missing trust source fails before any network connection.
-    this.trust = resolveHostTrust(this.config);
+    // Load now so a missing known_hosts entry fails before any network connection.
+    loadHostTrust(this.config.host, this.config.port);
   }
 
   async exec(command: string, timeoutSeconds = 30): Promise<ExecResult> {
@@ -108,25 +102,20 @@ export class SshClient {
       // Re-read known_hosts for each new connection so edits apply without a restart.
       let trust: HostTrust;
       try {
-        trust = this.trust.mode === 'known_hosts' ? resolveHostTrust(this.config) : this.trust;
+        trust = loadHostTrust(this.config.host, this.config.port);
       } catch (error) {
         reject(error);
         return;
       }
 
-      if (trust.mode === 'insecure') {
-        logger.warn('SSH host key verification is disabled by PROXMOX_SSH_ALLOW_INSECURE=true');
-      } else {
-        const source = trust.mode === 'fingerprint' ? 'PROXMOX_SSH_HOST_KEY_FINGERPRINT' : trust.path;
-        // Without hostHash, ssh2 passes the raw public key Buffer (not a hash string).
-        connectConfig.hostVerifier = (key: Buffer): boolean => {
-          const matches = trust.verify(key);
-          if (!matches) logger.error({ host: this.config.host, source }, 'SSH host key does not match the trusted key');
-          return matches;
-        };
-        // Offer only key types known_hosts has, so the server cannot pick a type we cannot verify.
-        if (trust.mode === 'known_hosts') connectConfig.algorithms = { serverHostKey: trust.algorithms as ServerHostKeyAlgorithm[] };
-      }
+      // Without hostHash, ssh2 passes the raw public key Buffer (not a hash string).
+      connectConfig.hostVerifier = (key: Buffer): boolean => {
+        const matches = trust.verify(key);
+        if (!matches) logger.error({ host: this.config.host, file: trust.path }, 'SSH host key does not match known_hosts');
+        return matches;
+      };
+      // Offer only key types known_hosts has, so the server cannot pick a type we cannot verify.
+      connectConfig.algorithms = { serverHostKey: trust.algorithms as ServerHostKeyAlgorithm[] };
 
       conn
         .on('ready', () => {
@@ -269,10 +258,9 @@ let sshClientInstance: SshClient | null = null;
 let sshClientConfigKey: string | null = null;
 
 export function getSshClient(config: SshConfig): SshClient {
-  const key = JSON.stringify([config.host, config.port, config.username, config.privateKeyPath,
-    config.hostKeyFingerprint ?? null, config.knownHostsPath ?? null, config.allowInsecure === true]);
+  const key = JSON.stringify([config.host, config.port, config.username, config.privateKeyPath]);
   if (sshClientInstance && key !== sshClientConfigKey) {
-    throw new Error('SSH configuration changed; close the existing SSH client before changing host identity or trust policy.');
+    throw new Error('SSH configuration changed; close the existing SSH client before changing the host or credentials.');
   }
   if (!sshClientInstance) {
     sshClientInstance = new SshClient(config);

@@ -13,7 +13,6 @@ export function createTestConfig(overrides: Partial<Config> = {}): Config {
     allowElevated: false,
     sslMode: 'insecure',
     sshEnabled: false,
-    sshAllowInsecure: false,
     sshPort: 22,
     sshUser: 'root',
     allowUnsafeCommands: false,

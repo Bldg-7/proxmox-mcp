@@ -982,7 +982,7 @@ SSH를 통해 Proxmox 호스트에 접속하여 `pct exec`로 LXC 컨테이너 �
 - 명령은 셸 이스케이프 후 `/usr/sbin/pct exec {vmid} -- /bin/sh -c '{command}'`로 실행
 - 노드명은 설정된 `PROXMOX_SSH_NODE`과 일치해야 함
 - 출력 64KB 제한
-- 연결 전 호스트 키 검증: `PROXMOX_SSH_HOST_KEY_FINGERPRINT`, `PROXMOX_SSH_KNOWN_HOSTS`, 또는 `~/.ssh/known_hosts` (README 참고)
+- 연결 전 서버 사용자의 `~/.ssh/known_hosts`로 호스트 키 확인
 
 **필수 환경 변수**:
 ```bash
