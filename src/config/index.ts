@@ -34,6 +34,15 @@ export function loadConfig(): Config {
     sshNode: process.env.PROXMOX_SSH_NODE || undefined,
     sshHostKeyFingerprint: process.env.PROXMOX_SSH_HOST_KEY_FINGERPRINT || undefined,
     sshAllowInsecure: process.env.PROXMOX_SSH_ALLOW_INSECURE === 'true',
+    fileTransfer: process.env.PROXMOX_FILE_TRANSFER_ENABLED === 'true' ? {
+      transferRoot: process.env.PROXMOX_TRANSFER_ROOT,
+      journalRoot: process.env.PROXMOX_TRANSFER_JOURNAL_ROOT,
+      uploadRoot: process.env.PROXMOX_UPLOAD_ROOT,
+      uploadMaxBytes: process.env.PROXMOX_UPLOAD_MAX_BYTES,
+      downloadMaxBytes: process.env.PROXMOX_DOWNLOAD_MAX_BYTES,
+      quotaBytes: process.env.PROXMOX_TRANSFER_QUOTA_BYTES,
+      timeoutSeconds: process.env.PROXMOX_TRANSFER_TIMEOUT_SECONDS,
+    } : undefined,
     allowUnsafeCommands: process.env.PROXMOX_ALLOW_UNSAFE_COMMANDS === 'true',
   };
 

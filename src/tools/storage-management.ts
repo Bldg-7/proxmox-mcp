@@ -3,6 +3,8 @@ import type { Config } from '../config/index.js';
 import type { ToolResponse } from '../types/index.js';
 import { formatToolResponse, formatErrorResponse } from '../formatters/index.js';
 import { requireElevated } from '../middleware/index.js';
+import type { TransferJobs } from '../transfers/job-service.js';
+import { requireTransfers } from './file-transfer.js';
 import { formatRestoreListing } from '../formatters/restore-list.js';
 import { validateNodeName, validateStorageName } from '../validators/index.js';
 import {
@@ -273,12 +275,14 @@ export async function deleteStorage(
 export async function uploadToStorage(
   _client: ProxmoxApiClient,
   config: Config,
-  _input: UploadToStorageInput
+  input: UploadToStorageInput,
+  jobs?: TransferJobs,
 ): Promise<ToolResponse> {
   try {
-    requireElevated(config, 'upload to storage');
-
-    throw new Error('Local file transfers are not enabled in this version.');
+    const service = requireTransfers(config, jobs);
+    if (!config.fileTransfer?.uploadRoot) throw new Error('Upload requires PROXMOX_UPLOAD_ROOT');
+    return formatToolResponse(JSON.stringify(service.start({kind:'upload', node:input.node, storage:input.storage,
+      filename:input.filename, content:input.content, requestId:input.request_id, expectedSha256:input.expected_sha256})));
   } catch (error) {
     return formatErrorResponse(error as Error, 'Upload to Storage');
   }
@@ -443,11 +447,13 @@ export async function listFileRestore(
 export async function downloadFileRestore(
   _client: ProxmoxApiClient,
   config: Config,
-  _input: DownloadFileRestoreInput
+  input: DownloadFileRestoreInput,
+  jobs?: TransferJobs,
 ): Promise<ToolResponse> {
   try {
-    requireElevated(config, 'download files from a PBS backup');
-    throw new Error('Local file transfers are not enabled in this version.');
+    const service = requireTransfers(config, jobs);
+    return formatToolResponse(JSON.stringify(service.start({kind:'download', node:input.node, storage:input.storage,
+      volume:input.volume, filepath:input.filepath, requestId:input.request_id, tar:input.archive === 'tar.zst', expectedSha256:input.expected_sha256})));
   } catch (error) {
     return formatErrorResponse(error as Error, 'Download File Restore');
   }
@@ -526,7 +532,8 @@ export async function handleStorageConfigTool(
 export async function handleStorageContentTool(
   client: ProxmoxApiClient,
   config: Config,
-  input: StorageContentToolInput
+  input: StorageContentToolInput,
+  jobs?: TransferJobs,
 ): Promise<ToolResponse> {
   switch (input.action) {
     case 'list':
@@ -536,7 +543,7 @@ export async function handleStorageContentTool(
       return listTemplates(client, config, input);
     }
     case 'upload':
-      return uploadToStorage(client, config, input);
+      return uploadToStorage(client, config, input, jobs);
     case 'download_url':
       return downloadUrlToStorage(client, config, input);
     case 'delete':
@@ -572,14 +579,15 @@ export async function handlePoolTool(
 export async function handleFileRestore(
   client: ProxmoxApiClient,
   config: Config,
-  input: FileRestoreInput
+  input: FileRestoreInput,
+  jobs?: TransferJobs,
 ): Promise<ToolResponse> {
   const validated = fileRestoreSchema.parse(input);
   switch (validated.action) {
     case 'list':
       return listFileRestore(client, config, validated);
     case 'download':
-      return downloadFileRestore(client, config, validated);
+      return downloadFileRestore(client, config, validated, jobs);
     default:
       return formatErrorResponse(
         new Error(`Unknown action: ${(validated as { action: string }).action}`),

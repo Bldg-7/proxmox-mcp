@@ -11,6 +11,7 @@ import type { Config } from './config/index.js';
 import type { ToolName } from './types/tools.js';
 import { toolRegistry } from './tools/registry.js';
 import { TOOL_METADATA } from './tools/metadata.js';
+import type { TransferJobs } from './transfers/job-service.js';
 import { TOOL_NAMES } from './types/tools.js';
 import { sanitizeDiagnostic, MAX_ERROR_CHARS } from './security/diagnostics.js';
 
@@ -167,8 +168,9 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
 
   // Storage Management (consolidated)
   proxmox_storage_config: 'Manage storage configurations (list, get, create, update, delete, cluster_usage)',
-  proxmox_storage_content: 'Manage storage content (list, list_templates, download_url, delete, prune); local upload is not enabled',
-  proxmox_file_restore: 'Browse PBS backups (elevated). action=list: use filepath=/ for root or the opaque filepath from a listing. Local download is not enabled.',
+  proxmox_storage_content: 'Manage storage content (list, list_templates, download_url, delete, prune); upload starts an opt-in elevated local ISO/template transfer (filename, content, request_id required)',
+  proxmox_file_transfer: 'Get status or cancel an opt-in local file transfer by local id (not PVE UPID). Requires elevated permissions.',
+  proxmox_file_restore: 'Browse PBS backups (elevated). action=list: use filepath=/ for root or the opaque filepath from a listing. action=download starts an opt-in transfer (volume, filepath, request_id required).',
 
   // Ceph Integration (consolidated)
   proxmox_ceph: 'Query Ceph cluster. action=status: get Ceph cluster health, FSID, monitors, OSDs, and placement groups',
@@ -257,7 +259,7 @@ const TOOL_DESCRIPTIONS: Record<ToolName, string> = {
   proxmox_lxc_exec: 'Execute a command inside an LXC container via SSH + pct exec (requires elevated + PROXMOX_SSH_ENABLED=true)',
 };
 
-export function createServer(client: ProxmoxApiClient, config: Config): Server {
+export function createServer(client: ProxmoxApiClient, config: Config, jobs?: TransferJobs): Server {
   const server = new Server(
     {
       name: 'proxmox-mcp',
@@ -326,7 +328,7 @@ export function createServer(client: ProxmoxApiClient, config: Config): Server {
 
     try {
       const validated = entry.schema.parse(args ?? {});
-      const result = await entry.handler(client, config, validated);
+      const result = await entry.handler(client, config, validated, jobs);
 
       return result.isError ? {
         ...result,

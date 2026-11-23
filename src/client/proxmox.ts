@@ -93,6 +93,8 @@ export class ProxmoxApiClient {
     this.storageTransfer = new StorageTransferClient(new URL(this.baseUrl).origin, this.dispatcher, this.authHeader);
   }
 
+  async close(): Promise<void> { await this.dispatcher.close(); }
+
   async request<T>(endpoint: string, method = 'GET', body?: unknown): Promise<T> {
     const normalizedMethod = method.toUpperCase();
     const safeEndpoint = sanitizeDiagnostic(endpoint, MAX_ERROR_CHARS, [this.tokenValue]);

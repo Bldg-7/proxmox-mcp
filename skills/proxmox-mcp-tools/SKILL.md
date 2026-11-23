@@ -1,6 +1,6 @@
 ---
 name: proxmox-mcp-tools
-description: Comprehensive MCP tool reference for Proxmox Virtual Environment management - 92 tools across 14 domains including QEMU VMs, LXC containers, cluster operations, storage, networking, Ceph, certificates, ACME, and notifications
+description: Comprehensive MCP tool reference for Proxmox Virtual Environment management - 93 tools across 14 domains including QEMU VMs, LXC containers, cluster operations, storage, networking, Ceph, certificates, ACME, and notifications
 license: MIT
 compatibility:
   - claude-code
@@ -26,7 +26,7 @@ This skill teaches AI agents how to use the **@bldg-7/proxmox-mcp** server, whic
 
 **What you'll learn**:
 - How to connect to Proxmox VE via MCP
-- 92 tools organized into 14 functional domains
+- 93 tools organized into 14 functional domains
 - Permission model (basic vs elevated operations)
 - Common workflows and patterns
 - Troubleshooting API quirks
@@ -103,7 +103,7 @@ PROXMOX_SSH_HOST_KEY_FINGERPRINT=sha256:... # Optional host key verification
 | **ACME** | 8 | ACME accounts, plugins, directories | [proxmox-acme.md](references/proxmox-acme.md) |
 | **Notifications** | 5 | Notification targets, SMTP/Gotify testing | [proxmox-notifications.md](references/proxmox-notifications.md) |
 
-**Total**: 92 tools
+**Total**: 93 tools
 
 ---
 
@@ -172,8 +172,9 @@ PROXMOX_SSH_HOST_KEY_FINGERPRINT=sha256:... # Optional host key verification
 ```
 1. proxmox_storage_config → Available storage
 2. proxmox_storage_content → Browse content
-3. proxmox_storage_content → Upload ISO/template
-4. proxmox_storage_content → Clean old backups
+3. proxmox_storage_content → Start opt-in ISO/template upload with a request UUID
+4. proxmox_file_transfer → Check local status; use node task get for the resulting upload UPID
+5. proxmox_storage_content → Clean old backups
 ```
 
 **More workflows**: See [proxmox-workflows.md](references/proxmox-workflows.md)

@@ -79,9 +79,9 @@
 
 #### `proxmox_file_restore`
 
-**Description:** Download a file from backup
+**Description:** `action=download` starts a PBS file transfer to the MCP server. Poll `proxmox_file_transfer` with the returned local ID.
 
-**Permission:** basic
+**Permission:** elevated + operator file transfer opt-in
 
 **Parameters:**
 
@@ -90,7 +90,10 @@
 | `node` | string | Yes | Node name |
 | `storage` | string | Yes | Storage identifier |
 | `volume` | string | Yes | Backup volume identifier |
-| `filepath` | string | Yes | File path inside backup |
+| `filepath` | string | Yes | Opaque base64 ID from a PBS listing |
+| `request_id` | UUID | Yes | Reuse for retries of this request |
+| `archive` | enum | No | Directory format: zip (default) or tar.zst |
+| `expected_sha256` | string | No | Expected digest of received bytes |
 
 ---
 
@@ -236,9 +239,9 @@
 
 #### `proxmox_file_restore`
 
-**Description:** List files in a backup for restore
+**Description:** `action=list` browses a PBS snapshot; local transfer opt-in not required
 
-**Permission:** basic
+**Permission:** elevated
 
 **Parameters:**
 
@@ -246,8 +249,8 @@
 |------|------|----------|-------------|
 | `node` | string | Yes | Node name |
 | `storage` | string | Yes | Storage identifier |
-| `volume` | string | Yes | Backup volume identifier |
-| `path` | unknown | No | - |
+| `volume` | string | Yes | PBS snapshot identifier |
+| `filepath` | string | No | `/` for root, otherwise pass the opaque ID unchanged |
 
 ---
 
@@ -344,7 +347,7 @@
 
 #### `proxmox_storage_content`
 
-**Description:** Upload ISO/template to storage (requires elevated permissions)
+**Description:** `action=upload` starts a local ISO/template transfer (requires elevated permissions and operator opt-in)
 
 **Permission:** elevated
 
@@ -354,10 +357,14 @@
 |------|------|----------|-------------|
 | `node` | string | Yes | Node name |
 | `storage` | string | Yes | Storage identifier |
-| `content` | enum | Yes | Upload content type |
-| `filename` | string | Yes | Filename to upload |
-| `checksum` | unknown | No | - |
-| `checksum-algorithm` | unknown | No | - |
+| `content` | enum | Yes | iso or vztmpl |
+| `filename` | string | Yes | Approved basename under the configured upload root |
+| `request_id` | UUID | Yes | Client-generated ID; reuse for retries |
+| `expected_sha256` | string | No | Expected SHA-256 of the upload snapshot |
+
+#### `proxmox_file_transfer`
+
+Elevated + operator opt-in. Call with `action=status` or `action=cancel` and `id` (local UUID, **not** UPID). For `submitted` uploads check the returned UPID with `proxmox_node_task get`. `received` downloads return artifact metadata, never file bytes. Do not automatically retry `remote_outcome_unknown` with a new request ID.
 
 ---
 

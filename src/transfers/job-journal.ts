@@ -39,11 +39,18 @@ export class JobJournal {
   }
 
   /** A restart must reconcile against the original artifact directory, not a new mount/path. */
-  bindManagedRoot(identity: string): void {
+  bindManagedRoot(identity: string, serverIdentity?: string): void {
     this.db.exec('CREATE TABLE IF NOT EXISTS binding (name TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT');
     this.db.prepare('INSERT OR IGNORE INTO binding VALUES (?,?)').run('managedRoot',identity);
     if (this.db.prepare('SELECT value FROM binding WHERE name=?').get('managedRoot')?.value !== identity) {
       throw new Error('Transfer journal belongs to a different managed directory');
+    }
+    if (serverIdentity !== undefined) {
+      const stored = this.db.prepare("SELECT value FROM binding WHERE name='server'").get();
+      if (stored ? stored.value !== serverIdentity : this.db.prepare('SELECT 1 FROM jobs LIMIT 1').get()) {
+        throw new Error('Transfer journal belongs to a different or unknown PVE identity');
+      }
+      if (!stored) this.db.prepare("INSERT INTO binding VALUES ('server',?)").run(serverIdentity);
     }
   }
   close(): void { this.db.close(); }

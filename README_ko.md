@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 92개 도구를 제공하는 MCP 서버입니다.
+Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 93개 도구를 제공하는 MCP 서버입니다.
 
 ## 참고 프로젝트 & 개선사항
 
@@ -30,13 +30,13 @@ Proxmox VE의 QEMU 가상머신과 LXC 컨테이너를 관리하는 92개 도구
 
 **개발자 경험**:
 - `npx @bldg-7/proxmox-mcp`로 바로 실행
-- MCP `ListTools`를 통해 92개 도구 설명 자동 노출
+- MCP `ListTools`를 통해 93개 도구 설명 자동 노출
 - Rate Limiter 미들웨어 내장
 - `console.log` 대신 Pino 구조화 로깅
 
 ## 주요 기능
 
-- **92개 관리 도구** - Proxmox 전 영역 커버
+- **93개 관리 도구** - Proxmox 전 영역 커버
 - **완전한 TypeScript 구현** - 엄격한 타입 안전성
 - **QEMU VM + LXC 컨테이너** 동시 지원
 - **보안 인증** - API 토큰
@@ -79,6 +79,21 @@ npx @bldg-7/proxmox-mcp
 | `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | SSH 활성화 시 (명시적 insecure 모드 제외) | 패딩 없는 OpenSSH `SHA256:<base64>` 또는 64자리 SHA-256 hex | - |
 | `PROXMOX_SSH_ALLOW_INSECURE` | 아니오 | SSH 호스트 키 검증 생략을 명시적으로 허용 (테스트 네트워크 전용) | `false` |
 | `PROXMOX_LOG_LEVEL` | 아니오 | 로그 레벨 (`trace`, `debug`, `info`, `warn`, `error`, `fatal`) | `info` |
+
+### 로컬 파일 전송 (기본 비활성)
+
+`PROXMOX_FILE_TRANSFER_ENABLED=true`와 `PROXMOX_ALLOW_ELEVATED=true`가 **모두** 필요합니다. Linux/macOS의 신뢰된 로컬 파일시스템에 서비스 계정 소유의 전용 디렉터리(0700)를 미리 준비하세요. 서로 겹치지 않는 절대 경로를 지정하며 심볼릭 링크는 허용하지 않습니다.
+
+| 환경 변수 | 용도 / 기본값 |
+|---|---|
+| `PROXMOX_UPLOAD_ROOT` | 승인된 입력 폴더. 생략하면 다운로드만 가능합니다. |
+| `PROXMOX_TRANSFER_ROOT` | 임시 파일과 복원 결과를 저장할 폴더 (필수) |
+| `PROXMOX_TRANSFER_JOURNAL_ROOT` | SQLite 작업 기록용 별도 폴더 (필수). MCP 인스턴스·PVE 인증 주체마다 분리합니다. |
+| `PROXMOX_UPLOAD_MAX_BYTES` / `PROXMOX_DOWNLOAD_MAX_BYTES` | 파일당 한도, 각각 기본 2 GiB |
+| `PROXMOX_TRANSFER_QUOTA_BYTES` | 임시 파일과 저장 결과의 합계 한도, 기본 4 GiB |
+| `PROXMOX_TRANSFER_TIMEOUT_SECONDS` | 작업 전체 제한 시간, 기본 1800초 |
+
+서버 시작 시 폴더 검증에 실패하면 시작을 거부합니다. 파일은 요청자의 PC가 아닌 **MCP 서버**에 있습니다. [전송 도구 사용 예시](docs/TOOLS_ko.md#proxmox_file_transfer)를 참고하세요. PBS 목록 조회에는 elevated 권한만 필요하며, `download_url`은 PVE가 URL을 가져오는 별개 기능입니다.
 
 ### SSH 신뢰 설정 및 진단 출력
 
@@ -143,7 +158,7 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 ## 도구 목록
 
-이 서버는 Proxmox 관리를 위한 **92개의 종합 도구**를 제공합니다:
+이 서버는 Proxmox 관리를 위한 **93개의 종합 도구**를 제공합니다:
 
 | 카테고리 | 도구 수 | 권한 |
 |----------|---------|------|
@@ -154,7 +169,7 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 | 클러스터 운영 | 5 | 혼합 |
 | 클러스터 방화벽 | 6 | 혼합 |
 | 고가용성 | 2 | 혼합 |
-| 스토리지 | 3 | 혼합 |
+| 스토리지 | 4 | 혼합 |
 | SDN 네트워킹 | 4 | 혼합 |
 | 접근 제어 | 7 | 혼합 |
 | Ceph | 6 | 혼합 |
@@ -167,7 +182,7 @@ macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 | 인증서 | 1 | 혼합 |
 | ACME | 3 | 혼합 |
 | 알림 | 1 | 혼합 |
-| **합계** | **92** | |
+| **합계** | **93** | |
 
 📖 **[전체 도구 레퍼런스 →](docs/TOOLS_ko.md)**
 

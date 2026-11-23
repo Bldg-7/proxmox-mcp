@@ -15,8 +15,9 @@ const sha = (s: string): string => createHash('sha256').update(s).digest('hex');
 const upid = 'UPID:lab:0123:0001:abcd:imgcopy::root@pam!test:';
 const download = (): JobInput => ({kind:'download',requestId:randomUUID(),node:'lab',storage:'pbs',filepath:'/+8=',volume:'backup/vm/100/t'});
 const upload = (): JobInput => ({kind:'upload',requestId:randomUUID(),node:'lab',storage:'local',filename:'test.iso',content:'iso'});
-function mockTransport(): Pick<StorageTransferClient,'upload'|'download'> {
+function mockTransport(): Pick<StorageTransferClient,'upload'|'download'|'assertUploadAvailable'> {
   return {
+    assertUploadAvailable:vi.fn(async () => undefined),
     upload:vi.fn(async snap => { for await (const _ of snap.bytes) void _; return upid; }),
     download:vi.fn(async function* (): AsyncGenerator<Buffer> { yield Buffer.from('abc'); }),
   };

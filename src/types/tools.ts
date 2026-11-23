@@ -46,6 +46,7 @@ export const TOOL_NAMES = [
   'proxmox_storage_config',
   'proxmox_storage_content',
   'proxmox_file_restore',
+  'proxmox_file_transfer',
   'proxmox_ceph',
   'proxmox_ceph_osd',
   'proxmox_ceph_mon',

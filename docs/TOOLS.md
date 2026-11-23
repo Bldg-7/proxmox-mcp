@@ -1,9 +1,9 @@
 # Proxmox MCP Tools Reference
 
-> Complete reference for all 92 consolidated tools in the Proxmox MCP server
+> Complete reference for all 93 consolidated tools in the Proxmox MCP server
 
 **Current Version**: 0.6.1  
-**Total Tools**: 92  
+**Total Tools**: 93
 **Last Updated**: 2026-02-12
 
 ---
@@ -16,7 +16,7 @@
   - [Node & Cluster (13 tools)](#node--cluster-13-tools)
   - [Guest Management (20 tools)](#guest-management-20-tools)
   - [Guest Agent (7 tools)](#guest-agent-7-tools)
-  - [Storage & Ceph (9 tools)](#storage--ceph-9-tools)
+  - [Storage & Ceph (10 tools)](#storage--ceph-10-tools)
   - [Cluster Services (12 tools)](#cluster-services-12-tools)
   - [SDN Networking (4 tools)](#sdn-networking-4-tools)
   - [Access Control (6 tools)](#access-control-6-tools)
@@ -33,7 +33,7 @@
 
 ## Overview
 
-This document provides a complete reference for all 92 consolidated tools available in the Proxmox MCP server. Each tool uses an `action`, `type`, or `operation` parameter to multiplex related operations into a single tool, reducing tool count while maintaining full API coverage.
+This document provides a complete reference for all 93 consolidated tools available in the Proxmox MCP server. Each tool uses an `action`, `type`, or `operation` parameter to multiplex related operations into a single tool, reducing tool count while maintaining full API coverage.
 
 ### Tool Distribution
 
@@ -42,7 +42,7 @@ This document provides a complete reference for all 92 consolidated tools availa
 | Node & Cluster | 13 | Mixed |
 | Guest Management | 20 | Mixed |
 | Guest Agent | 7 | Elevated |
-| Storage & Ceph | 9 | Mixed |
+| Storage & Ceph | 10 | Mixed |
 | Cluster Services | 12 | Mixed |
 | SDN Networking | 4 | Mixed |
 | Access Control | 6 | Mixed |
@@ -54,7 +54,7 @@ This document provides a complete reference for all 92 consolidated tools availa
 | Cloud-Init, Certificates & ACME | 5 | Mixed |
 | LXC Exec | 1 | Elevated |
 | Notifications | 1 | Mixed |
-| **Total** | **92** | |
+| **Total** | **93** | |
 
 ---
 
@@ -440,7 +440,7 @@ Manage guest users via QEMU agent. operation=set_password (requires elevated per
 
 ---
 
-### Storage & Ceph (9 tools)
+### Storage & Ceph (10 tools)
 
 #### `proxmox_storage_config`
 Manage storage configurations (list, get, create, update, delete, cluster_usage)
@@ -465,7 +465,7 @@ Manage storage content (list, list_templates, upload, download_url, delete, prun
 |--------|------------|-------------|
 | `list` | Basic | List storage content |
 | `list_templates` | Basic | List available templates |
-| `upload` | Elevated 🔒 | Local file upload is not enabled; no file is read or sent |
+| `upload` | Elevated 🔒 | Opt-in: start an ISO/template upload from an approved basename; requires `request_id` |
 | `download_url` | Elevated 🔒 | Download from URL to storage |
 | `delete` | Elevated 🔒 | Delete storage content |
 | `prune` | Elevated 🔒 | Prune old backups |
@@ -473,14 +473,34 @@ Manage storage content (list, list_templates, upload, download_url, delete, prun
 ---
 
 #### `proxmox_file_restore`
-Browse the contents of PBS snapshots. Local downloads are not yet available.
+Browse PBS snapshots and optionally restore an entry to the MCP server.
 
 | Action | Permission | Description |
 |--------|------------|-------------|
 | `list` | Elevated 🔒 | Browse a PBS snapshot; omit `filepath` for root, then pass a returned base64 `filepath` unchanged (not its display `text`) |
-| `download` | Elevated 🔒 | Local file download is not enabled; nothing is fetched or written |
+| `download` | Elevated 🔒 | Opt-in: start a local download using the listed `filepath`, `volume`, and a `request_id` |
 
 The MCP server requires elevated access for this sensitive listing, independently of PVE volume ACLs. `path` is a deprecated alias for `filepath`; do not pass both. A listing over 1 MiB is rejected; output is limited to 100 complete entries and 16,000 characters, not server-side pagination.
+
+---
+
+#### `proxmox_file_transfer`
+
+Elevated + [local transfer opt-in](../README.md#local-file-transfers-off-by-default) required for **start, status and cancel**. Examples (one call per line):
+
+```jsonc
+// proxmox_storage_content
+{"action":"upload","request_id":"6fe1df80-6ce9-4fa6-a426-539da8047784","node":"pve1","storage":"local","content":"iso","filename":"installer.iso"}
+// proxmox_file_restore (use the actual filepath returned by list)
+{"action":"download","request_id":"51e285ff-99da-4a97-9afa-b72a105fc589","node":"pve1","storage":"pbs","volume":"pbs:backup/vm/100/<timestamp>","filepath":"<opaque base64>","archive":"zip"}
+// proxmox_file_transfer
+{"action":"status","id":"<local UUID returned by start>"}
+{"action":"cancel","id":"<local UUID returned by start>"}
+```
+
+Start returns immediately. Generate a new `request_id` UUID per distinct request; reuse it for retries, including if the reply was lost. One active transfer per server, no implicit queue/retry. Upload supports `iso`/`vztmpl` only, a generated remote filename, and an existence check (not atomic remote no-overwrite). Use optional `expected_sha256` on either action; legacy upload `checksum`/`checksum-algorithm` fields are rejected. Downloaded directories default to zip; `archive:"tar.zst"` selects tar.zst.
+
+The text result contains job JSON. `submitted` means PVE accepted an upload: use **`upid`** with `proxmox_node_task get` to check final success. `received` returns `artifact.filename` relative to the transfer root, size, SHA-256 and verification level (no file bytes). Without an expected digest this is receipt, not proof of source integrity. Cancellation stops local work, not a remote worker. `remote_outcome_unknown` means reconcile against PVE before any new request. Keep the journal on restart: it preserves idempotency and does not replay interrupted transfers. At 1,000 records new requests are refused; archive journals only offline and remember that a new journal has no prior request history.
 
 ---
 

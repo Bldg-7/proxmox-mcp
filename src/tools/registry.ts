@@ -178,6 +178,7 @@ import {
   storageConfigToolSchema,
   storageContentToolSchema,
   fileRestoreSchema,
+  transferControlSchema,
 } from '../schemas/storage-management.js';
 import {
   cephToolSchema,
@@ -228,11 +229,15 @@ import { acmeAccountSchema, acmeInfoSchema } from '../schemas/acme.js';
 import { notificationSchema } from '../schemas/notifications.js';
 import { lxcExecSchema } from '../schemas/lxc-exec.js';
 
+import { handleFileTransfer } from './file-transfer.js';
+import type { TransferJobs } from '../transfers/job-service.js';
+
 // Tool handler type - accepts any input type for flexibility
 export type ToolHandler = (
   client: ProxmoxApiClient,
   config: Config,
-  input: any
+  input: any,
+  jobs?: TransferJobs,
 ) => Promise<ToolResponse>;
 
 // Registry entry type
@@ -322,6 +327,7 @@ export const toolRegistry: Record<ToolName, ToolRegistryEntry> = {
   proxmox_storage_config: { handler: handleStorageConfigTool, schema: storageConfigToolSchema },
   proxmox_storage_content: { handler: handleStorageContentTool, schema: storageContentToolSchema },
   proxmox_file_restore: { handler: handleFileRestore, schema: fileRestoreSchema },
+  proxmox_file_transfer: { handler: handleFileTransfer, schema: transferControlSchema },
 
   // Ceph Integration (consolidated)
   proxmox_ceph: { handler: handleCephTool, schema: cephToolSchema },

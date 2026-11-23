@@ -149,10 +149,8 @@ describe('uploadToStorage', () => {
     const config = createTestConfig({ allowElevated: false });
 
     const result = await uploadToStorage(client, config, {
-      node: 'pve1',
-      storage: 'local',
-      content: 'iso',
-      filename: 'ubuntu.iso',
+      request_id: '7cf49d08-8647-439b-88ec-16b154c5a3e1',
+      node: 'pve1', storage: 'local', content: 'iso', filename: 'ubuntu.iso',
     });
 
     expect(result.isError).toBe(true);
@@ -162,6 +160,7 @@ describe('uploadToStorage', () => {
     const config = createTestConfig({ allowElevated: true });
     const upload = vi.spyOn(client.storageTransfer, 'upload');
     const result = await uploadToStorage(client, config, {
+      request_id: '9f4e8485-e3a6-4b8d-8d56-943731aa45d1',
       node: 'pve1',
       storage: 'local',
       content: 'iso',
@@ -309,6 +308,7 @@ describe('downloadFileRestore', () => {
     const download = vi.spyOn(client.storageTransfer, 'download');
 
     const result = await downloadFileRestore(client, config, {
+      request_id: '7cf49d08-8647-439b-88ec-16b154c5a3e1',
       node: 'pve1',
       storage: 'backup-nfs',
       volume: 'backup-nfs:backup/vzdump-qemu-100-2024_01_01-12_00_00.vma.zst',

@@ -104,7 +104,10 @@ export const TOOL_METADATA: Record<ToolName, ToolMetadata> = {
   // Storage Management
   proxmox_storage_config: { title: 'Storage Configuration', annotations: writes(true, true) },
   proxmox_storage_content: { title: 'Storage Content', annotations: writes(true, false, true) },
-  proxmox_file_restore: { title: 'Backup File Restore', annotations: READ_ONLY },
+  // download writes a new file on the MCP host; request_id makes retries return the same job.
+  proxmox_file_restore: { title: 'Backup File Restore', annotations: writes(false, true) },
+  // cancel aborts a running transfer and removes its partial local files.
+  proxmox_file_transfer: { title: 'Local File Transfers', annotations: writes(true, true) },
 
   // Ceph
   proxmox_ceph: { title: 'Ceph Status', annotations: READ_ONLY },

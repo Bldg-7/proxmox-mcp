@@ -173,11 +173,8 @@ describe('Storage consolidated tools', () => {
       const config = createTestConfig({ allowElevated: false });
 
       const result = await handleStorageContentTool(client, config, {
-        action: 'upload',
-        node: 'pve1',
-        storage: 'local',
-        content: 'iso',
-        filename: 'test.iso',
+        action: 'upload', request_id: '7cf49d08-8647-439b-88ec-16b154c5a3e1',
+        node: 'pve1', storage: 'local', content: 'iso', filename: 'test.iso',
       });
 
       expect(result.isError).toBe(true);
@@ -189,7 +186,7 @@ describe('Storage consolidated tools', () => {
       client.request.mockResolvedValue('UPID:pve1:123');
 
       const result = await handleStorageContentTool(client, config, {
-        action: 'upload',
+        action: 'upload', request_id: '7cf49d08-8647-439b-88ec-16b154c5a3e1',
         node: 'pve1',
         storage: 'local',
         content: 'iso',

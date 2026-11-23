@@ -8,7 +8,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-A comprehensive MCP server providing 92 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
+A comprehensive MCP server providing 93 tools for managing Proxmox Virtual Environment, including QEMU VMs and LXC containers.
 
 ## Credits & Background
 
@@ -30,13 +30,13 @@ This project is a TypeScript rewrite of [mcp-proxmox-server](https://github.com/
 
 **Developer Experience**:
 - `npx @bldg-7/proxmox-mcp` just works
-- All 92 tool descriptions exposed via MCP `ListTools`
+- All 93 tool descriptions exposed via MCP `ListTools`
 - Rate limiter middleware included
 - Pino structured logging instead of `console.log`
 
 ## Features
 
-- **92 comprehensive tools** for Proxmox management
+- **93 comprehensive tools** for Proxmox management
 - **Full TypeScript implementation** with strict type safety
 - **Support for both QEMU VMs and LXC containers**
 - **Secure authentication** (API token)
@@ -81,6 +81,21 @@ Set the following environment variables before starting the server:
 | `PROXMOX_SSH_HOST_KEY_FINGERPRINT` | When SSH enabled (unless explicitly insecure) | OpenSSH `SHA256:<base64>` without padding, or 64-digit SHA-256 hex | - |
 | `PROXMOX_SSH_ALLOW_INSECURE` | No | Explicitly allow SSH without host-key verification (test networks only) | `false` |
 | `PROXMOX_LOG_LEVEL` | No | Log verbosity (`trace`, `debug`, `info`, `warn`, `error`, `fatal`) | `info` |
+
+### Local file transfers (off by default)
+
+To opt in, set **both** `PROXMOX_FILE_TRANSFER_ENABLED=true` and `PROXMOX_ALLOW_ELEVATED=true`. Prepare distinct, non-overlapping, service-user-owned `0700` directories on a trusted Linux/macOS local filesystem. Use canonical absolute paths without symlinks:
+
+| Environment variable | Purpose / default |
+|---|---|
+| `PROXMOX_UPLOAD_ROOT` | Optional approved input directory. Without it only downloads are available. |
+| `PROXMOX_TRANSFER_ROOT` | Required private directory for staging and restored artifacts. |
+| `PROXMOX_TRANSFER_JOURNAL_ROOT` | Required separate directory for the SQLite job journal; dedicate it to one server and PVE identity. |
+| `PROXMOX_UPLOAD_MAX_BYTES` / `PROXMOX_DOWNLOAD_MAX_BYTES` | Per-file limits, each 2 GiB by default. |
+| `PROXMOX_TRANSFER_QUOTA_BYTES` | Managed staging + artifact quota; default 4 GiB. |
+| `PROXMOX_TRANSFER_TIMEOUT_SECONDS` | Overall deadline per transfer; default 1800 seconds. |
+
+Roots are checked on startup; invalid settings prevent startup. Files are local to the MCP **server**, not the requesting user's machine. See [transfer actions and examples](docs/TOOLS.md#proxmox_file_transfer). PBS browsing requires elevated access but not file transfer opt-in. `download_url` is a different operation: PVE fetches a URL, not a local file.
 
 ### SSH trust and diagnostic output
 
@@ -146,7 +161,7 @@ Add to your Claude Desktop configuration (`~/Library/Application Support/Claude/
 
 ## Available Tools
 
-This server provides **92 comprehensive tools** for Proxmox management:
+This server provides **93 comprehensive tools** for Proxmox management:
 
 | Category | Tools | Permission |
 |----------|-------|------------|
@@ -157,7 +172,7 @@ This server provides **92 comprehensive tools** for Proxmox management:
 | Cluster Operations | 5 | Mixed |
 | Cluster Firewall | 6 | Mixed |
 | High Availability | 2 | Mixed |
-| Storage | 3 | Mixed |
+| Storage | 4 | Mixed |
 | SDN Networking | 4 | Mixed |
 | Access Control | 7 | Mixed |
 | Ceph | 6 | Mixed |
@@ -170,7 +185,7 @@ This server provides **92 comprehensive tools** for Proxmox management:
 | Certificates | 1 | Mixed |
 | ACME | 3 | Mixed |
 | Notifications | 1 | Mixed |
-| **Total** | **92** | |
+| **Total** | **93** | |
 
 📖 **[Full Tools Reference →](docs/TOOLS.md)**
 
@@ -182,7 +197,7 @@ This package includes **Agent Skills** - AI-optimized documentation that teaches
 
 | Skill | Description | Tools/Topics |
 |-------|-------------|--------------|
-| **proxmox-mcp-tools** | Complete MCP tool reference for Proxmox VE | 92 tools across 14 domains (VMs, LXC, cluster, storage, networking, Ceph, certificates, ACME, notifications) |
+| **proxmox-mcp-tools** | Complete MCP tool reference for Proxmox VE | 93 tools across 14 domains (VMs, LXC, cluster, storage, networking, Ceph, certificates, ACME, notifications) |
 | **proxmox-admin** | Operational expertise for Proxmox infrastructure | VM lifecycle, storage management, HA configuration, troubleshooting |
 
 ### Installation
@@ -250,7 +265,7 @@ Agent combines tool knowledge + operational expertise:
 ### Skill Contents
 
 **proxmox-mcp-tools** — Tool Reference:
-- 92 tools organized into 14 domains (VMs, LXC, cluster, storage, networking, Ceph, access control, pools, certificates, ACME, notifications)
+- 93 tools organized into 14 domains (VMs, LXC, cluster, storage, networking, Ceph, access control, pools, certificates, ACME, notifications)
 - Parameters, types, and descriptions for every tool
 - Permission levels (basic vs elevated 🔒)
 - Common workflow patterns (create VM, backup/restore, clone, migrate)

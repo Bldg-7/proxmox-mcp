@@ -2,8 +2,8 @@
 
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { loadConfig } from './config/index.js';
-import { ProxmoxApiClient } from './client/proxmox.js';
-import { createServer } from './server.js';
+import { createServerRuntime } from './runtime.js';
+import { closeSshClient } from './client/ssh.js';
 import { TOOL_NAMES } from './types/tools.js';
 import { logger } from './utils/index.js';
 
@@ -19,17 +19,22 @@ export async function main(): Promise<void> {
     const config = loadConfig();
     logger.info('Configuration loaded successfully');
 
-    // Create Proxmox API client
-    const client = new ProxmoxApiClient(config);
-    logger.info('Proxmox API client initialized');
-
-    // Create MCP server with all tools registered
-    const server = createServer(client, config);
+    const runtime = await createServerRuntime(config);
+    const shutdown = (): void => {
+      void runtime.close().catch(error => {
+        logger.error({error}, 'Error closing server');
+        process.exitCode = 1;
+      }).finally(closeSshClient);
+    };
+    process.once('SIGINT', shutdown);
+    process.once('SIGTERM', shutdown);
+    process.stdin.once('end', shutdown);
     logger.info(`MCP server created with ${TOOL_NAMES.length} tools registered`);
 
     // Create stdio transport and connect server
     const transport = new StdioServerTransport();
-    await server.connect(transport);
+    try { await runtime.server.connect(transport); }
+    catch (error) { await runtime.close(); throw error; }
     logger.info('MCP server started on stdio transport');
   } catch (error) {
     logger.error({ error }, 'Fatal error during startup');

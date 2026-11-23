@@ -15,8 +15,8 @@ const inputSchema = z.discriminatedUnion('kind', [
 ]);
 export type JobInput = z.input<typeof inputSchema>;
 type Input = z.output<typeof inputSchema>;
-type Transport = Pick<StorageTransferClient, 'upload' | 'download'>;
-type Policy = LocalFilePolicy & {journalRoot: string; timeoutMs?: number};
+type Transport = Pick<StorageTransferClient, 'upload' | 'download' | 'assertUploadAvailable'>;
+type Policy = LocalFilePolicy & {journalRoot: string; timeoutMs?: number; serverIdentity?: string};
 interface Active { id: string; controller: AbortController; done: Promise<void> }
 
 function view(record: JobRecord): JobStatus {
@@ -47,7 +47,7 @@ export class TransferJobs {
     }
     const journal = await JobJournal.open(root.path);
     try {
-      journal.bindManagedRoot(managed.identity);
+      journal.bindManagedRoot(managed.identity, policy.serverIdentity);
       const service = new TransferJobs(journal, files, transport, timeout, policy.downloadMaxBytes ?? 2 * 1024 ** 3);
       await service.recover();
       return service;
@@ -108,7 +108,9 @@ export class TransferJobs {
       if (input.kind === 'upload') {
         await this.files.withSnapshot(input.filename, signal, async snapshot => {
           signal.throwIfAborted();
-          // Durable BEFORE the first possible network side effect. After this point loss of
+          await this.transport.assertUploadAvailable({node:input.node,storage:input.storage},input.content,job.remoteFilename!,signal);
+          signal.throwIfAborted();
+          // Durable BEFORE the first possible remote write. After this point loss of
           // an acknowledgement must never be reported as a definite failure or auto-retried.
           this.save(job, {state:'transferring', size:snapshot.size, sha256:snapshot.sha256});
           const upid = await this.transport.upload({ ...snapshot, node:input.node, storage:input.storage,

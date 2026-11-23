@@ -198,6 +198,7 @@ export const toolPermissions: ToolPermissions = {
     update: 'elevated',
     delete: 'elevated',
   },
+  proxmox_file_transfer: { status: 'elevated', cancel: 'elevated' },
   proxmox_file_restore: {
     list: 'elevated',
     download: 'elevated',

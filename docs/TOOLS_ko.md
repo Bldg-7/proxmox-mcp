@@ -1,9 +1,9 @@
 # Proxmox MCP 도구 레퍼런스
 
-> Proxmox MCP 서버의 92개 통합 도구에 대한 완전한 레퍼런스
+> Proxmox MCP 서버의 93개 통합 도구에 대한 완전한 레퍼런스
 
 **현재 버전**: 0.6.1  
-**총 도구 수**: 92  
+**총 도구 수**: 93
 **최종 업데이트**: 2026-02-12
 
 ---
@@ -16,7 +16,7 @@
   - [노드 & 클러스터 (13개)](#노드--클러스터-13개)
   - [게스트 관리 (20개)](#게스트-관리-20개)
   - [게스트 에이전트 (7개)](#게스트-에이전트-7개)
-  - [스토리지 & Ceph (9개)](#스토리지--ceph-9개)
+  - [스토리지 & Ceph (10개)](#스토리지--ceph-10개)
   - [클러스터 서비스 (12개)](#클러스터-서비스-12개)
   - [SDN 네트워킹 (4개)](#sdn-네트워킹-4개)
   - [접근 제어 (6개)](#접근-제어-6개)
@@ -33,7 +33,7 @@
 
 ## 개요
 
-이 문서는 Proxmox MCP 서버에서 사용 가능한 92개 통합 도구에 대한 완전한 레퍼런스를 제공합니다. 각 도구는 `action`, `type` 또는 `operation` 매개변수를 사용하여 관련 작업을 하나의 도구로 통합하여, 전체 API 커버리지를 유지하면서 도구 수를 줄였습니다.
+이 문서는 Proxmox MCP 서버에서 사용 가능한 93개 통합 도구에 대한 완전한 레퍼런스를 제공합니다. 각 도구는 `action`, `type` 또는 `operation` 매개변수를 사용하여 관련 작업을 하나의 도구로 통합하여, 전체 API 커버리지를 유지하면서 도구 수를 줄였습니다.
 
 ### 도구 분포
 
@@ -42,7 +42,7 @@
 | 노드 & 클러스터 | 13 | 혼합 |
 | 게스트 관리 | 20 | 혼합 |
 | 게스트 에이전트 | 7 | 관리자 |
-| 스토리지 & Ceph | 9 | 혼합 |
+| 스토리지 & Ceph | 10 | 혼합 |
 | 클러스터 서비스 | 12 | 혼합 |
 | SDN 네트워킹 | 4 | 혼합 |
 | 접근 제어 | 6 | 혼합 |
@@ -54,7 +54,7 @@
 | Cloud-Init, 인증서 & ACME | 5 | 혼합 |
 | LXC 실행 | 1 | 관리자 |
 | 알림 | 1 | 혼합 |
-| **합계** | **92** | |
+| **합계** | **93** | |
 
 ---
 
@@ -440,7 +440,7 @@ QEMU 에이전트를 통해 게스트 사용자를 관리합니다. operation=se
 
 ---
 
-### 스토리지 & Ceph (9개)
+### 스토리지 & Ceph (10개)
 
 #### `proxmox_storage_config`
 스토리지 설정을 관리합니다 (list, get, create, update, delete, cluster_usage)
@@ -465,7 +465,7 @@ QEMU 에이전트를 통해 게스트 사용자를 관리합니다. operation=se
 |--------|------|------|
 | `list` | 기본 | 스토리지 콘텐츠 목록 |
 | `list_templates` | 기본 | 사용 가능한 템플릿 목록 |
-| `upload` | 관리자 🔒 | 로컬 업로드 미활성: 파일을 읽거나 전송하지 않음 |
+| `upload` | 관리자 🔒 | 운영자 설정 시 승인된 파일명과 `request_id`로 ISO/template 업로드 시작 |
 | `download_url` | 관리자 🔒 | URL에서 스토리지로 다운로드 |
 | `delete` | 관리자 🔒 | 스토리지 콘텐츠 삭제 |
 | `prune` | 관리자 🔒 | 오래된 백업 정리 |
@@ -473,14 +473,34 @@ QEMU 에이전트를 통해 게스트 사용자를 관리합니다. operation=se
 ---
 
 #### `proxmox_file_restore`
-PBS 스냅샷 내부를 조회합니다. 로컬 파일 다운로드는 아직 사용할 수 없습니다.
+PBS 스냅샷 내부를 조회하고, 설정에 따라 MCP 서버로 파일을 복원합니다.
 
 | Action | 권한 | 설명 |
 |--------|------|------|
 | `list` | 관리자 🔒 | PBS 스냅샷 탐색. 루트는 `filepath` 생략, 하위 목록은 표시 이름 `text`가 아닌 응답의 base64 `filepath`를 그대로 사용 |
-| `download` | 관리자 🔒 | 로컬 다운로드 미활성: 파일을 가져오거나 저장하지 않음 |
+| `download` | 관리자 🔒 | 운영자 설정 시 `volume`, 목록에서 받은 `filepath`, `request_id`로 다운로드 시작 |
 
 민감한 목록 조회이므로 PVE 볼륨 ACL과 별도로 MCP 관리자 권한을 요구합니다. `path`는 `filepath`의 폐기 예정 별칭이며 동시에 지정할 수 없습니다. 1 MiB 초과 응답은 거부하고 출력은 완전한 항목 100개·16,000자로 제한합니다. 서버 페이지네이션은 아닙니다.
+
+---
+
+#### `proxmox_file_transfer`
+
+전송 시작·상태·취소 모두 관리자 권한과 [로컬 전송 활성화](../README_ko.md#로컬-파일-전송-기본-비활성)가 필요합니다. 호출 예시:
+
+```jsonc
+// proxmox_storage_content
+{"action":"upload","request_id":"6fe1df80-6ce9-4fa6-a426-539da8047784","node":"pve1","storage":"local","content":"iso","filename":"installer.iso"}
+// proxmox_file_restore (filepath는 실제 목록에서 복사)
+{"action":"download","request_id":"51e285ff-99da-4a97-9afa-b72a105fc589","node":"pve1","storage":"pbs","volume":"pbs:backup/vm/100/<timestamp>","filepath":"<opaque base64>","archive":"zip"}
+// proxmox_file_transfer
+{"action":"status","id":"<시작 응답의 로컬 UUID>"}
+{"action":"cancel","id":"<시작 응답의 로컬 UUID>"}
+```
+
+시작 호출은 즉시 반환됩니다. 요청마다 새 UUID `request_id`를 만들고 응답 유실 등으로 재시도할 때는 **같은 값**을 사용하세요. 서버당 동시에 한 건만 전송하며 자동 대기·재시도하지 않습니다. 업로드는 `iso`/`vztmpl`만 지원하고 원격 파일명을 생성해 충돌을 사전 조회합니다(원격의 원자적 덮어쓰기 방지는 아님). 양쪽 모두 선택적 `expected_sha256`을 받으며 예전 업로드 `checksum`/`checksum-algorithm`은 거부합니다. 디렉터리 다운로드는 기본 zip이며 `archive:"tar.zst"`도 가능합니다.
+
+응답 텍스트는 작업 JSON입니다. `submitted`는 PVE 작업 접수이므로 **`upid`**로 `proxmox_node_task get`을 조회해야 합니다. `received`는 저장 폴더 기준 `artifact.filename`, 크기, digest, 검증 수준을 반환하며 파일 바이트는 반환하지 않습니다. 기대 digest가 없으면 수신 완료이지 원본 무결성 보장이 아닙니다. 취소는 로컬 작업만 중지합니다. `remote_outcome_unknown`이면 새 요청 전 PVE에서 결과를 확인하세요. 재시작 시 저널을 보존해야 중복을 방지하며 전송을 자동 재개하지 않습니다. 기록 1,000개에 도달하면 새 요청을 거부합니다. 오프라인에서만 기록을 보관·정리하고 새 저널은 과거 요청을 기억하지 못한다는 점에 유의하세요.
 
 ---
 

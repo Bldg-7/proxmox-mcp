@@ -36,6 +36,17 @@ describe('storage wire contract (loopback only)', () => {
     expect(auth).toBe('PVEAPIToken=test');
   });
 
+  it('checks the generated volume ID against the storage content listing', async () => {
+    let path = '';
+    const client = await serve((req,res) => {
+      path = req.url!; res.writeHead(200,{'content-type':'application/json'});
+      res.end(JSON.stringify({data:[{volid:'pbs:iso/existing.iso'}]}));
+    });
+    await client.assertUploadAvailable(target,'iso','new.iso',AbortSignal.timeout(5000));
+    await expect(client.assertUploadAvailable(target,'iso','existing.iso',AbortSignal.timeout(5000))).rejects.toThrow('already exists');
+    expect(path).toBe('/api2/json/nodes/lab/storage/pbs/content?content=iso');
+  });
+
   it('emits a known-length multipart POST, ordered fields and exact file bytes', async () => {
     const data = Buffer.from([0, 255, 13, 10, 42]);
     const sha256 = createHash('sha256').update(data).digest('hex');

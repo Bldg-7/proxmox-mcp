@@ -57,10 +57,23 @@ export const configSchema = z.object({
     try { parseHostFingerprint(value); return true; } catch { return false; }
   }, 'Expected OpenSSH SHA256:<base64> or 64-digit SHA-256 hex').optional(),
   sshAllowInsecure: z.boolean().default(false),
+  // Absent unless the operator explicitly enables local file transfers.
+  fileTransfer: z.object({
+    transferRoot: z.string().min(1),
+    journalRoot: z.string().min(1),
+    uploadRoot: z.string().min(1).optional(),
+    uploadMaxBytes: z.coerce.number().int().positive().safe().optional(),
+    downloadMaxBytes: z.coerce.number().int().positive().safe().optional(),
+    quotaBytes: z.coerce.number().int().positive().safe().optional(),
+    timeoutSeconds: z.coerce.number().int().positive().max(2147483).optional(),
+  }).optional(),
   allowUnsafeCommands: z
     .boolean()
     .default(false),
 }).superRefine((config, ctx) => {
+  if (config.fileTransfer && !config.allowElevated) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['fileTransfer'], message: 'File transfers require PROXMOX_ALLOW_ELEVATED=true' });
+  }
   if (config.sshEnabled && !config.sshHostKeyFingerprint && !config.sshAllowInsecure) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['sshHostKeyFingerprint'], message: 'PROXMOX_SSH_HOST_KEY_FINGERPRINT is required when SSH is enabled unless PROXMOX_SSH_ALLOW_INSECURE=true' });
   }

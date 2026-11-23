@@ -97,18 +97,22 @@ export const deleteStorageSchema = z.object({
 
 export type DeleteStorageInput = z.input<typeof deleteStorageSchema>;
 
+const requestId = z.string().uuid().describe('Client-generated UUID; reuse for retries of the same request');
+const expectedSha256 = z.string().regex(/^[0-9a-fA-F]{64}$/).optional().describe('Expected SHA-256 hex digest');
+export const transferControlSchema = z.object({
+  action: z.enum(['status', 'cancel']),
+  id: z.string().uuid().describe('Local transfer ID returned by start (not a PVE UPID)'),
+}).strict();
+
 // proxmox_upload_to_storage - Upload file to storage
 export const uploadToStorageSchema = z.object({
   node: z.string().min(1).describe('Node name'),
   storage: z.string().min(1).describe('Storage identifier'),
-  content: z.enum(['iso', 'vztmpl', 'backup']).describe('Upload content type'),
-  filename: z.string().min(1).describe('Filename to upload'),
-  checksum: z.string().optional().describe('Checksum value'),
-  ['checksum-algorithm']: z
-    .enum(['md5', 'sha1', 'sha256', 'sha512'])
-    .optional()
-    .describe('Checksum algorithm'),
-});
+  content: z.enum(['iso', 'vztmpl']).describe('Upload content type'),
+  filename: z.string().regex(/^[A-Za-z0-9][A-Za-z0-9_.-]{0,213}$/).describe('Approved local basename; remote filename is generated'),
+  request_id: requestId,
+  expected_sha256: expectedSha256,
+}).strict();
 
 export type UploadToStorageInput = z.input<typeof uploadToStorageSchema>;
 
@@ -170,9 +174,12 @@ export type ListFileRestoreInput = z.input<typeof listFileRestoreSchema>;
 export const downloadFileRestoreSchema = z.object({
   node: z.string().min(1).describe('Node name'),
   storage: z.string().min(1).describe('Storage identifier'),
-  volume: z.string().min(1).describe('Backup volume identifier'),
-  filepath: z.string().min(1).describe('File path inside backup'),
-});
+  volume: z.string().min(1).max(1024).describe('PBS snapshot volume ID or name'),
+  filepath: restoreEntryId.describe('Opaque filepath from the PBS listing'),
+  request_id: requestId,
+  archive: z.enum(['zip', 'tar.zst']).optional().describe('Directory archive format (default zip)'),
+  expected_sha256: expectedSha256,
+}).strict();
 
 export type DownloadFileRestoreInput = z.input<typeof downloadFileRestoreSchema>;
 
@@ -293,18 +300,7 @@ export const storageContentToolSchema = z.discriminatedUnion('action', [
     node: z.string().min(1).describe('Node name'),
     storage: z.string().min(1).describe('Storage identifier'),
   }),
-  z.object({
-    action: z.literal('upload'),
-    node: z.string().min(1).describe('Node name'),
-    storage: z.string().min(1).describe('Storage identifier'),
-    content: z.enum(['iso', 'vztmpl', 'backup']).describe('Upload content type'),
-    filename: z.string().min(1).describe('Filename to upload'),
-    checksum: z.string().optional().describe('Checksum value'),
-    ['checksum-algorithm']: z
-      .enum(['md5', 'sha1', 'sha256', 'sha512'])
-      .optional()
-      .describe('Checksum algorithm'),
-  }),
+  uploadToStorageSchema.extend({ action: z.literal('upload') }),
   z.object({
     action: z.literal('download_url'),
     node: z.string().min(1).describe('Node name'),

@@ -70,6 +70,17 @@ export class StorageTransferClient {
     return readEnvelope(await this.send(restorePath(target, 'list'), { method: 'GET', signal: AbortSignal.timeout(30_000) }), 1024 * 1024);
   }
 
+  /** Best effort only: PVE has no atomic create-if-absent upload endpoint. */
+  async assertUploadAvailable(target: Target, content: 'iso' | 'vztmpl', filename: string, signal: AbortSignal): Promise<void> {
+    const response = await this.send(`${storagePath(target)}/content?${new URLSearchParams({content})}`, {method:'GET', signal});
+    const entries = await readEnvelope(response, 1024 * 1024);
+    if (!Array.isArray(entries)) throw new Error('Invalid storage content listing');
+    for (const item of entries) {
+      if (!item || typeof item.volid !== 'string') throw new Error('Invalid storage content entry');
+      if (item.volid === `${target.storage}:${content}/${filename}`) throw new Error('Generated upload filename already exists');
+    }
+  }
+
   async upload(snapshot: Snapshot, signal: AbortSignal): Promise<string> {
     const path = `${storagePath(snapshot)}/upload`;
     if (!Number.isSafeInteger(snapshot.size) || snapshot.size <= 0 || !/^[a-f0-9]{64}$/.test(snapshot.sha256) ||
